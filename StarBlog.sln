@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileParseTest", "demo\FileP
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarBlog.Web", "StarBlog.Web\StarBlog.Web.csproj", "{CF6E1009-49D8-43DC-8947-8E0FB9F3E510}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarBlog.Data", "StarBlog.Data\StarBlog.Data.csproj", "{80AA4639-279B-4F48-8EE3-83EE8E30F156}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,5 +25,9 @@ Global
 		{CF6E1009-49D8-43DC-8947-8E0FB9F3E510}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CF6E1009-49D8-43DC-8947-8E0FB9F3E510}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CF6E1009-49D8-43DC-8947-8E0FB9F3E510}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80AA4639-279B-4F48-8EE3-83EE8E30F156}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80AA4639-279B-4F48-8EE3-83EE8E30F156}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80AA4639-279B-4F48-8EE3-83EE8E30F156}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80AA4639-279B-4F48-8EE3-83EE8E30F156}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
