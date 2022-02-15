@@ -1,0 +1,27 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "demo", "demo", "{68E4117F-1EC3-4B1D-B413-888607595781}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileParseTest", "demo\FileParseTest\FileParseTest.csproj", "{0512E31F-954B-4E53-B3AF-F2EF206FAE33}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarBlog.Web", "StarBlog.Web\StarBlog.Web.csproj", "{CF6E1009-49D8-43DC-8947-8E0FB9F3E510}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0512E31F-954B-4E53-B3AF-F2EF206FAE33} = {68E4117F-1EC3-4B1D-B413-888607595781}
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0512E31F-954B-4E53-B3AF-F2EF206FAE33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0512E31F-954B-4E53-B3AF-F2EF206FAE33}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0512E31F-954B-4E53-B3AF-F2EF206FAE33}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0512E31F-954B-4E53-B3AF-F2EF206FAE33}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF6E1009-49D8-43DC-8947-8E0FB9F3E510}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF6E1009-49D8-43DC-8947-8E0FB9F3E510}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF6E1009-49D8-43DC-8947-8E0FB9F3E510}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF6E1009-49D8-43DC-8947-8E0FB9F3E510}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,25 @@
+#footer {
+    /*background: #23282D;*/
+    padding: 40px 0 30px;
+    margin-top: 40px;
+}
+
+#footer p {
+    color: rgba(255, 255, 255, .4);
+    letter-spacing: 1px;
+    font-size: 14px;
+    text-transform: uppercase;
+}
+
+#footer a {
+    color: rgba(255, 255, 255, .8);
+}
+
+#footer i {
+    font-size: 30px;
+    margin: 5px;
+}
+
+#footer-content {
+    margin: 0 auto;
+}

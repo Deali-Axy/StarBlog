@@ -1,0 +1,51 @@
+body {
+    background: #efefef;
+}
+
+.post-container {
+    padding: 0 15px 18px;
+    margin: 0 0 30px 0;
+    /*border: #DEDFDE solid 1px;*/
+}
+
+.navbar {
+    width: 100%;
+}
+
+.navbar input {
+    outline: none !important;
+    background: #efefef;
+}
+
+.navbar button {
+    background: #efefef;
+    border: #b2b2b2 solid 1px;
+    color: #b2b2b2;
+}
+
+.navbar .nav-item {
+    font-size: 1.5em;
+}
+
+
+.post-header {
+    margin: 0 0 35px 0;
+}
+
+.post-title {
+    color: #333;
+}
+
+.post-meta {
+    margin: 10px -5px;
+    color: #777;
+}
+
+.post-meta span{
+    margin: 0 5px;
+}
+
+.post-content {
+    margin: 0 0 20px 0;
+    color: #1a1a1a;
+}
