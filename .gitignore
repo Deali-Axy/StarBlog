@@ -1,5 +1,7 @@
 StarBlog.Web/wwwroot/lib/
-
+app.db
+app.db-shm
+app.db-wal
 
 bin/
 obj/

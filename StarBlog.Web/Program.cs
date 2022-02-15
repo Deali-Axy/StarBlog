@@ -1,7 +1,10 @@
+using StarBlog.Data.Extensions;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddFreeSql(builder.Configuration);
 
 var app = builder.Build();
 
