@@ -8,6 +8,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarBlog.Web", "StarBlog.We
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarBlog.Data", "StarBlog.Data\StarBlog.Data.csproj", "{80AA4639-279B-4F48-8EE3-83EE8E30F156}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarBlog.Migrate", "StarBlog.Migrate\StarBlog.Migrate.csproj", "{E14A9022-4B40-458F-B508-38F09442A241}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{D71DA310-839F-4195-B8F9-E91E817401C0}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,5 +36,9 @@ Global
 		{80AA4639-279B-4F48-8EE3-83EE8E30F156}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{80AA4639-279B-4F48-8EE3-83EE8E30F156}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{80AA4639-279B-4F48-8EE3-83EE8E30F156}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E14A9022-4B40-458F-B508-38F09442A241}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E14A9022-4B40-458F-B508-38F09442A241}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E14A9022-4B40-458F-B508-38F09442A241}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E14A9022-4B40-458F-B508-38F09442A241}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
