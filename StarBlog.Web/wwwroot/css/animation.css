@@ -1,0 +1,77 @@
+@keyframes tile-flip {
+    from {
+        transform: rotateY(0);
+    }
+
+    50% {
+        transform: rotateY(180deg);
+    }
+
+    to {
+        transform: rotateY(0);
+    }
+}
+
+@keyframes tile-flip2 {
+    from {
+        transform: rotateY(180deg);
+    }
+
+    50% {
+        transform: rotateY(360deg);
+    }
+
+    to {
+        transform: rotateY(180deg);
+    }
+}
+
+@keyframes tile-bg-dark {
+    from {
+        filter: brightness(100%);
+    }
+
+    to {
+        filter: brightness(50%);
+    }
+}
+
+@keyframes tile-bg-light {
+    from {
+        filter: brightness(50%);
+    }
+
+    to {
+        filter: brightness(100%);
+    }
+}
+
+@keyframes tile-content-show {
+    from {
+        filter: opacity(0);
+    }
+
+    to {
+        filter: opacity(100%);
+    }
+}
+
+@keyframes tile-content-hide {
+    from {
+        filter: opacity(100%);
+    }
+
+    to {
+        filter: opacity(0);
+    }
+}
+
+@keyframes go-more {
+    from {
+        transform: translate(0);
+    }
+
+    to {
+        transform: translate(30px);
+    }
+}
