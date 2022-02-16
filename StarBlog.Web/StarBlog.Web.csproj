@@ -8,12 +8,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Folder Include="Models" />
         <Folder Include="wwwroot\lib" />
-        <Folder Include="wwwroot\node_modules" />
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\StarBlog.Contrib\StarBlog.Contrib.csproj" />
       <ProjectReference Include="..\StarBlog.Data\StarBlog.Data.csproj" />
     </ItemGroup>
 
