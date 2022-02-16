@@ -1,0 +1,30 @@
+﻿@model Post
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb metro-bg-white">
+        <li class="breadcrumb-item">
+            <a href="#">Home</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="#">Library</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+            @Model.Category.Name
+        </li>
+    </ol>
+</nav>
+
+<div class="post-container">
+    <header class="post-header">
+        <div class="post-title h3 font-weight-bold">@Model.Title</div>
+        <div class="post-meta">
+            <span>2017-02-01 12:00:01</span>
+            <span>字数：@Model.Content.Length</span>
+            <span>分类：@Model.Category.Name</span>
+        </div>
+    </header>
+
+    <div class="post-content">
+        @Model.Content
+    </div>
+</div>

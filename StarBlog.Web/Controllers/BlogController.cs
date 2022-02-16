@@ -16,7 +16,15 @@ public class BlogController : Controller {
 
     public IActionResult List() {
         return View(new BlogList {
-            Posts = _postRepo.Select.ToList()
+            Posts = _postRepo.Select.Include(a => a.Category).ToList()
         });
+    }
+
+    public IActionResult Details(string id) {
+        return View(
+            _postRepo.Where(a => a.Id == id)
+                .Include(a => a.Category)
+                .First()
+        );
     }
 }
