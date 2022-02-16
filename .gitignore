@@ -2,6 +2,8 @@ StarBlog.Web/wwwroot/lib/
 app.db
 app.db-shm
 app.db-wal
+*.min.css
+*.min.js
 
 bin/
 obj/
