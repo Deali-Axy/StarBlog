@@ -2,6 +2,6 @@
 
 namespace StarBlog.Web.ViewModels; 
 
-public class BlogList {
+public class BlogListViewModel {
     public List<Post> Posts { get; set; }
 }
