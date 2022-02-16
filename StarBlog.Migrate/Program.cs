@@ -31,7 +31,10 @@ var destFile = Path.GetFullPath("../../../../StarBlog.Web/app.db");
 Console.WriteLine($"覆盖数据库：{destFile}");
 File.Copy("app.db", destFile, true);
 
+
 void WalkDirectoryTree(DirectoryInfo root) {
+    // 参考资料：https://docs.microsoft.com/zh-cn/dotnet/csharp/programming-guide/file-system/how-to-iterate-through-a-directory-tree
+
     FileInfo[] files = null;
     DirectoryInfo[] subDirs = null;
 
@@ -91,7 +94,10 @@ void WalkDirectoryTree(DirectoryInfo root) {
             Summary = content.Limit(200),
             Content = content,
             Path = postPath,
-            CategoryId = categories[^1].Id
+            CreationTime = fi.CreationTime,
+            LastUpdateTime = fi.LastWriteTime,
+            CategoryId = categories[^1].Id,
+            Categories = string.Join(",", categories.Select(a => a.Id))
         };
         postRepo.Insert(post);
     }
