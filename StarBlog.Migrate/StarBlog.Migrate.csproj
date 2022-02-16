@@ -9,6 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\StarBlog.Contrib\StarBlog.Contrib.csproj" />
       <ProjectReference Include="..\StarBlog.Data\StarBlog.Data.csproj" />
     </ItemGroup>
 
