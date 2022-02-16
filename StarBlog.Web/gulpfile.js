@@ -35,7 +35,8 @@ const libs = [
     {name: "jquery", dist: "./node_modules/jquery/dist/**/*.*"},
     {name: "popper", dist: "./node_modules/popper.js/dist/**/*.*"},
     {name: "bootstrap", dist: "./node_modules/bootstrap/dist/**/*.*"},
-    {name:"bootswatch",dist: "./node_modules/bootswatch/dist/**/*.*"}
+    {name: "bootswatch", dist: "./node_modules/bootswatch/dist/**/*.*"},
+    {name: "prismjs", dist: "./node_modules/prismjs/**/*.*"},
 ];
 
 //清除压缩后的文件
