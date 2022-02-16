@@ -7,7 +7,7 @@ using StarBlog.Migrate;
 
 var log = new System.Collections.Specialized.StringCollection();
 
-const string path = @"E:\Documents\0_Write\0_blog";
+const string path = @"E:\Documents\0_Write\0_blog\";
 
 var exclusionDirs = new List<string> {".git"};
 
@@ -55,51 +55,51 @@ void WalkDirectoryTree(DirectoryInfo root) {
         Console.WriteLine(e.Message);
     }
 
-    if (files == null) return;
+    if (files != null) {
+        foreach (var fi in files) {
+            // In this example, we only access the existing FileInfo object. If we
+            // want to open, delete or modify the file, then
+            // a try-catch block is required here to handle the case
+            // where the file has been deleted since the call to TraverseTree().
+            Console.WriteLine(fi.FullName);
+            var postPath = fi.DirectoryName!.Replace(path, "");
 
-    foreach (var fi in files) {
-        // In this example, we only access the existing FileInfo object. If we
-        // want to open, delete or modify the file, then
-        // a try-catch block is required here to handle the case
-        // where the file has been deleted since the call to TraverseTree().
-        Console.WriteLine(fi.FullName);
-        var postPath = fi.DirectoryName!.Replace(path, "");
-
-        var categoryNames = postPath.Split("\\");
-        var categories = new List<Category>();
-        if (categoryNames.Length > 0) {
-            var rootCategory = categoryRepo.Where(a => a.Name == categoryNames[0]).First()
-                               ?? categoryRepo.Insert(new Category {Name = categoryNames[0]});
-            categories.Add(rootCategory);
-            for (var i = 1; i < categoryNames.Length; i++) {
-                var name = categoryNames[i];
-                var parent = categories[i - 1];
-                var category = categoryRepo.Where(
-                                   a => a.ParentId == parent.Id && a.Name == name).First()
-                               ?? categoryRepo.Insert(new Category {
-                                   Name = name,
-                                   ParentId = parent.Id
-                               });
-                categories.Add(category);
+            var categoryNames = postPath.Split("\\");
+            var categories = new List<Category>();
+            if (categoryNames.Length > 0) {
+                var rootCategory = categoryRepo.Where(a => a.Name == categoryNames[0]).First()
+                                   ?? categoryRepo.Insert(new Category {Name = categoryNames[0]});
+                categories.Add(rootCategory);
+                for (var i = 1; i < categoryNames.Length; i++) {
+                    var name = categoryNames[i];
+                    var parent = categories[i - 1];
+                    var category = categoryRepo.Where(
+                                       a => a.ParentId == parent.Id && a.Name == name).First()
+                                   ?? categoryRepo.Insert(new Category {
+                                       Name = name,
+                                       ParentId = parent.Id
+                                   });
+                    categories.Add(category);
+                }
             }
+
+            var reader = fi.OpenText();
+            var content = reader.ReadToEnd();
+            reader.Close();
+
+            var post = new Post {
+                Id = GuidUtils.GuidTo16String(),
+                Title = fi.Name,
+                Summary = content.Limit(200),
+                Content = content,
+                Path = postPath,
+                CreationTime = fi.CreationTime,
+                LastUpdateTime = fi.LastWriteTime,
+                CategoryId = categories[^1].Id,
+                Categories = string.Join(",", categories.Select(a => a.Id))
+            };
+            postRepo.Insert(post);
         }
-
-        var reader = fi.OpenText();
-        var content = reader.ReadToEnd();
-        reader.Close();
-
-        var post = new Post {
-            Id = GuidUtils.GuidTo16String(),
-            Title = fi.Name,
-            Summary = content.Limit(200),
-            Content = content,
-            Path = postPath,
-            CreationTime = fi.CreationTime,
-            LastUpdateTime = fi.LastWriteTime,
-            CategoryId = categories[^1].Id,
-            Categories = string.Join(",", categories.Select(a => a.Id))
-        };
-        postRepo.Insert(post);
     }
 
     // Now find all the subdirectories under this directory.
