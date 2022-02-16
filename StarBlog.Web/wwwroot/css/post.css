@@ -49,3 +49,7 @@ body {
     margin: 0 0 20px 0;
     color: #1a1a1a;
 }
+
+pre {
+    padding: 10px 18px;
+}
