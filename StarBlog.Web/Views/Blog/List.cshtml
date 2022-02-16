@@ -1,4 +1,5 @@
-﻿@model BlogList
+﻿@using StarBlog.Contrib.Extensions
+@model BlogList
 @{
     ViewData["Title"] = "博客列表";
 }
@@ -6,12 +7,17 @@
 @foreach (var post in Model.Posts) {
     <div class="card mb-3">
         <div class="card-header">
-            Featured
+            @post.Category.Name
         </div>
         <div class="card-body">
             <h5 class="card-title">@post.Title</h5>
-            <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-            <a href="#" class="btn btn-outline-secondary float-right">Go somewhere</a>
+            <p class="card-text">
+                @post.Content.Limit(200)
+            </p>
+            <a class="btn btn-outline-secondary" 
+               asp-controller="Blog" asp-action="Details" asp-route-id="@post.Id">
+                查看全文
+            </a>
         </div>
     </div>
 }
