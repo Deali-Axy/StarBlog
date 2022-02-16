@@ -1,5 +1,5 @@
 ﻿@using StarBlog.Contrib.Extensions
-@model BlogList
+@model BlogListViewModel
 @{
     ViewData["Title"] = "博客列表";
 }
@@ -12,7 +12,7 @@
         <div class="card-body">
             <h5 class="card-title">@post.Title</h5>
             <p class="card-text">
-                @post.Content.Limit(200)
+                @post.Summary
             </p>
             <a class="btn btn-outline-secondary" 
                asp-controller="Blog" asp-action="Details" asp-route-id="@post.Id">
