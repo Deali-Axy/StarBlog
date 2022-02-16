@@ -16,4 +16,10 @@
       <ProjectReference Include="..\StarBlog.Data\StarBlog.Data.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Markdig" Version="0.27.0" />
+      <PackageReference Include="Markdown.ColorCode" Version="1.0.0" />
+      <PackageReference Include="WebStoating.Markdig.Prism" Version="1.0.0" />
+    </ItemGroup>
+
 </Project>
