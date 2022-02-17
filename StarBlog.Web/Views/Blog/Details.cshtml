@@ -3,6 +3,9 @@
 @{
     ViewData["Title"] = Model.Title;
 }
+@section head {
+    <link rel="stylesheet" href="~/lib/editormd/css/editormd.preview.min.css">
+}
 
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
@@ -27,7 +30,28 @@
         </div>
     </header>
 
-    <div class="post-content">
-        @Html.Raw(Model.ContentHtml)
+    @* <div class="post-content"> *@
+    @*     @Html.Raw(Model.ContentHtml) *@
+    @* </div> *@
+    
+    <div id="test-markdown-view">
+        <!-- Server-side output Markdown text -->
+        <textarea style="display:none;">@Model.Content</textarea>             
     </div>
 </div>
+
+@section bottom {
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/editormd/editormd.min.js"></script>
+    <script src="~/lib/editormd/lib/marked.min.js"></script>
+    <script src="~/lib/editormd/lib/prettify.min.js"></script>
+    <script type="text/javascript">
+        $(function() {
+    	    var testView = editormd.markdownToHTML("test-markdown-view", {
+                // markdown : "[TOC]\n### Hello world!\n## Heading 2", // Also, you can dynamic set Markdown text
+                // htmlDecode : true,  // Enable / disable HTML tag encode.
+                // htmlDecode : "style,script,iframe",  // Note: If enabled, you should filter some dangerous HTML tags for website security.
+            });
+        });
+    </script>    
+}
