@@ -7,7 +7,8 @@ using StarBlog.Migrate;
 
 var log = new System.Collections.Specialized.StringCollection();
 
-const string path = @"E:\Documents\0_Write\0_blog\";
+// const string path = @"E:\Documents\0_Write\0_blog\";
+const string path = @"D:\blog\";
 
 var exclusionDirs = new List<string> {".git"};
 
