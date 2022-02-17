@@ -1,6 +1,5 @@
 ﻿using FreeSql;
 using Markdig;
-using Markdig.Prism;
 using Markdown.ColorCode;
 using StarBlog.Data.Models;
 using StarBlog.Web.ViewModels;
@@ -27,8 +26,7 @@ public class PostService {
             .UseAutoLinks()
             .UseTaskLists()
             .UseBootstrap()
-            // .UsePrism()
-            .UseColorCode()
+            // .UseColorCode()
             .Build();
 
         var vm = new PostViewModel {
