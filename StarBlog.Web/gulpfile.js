@@ -39,6 +39,13 @@ const libs = [
     {name: "prismjs", dist: "./node_modules/prismjs/**/*.*"},
 ];
 
+// 使用 npm 下载的前端组件，自定义存放位置
+const customLibs = [
+    {name: "editormd", dist: "./node_modules/editor.md/*.js"},
+    {name: "editormd/css", dist: "./node_modules/editor.md/css/*.css"},
+    {name: "editormd/lib", dist: "./node_modules/editor.md/lib/*.js"},
+]
+
 //清除压缩后的文件
 gulp.task("clean:css", done => rimraf(paths.minCssDist, done));
 gulp.task("clean:js", done => rimraf(paths.minJsDist, done));
@@ -53,6 +60,13 @@ gulp.task("move", done => {
     });
     done()
 });
+gulp.task("custom-move", done => {
+    customLibs.forEach(item => {
+        gulp.src(item.dist)
+            .pipe(gulp.dest(paths.lib + item.name))
+    })
+    done()
+})
 
 //每一个 css 文件压缩到对应的 min.css
 gulp.task("min:css", () => {
