@@ -23,7 +23,7 @@ public class BlogController : Controller {
         });
     }
 
-    public IActionResult Details(string id) {
+    public IActionResult Post(string id) {
         return View(_postService.GetPostViewModel(_postRepo.Where(a => a.Id == id)
             .Include(a => a.Category)
             .First()));
