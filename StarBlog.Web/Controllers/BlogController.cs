@@ -19,7 +19,10 @@ public class BlogController : Controller {
 
     public IActionResult List() {
         return View(new BlogListViewModel {
-            Posts = _postRepo.Select.Include(a => a.Category).ToList()
+            Posts = _postRepo.Select
+                .OrderByDescending(a => a.LastUpdateTime)
+                .Include(a => a.Category)
+                .ToList()
         });
     }
 
