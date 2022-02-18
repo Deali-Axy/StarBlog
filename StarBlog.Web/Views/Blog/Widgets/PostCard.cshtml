@@ -1,0 +1,17 @@
+﻿@model Post
+
+<div class="card mb-3">
+    <div class="card-header">
+        @Model.Category.Name
+    </div>
+    <div class="card-body">
+        <h5 class="card-title">@Model.Title</h5>
+        <p class="card-text">
+            @Model.Summary
+        </p>
+        <a class="btn btn-outline-secondary"
+           asp-controller="Blog" asp-action="Post" asp-route-id="@Model.Id">
+            查看全文
+        </a>
+    </div>
+</div>

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using StarBlog.Data.Models;
 using StarBlog.Web.Services;
 using StarBlog.Web.ViewModels;
+using X.PagedList;
 
 namespace StarBlog.Web.Controllers;
 
@@ -17,12 +18,28 @@ public class BlogController : Controller {
         _postService = postService;
     }
 
-    public IActionResult List() {
-        return View(new BlogListViewModel {
-            Posts = _postRepo.Select
+    public IActionResult List(int categoryId = 0, int page = 1, int pageSize = 5) {
+        var categories = _categoryRepo.Select.IncludeMany(a => a.Posts).ToList();
+        categories.Insert(0, new Category {Id = 0, Name = "All", Posts = _postRepo.Select.ToList()});
+        List<Post> posts;
+        if (categoryId == 0) {
+            posts = _postRepo.Select
                 .OrderByDescending(a => a.LastUpdateTime)
                 .Include(a => a.Category)
-                .ToList()
+                .ToList();
+        }
+        else {
+            posts = _postRepo.Where(a => a.CategoryId == categoryId)
+                .OrderByDescending(a => a.LastUpdateTime)
+                .Include(a => a.Category)
+                .ToList();
+        }
+
+        return View(new BlogListViewModel {
+            CurrentCategory = categoryId == 0 ? categories[0] : _categoryRepo.Where(a => a.Id == categoryId).First(),
+            CurrentCategoryId = categoryId,
+            Categories = categories,
+            Posts = posts.ToPagedList(page, pageSize)
         });
     }
 

@@ -1,26 +1,51 @@
-﻿@using StarBlog.Contrib.Extensions
+﻿@using X.PagedList.Web.Common
+@using X.PagedList.Mvc.Core
+@using StarBlog.Web.Utils
 @model BlogListViewModel
 @{
     ViewData["Title"] = "博客列表";
 }
-<div class="container px-4 py-3" id="custom-cards">
-    <h2 class="pb-2 mb-3 border-bottom">Blog Posts</h2>
+<div class="container px-4 py-3">
+    <h2 class="d-flex w-100 justify-content-between pb-2 mb-3 border-bottom">
+        <div>Blog / @Model.CurrentCategory.Name</div>
+        <div>@Model.Posts.TotalItemCount.ToString() Posts</div>
+    </h2>
 
-    @foreach (var post in Model.Posts) {
-        <div class="card mb-3">
-            <div class="card-header">
-                @post.Category.Name
-            </div>
-            <div class="card-body">
-                <h5 class="card-title">@post.Title</h5>
-                <p class="card-text">
-                    @post.Summary
-                </p>
-                <a class="btn btn-outline-secondary"
-                   asp-controller="Blog" asp-action="Post" asp-route-id="@post.Id">
-                    查看全文
-                </a>
+    <div class="row">
+        <div class="col-lg-3">
+            <div class="list-group">
+                @foreach (var item in Model.Categories) {
+                    if (item.Id == Model.CurrentCategoryId) {
+                        <div class="list-group-item active d-flex w-100 justify-content-between">
+                            <span>@item.Name</span>
+                            <span>(@item.Posts.Count.ToString())</span>
+                        </div>
+                    }
+                    else {
+                        <a class="list-group-item list-group-item-action d-flex w-100 justify-content-between"
+                           asp-controller="Blog" asp-action="List" asp-route-categoryId="@item.Id">
+                            <span>@item.Name</span>
+                            <span>(@item.Posts.Count.ToString())</span>
+                        </a>
+                    }
+                }
             </div>
         </div>
-    }
+
+        <div class="col-lg-9">
+            @foreach (var post in Model.Posts) {
+                <partial name="Widgets/PostCard" model="post"/>
+            }
+        </div>
+    </div>
+
+    <nav aria-label="Page navigation example">
+        @Html.PagedListPager(Model.Posts, page => Url.Action(
+            RazorHelper.GetCurrentActionName(ViewContext), new {page, categoryId = Model.CurrentCategoryId}),
+            new PagedListRenderOptions {
+                LiElementClasses = new[] {"page-item"},
+                PageClasses = new[] {"page-link"},
+                UlElementClasses = new[] {"pagination justify-content-center"}
+            })
+    </nav>
 </div>
