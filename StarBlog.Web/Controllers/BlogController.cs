@@ -36,7 +36,7 @@ public class BlogController : Controller {
         }
 
         return View(new BlogListViewModel {
-            CurrentCategory = categoryId == 0 ? categories[0] : _categoryRepo.Where(a => a.Id == categoryId).First(),
+            CurrentCategory = categoryId == 0 ? categories[0] : categories.First(a => a.Id == categoryId),
             CurrentCategoryId = categoryId,
             Categories = categories,
             Posts = posts.ToPagedList(page, pageSize)
