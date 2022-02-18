@@ -6,167 +6,79 @@
 @section head {
     <link rel="stylesheet" href="~/lib/editormd/css/editormd.preview.min.css">
     <style>
-      .bd-placeholder-img {
-        font-size: 1.125rem;
-        text-anchor: middle;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        user-select: none;
-      }
-
-      @@media (min-width: 768px) {
-        .bd-placeholder-img-lg {
-          font-size: 3.5rem;
+        .post-content {
+            padding: 0;
+            font-size: 1.2em;
         }
-      }
     </style>
-    <link rel="stylesheet" href="~/css/cheatsheet.css">
 }
 
-<aside class="bd-aside sticky-xl-top text-muted align-self-start mb-3 mb-xl-5 px-2">
-    <h2 class="h6 pt-4 pb-3 mb-4 border-bottom">On this page</h2>
-    <nav class="small" id="toc">
-        <ul class="list-unstyled">
-            <li class="my-2">
-                <button class="btn d-inline-flex align-items-center collapsed" data-bs-toggle="collapse" aria-expanded="false" data-bs-target="#contents-collapse" aria-controls="contents-collapse">Contents</button>
-                <ul class="list-unstyled ps-3 collapse" id="contents-collapse">
-                    <li>
-                        <a class="d-inline-flex align-items-center rounded" href="#typography">Typography</a>
-                    </li>
-                </ul>
-            </li>
-            <li class="my-2">
-                <button class="btn d-inline-flex align-items-center collapsed" data-bs-toggle="collapse" aria-expanded="false" data-bs-target="#forms-collapse" aria-controls="forms-collapse">Forms</button>
-                <ul class="list-unstyled ps-3 collapse" id="forms-collapse">
-                    <li>
-                        <a class="d-inline-flex align-items-center rounded" href="#overview">Overview</a>
-                    </li>
-                </ul>
-            </li>
-        </ul>
-    </nav>
-</aside>
-
-<div class="bd-cheatsheet container-fluid bg-body">
-    <section id="content">
-        <h2 class="sticky-xl-top fw-bold pt-3 pt-xl-5 pb-2 pb-xl-3">Contents</h2>
-
-        <article class="my-3" id="typography">
-            <div class="bd-heading sticky-xl-top align-self-start mt-5 mb-3 mt-xl-0 mb-xl-2">
-                <h3>Typography</h3>
-                <a class="d-flex align-items-center" href="../content/typography/">Documentation</a>
+<div class="container">
+    <div class="row">
+        <div class="col-lg-2">
+            <div id="sidebar" class="p-3 sticky-lg-top">
+                @* <h5>Table of Contents</h5> *@
+                <div href="/" class="d-flex align-items-center pb-3 mb-3 link-dark text-decoration-none border-bottom">
+                    <span class="bi me-2">
+                        <i class="fa-solid fa-table-list fa-2xl"></i>
+                    </span>
+                    <span class="fs-5 fw-semibold">ToC</span>
+                </div>
+                
+                <div id="custom-toc-container">#custom-toc-container</div>
             </div>
-
-            <div>
-                <div class="bd-example">
-                    <p class="display-1">Display 1</p>
-                    <p class="display-2">Display 2</p>
-                    <p class="display-3">Display 3</p>
-                    <p class="display-4">Display 4</p>
-                    <p class="display-5">Display 5</p>
-                    <p class="display-6">Display 6</p>
+        </div>
+        <div class="col-lg-10">
+            <header class="post-header py-3 mb-3 border-bottom">
+                <div class="post-title h3 font-weight-bold">@Model.Title</div>
+                <div class="post-meta">
+                    <span>
+                        @Model.LastUpdateTime.ToLongDateString()
+                        @Model.LastUpdateTime.ToLongTimeString()
+                    </span>
+                    <span>字数：@Model.Content.Length.ToString()</span>
+                    <span>分类：@Model.Category.Name</span>
                 </div>
-
-                <div class="bd-example">
-                    <p class="h1">Heading 1</p>
-                    <p class="h2">Heading 2</p>
-                    <p class="h3">Heading 3</p>
-                    <p class="h4">Heading 4</p>
-                    <p class="h5">Heading 5</p>
-                    <p class="h6">Heading 6</p>
-                </div>
-
-                <div class="bd-example">
-                    <p class="lead">
-                        This is a lead paragraph. It stands out from regular paragraphs.
-                    </p>
-                </div>
-
-                <div class="bd-example">
-                    <p>You can use the mark tag to <mark>highlight</mark> text.</p>
-                    <p>
-                        <del>This line of text is meant to be treated as deleted text.</del>
-                    </p>
-                    <p>
-                        <s>This line of text is meant to be treated as no longer accurate.</s>
-                    </p>
-                    <p>
-                        <ins>This line of text is meant to be treated as an addition to the document.</ins>
-                    </p>
-                    <p>
-                        <u>This line of text will render as underlined.</u>
-                    </p>
-                    <p>
-                        <small>This line of text is meant to be treated as fine print.</small>
-                    </p>
-                    <p>
-                        <strong>This line rendered as bold text.</strong>
-                    </p>
-                    <p>
-                        <em>This line rendered as italicized text.</em>
-                    </p>
-                </div>
-
-                <div class="bd-example">
-                    <blockquote class="blockquote">
-                        <p>A well-known quote, contained in a blockquote element.</p>
-                        <footer class="blockquote-footer">Someone famous in <cite title="Source Title">Source Title</cite></footer>
-                    </blockquote>
-                </div>
-
-                <div class="bd-example">
-                    <ul class="list-unstyled">
-                        <li>This is a list.</li>
-                        <li>It appears completely unstyled.</li>
-                        <li>Structurally, it's still a list.</li>
-                        <li>However, this style only applies to immediate child elements.</li>
-                        <li>
-                            Nested lists:
-                            <ul>
-                                <li>are unaffected by this style</li>
-                                <li>will still show a bullet</li>
-                                <li>and have appropriate left margin</li>
-                            </ul>
-                        </li>
-                        <li>This may still come in handy in some situations.</li>
-                    </ul>
-                </div>
-
-                <div class="bd-example">
-                    <ul class="list-inline">
-                        <li class="list-inline-item">This is a list item.</li>
-                        <li class="list-inline-item">And another one.</li>
-                        <li class="list-inline-item">But they're displayed inline.</li>
-                    </ul>
-                </div>
+            </header>
+            <div id="test-editormd-view" class="post-content">
+                <textarea id="append-test" style="display:none;">@Model.Content</textarea>
             </div>
-        </article>
-
-        <article class="my-3" id="images">
-            <div class="bd-heading sticky-xl-top align-self-start mt-5 mb-3 mt-xl-0 mb-xl-2">
-                <h3>Images</h3>
-                <a class="d-flex align-items-center" href="../content/images/">Documentation</a>
-            </div>
-
-            <div>
-                <div class="bd-example">
-                    <svg class="bd-placeholder-img bd-placeholder-img-lg img-fluid" width="100%" height="250" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Responsive image" preserveAspectRatio="xMidYMid slice" focusable="false">
-                        <title>Placeholder</title><rect width="100%" height="100%" fill="#868e96"/><text x="50%" y="50%" fill="#dee2e6" dy=".3em">Responsive image</text>
-                    </svg>
-
-                </div>
-
-                <div class="bd-example">
-                    <svg class="bd-placeholder-img img-thumbnail" width="200" height="200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A generic square placeholder image with a white border around it, making it resemble a photograph taken with an old instant camera: 200x200" preserveAspectRatio="xMidYMid slice" focusable="false">
-                        <title>A generic square placeholder image with a white border around it, making it resemble a photograph taken with an old instant camera</title><rect width="100%" height="100%" fill="#868e96"/><text x="50%" y="50%" fill="#dee2e6" dy=".3em">200x200</text>
-                    </svg>
-
-                </div>
-            </div>
-        </article>
-    </section>
+        </div>
+    </div>
 </div>
 
 @section bottom {
-    <script src="~/js/cheatsheet.js"></script>
+    <script src="~/lib/editormd/examples/js/jquery.min.js"></script>
+    <script src="~/lib/editormd/lib/marked.min.js"></script>
+    <script src="~/lib/editormd/lib/prettify.min.js"></script>
+
+    <script src="~/lib/editormd/lib/raphael.min.js"></script>
+    <script src="~/lib/editormd/lib/underscore.min.js"></script>
+    <script src="~/lib/editormd/lib/sequence-diagram.min.js"></script>
+    <script src="~/lib/editormd/lib/flowchart.min.js"></script>
+    <script src="~/lib/editormd/lib/jquery.flowchart.min.js"></script>
+
+    <script src="~/lib/editormd/editormd.min.js"></script>
+    <script type="text/javascript">
+    $(function() {
+          let testEditormdView = editormd.markdownToHTML("test-editormd-view", {
+              htmlDecode      : "style,script,iframe",  // you can filter tags decode
+              //toc             : false,
+              tocm            : true,    // Using [TOCM]
+              tocContainer    : "#custom-toc-container", // 自定义 ToC 容器层
+              //gfm             : false,
+              //tocDropdown     : true,
+              // markdownSourceCode : true, // 是否保留 Markdown 源码，即是否删除保存源码的 Textarea 标签
+              emoji           : true,
+              taskList        : true,
+              tex             : true,  // 默认不解析
+              flowChart       : true,  // 默认不解析
+              sequenceDiagram : true,  // 默认不解析
+          });
+          
+          for (const imgElem of document.querySelectorAll('.post-content img')) {
+              imgElem.setAttribute('src', 'https://picsum.photos/seed/picsum/600/300')
+          }
+    })
+    </script>
 }
