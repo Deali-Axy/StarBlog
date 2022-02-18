@@ -44,6 +44,7 @@ const customLibs = [
     {name: "editormd", dist: "./node_modules/editor.md/*.js"},
     {name: "editormd/css", dist: "./node_modules/editor.md/css/*.css"},
     {name: "editormd/lib", dist: "./node_modules/editor.md/lib/*.js"},
+    {name: "editormd/examples/js", dist: "./node_modules/editor.md/examples/js/*.js"},
     {name: 'font-awesome', dist: './node_modules/@fortawesome/fontawesome-free/**/*.*'},
 ]
 
