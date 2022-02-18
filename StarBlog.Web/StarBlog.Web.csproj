@@ -24,5 +24,4 @@
         <Content Remove="Views\razor.backup\**" />
     </ItemGroup>
     
-
 </Project>
