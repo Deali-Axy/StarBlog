@@ -44,6 +44,7 @@ const customLibs = [
     {name: "editormd", dist: "./node_modules/editor.md/*.js"},
     {name: "editormd/css", dist: "./node_modules/editor.md/css/*.css"},
     {name: "editormd/lib", dist: "./node_modules/editor.md/lib/*.js"},
+    {name: 'font-awesome', dist: './node_modules/@fortawesome/fontawesome-free/**/*.*'},
 ]
 
 //清除压缩后的文件
@@ -53,14 +54,14 @@ gulp.task("clean:js", done => rimraf(paths.minJsDist, done));
 gulp.task("clean", gulp.series(["clean:js", "clean:css"]));
 
 //移动 npm 下载的前端组件包到 wwwroot 路径下
-gulp.task("move", done => {
-    libs.forEach(function (item) {
+gulp.task("move:dist", done => {
+    libs.forEach(item => {
         gulp.src(item.dist)
             .pipe(gulp.dest(paths.lib + item.name + "/dist"));
     });
     done()
-});
-gulp.task("custom-move", done => {
+})
+gulp.task("move:custom", done => {
     customLibs.forEach(item => {
         gulp.src(item.dist)
             .pipe(gulp.dest(paths.lib + item.name))
@@ -78,7 +79,7 @@ gulp.task("min:css", () => {
 });
 
 //将所有的 css 文件合并打包压缩到 app.min.css 中
-gulp.task("concatmin:css", () => {
+gulp.task("concat:css", () => {
     return gulp.src([paths.cssDist, "!" + paths.minCssDist], {base: "."})
         .pipe(concat(paths.concatCssDist))
         .pipe(changed('.'))
@@ -96,7 +97,7 @@ gulp.task("min:js", () => {
 });
 
 //将所有的 js 文件合并打包压缩到 app.min.js 中
-gulp.task("concatmin:js", () => {
+gulp.task("concat:js", () => {
     return gulp.src([paths.jsDist, "!" + paths.minJsDist], {base: "."})
         .pipe(concat(paths.concatJsDist))
         .pipe(changed('.'))
@@ -104,12 +105,14 @@ gulp.task("concatmin:js", () => {
         .pipe(gulp.dest("."));
 });
 
-gulp.task("min", gulp.series(["min:js", "min:css"]));
-gulp.task("concatmin", gulp.series(["concatmin:js", "concatmin:css"]));
+
+gulp.task('move', gulp.series(['move:dist', 'move:custom']))
+gulp.task("min", gulp.series(["min:js", "min:css"]))
+gulp.task("concat", gulp.series(["concat:js", "concat:css"]))
 
 
 //监听文件变化后自动执行
 gulp.task("auto", () => {
-    gulp.watch(paths.css, gulp.series(["min:css", "concatmin:css"]));
-    gulp.watch(paths.js, gulp.series(["min:js", "concatmin:js"]));
+    gulp.watch(paths.css, gulp.series(["min:css", "concat:css"]));
+    gulp.watch(paths.js, gulp.series(["min:js", "concat:js"]));
 });
