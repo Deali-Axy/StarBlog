@@ -8,17 +8,21 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Folder Include="wwwroot\lib" />
+        <ProjectReference Include="..\StarBlog.Contrib\StarBlog.Contrib.csproj" />
+        <ProjectReference Include="..\StarBlog.Data\StarBlog.Data.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\StarBlog.Contrib\StarBlog.Contrib.csproj" />
-      <ProjectReference Include="..\StarBlog.Data\StarBlog.Data.csproj" />
+        <PackageReference Include="Markdig" Version="0.27.0" />
+        <PackageReference Include="Markdown.ColorCode" Version="1.0.0" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Markdig" Version="0.27.0" />
-      <PackageReference Include="Markdown.ColorCode" Version="1.0.0" />
+        <Compile Remove="Views\razor.backup\**" />
+        <EmbeddedResource Remove="Views\razor.backup\**" />
+        <None Remove="Views\razor.backup\**" />
+        <Content Remove="Views\razor.backup\**" />
     </ItemGroup>
+    
 
 </Project>
