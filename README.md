@@ -6,6 +6,7 @@
 
 - ORM：FreeSQL
 - markdown解析：[Markdig](https://github.com/xoofx/markdig)
+- 分页：X.PagedList
 
 
 ## 代码高亮：
