@@ -1,0 +1,25 @@
+﻿@using StarBlog.Contrib.Extensions
+@model BlogListViewModel
+@{
+    ViewData["Title"] = "博客列表";
+}
+
+<div class="container">
+    @foreach (var post in Model.Posts) {
+        <div class="card mb-3">
+            <div class="card-header">
+                @post.Category.Name
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">@post.Title</h5>
+                <p class="card-text">
+                    @post.Summary
+                </p>
+                <a class="btn btn-outline-secondary"
+                   asp-controller="Blog" asp-action="Post" asp-route-id="@post.Id">
+                    查看全文
+                </a>
+            </div>
+        </div>
+    }
+</div>
