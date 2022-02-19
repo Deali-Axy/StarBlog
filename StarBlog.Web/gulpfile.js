@@ -38,6 +38,8 @@ const libs = [
     {name: "bootswatch", dist: "./node_modules/bootswatch/dist/**/*.*"},
     {name: "prismjs", dist: "./node_modules/prismjs/**/*.*"},
     {name: 'vue', dist: './node_modules/vue/dist/**/*.*'},
+    {name: 'echarts', dist: './node_modules/echarts/dist/**/*.*'},
+    {name: 'echarts-wordcloud', dist: './node_modules/echarts-wordcloud/dist/**/*.*'},
 ];
 
 // 使用 npm 下载的前端组件，自定义存放位置
