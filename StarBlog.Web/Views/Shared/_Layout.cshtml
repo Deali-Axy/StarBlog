@@ -1,4 +1,6 @@
 ﻿@using StarBlog.Web.Utils
+@inject StarBlog.Contrib.SiteMessage.Messages Messages
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -101,7 +103,20 @@
     </div>
 </header>
 
-<main id="vue-app">@RenderBody()</main>
+<main id="vue-app">
+    <div class="container mt-3">
+        @if (!Messages.IsEmpty) {
+            while (!Messages.IsEmpty) {
+                var message = Messages.Dequeue();
+
+                <div class="alert alert-@message.Tag" role="alert">
+                    @Html.Raw(message.Content)
+                </div>
+            }
+        }
+    </div>
+    @RenderBody()
+</main>
 
 <footer class="bg-dark">
     <div id="footer">
