@@ -7,6 +7,12 @@
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
+    <!--  输出XML  -->
+    <PropertyGroup>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <NoWarn>$(NoWarn);1591</NoWarn>
+    </PropertyGroup>
+
     <ItemGroup>
         <ProjectReference Include="..\StarBlog.Contrib\StarBlog.Contrib.csproj" />
         <ProjectReference Include="..\StarBlog.Data\StarBlog.Data.csproj" />
@@ -26,5 +32,5 @@
         <None Remove="Views\razor.backup\**" />
         <Content Remove="Views\razor.backup\**" />
     </ItemGroup>
-    
+
 </Project>
