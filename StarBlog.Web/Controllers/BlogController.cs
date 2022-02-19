@@ -48,4 +48,10 @@ public class BlogController : Controller {
             .Include(a => a.Category)
             .First()));
     }
+
+    public IActionResult RandomPost() {
+        var posts = _postRepo.Select.ToList();
+        var rndPost = posts[new Random().Next(posts.Count)];
+        return RedirectToAction(nameof(Data.Models.Post), new {id = rndPost.Id});
+    }
 }
