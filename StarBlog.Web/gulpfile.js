@@ -37,6 +37,7 @@ const libs = [
     {name: "bootstrap", dist: "./node_modules/bootstrap/dist/**/*.*"},
     {name: "bootswatch", dist: "./node_modules/bootswatch/dist/**/*.*"},
     {name: "prismjs", dist: "./node_modules/prismjs/**/*.*"},
+    {name: 'vue', dist: './node_modules/vue/dist/**/*.*'},
 ];
 
 // 使用 npm 下载的前端组件，自定义存放位置
