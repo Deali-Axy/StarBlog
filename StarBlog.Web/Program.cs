@@ -5,10 +5,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddSwaggerGen();
 builder.Services.AddFreeSql(builder.Configuration);
 
 // 自定义服务
 builder.Services.AddScoped<PostService>();
+builder.Services.AddSingleton<ThemeService>();
 
 var app = builder.Build();
 
@@ -23,8 +25,10 @@ if (!app.Environment.IsDevelopment()) {
 app.UseStaticFiles();
 
 app.UseRouting();
-
 app.UseAuthorization();
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.MapControllerRoute(
     name: "default",
