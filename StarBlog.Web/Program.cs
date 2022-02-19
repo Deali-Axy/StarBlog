@@ -1,3 +1,4 @@
+using StarBlog.Contrib.SiteMessage;
 using StarBlog.Data.Extensions;
 using StarBlog.Web.Services;
 
@@ -15,6 +16,7 @@ builder.Services.AddFreeSql(builder.Configuration);
 builder.Services.AddScoped<BlogService>();
 builder.Services.AddScoped<PostService>();
 builder.Services.AddSingleton<ThemeService>();
+builder.Services.AddSingleton<Messages>();
 
 var app = builder.Build();
 
