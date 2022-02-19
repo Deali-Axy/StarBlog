@@ -48,15 +48,4 @@ public class BlogController : Controller {
             .Include(a => a.Category)
             .First()));
     }
-
-    public IActionResult Search(string keyword, int categoryId = 0, int page = 1, int pageSize = 5) {
-        var posts = _postRepo
-            .Where(a => a.Title.Contains(keyword))
-            .Include(a => a.Category)
-            .ToList();
-        var categories = posts.Select(a => a.Category).ToList();
-        // todo 搜索不能简单粗暴返回 BlogListViewModel ！ 需要另起页面！
-        return View("List", new BlogListViewModel {
-        });
-    }
 }

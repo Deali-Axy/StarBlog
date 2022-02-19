@@ -1,0 +1,19 @@
+﻿@model SearchResultViewModel
+
+
+@{
+    ViewData["Title"] = $"{Model.Keyword} - 搜索结果";
+}
+
+<div class="container px-4 py-3">
+    <h2 class="d-flex w-100 justify-content-between pb-2 mb-3 border-bottom">
+        <div>Search Results "@Model.Keyword"</div>
+        <div>@Model.Posts.Count.ToString() Posts</div>
+    </h2>
+
+    <div>
+        @foreach (var post in Model.Posts) {
+            <partial name="Widgets/PostCard" model="post"/>
+        }
+    </div>
+</div>
