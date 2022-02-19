@@ -3,6 +3,9 @@ using StarBlog.Web.Services;
 
 namespace StarBlog.Web.Apis; 
 
+/// <summary>
+/// 页面主题
+/// </summary>
 [ApiController]
 [Route("Api/[controller]")]
 public class ThemeController : ControllerBase {

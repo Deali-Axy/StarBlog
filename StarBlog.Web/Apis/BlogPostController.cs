@@ -2,14 +2,19 @@
 using Microsoft.AspNetCore.Mvc;
 using StarBlog.Data.Models;
 
-namespace StarBlog.Web.Apis; 
+namespace StarBlog.Web.Apis;
 
+/// <summary>
+/// 文章
+/// </summary>
 [ApiController]
 [Route("Api/[controller]")]
 public class BlogPostController : ControllerBase {
     private readonly IBaseRepository<Post> _postRepo;
 
-    public BlogPostController(IBaseRepository<Post> postRepo) {
+
+    public BlogPostController(IBaseRepository<Post> postRepo, IBaseRepository<TopPost> topPostRepo,
+        IBaseRepository<FeaturedPost> featuredPostRepo) {
         _postRepo = postRepo;
     }
 
