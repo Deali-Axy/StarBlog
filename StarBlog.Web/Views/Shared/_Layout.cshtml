@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using StarBlog.Web.Utils
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
@@ -9,17 +10,18 @@
     <title>StarBlog · 画星星高手 - @ViewData["Title"]</title>
 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css">
-    <link rel="stylesheet" href="~/lib/bootswatch/dist/united/bootstrap.css">
+    @* <link rel="stylesheet" href="~/lib/bootswatch/dist/united/bootstrap.css"> *@
     <link rel="stylesheet" href="~/lib/font-awesome/css/all.css">
     <link rel="stylesheet" href="~/css/features.css">
     <link rel="stylesheet" href="~/css/metro.css">
     <link rel="stylesheet" href="~/css/footer.css">
+    <script src="~/js/site-preload.js"></script>
 
     @await RenderSectionAsync("head", false)
 </head>
-<body class="metro-bg-white">
+<body>
 
-<header>
+<header id="vue-header">
     <div class="px-3 py-2 bg-dark text-white">
         <div class="container">
             <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
@@ -81,6 +83,17 @@
             </form>
 
             <div class="text-end">
+                <span class="dropdown me-2">
+                    <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                        Themes
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                        <li v-for="theme in themes">
+                            <a v-if="theme.name===currentTheme" class="dropdown-item active">{{theme.name}}</a>
+                            <a v-else class="dropdown-item" v-on:click="setTheme(theme.name)">{{theme.name}}</a>
+                        </li>
+                    </ul>
+                </span>
                 <button type="button" class="btn btn-light text-dark me-2">Login</button>
                 <button type="button" class="btn btn-primary">Sign-up</button>
             </div>
@@ -90,7 +103,7 @@
 
 <main id="vue-app">@RenderBody()</main>
 
-<footer class="metro-bg-black">
+<footer class="bg-dark">
     <div id="footer">
         <div class="container">
             <div class="row">
@@ -168,6 +181,8 @@
 
 
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/lib/vue/dist/vue.js"></script>
+<script src="~/js/site.js"></script>
 @await RenderSectionAsync("bottom", false)
 </body>
 </html>
