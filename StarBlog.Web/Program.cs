@@ -5,10 +5,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options => {
+    var filePath = Path.Combine(System.AppContext.BaseDirectory, $"{typeof(Program).Assembly.GetName().Name}.xml");
+    options.IncludeXmlComments(filePath, true);
+});
 builder.Services.AddFreeSql(builder.Configuration);
 
 // 自定义服务
+builder.Services.AddScoped<BlogService>();
 builder.Services.AddScoped<PostService>();
 builder.Services.AddSingleton<ThemeService>();
 
