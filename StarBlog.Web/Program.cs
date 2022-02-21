@@ -11,6 +11,13 @@ builder.Services.AddSwaggerGen(options => {
     options.IncludeXmlComments(filePath, true);
 });
 builder.Services.AddFreeSql(builder.Configuration);
+builder.Services.AddCors(options => {
+    options.AddDefaultPolicy(builder => {
+        builder.AllowAnyOrigin();
+        builder.AllowAnyHeader();
+        builder.AllowAnyMethod();
+    });
+});
 
 // 自定义服务
 builder.Services.AddScoped<BlogService>();
@@ -26,6 +33,8 @@ if (!app.Environment.IsDevelopment()) {
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
+app.UseCors();
 
 // app.UseHttpsRedirection();
 app.UseStaticFiles();
