@@ -11,5 +11,5 @@ public class HomeViewModel {
     /// <summary>
     /// 推荐博客行，一行最多两个博客
     /// </summary>
-    public List<List<Post>>? FeaturedPosts { get; set; }
+    public List<List<Post>> FeaturedPosts { get; set; } = new();
 }
