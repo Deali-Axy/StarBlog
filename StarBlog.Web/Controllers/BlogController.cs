@@ -25,25 +25,12 @@ public class BlogController : Controller {
     public IActionResult List(int categoryId = 0, int page = 1, int pageSize = 5) {
         var categories = _categoryRepo.Select.IncludeMany(a => a.Posts).ToList();
         categories.Insert(0, new Category {Id = 0, Name = "All", Posts = _postRepo.Select.ToList()});
-        List<Post> posts;
-        if (categoryId == 0) {
-            posts = _postRepo.Select
-                .OrderByDescending(a => a.LastUpdateTime)
-                .Include(a => a.Category)
-                .ToList();
-        }
-        else {
-            posts = _postRepo.Where(a => a.CategoryId == categoryId)
-                .OrderByDescending(a => a.LastUpdateTime)
-                .Include(a => a.Category)
-                .ToList();
-        }
 
         return View(new BlogListViewModel {
             CurrentCategory = categoryId == 0 ? categories[0] : categories.First(a => a.Id == categoryId),
             CurrentCategoryId = categoryId,
             Categories = categories,
-            Posts = posts.ToPagedList(page, pageSize)
+            Posts = _postService.GetPagedList(categoryId, page, pageSize)
         });
     }
 
