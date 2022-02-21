@@ -12,10 +12,12 @@ builder.Services.AddSwaggerGen(options => {
 });
 builder.Services.AddFreeSql(builder.Configuration);
 builder.Services.AddCors(options => {
-    options.AddDefaultPolicy(builder => {
-        builder.AllowAnyOrigin();
-        builder.AllowAnyHeader();
-        builder.AllowAnyMethod();
+    options.AddDefaultPolicy(policyBuilder => {
+        policyBuilder.AllowCredentials();
+        policyBuilder.AllowAnyHeader();
+        policyBuilder.AllowAnyMethod();
+        // policyBuilder.AllowAnyOrigin();
+        policyBuilder.WithOrigins("http://localhost:8080");
     });
 });
 
@@ -34,13 +36,13 @@ if (!app.Environment.IsDevelopment()) {
     app.UseHsts();
 }
 
-app.UseCors();
-
 // app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseCors();
 app.UseAuthorization();
+
 
 app.UseSwagger();
 app.UseSwaggerUI();
