@@ -1,5 +1,6 @@
 ﻿using FreeSql;
 using Microsoft.AspNetCore.Mvc;
+using StarBlog.Contrib.Utils;
 using StarBlog.Data.Models;
 using StarBlog.Web.Extensions;
 using StarBlog.Web.Services;
@@ -32,12 +33,16 @@ public class PhotoController : ControllerBase {
     public ApiResponse<Photo> Get(string id) {
         var photo = _photoService.GetById(id);
         if (photo == null) return ApiResponse.NotFound(Response);
-        return new ApiResponse<Photo> { Data = photo };
+        return new ApiResponse<Photo> {Data = photo};
     }
 
     [HttpPost]
-    public ApiResponse<Photo> Add(Photo photo) {
-        return new ApiResponse<Photo> { Data = photo };
+    public ApiResponse<Photo> Add([FromForm] string title, IFormFile file) {
+        var photo = _photoService.Add(title, file);
+
+        return !ModelState.IsValid
+            ? ApiResponse.BadRequest(Response, ModelState)
+            : new ApiResponse<Photo>(photo);
     }
 
     [HttpDelete("{id}")]
