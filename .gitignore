@@ -1,5 +1,6 @@
 StarBlog.Web/wwwroot/lib/
 StarBlog.Web/wwwroot/assets/blog
+StarBlog.Web/wwwroot/media
 app.db
 app.db-shm
 app.db-wal
