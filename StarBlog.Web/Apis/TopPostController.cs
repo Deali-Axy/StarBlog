@@ -31,10 +31,7 @@ public class TopPostController : ControllerBase {
     [HttpPut("[action]")]
     public ApiResponse Set([FromQuery] string postId) {
         var post = _postRepo.Where(a => a.Id == postId).First();
-        if (post == null) {
-            Response.StatusCode = StatusCodes.Status404NotFound;
-            return new ApiResponse {Successful = false, Message = "post not found"};
-        }
+        if (post == null) return ApiResponse.NotFound(Response);
 
         var rows = _topPostRepo.Select.ToDelete().ExecuteAffrows();
         _topPostRepo.Insert(new TopPost {PostId = post.Id});
