@@ -23,6 +23,7 @@ builder.Services.AddCors(options => {
 
 // 自定义服务
 builder.Services.AddScoped<BlogService>();
+builder.Services.AddScoped<PhotoService>();
 builder.Services.AddScoped<PostService>();
 builder.Services.AddSingleton<ThemeService>();
 builder.Services.AddSingleton<Messages>();
