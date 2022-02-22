@@ -1,4 +1,7 @@
-﻿namespace StarBlog.Web.ViewModels.Response;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+
+namespace StarBlog.Web.ViewModels.Response;
 
 public class ApiResponse<T> : IApiResponse<T> {
     public bool Successful { get; set; }
@@ -24,21 +27,34 @@ public class ApiResponse : IApiResponse {
 
     public static ApiResponse Ok(HttpResponse httpResponse, string message = "Ok") {
         httpResponse.StatusCode = StatusCodes.Status200OK;
-        return new ApiResponse { Successful = true, Message = message };
+        return new ApiResponse {Successful = true, Message = message};
     }
 
     public static ApiResponse Unauthorized(HttpResponse httpResponse, string message = "Unauthorized") {
         httpResponse.StatusCode = StatusCodes.Status401Unauthorized;
-        return new ApiResponse { Successful = false, Message = message };
+        return new ApiResponse {Successful = false, Message = message};
     }
 
     public static ApiResponse NotFound(HttpResponse httpResponse, string message = "NotFound") {
         httpResponse.StatusCode = StatusCodes.Status404NotFound;
-        return new ApiResponse { Successful = false, Message = message };
+        return new ApiResponse {Successful = false, Message = message};
     }
 
     public static ApiResponse BadRequest(HttpResponse httpResponse, string message = "BadRequest") {
         httpResponse.StatusCode = StatusCodes.Status400BadRequest;
-        return new ApiResponse { Successful = false, Message = message };
+        return new ApiResponse {Successful = false, Message = message};
+    }
+
+    public static ApiResponse<SerializableError> BadRequest(HttpResponse httpResponse
+        , string message, ModelStateDictionary modelState) {
+        httpResponse.StatusCode = StatusCodes.Status400BadRequest;
+        return new ApiResponse<SerializableError> {
+            Successful = false, Message = message, Data = new SerializableError(modelState)
+        };
+    }
+
+    public static ApiResponse Error(HttpResponse httpResponse, string message = "Error") {
+        httpResponse.StatusCode = StatusCodes.Status500InternalServerError;
+        return new ApiResponse {Successful = false, Message = message};
     }
 }
