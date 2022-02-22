@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using StarBlog.Data.Models;
 using StarBlog.Web.Services;
 using StarBlog.Web.ViewModels;
+using StarBlog.Web.ViewModels.Response;
 
 namespace StarBlog.Web.Apis;
 
@@ -24,8 +25,8 @@ public class BlogController : ControllerBase {
     /// </summary>
     /// <returns></returns>
     [HttpGet("top")]
-    public ActionResult<Post?> GetTopOnePost() {
-        return _blogService.GetTopOnePost();
+    public ApiResponse<Post> GetTopOnePost() {
+        return new ApiResponse<Post> { Data = _blogService.GetTopOnePost() };
     }
 
     /// <summary>
@@ -33,7 +34,7 @@ public class BlogController : ControllerBase {
     /// </summary>
     /// <returns></returns>
     [HttpGet("featured")]
-    public ActionResult<List<List<Post>>> GetFeaturedPostRows() {
-        return _blogService.GetFeaturedPostRows();
+    public ApiResponse<List<List<Post>>> GetFeaturedPostRows() {
+        return new ApiResponse<List<List<Post>>> { Data = _blogService.GetFeaturedPostRows() };
     }
 }
