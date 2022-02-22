@@ -4,6 +4,13 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 namespace StarBlog.Web.ViewModels.Response;
 
 public class ApiResponse<T> : IApiResponse<T> {
+    public ApiResponse() {
+    }
+
+    public ApiResponse(T? data) {
+        Data = data;
+    }
+
     public int StatusCode { get; set; } = 200;
     public bool Successful { get; set; }
     public string? Message { get; set; }
@@ -26,6 +33,14 @@ public class ApiResponse : IApiResponse {
     public int StatusCode { get; set; } = 200;
     public bool Successful { get; set; }
     public string? Message { get; set; }
+
+    public static ApiResponse NoContent(HttpResponse httpResponse, string message = "NoContent") {
+        httpResponse.StatusCode = StatusCodes.Status204NoContent;
+        return new ApiResponse {
+            StatusCode = httpResponse.StatusCode,
+            Successful = true, Message = message
+        };
+    }
 
     public static ApiResponse Ok(HttpResponse httpResponse, string message = "Ok") {
         httpResponse.StatusCode = StatusCodes.Status200OK;
