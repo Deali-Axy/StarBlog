@@ -4,6 +4,7 @@ using StarBlog.Data.Models;
 using StarBlog.Web.Extensions;
 using StarBlog.Web.Services;
 using StarBlog.Web.ViewModels;
+using StarBlog.Web.ViewModels.Response;
 using X.PagedList;
 
 namespace StarBlog.Web.Apis;
@@ -23,21 +24,21 @@ public class BlogPostController : ControllerBase {
     }
 
     [HttpGet]
-    public ActionResult<PagedResponse<Post>> GetList(int categoryId = 0, int page = 1, int pageSize = 10) {
+    public ApiResponsePaged<Post> GetList(int categoryId = 0, int page = 1, int pageSize = 10) {
         var pagedList = _postService.GetPagedList(categoryId, page, pageSize);
-        var pagedRes = new PagedResponse<Post> {
-            Successful = true,
+        return  new ApiResponsePaged<Post> {
             Message = "Get posts list",
             Data = pagedList.ToList(),
             Pagination = pagedList.ToPaginationMetadata()
         };
-        return Ok(pagedRes);
     }
 
     [HttpGet("{id}")]
-    public ActionResult<Post> Get(string id) {
+    public ApiResponse<Post> Get(string id) {
         var post = _postRepo.Where(a => a.Id == id).First();
-        if (post == null) return NotFound();
-        return post;
+        if (post == null) {
+            return new ApiResponse<Post> {Successful = false, Message = "not found"};
+        }
+        return new ApiResponse<Post> {Data = post};
     }
 }

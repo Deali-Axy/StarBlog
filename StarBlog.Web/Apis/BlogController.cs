@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using StarBlog.Data.Models;
 using StarBlog.Web.Services;
+using StarBlog.Web.ViewModels;
 
 namespace StarBlog.Web.Apis;
 
@@ -32,7 +33,7 @@ public class BlogController : ControllerBase {
     /// </summary>
     /// <returns></returns>
     [HttpGet("featured")]
-    public ActionResult<List<List<Post>>> GetFeaturedPosts() {
-        return _blogService.GetFeaturedPosts();
+    public ActionResult<List<List<Post>>> GetFeaturedPostRows() {
+        return _blogService.GetFeaturedPostRows();
     }
 }
