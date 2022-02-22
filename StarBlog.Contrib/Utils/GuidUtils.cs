@@ -1,4 +1,4 @@
-﻿namespace StarBlog.Migrate;
+﻿namespace StarBlog.Contrib.Utils;
 
 public static class GuidUtils {
     /// <summary>
