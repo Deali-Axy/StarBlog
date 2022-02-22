@@ -22,10 +22,9 @@ public class TopPostController : ControllerBase {
     }
 
     [HttpGet]
-    public ApiResponse<PostListDto> Get() {
-        var postId = _topPostRepo.Select.Include(a => a.Post).First(a => a.Post.Id);
-        var dto = _postRepo.Where(a => a.Id == postId).First<PostListDto>();
-        return new ApiResponse<PostListDto> {Data = dto};
+    public ApiResponse<Post> Get() {
+        var data = _topPostRepo.Select.Include(a => a.Post).First(a => a.Post);
+        return data == null ? ApiResponse.NoContent(Response) : new ApiResponse<Post>(data: data);
     }
 
     [HttpPut("[action]")]
@@ -35,12 +34,12 @@ public class TopPostController : ControllerBase {
 
         var rows = _topPostRepo.Select.ToDelete().ExecuteAffrows();
         _topPostRepo.Insert(new TopPost {PostId = post.Id});
-        return new ApiResponse {Successful = true, Message = $"ok. deleted {rows} old topPosts."};
+        return ApiResponse.Ok(Response, $"ok. deleted {rows} old topPosts.");
     }
 
     [HttpDelete]
     public ApiResponse Clear() {
         var rows = _topPostRepo.Select.ToDelete().ExecuteAffrows();
-        return new ApiResponse {Successful = true, Message = $"deleted {rows} topPosts."};
+        return ApiResponse.Ok(Response, $"ok. deleted {rows} old topPosts.");
     }
 }
