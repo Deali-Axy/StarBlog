@@ -17,6 +17,11 @@ public class CategoryController : ControllerBase {
         _categoryRepo = categoryRepo;
     }
 
+    [HttpGet("All")]
+    public List<Category> GetAll() {
+        return _categoryRepo.Select.ToList();
+    }
+
     [HttpGet]
     public ApiResponsePaged<Category> GetList(int page = 1, int pageSize = 10) {
         var paged = _categoryRepo.Select.ToList().ToPagedList(page, pageSize);
