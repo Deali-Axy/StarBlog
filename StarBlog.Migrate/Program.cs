@@ -3,7 +3,7 @@
 using StarBlog.Contrib.Extensions;
 using StarBlog.Data;
 using StarBlog.Data.Models;
-using StarBlog.Migrate;
+using StarBlog.Contrib.Utils;
 
 var log = new System.Collections.Specialized.StringCollection();
 
