@@ -1,6 +1,9 @@
 ﻿using FreeSql;
 using Microsoft.AspNetCore.Mvc;
 using StarBlog.Data.Models;
+using StarBlog.Web.Extensions;
+using StarBlog.Web.Services;
+using StarBlog.Web.ViewModels.Response;
 
 namespace StarBlog.Web.Apis;
 
@@ -10,21 +13,40 @@ namespace StarBlog.Web.Apis;
 [ApiController]
 [Route("Api/[controller]")]
 public class PhotoController : ControllerBase {
-    private readonly IBaseRepository<Photo> _photoRepo;
+    private readonly PhotoService _photoService;
 
-    public PhotoController(IBaseRepository<Photo> photoRepo) {
-        _photoRepo = photoRepo;
+    public PhotoController(PhotoService photoService) {
+        _photoService = photoService;
     }
 
     [HttpGet]
-    public ActionResult<List<Photo>> GetAll() {
-        return _photoRepo.Select.ToList();
+    public ApiResponsePaged<Photo> GetList(int page = 1, int pageSize = 10) {
+        var paged = _photoService.GetPagedList(page, pageSize);
+        return new ApiResponsePaged<Photo> {
+            Pagination = paged.ToPaginationMetadata(),
+            Data = paged.ToList()
+        };
     }
 
     [HttpGet("{id}")]
-    public ActionResult<Photo> Get(string id) {
-        var photo = _photoRepo.Where(a => a.Id == id).First();
-        if (photo == null) return NotFound();
-        return photo;
+    public ApiResponse<Photo> Get(string id) {
+        var photo = _photoService.GetById(id);
+        if (photo == null) return ApiResponse.NotFound(Response);
+        return new ApiResponse<Photo> { Data = photo };
+    }
+
+    [HttpPost]
+    public ApiResponse<Photo> Add(Photo photo) {
+        return new ApiResponse<Photo> { Data = photo };
+    }
+
+    [HttpDelete("{id}")]
+    public IApiResponse Delete(string id) {
+        var photo = _photoService.GetById(id);
+        if (photo == null) return ApiResponse.NotFound(Response);
+        var rows = _photoService.DeleteById(id);
+        return rows > 0
+            ? ApiResponse.Ok(Response, $"deleted {rows} rows.")
+            : ApiResponse.BadRequest(Response, "deleting failed.");
     }
 }

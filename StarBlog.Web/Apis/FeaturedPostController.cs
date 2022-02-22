@@ -32,7 +32,7 @@ public class FeaturedPostController : ControllerBase {
     public ApiResponse<Post> Get(int id) {
         var item = _featuredPostRepo.Where(a => a.Id == id)
             .Include(a => a.Post).First();
-        return item == null ? ApiResponse<Post>.NotFound(Response) : new ApiResponse<Post> {Data = item.Post};
+        return item == null ? ApiResponse.NotFound(Response) : new ApiResponse<Post> {Data = item.Post};
     }
 
     [HttpPost]
