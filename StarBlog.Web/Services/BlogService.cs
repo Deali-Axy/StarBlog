@@ -20,13 +20,13 @@ public class BlogService {
     /// 获取推荐博客row，一行最多两个博客
     /// </summary>
     /// <returns></returns>
-    public List<List<Post>> GetFeaturedPosts() {
+    public List<List<Post>> GetFeaturedPostRows() {
         var data = new List<List<Post>>();
-        
-        var posts= _featuredPostRepo.Select.Include(a => a.Post.Category)
+
+        var posts = _featuredPostRepo.Select.Include(a => a.Post.Category)
             .ToList(a => a.Post);
         for (var i = 0; i < posts.Count; i += 2) {
-            data.Add(new List<Post>{posts[i], posts[i + 1]});
+            data.Add(new List<Post> {posts[i], posts[i + 1]});
         }
 
         return data;
