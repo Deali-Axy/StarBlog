@@ -12,7 +12,7 @@ public class ApiResponse<T> : IApiResponse<T> {
     }
 
     public int StatusCode { get; set; } = 200;
-    public bool Successful { get; set; }
+    public bool Successful { get; set; } = true;
     public string? Message { get; set; }
     public T? Data { get; set; }
 
