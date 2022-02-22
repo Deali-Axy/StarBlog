@@ -18,29 +18,33 @@ public class CategoryController : ControllerBase {
     }
 
     [HttpGet]
-    public ActionResult<ApiResponsePaged<Category>> GetList(int page = 1, int pageSize = 10) {
+    public ApiResponsePaged<Category> GetList(int page = 1, int pageSize = 10) {
         var paged = _categoryRepo.Select.ToList().ToPagedList(page, pageSize);
-        return Ok(new ApiResponsePaged<Category> {
+        return new ApiResponsePaged<Category> {
             Pagination = paged.ToPaginationMetadata(),
             Data = paged.ToList()
-        });
+        };
     }
 
     [HttpGet("{id:int}")]
-    public ActionResult<ApiResponse<Category>> Get(int id) {
+    public ApiResponse<Category> Get(int id) {
         var item = _categoryRepo.Where(a => a.Id == id).First();
-        if (item == null) return NotFound();
-        return new ApiResponse<Category> {Data = item};
+        if (item == null) return ApiResponse<Category>.NotFound(Response);
+        return new ApiResponse<Category> { Data = item };
     }
 
+    /// <summary>
+    /// 分类词云
+    /// </summary>
+    /// <returns></returns>
     [HttpGet("[action]")]
-    public ActionResult<ApiResponse<List<object>>> WordCloud() {
+    public ApiResponse<List<object>> WordCloud() {
         var list = _categoryRepo.Select.IncludeMany(a => a.Posts).ToList();
         var data = new List<object>();
         foreach (var item in list) {
-            data.Add(new {name = item.Name, value = item.Posts.Count});
+            data.Add(new { name = item.Name, value = item.Posts.Count });
         }
 
-        return new ApiResponse<List<object>> {Data = data};
+        return new ApiResponse<List<object>> { Data = data };
     }
 }
