@@ -41,12 +41,12 @@ public class PhotoController : ControllerBase {
     }
 
     [HttpDelete("{id}")]
-    public IApiResponse Delete(string id) {
+    public ApiResponse Delete(string id) {
         var photo = _photoService.GetById(id);
         if (photo == null) return ApiResponse.NotFound(Response);
         var rows = _photoService.DeleteById(id);
         return rows > 0
             ? ApiResponse.Ok(Response, $"deleted {rows} rows.")
-            : ApiResponse.BadRequest(Response, "deleting failed.");
+            : ApiResponse.Error(Response, "deleting failed.");
     }
 }

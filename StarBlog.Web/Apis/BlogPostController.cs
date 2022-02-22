@@ -26,7 +26,7 @@ public class BlogPostController : ControllerBase {
     [HttpGet]
     public ApiResponsePaged<Post> GetList(int categoryId = 0, int page = 1, int pageSize = 10) {
         var pagedList = _postService.GetPagedList(categoryId, page, pageSize);
-        return  new ApiResponsePaged<Post> {
+        return new ApiResponsePaged<Post> {
             Message = "Get posts list",
             Data = pagedList.ToList(),
             Pagination = pagedList.ToPaginationMetadata()
@@ -36,9 +36,7 @@ public class BlogPostController : ControllerBase {
     [HttpGet("{id}")]
     public ApiResponse<Post> Get(string id) {
         var post = _postRepo.Where(a => a.Id == id).First();
-        if (post == null) {
-            return new ApiResponse<Post> {Successful = false, Message = "not found"};
-        }
+        if (post == null) return ApiResponse.NotFound(Response);
         return new ApiResponse<Post> {Data = post};
     }
 }
