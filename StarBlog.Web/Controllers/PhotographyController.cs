@@ -1,20 +1,21 @@
 ﻿using FreeSql;
 using Microsoft.AspNetCore.Mvc;
 using StarBlog.Data.Models;
+using StarBlog.Web.Services;
 using StarBlog.Web.ViewModels;
 
-namespace StarBlog.Web.Controllers; 
+namespace StarBlog.Web.Controllers;
 
 public class PhotographyController : Controller {
-    private readonly IBaseRepository<Photo> _photoRepo;
+    private readonly PhotoService _photoService;
 
-    public PhotographyController(IBaseRepository<Photo> photoRepo) {
-        _photoRepo = photoRepo;
+    public PhotographyController(PhotoService photoService) {
+        _photoService = photoService;
     }
 
-    public IActionResult Index() {
+    public IActionResult Index(int page = 1, int pageSize = 10) {
         return View(new PhotographyViewModel {
-            Photos = _photoRepo.Select.ToList()
+            Photos = _photoService.GetPagedList(page, pageSize)
         });
     }
 }
