@@ -29,10 +29,11 @@ public class ApiResponse<T> : IApiResponse<T> {
     }
 }
 
-public class ApiResponse : IApiResponse {
+public class ApiResponse : IApiResponse, IApiErrorResponse {
     public int StatusCode { get; set; } = 200;
     public bool Successful { get; set; }
     public string? Message { get; set; }
+    public SerializableError ErrorData { get; set; }
 
     public static ApiResponse NoContent(HttpResponse httpResponse, string message = "NoContent") {
         httpResponse.StatusCode = StatusCodes.Status204NoContent;
@@ -74,12 +75,13 @@ public class ApiResponse : IApiResponse {
         };
     }
 
-    public static ApiResponse<SerializableError> BadRequest(HttpResponse httpResponse
-        , string message, ModelStateDictionary modelState) {
+    public static ApiResponse BadRequest(HttpResponse httpResponse,
+        ModelStateDictionary modelState, string message = "ModelState is not valid.") {
         httpResponse.StatusCode = StatusCodes.Status400BadRequest;
-        return new ApiResponse<SerializableError> {
+        return new ApiResponse {
             StatusCode = httpResponse.StatusCode,
-            Successful = false, Message = message, Data = new SerializableError(modelState)
+            Successful = false, Message = message,
+            ErrorData = new SerializableError(modelState)
         };
     }
 
