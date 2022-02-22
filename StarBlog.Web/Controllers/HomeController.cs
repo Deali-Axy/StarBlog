@@ -18,7 +18,7 @@ public class HomeController : Controller {
     public IActionResult Index() {
         return View(new HomeViewModel {
             TopPost = _blogService.GetTopOnePost(),
-            FeaturedPosts = _blogService.GetFeaturedPosts()
+            FeaturedPosts = _blogService.GetFeaturedPostRows()
         });
     }
 }
