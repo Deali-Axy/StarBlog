@@ -1,15 +1,12 @@
 using StarBlog.Contrib.SiteMessage;
 using StarBlog.Data.Extensions;
+using StarBlog.Web.Extensions;
 using StarBlog.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddSwaggerGen(options => {
-    var filePath = Path.Combine(System.AppContext.BaseDirectory, $"{typeof(Program).Assembly.GetName().Name}.xml");
-    options.IncludeXmlComments(filePath, true);
-});
 builder.Services.AddFreeSql(builder.Configuration);
 builder.Services.AddCors(options => {
     options.AddDefaultPolicy(policyBuilder => {
@@ -20,6 +17,9 @@ builder.Services.AddCors(options => {
         policyBuilder.WithOrigins("http://localhost:8080");
     });
 });
+builder.Services.AddSwagger();
+builder.Services.AddSettings(builder.Configuration);
+builder.Services.AddAuth(builder.Configuration);
 
 // 自定义服务
 builder.Services.AddScoped<BlogService>();
@@ -42,6 +42,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 app.UseCors();
+app.UseAuthentication();
 app.UseAuthorization();
 
 
