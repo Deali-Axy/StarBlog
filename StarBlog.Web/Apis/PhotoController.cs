@@ -1,6 +1,5 @@
-﻿using FreeSql;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using StarBlog.Contrib.Utils;
 using StarBlog.Data.Models;
 using StarBlog.Web.Extensions;
 using StarBlog.Web.Services;
@@ -11,6 +10,7 @@ namespace StarBlog.Web.Apis;
 /// <summary>
 /// 摄影
 /// </summary>
+[Authorize]
 [ApiController]
 [Route("Api/[controller]")]
 public class PhotoController : ControllerBase {
