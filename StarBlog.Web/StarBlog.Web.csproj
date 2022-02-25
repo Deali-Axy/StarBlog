@@ -28,11 +28,4 @@
         <PackageReference Include="X.PagedList.Mvc.Core" Version="8.1.0" />
     </ItemGroup>
 
-    <ItemGroup>
-        <Compile Remove="Views\razor.backup\**" />
-        <EmbeddedResource Remove="Views\razor.backup\**" />
-        <None Remove="Views\razor.backup\**" />
-        <Content Remove="Views\razor.backup\**" />
-    </ItemGroup>
-
 </Project>
