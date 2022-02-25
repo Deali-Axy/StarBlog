@@ -11,7 +11,6 @@ namespace StarBlog.Web.Apis;
 /// <summary>
 /// 摄影
 /// </summary>
-[Authorize]
 [ApiController]
 [Route("Api/[controller]")]
 public class PhotoController : ControllerBase {
@@ -37,6 +36,7 @@ public class PhotoController : ControllerBase {
         return new ApiResponse<Photo> { Data = photo };
     }
 
+    [Authorize]
     [HttpPost]
     public ApiResponse<Photo> Add([FromForm] PhotoCreationDto dto, IFormFile file) {
         var photo = _photoService.Add(dto, file);
@@ -46,6 +46,7 @@ public class PhotoController : ControllerBase {
             : new ApiResponse<Photo>(photo);
     }
 
+    [Authorize]
     [HttpDelete("{id}")]
     public ApiResponse Delete(string id) {
         var photo = _photoService.GetById(id);

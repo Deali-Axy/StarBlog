@@ -22,6 +22,7 @@
         <PackageReference Include="Markdig" Version="0.27.0" />
         <PackageReference Include="Markdown.ColorCode" Version="1.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.2" />
+        <PackageReference Include="SixLabors.ImageSharp" Version="2.0.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
         <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="6.2.3" />
         <PackageReference Include="X.PagedList" Version="8.1.0" />
