@@ -1,4 +1,5 @@
 ﻿using FreeSql;
+using SixLabors.ImageSharp;
 using StarBlog.Contrib.Utils;
 using StarBlog.Data.Models;
 using StarBlog.Web.ViewModels.Photography;
@@ -38,7 +39,15 @@ public class PhotoService {
         };
 
         var savePath = GetPhotoFilePath(photo);
-        photoFile.CopyTo(new FileStream(savePath, FileMode.Create));
+        using (var fs = new FileStream(savePath, FileMode.Create)) {
+            photoFile.CopyTo(fs);
+        }
+
+        using (var img = Image.Load(savePath)) {
+            photo.Height = img.Height;
+            photo.Width = img.Width;
+        }
+
 
         return _photoRepo.Insert(photo);
     }

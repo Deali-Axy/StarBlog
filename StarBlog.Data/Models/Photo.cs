@@ -22,6 +22,16 @@ public class Photo {
     public string FilePath { get; set; }
 
     /// <summary>
+    /// 高度
+    /// </summary>
+    public long Height { get; set; }
+
+    /// <summary>
+    /// 宽度
+    /// </summary>
+    public long Width { get; set; }
+
+    /// <summary>
     /// 创建时间
     /// </summary>
     public DateTime CreateTime { get; set; }
