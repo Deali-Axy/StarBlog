@@ -12,9 +12,14 @@ public class Photo {
     public string Title { get; set; }
 
     /// <summary>
-    /// 文件存储位置
+    /// 拍摄地点
     /// </summary>
     public string Location { get; set; }
+
+    /// <summary>
+    /// 文件存储位置
+    /// </summary>
+    public string FilePath { get; set; }
 
     /// <summary>
     /// 创建时间

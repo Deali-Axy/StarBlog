@@ -1,6 +1,7 @@
 ﻿using FreeSql;
 using StarBlog.Contrib.Utils;
 using StarBlog.Data.Models;
+using StarBlog.Web.ViewModels.Photography;
 using X.PagedList;
 
 namespace StarBlog.Web.Services;
@@ -22,22 +23,38 @@ public class PhotoService {
         return _photoRepo.Where(a => a.Id == id).First();
     }
 
-    public Photo Add(string title, IFormFile photoFile) {
+    public string GetPhotoFilePath(Photo photo) {
+        return Path.Combine(_environment.WebRootPath, "media", photo.FilePath);
+    }
+
+    public Photo Add(PhotoCreationDto dto, IFormFile photoFile) {
         var photoId = GuidUtils.GuidTo16String();
         var photo = new Photo {
             Id = photoId,
-            Title = title,
+            Title = dto.Title,
             CreateTime = DateTime.Now,
-            Location = Path.Combine("photography", $"{photoId}.jpg")
+            Location = dto.Location,
+            FilePath = Path.Combine("photography", $"{photoId}.jpg")
         };
 
-        var savePath = Path.Combine(_environment.WebRootPath, "media", photo.Location);
+        var savePath = GetPhotoFilePath(photo);
         photoFile.CopyTo(new FileStream(savePath, FileMode.Create));
-        
+
         return _photoRepo.Insert(photo);
     }
 
+    /// <summary>
+    /// 删除照片
+    /// <para>删除照片文件和数据库记录</para>
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     public int DeleteById(string id) {
+        var photo = _photoRepo.Where(a => a.Id == id).First();
+        if (photo == null) return -1;
+
+        var filePath = GetPhotoFilePath(photo);
+        if (File.Exists(filePath)) File.Delete(filePath);
         return _photoRepo.Delete(a => a.Id == id);
     }
 }
