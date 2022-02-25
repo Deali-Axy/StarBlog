@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using StarBlog.Data.Models;
 using StarBlog.Web.Extensions;
 using StarBlog.Web.Services;
+using StarBlog.Web.ViewModels.Photography;
 using StarBlog.Web.ViewModels.Response;
 
 namespace StarBlog.Web.Apis;
@@ -33,12 +34,12 @@ public class PhotoController : ControllerBase {
     public ApiResponse<Photo> Get(string id) {
         var photo = _photoService.GetById(id);
         if (photo == null) return ApiResponse.NotFound(Response);
-        return new ApiResponse<Photo> {Data = photo};
+        return new ApiResponse<Photo> { Data = photo };
     }
 
     [HttpPost]
-    public ApiResponse<Photo> Add([FromForm] string title, IFormFile file) {
-        var photo = _photoService.Add(title, file);
+    public ApiResponse<Photo> Add([FromForm] PhotoCreationDto dto, IFormFile file) {
+        var photo = _photoService.Add(dto, file);
 
         return !ModelState.IsValid
             ? ApiResponse.BadRequest(Response, ModelState)
