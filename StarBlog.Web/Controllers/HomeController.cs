@@ -18,7 +18,7 @@ public class HomeController : Controller {
     public IActionResult Index() {
         return View(new HomeViewModel {
             TopPost = _blogService.GetTopOnePost(),
-            FeaturedPosts = _blogService.GetFeaturedPostRows(),
+            FeaturedPosts = _blogService.GetFeaturedPosts(),
             FeaturedPhotos = _photoService.GetFeaturedPhotos(),
             FeaturedCategories = _categoryService.GetFeaturedCategories()
         });
