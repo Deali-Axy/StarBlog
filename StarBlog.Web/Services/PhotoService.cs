@@ -9,15 +9,22 @@ namespace StarBlog.Web.Services;
 
 public class PhotoService {
     private readonly IBaseRepository<Photo> _photoRepo;
+    private readonly IBaseRepository<FeaturedPhoto> _featuredPhotoRepo;
     private readonly IWebHostEnvironment _environment;
 
-    public PhotoService(IBaseRepository<Photo> photoRepo, IWebHostEnvironment environment) {
+    public PhotoService(IBaseRepository<Photo> photoRepo, IWebHostEnvironment environment, IBaseRepository<FeaturedPhoto> featuredPhotoRepo) {
         _photoRepo = photoRepo;
         _environment = environment;
+        _featuredPhotoRepo = featuredPhotoRepo;
     }
 
     public IPagedList<Photo> GetPagedList(int page = 1, int pageSize = 10) {
         return _photoRepo.Select.ToList().ToPagedList(page, pageSize);
+    }
+
+    public List<Photo> GetFeaturedPhotos() {
+        return _featuredPhotoRepo.Select
+            .Include(a => a.Photo).ToList(a => a.Photo);
     }
 
     public Photo? GetById(string id) {
