@@ -1,0 +1,16 @@
+﻿@model Photo
+
+<div class="card">
+    <img class="bd-placeholder-img card-img-top" src="/media/@Model.FilePath" alt="">
+
+    <div class="card-body">
+        <h5 class="card-title">@Model.Title</h5>
+        <div class="card-text d-flex justify-content-between">
+            <span>@Model.Location</span>
+            <span>
+                @Model.CreateTime.ToShortDateString()
+                @Model.CreateTime.ToShortTimeString()
+            </span>
+        </div>
+    </div>
+</div>
