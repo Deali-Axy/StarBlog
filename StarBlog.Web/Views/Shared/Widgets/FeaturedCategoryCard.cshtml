@@ -1,0 +1,17 @@
+﻿@model FeaturedCategory
+
+<div class="feature col">
+    <div class="feature-icon bg-primary bg-gradient">
+        <div class="bi">
+            <i class="@Model.IconCssClass"></i>
+        </div>
+    </div>
+    <h2>@Model.Name</h2>
+    <p>@Model.Description</p>
+    <a class="icon-link" asp-controller="Blog" asp-action="List" asp-route-categoryId="@Model.CategoryId.ToString()">
+        More posts
+        <span class="bi">
+            <i class="fa-solid fa-chevron-right"></i>
+        </span>
+    </a>
+</div>
