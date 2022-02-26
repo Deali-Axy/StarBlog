@@ -20,15 +20,20 @@ public class BlogService {
     /// 获取推荐博客row，一行最多两个博客
     /// </summary>
     /// <returns></returns>
+    [Obsolete("不需要分出来row了，直接使用 GetFeaturedPosts() 即可")]
     public List<List<Post>> GetFeaturedPostRows() {
         var data = new List<List<Post>>();
 
-        var posts = _featuredPostRepo.Select.Include(a => a.Post.Category)
-            .ToList(a => a.Post);
+        var posts = GetFeaturedPosts();
         for (var i = 0; i < posts.Count; i += 2) {
             data.Add(new List<Post> {posts[i], posts[i + 1]});
         }
 
         return data;
+    }
+
+    public List<Post> GetFeaturedPosts() {
+        return _featuredPostRepo.Select.Include(a => a.Post.Category)
+            .ToList(a => a.Post);
     }
 }

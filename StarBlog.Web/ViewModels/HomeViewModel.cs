@@ -9,10 +9,10 @@ public class HomeViewModel {
     public Post? TopPost { get; set; }
 
     /// <summary>
-    /// 推荐博客行，一行最多两个博客
+    /// 推荐博客
     /// </summary>
-    public List<List<Post>> FeaturedPosts { get; set; } = new();
-
+    public List<Post> FeaturedPosts { get; set; } = new();
+    
     /// <summary>
     /// 推荐照片，原则上只能三个
     /// </summary>
