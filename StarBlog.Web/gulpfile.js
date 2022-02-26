@@ -40,6 +40,7 @@ const libs = [
     {name: 'vue', dist: './node_modules/vue/dist/**/*.*'},
     {name: 'echarts', dist: './node_modules/echarts/dist/**/*.*'},
     {name: 'echarts-wordcloud', dist: './node_modules/echarts-wordcloud/dist/**/*.*'},
+    {name: 'masonry-layout', dist: './node_modules/masonry-layout/dist/*.*'},
 ];
 
 // 使用 npm 下载的前端组件，自定义存放位置

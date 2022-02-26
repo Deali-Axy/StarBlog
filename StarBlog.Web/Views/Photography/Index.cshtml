@@ -1,4 +1,7 @@
-﻿@model PhotographyViewModel
+﻿@using StarBlog.Web.Utils
+@using X.PagedList.Mvc.Core
+@using X.PagedList.Web.Common
+@model PhotographyViewModel
 @{
     ViewData["Title"] = "摄影";
 }
@@ -6,18 +9,42 @@
 <div class="container px-4 py-3">
     <h2 class="d-flex w-100 justify-content-between pb-2 mb-3 border-bottom">
         <div>Photography</div>
-        <div>@Model?.Photos.Count.ToString() Photos</div>
+        <div>@Model?.Photos.TotalItemCount.ToString() Photos</div>
     </h2>
 
-    <div class="d-flex justify-content-center">
-        <div class="card" style="width: 18rem;">
-            <img src="~/images/codelab.jpg" class="card-img-top" alt="...">
-            <div class="card-body">
-                <h5 class="card-title">功能正在开发中</h5>
-                <p class="card-text">Features are under development.</p>
-                <a class="btn btn-primary" asp-controller="Home" asp-action="Index">返回主页</a>
+    @if (Model?.Photos == null) {
+        <div class="d-flex justify-content-center">
+            <div class="card" style="width: 18rem;">
+                <img src="~/images/codelab.jpg" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">功能正在开发中</h5>
+                    <p class="card-text">Features are under development.</p>
+                    <a class="btn btn-primary" asp-controller="Home" asp-action="Index">返回主页</a>
+                </div>
             </div>
         </div>
-    </div>
+    }
+    else {
+        <div class="row" data-masonry='{"percentPosition": true }'>
+            @foreach (var photo in Model.Photos) {
+                <div class="col-sm-6 col-lg-4 mb-4">
+                    <partial name="Widgets/PhotoCard" model="photo"/>
+                </div>
+            }
+        </div>
+    }
 
+    <nav aria-label="Page navigation example">
+        @Html.PagedListPager(Model.Photos, page => Url.Action(
+            RazorHelper.GetCurrentActionName(ViewContext), new {page}),
+            new PagedListRenderOptions {
+                LiElementClasses = new[] {"page-item"},
+                PageClasses = new[] {"page-link"},
+                UlElementClasses = new[] {"pagination justify-content-center"}
+            })
+    </nav>
 </div>
+
+@section bottom {
+    <script src="~/lib/masonry-layout/dist/masonry.pkgd.min.js"></script>
+}
