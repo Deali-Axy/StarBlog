@@ -1,0 +1,20 @@
+﻿@using StarBlog.Contrib.Extensions
+@model Post
+
+<div class="col-md-6">
+    <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+        <div class="col p-4 d-flex flex-column position-static">
+            <strong class="d-inline-block mb-2 text-primary">@Model.Category.Name</strong>
+            <h5 class="mb-0">@Model.Title</h5>
+            <div class="mb-1 text-muted">@Model.LastUpdateTime.ToShortDateString()</div>
+            <p class="card-text mb-auto">@Model.Summary.Limit(50)</p>
+            <a class="stretched-link"
+               asp-controller="Blog" asp-action="Post" asp-route-id="@Model.Id">
+                Continue reading
+            </a>
+        </div>
+        <div class="col-auto d-none d-lg-block">
+            <img class="bd-placeholder-img" src="https://picsum.photos/seed/@Model.Id/200/250" alt="">
+        </div>
+    </div>
+</div>
