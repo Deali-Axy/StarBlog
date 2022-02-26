@@ -8,6 +8,9 @@ using X.PagedList;
 
 namespace StarBlog.Web.Apis;
 
+/// <summary>
+/// 文章分类
+/// </summary>
 [ApiController]
 [Route("Api/[controller]")]
 public class CategoryController : ControllerBase {
