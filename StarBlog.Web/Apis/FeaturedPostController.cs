@@ -32,22 +32,22 @@ public class FeaturedPostController : ControllerBase {
     public ApiResponse<Post> Get(int id) {
         var item = _featuredPostRepo.Where(a => a.Id == id)
             .Include(a => a.Post).First();
-        return item == null ? ApiResponse.NotFound(Response) : new ApiResponse<Post> {Data = item.Post};
+        return item == null ? ApiResponse.NotFound() : new ApiResponse<Post> {Data = item.Post};
     }
 
     [HttpPost]
     public ApiResponse Add([FromQuery] string postId) {
         var post = _postRepo.Where(a => a.Id == postId).First();
-        if (post == null) return ApiResponse.NotFound(Response);
+        if (post == null) return ApiResponse.NotFound();
         _featuredPostRepo.Insert(new FeaturedPost {PostId = postId});
-        return ApiResponse.Ok(Response);
+        return ApiResponse.Ok();
     }
 
     [HttpDelete("{id:int}")]
     public ApiResponse Delete(int id) {
         var item = _featuredPostRepo.Where(a => a.Id == id).First();
-        if (item == null) return ApiResponse.NotFound(Response);
+        if (item == null) return ApiResponse.NotFound();
         var rows = _featuredPostRepo.Delete(item);
-        return ApiResponse.Ok(Response, $"deleted {rows} rows.");
+        return ApiResponse.Ok($"deleted {rows} rows.");
     }
 }

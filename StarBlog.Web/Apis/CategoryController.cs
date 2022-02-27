@@ -37,7 +37,7 @@ public class CategoryController : ControllerBase {
     [HttpGet("{id:int}")]
     public IApiResponse Get(int id) {
         var item = _categoryRepo.Where(a => a.Id == id).First();
-        if (item == null) return ApiResponse.NotFound(Response);
+        if (item == null) return ApiResponse.NotFound();
         return new ApiResponse<Category> { Data = item };
     }
 

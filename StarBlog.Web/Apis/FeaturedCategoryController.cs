@@ -17,7 +17,7 @@ public class FeaturedCategoryController : ControllerBase {
         _categoryService = categoryService;
     }
 
-    [HttpPost]
+    [HttpGet]
     public ApiResponse<List<FeaturedCategory>> GetList() {
         return new ApiResponse<List<FeaturedCategory>>(_categoryService.GetFeaturedCategories());
     }

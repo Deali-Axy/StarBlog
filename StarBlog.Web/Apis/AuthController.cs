@@ -5,7 +5,7 @@ using StarBlog.Web.Services;
 using StarBlog.Web.ViewModels;
 using StarBlog.Web.ViewModels.Response;
 
-namespace StarBlog.Web.Controllers;
+namespace StarBlog.Web.Apis;
 
 /// <summary>
 /// 认证
@@ -25,11 +25,12 @@ public class AuthController : ControllerBase {
     /// <param name="loginUser"></param>
     /// <returns></returns>
     [HttpPost]
-    public ApiResponse<LoginToken> Login(LoginUser loginUser) {
+    [ProducesResponseType(typeof(ApiResponse<LoginToken>), StatusCodes.Status200OK)]
+    public ApiResponse Login(LoginUser loginUser) {
         var user = _authService.GetUserByName(loginUser.Username);
-        if (user == null) return ApiResponse.NotFound(Response);
-        if (loginUser.Password != user.Password) return ApiResponse.Unauthorized(Response);
-        return new ApiResponse<LoginToken>(_authService.GenerateLoginToken(user));
+        if (user == null) return ApiResponse.Unauthorized("用户名或密码错误");
+        if (loginUser.Password != user.Password) return ApiResponse.Unauthorized("用户名或密码错误");
+        return ApiResponse.Ok(_authService.GenerateLoginToken(user));
     }
 
     /// <summary>
@@ -38,9 +39,9 @@ public class AuthController : ControllerBase {
     /// <returns></returns>
     [Authorize]
     [HttpGet]
-    public ActionResult<User> GetUser() {
+    public ApiResponse<User> GetUser() {
         var user = _authService.GetUser(User);
-        if (user == null) return NotFound();
-        return user;
+        if (user == null) return ApiResponse.NotFound("找不到用户资料");
+        return new ApiResponse<User>(user);
     }
 }

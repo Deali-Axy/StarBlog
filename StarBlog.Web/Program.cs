@@ -1,12 +1,15 @@
 using StarBlog.Contrib.SiteMessage;
 using StarBlog.Data.Extensions;
 using StarBlog.Web.Extensions;
+using StarBlog.Web.Filters;
 using StarBlog.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options => {
+    options.Filters.Add<ResponseWrapperFilter>();
+});
 builder.Services.AddFreeSql(builder.Configuration);
 builder.Services.AddCors(options => {
     options.AddDefaultPolicy(policyBuilder => {
