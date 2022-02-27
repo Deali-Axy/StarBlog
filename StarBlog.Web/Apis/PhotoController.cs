@@ -32,7 +32,7 @@ public class PhotoController : ControllerBase {
     [HttpGet("{id}")]
     public ApiResponse<Photo> Get(string id) {
         var photo = _photoService.GetById(id);
-        if (photo == null) return ApiResponse.NotFound(Response);
+        if (photo == null) return ApiResponse.NotFound();
         return new ApiResponse<Photo> { Data = photo };
     }
 
@@ -42,7 +42,7 @@ public class PhotoController : ControllerBase {
         var photo = _photoService.Add(dto, file);
 
         return !ModelState.IsValid
-            ? ApiResponse.BadRequest(Response, ModelState)
+            ? ApiResponse.BadRequest(ModelState)
             : new ApiResponse<Photo>(photo);
     }
 
@@ -50,10 +50,10 @@ public class PhotoController : ControllerBase {
     [HttpDelete("{id}")]
     public ApiResponse Delete(string id) {
         var photo = _photoService.GetById(id);
-        if (photo == null) return ApiResponse.NotFound(Response);
+        if (photo == null) return ApiResponse.NotFound();
         var rows = _photoService.DeleteById(id);
         return rows > 0
-            ? ApiResponse.Ok(Response, $"deleted {rows} rows.")
+            ? ApiResponse.Ok($"deleted {rows} rows.")
             : ApiResponse.Error(Response, "deleting failed.");
     }
 }

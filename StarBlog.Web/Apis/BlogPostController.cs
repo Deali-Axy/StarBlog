@@ -36,7 +36,7 @@ public class BlogPostController : ControllerBase {
     [HttpGet("{id}")]
     public ApiResponse<Post> Get(string id) {
         var post = _postRepo.Where(a => a.Id == id).First();
-        if (post == null) return ApiResponse.NotFound(Response);
+        if (post == null) return ApiResponse.NotFound();
         return new ApiResponse<Post> {Data = post};
     }
 }
