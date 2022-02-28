@@ -10,6 +10,7 @@ namespace StarBlog.Web.Apis;
 /// </summary>
 [ApiController]
 [Route("Api/[controller]")]
+[ApiExplorerSettings(GroupName = "blog")]
 public class TopPostController : ControllerBase {
     private readonly IBaseRepository<TopPost> _topPostRepo;
     private readonly IBaseRepository<Post> _postRepo;

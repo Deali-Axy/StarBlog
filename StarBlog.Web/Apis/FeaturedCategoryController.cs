@@ -10,6 +10,7 @@ namespace StarBlog.Web.Apis;
 /// </summary>
 [ApiController]
 [Route("Api/[controller]")]
+[ApiExplorerSettings(GroupName = "blog")]
 public class FeaturedCategoryController : ControllerBase {
     private readonly CategoryService _categoryService;
 
