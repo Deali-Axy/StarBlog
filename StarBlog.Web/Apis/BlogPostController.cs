@@ -1,5 +1,4 @@
-﻿using FreeSql;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using StarBlog.Data.Models;
 using StarBlog.Web.Extensions;
 using StarBlog.Web.Services;
@@ -16,12 +15,10 @@ namespace StarBlog.Web.Apis;
 [Route("Api/[controller]")]
 [ApiExplorerSettings(GroupName = "blog")]
 public class BlogPostController : ControllerBase {
-    private readonly IBaseRepository<Post> _postRepo;
     private readonly PostService _postService;
     private readonly BlogService _blogService;
 
-    public BlogPostController(IBaseRepository<Post> postRepo, PostService postService, BlogService blogService) {
-        _postRepo = postRepo;
+    public BlogPostController(PostService postService, BlogService blogService) {
         _postService = postService;
         _blogService = blogService;
     }
@@ -40,6 +37,14 @@ public class BlogPostController : ControllerBase {
     public ApiResponse<Post> Get(string id) {
         var post = _postService.GetById(id);
         return post == null ? ApiResponse.NotFound() : new ApiResponse<Post>(post);
+    }
+
+    [HttpDelete("{id}")]
+    public ApiResponse Delete(string id) {
+        var post = _postService.GetById(id);
+        if (post == null) return ApiResponse.NotFound($"博客 {id} 不存在");
+        var rows = _postService.Delete(id);
+        return ApiResponse.Ok($"删除了 {rows} 篇博客");
     }
 
     /// <summary>

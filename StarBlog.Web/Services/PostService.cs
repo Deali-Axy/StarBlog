@@ -20,6 +20,10 @@ public class PostService {
         return _postRepo.Where(a => a.Id == id).Include(a => a.Category).First();
     }
 
+    public int Delete(string id) {
+        return _postRepo.Delete(a => a.Id == id);
+    }
+
     public IPagedList<Post> GetPagedList(int categoryId = 0, int page = 1, int pageSize = 10) {
         List<Post> posts;
         if (categoryId == 0) {
