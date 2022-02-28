@@ -25,17 +25,17 @@ public class BlogController : ControllerBase {
     /// 获取置顶博客
     /// </summary>
     /// <returns></returns>
-    [HttpGet("top")]
+    [HttpGet("Top")]
     public ApiResponse<Post> GetTopOnePost() {
         return new ApiResponse<Post> { Data = _blogService.GetTopOnePost() };
     }
 
     /// <summary>
-    /// 获取推荐博客row，一行最多两个博客
+    /// 获取推荐博客
     /// </summary>
     /// <returns></returns>
-    [HttpGet("featured")]
-    public ApiResponse<List<List<Post>>> GetFeaturedPostRows() {
-        return new ApiResponse<List<List<Post>>> { Data = _blogService.GetFeaturedPostRows() };
+    [HttpGet("Featured")]
+    public ApiResponse<List<Post>> GetFeaturedPostRows() {
+        return new ApiResponse<List<Post>>(_blogService.GetFeaturedPosts());
     }
 }

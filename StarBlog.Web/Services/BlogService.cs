@@ -36,4 +36,29 @@ public class BlogService {
         return _featuredPostRepo.Select.Include(a => a.Post.Category)
             .ToList(a => a.Post);
     }
+
+    public FeaturedPost AddFeaturedPost(Post post) {
+        var item = _featuredPostRepo.Where(a => a.PostId == post.Id).First();
+        if (item != null) return item;
+        item = new FeaturedPost {PostId = post.Id};
+        _featuredPostRepo.Insert(item);
+        return item;
+    }
+
+    public int DeleteFeaturedPost(Post post) {
+        var item = _featuredPostRepo.Where(a => a.PostId == post.Id).First();
+        return item == null ? 0 : _featuredPostRepo.Delete(item);
+    }
+
+    /// <summary>
+    /// 设置置顶博客
+    /// </summary>
+    /// <param name="post"></param>
+    /// <returns>返回 <see cref="TopPost"/> 对象和删除原有置顶博客的行数</returns>
+    public (TopPost, int) SetTopPost(Post post) {
+        var rows = _topPostRepo.Select.ToDelete().ExecuteAffrows();
+        var item = new TopPost {PostId = post.Id};
+        _topPostRepo.Insert(item);
+        return (item, rows);
+    }
 }
