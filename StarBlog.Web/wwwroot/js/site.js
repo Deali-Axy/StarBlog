@@ -7,8 +7,8 @@
     created: function () {
         fetch('/Api/Theme')
             .then(res => res.json())
-            .then(data => {
-                this.themes = data
+            .then(res => {
+                this.themes = res.data
             })
 
         // 读取本地主题配置
