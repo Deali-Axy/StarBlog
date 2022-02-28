@@ -56,4 +56,16 @@ public class PhotoController : ControllerBase {
             ? ApiResponse.Ok($"deleted {rows} rows.")
             : ApiResponse.Error(Response, "deleting failed.");
     }
+
+    /// <summary>
+    /// 重建图片库数据（重新扫描每张图片的大小等数据）
+    /// </summary>
+    /// <returns></returns>
+    [Authorize]
+    [HttpPost("[action]")]
+    public ApiResponse ReBuildData() {
+        return ApiResponse.Ok(new {
+            Rows = _photoService.ReBuildData()
+        }, "重建图片库数据");
+    }
 }

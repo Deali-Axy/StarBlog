@@ -18,6 +18,10 @@ public class PhotoService {
         _featuredPhotoRepo = featuredPhotoRepo;
     }
 
+    public List<Photo> GetAll() {
+        return _photoRepo.Select.ToList();
+    }
+
     public IPagedList<Photo> GetPagedList(int page = 1, int pageSize = 10) {
         return _photoRepo.Select.ToList().ToPagedList(page, pageSize);
     }
@@ -50,11 +54,7 @@ public class PhotoService {
             photoFile.CopyTo(fs);
         }
 
-        using (var img = Image.Load(savePath)) {
-            photo.Height = img.Height;
-            photo.Width = img.Width;
-        }
-
+        photo = BuildPhotoData(photo);
 
         return _photoRepo.Insert(photo);
     }
@@ -72,5 +72,28 @@ public class PhotoService {
         var filePath = GetPhotoFilePath(photo);
         if (File.Exists(filePath)) File.Delete(filePath);
         return _photoRepo.Delete(a => a.Id == id);
+    }
+
+    /// <summary>
+    /// 重建图片库数据（重新扫描每张图片的大小等数据）
+    /// </summary>
+    public int ReBuildData() {
+        var photos = GetAll();
+        return photos.Sum(photo => _photoRepo.Update(BuildPhotoData(photo)));
+    }
+    
+    /// <summary>
+    /// 重建图片数据（扫描图片的大小等数据）
+    /// </summary>
+    /// <param name="photo"></param>
+    /// <returns></returns>
+    private Photo BuildPhotoData(Photo photo) {
+        var savePath = GetPhotoFilePath(photo);
+        using (var img = Image.Load(savePath)) {
+            photo.Height = img.Height;
+            photo.Width = img.Width;
+        }
+
+        return photo;
     }
 }
