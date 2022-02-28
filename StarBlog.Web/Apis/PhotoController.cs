@@ -68,4 +68,18 @@ public class PhotoController : ControllerBase {
             Rows = _photoService.ReBuildData()
         }, "重建图片库数据");
     }
+
+    /// <summary>
+    /// 批量导入图片
+    /// </summary>
+    /// <returns></returns>
+    [Authorize]
+    [HttpPost("[action]")]
+    public ApiResponse<List<Photo>> BatchImport() {
+        var result = _photoService.BatchImport();
+        return new ApiResponse<List<Photo>> {
+            Data = result,
+            Message = $"成功导入{result.Count}张图片"
+        };
+    }
 }
