@@ -37,15 +37,24 @@
             }
         </div>
     }
+    else {
+        @await Html.PartialAsync("Widgets/PlaceholderCard", "推荐图片")
+    }
 </div>
 
 <div class="container px-4 py-3" id="featured-3">
     <h2 class="pb-2 border-bottom">Blog Categories</h2>
-    <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
-        @foreach (var fc in Model.FeaturedCategories) {
-            @await Html.PartialAsync("Widgets/FeaturedCategoryCard", fc)
-        }
-    </div>
+    @if (Model.FeaturedCategories.Count > 0) {
+        <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
+            @foreach (var fc in Model.FeaturedCategories) {
+                @await Html.PartialAsync("Widgets/FeaturedCategoryCard", fc)
+            }
+        </div>
+    }
+    else {
+        @await Html.PartialAsync("Widgets/PlaceholderCard", "推荐分类")
+    }
+
 </div>
 
 <div class="container px-4 py-3">
@@ -55,12 +64,7 @@
         <partial name="Widgets/TopPostCard" model="Model.TopPost"/>
     }
     else {
-        <div class="card mb-4">
-            <div class="card-header">置顶博客</div>
-            <div class="card-body">
-                <h3>虚位以待~</h3>
-            </div>
-        </div>
+        @await Html.PartialAsync("Widgets/PlaceholderCard", "置顶博客")
     }
 
 
@@ -72,12 +76,7 @@
         </div>
     }
     else {
-        <div class="card mb-2">
-            <div class="card-header">推荐博客</div>
-            <div class="card-body">
-                <h3>虚位以待~</h3>
-            </div>
-        </div>
+        @await Html.PartialAsync("Widgets/PlaceholderCard", "推荐博客")
     }
 </div>
 
