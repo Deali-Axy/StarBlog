@@ -35,10 +35,6 @@ public class PhotoService {
         return _photoRepo.Where(a => a.Id == id).First();
     }
 
-    public string GetPhotoFilePath(Photo photo) {
-        return Path.Combine(_environment.WebRootPath, "media", photo.FilePath);
-    }
-
     public Photo Add(PhotoCreationDto dto, IFormFile photoFile) {
         var photoId = GuidUtils.GuidTo16String();
         var photo = new Photo {
@@ -81,7 +77,39 @@ public class PhotoService {
         var photos = GetAll();
         return photos.Sum(photo => _photoRepo.Update(BuildPhotoData(photo)));
     }
-    
+
+    /// <summary>
+    /// 批量导入图片
+    /// </summary>
+    /// <returns></returns>
+    public List<Photo> BatchImport() {
+        var result = new List<Photo>();
+        var importPath = Path.Combine(_environment.WebRootPath, "assets", "photography");
+        var root = new DirectoryInfo(importPath);
+        foreach (var file in root.GetFiles()) {
+            var photoId = GuidUtils.GuidTo16String();
+            var filename = Path.GetFileNameWithoutExtension(file.Name);
+            var photo = new Photo {
+                Id = photoId,
+                Title = filename,
+                CreateTime = DateTime.Now,
+                Location = filename,
+                FilePath = Path.Combine("photography", $"{photoId}.jpg")
+            };
+            var savePath = GetPhotoFilePath(photo);
+            file.CopyTo(savePath, true);
+            photo = BuildPhotoData(photo);
+            _photoRepo.Insert(photo);
+            result.Add(photo);
+        }
+
+        return result;
+    }
+
+    private string GetPhotoFilePath(Photo photo) {
+        return Path.Combine(_environment.WebRootPath, "media", photo.FilePath);
+    }
+
     /// <summary>
     /// 重建图片数据（扫描图片的大小等数据）
     /// </summary>
