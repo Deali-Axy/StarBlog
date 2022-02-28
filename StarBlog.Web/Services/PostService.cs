@@ -16,6 +16,10 @@ public class PostService {
         _categoryRepo = categoryRepo;
     }
 
+    public Post? GetById(string id) {
+        return _postRepo.Where(a => a.Id == id).Include(a => a.Category).First();
+    }
+
     public IPagedList<Post> GetPagedList(int categoryId = 0, int page = 1, int pageSize = 10) {
         List<Post> posts;
         if (categoryId == 0) {
