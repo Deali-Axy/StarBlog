@@ -7,9 +7,7 @@ using StarBlog.Web.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews(options => {
-    options.Filters.Add<ResponseWrapperFilter>();
-});
+builder.Services.AddControllersWithViews(options => { options.Filters.Add<ResponseWrapperFilter>(); });
 builder.Services.AddFreeSql(builder.Configuration);
 builder.Services.AddCors(options => {
     options.AddDefaultPolicy(policyBuilder => {
@@ -51,7 +49,13 @@ app.UseAuthorization();
 
 
 app.UseSwagger();
-app.UseSwaggerUI();
+app.UseSwaggerUI(options => {
+    options.RoutePrefix = "api-docs/swagger";
+    options.SwaggerEndpoint("/swagger/blog/swagger.json","Blog");
+    options.SwaggerEndpoint("/swagger/auth/swagger.json", "Auth");
+    options.SwaggerEndpoint("/swagger/common/swagger.json","Common");
+    options.SwaggerEndpoint("/swagger/test/swagger.json","Test");
+});
 
 app.MapControllerRoute(
     name: "default",

@@ -8,6 +8,7 @@ namespace StarBlog.Web.Apis;
 /// </summary>
 [ApiController]
 [Route("Api/[controller]")]
+[ApiExplorerSettings(GroupName = "common")]
 public class ThemeController : ControllerBase {
     private readonly ThemeService _themeService;
 

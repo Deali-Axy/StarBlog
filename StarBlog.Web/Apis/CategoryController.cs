@@ -13,6 +13,7 @@ namespace StarBlog.Web.Apis;
 /// </summary>
 [ApiController]
 [Route("Api/[controller]")]
+[ApiExplorerSettings(GroupName = "blog")]
 public class CategoryController : ControllerBase {
     private IBaseRepository<Category> _categoryRepo;
 

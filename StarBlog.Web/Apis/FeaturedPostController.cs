@@ -11,6 +11,7 @@ namespace StarBlog.Web.Apis;
 /// </summary>
 [ApiController]
 [Route("Api/[controller]")]
+[ApiExplorerSettings(GroupName = "blog")]
 public class FeaturedPostController : ControllerBase {
     private readonly IBaseRepository<Post> _postRepo;
     private readonly IBaseRepository<FeaturedPost> _featuredPostRepo;

@@ -5,6 +5,7 @@ namespace StarBlog.Web.Apis;
 
 [ApiController]
 [Route("Api/[controller]/[action]")]
+[ApiExplorerSettings(GroupName = "test")]
 public class DataWrapperTestController : ControllerBase {
     private readonly IFileProvider _fileProvider;
 
