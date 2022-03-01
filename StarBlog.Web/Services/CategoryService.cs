@@ -44,6 +44,11 @@ public class CategoryService {
         return _fcRepo.Select.Include(a => a.Category).ToList();
     }
 
+    public FeaturedCategory? GetFeaturedCategoryById(int id) {
+        return _fcRepo.Where(a => a.Id == id)
+            .Include(a => a.Category).First();
+    }
+
     public FeaturedCategory AddOrUpdateFeaturedCategory(Category category, FeaturedCategoryCreationDto dto) {
         var item = _fcRepo.Where(a => a.CategoryId == category.Id).First();
         if (item == null) {
@@ -67,5 +72,9 @@ public class CategoryService {
     public int DeleteFeaturedCategory(Category category) {
         var item = _fcRepo.Where(a => a.CategoryId == category.Id).First();
         return item == null ? 0 : _fcRepo.Delete(item);
+    }
+
+    public int DeleteFeaturedCategoryById(int id) {
+        return _fcRepo.Delete(a => a.Id == id);
     }
 }
