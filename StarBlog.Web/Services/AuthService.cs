@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using StarBlog.Data.Models;
 using StarBlog.Web.Models.Config;
-using StarBlog.Web.ViewModels;
+using StarBlog.Web.ViewModels.Auth;
 
 namespace StarBlog.Web.Services;
 
