@@ -55,6 +55,19 @@ public class PhotoService {
         return _photoRepo.Insert(photo);
     }
 
+    public FeaturedPhoto AddFeaturedPhoto(Photo photo) {
+        var item = _featuredPhotoRepo.Where(a => a.PhotoId == photo.Id).First();
+        if (item != null) return item;
+        item = new FeaturedPhoto { PhotoId = photo.Id };
+        _featuredPhotoRepo.Insert(item);
+        return item;
+    }
+
+    public int DeleteFeaturedPhoto(Photo photo) {
+        var item = _featuredPhotoRepo.Where(a => a.PhotoId == photo.Id).First();
+        return item == null ? 0 : _featuredPhotoRepo.Delete(item);
+    }
+
     /// <summary>
     /// 删除照片
     /// <para>删除照片文件和数据库记录</para>
