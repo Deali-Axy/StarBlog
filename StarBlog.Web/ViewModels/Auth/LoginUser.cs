@@ -1,4 +1,4 @@
-﻿namespace StarBlog.Web.ViewModels; 
+﻿namespace StarBlog.Web.ViewModels.Auth;
 
 public class LoginUser {
     public string Username { get; set; }
