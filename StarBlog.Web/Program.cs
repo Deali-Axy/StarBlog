@@ -78,6 +78,10 @@ app.UseSwaggerUI(options => {
     options.SwaggerEndpoint("/swagger/common/swagger.json", "Common");
     options.SwaggerEndpoint("/swagger/test/swagger.json", "Test");
 });
+app.UseReDoc(options => {
+    options.RoutePrefix = "api-docs/redoc";
+    options.SpecUrl = "/swagger/blog/swagger.json";
+});
 
 app.MapControllerRoute(
     name: "default",
