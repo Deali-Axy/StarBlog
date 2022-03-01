@@ -22,32 +22,31 @@ public class FeaturedPostController : ControllerBase {
     }
 
     [HttpGet]
-    public ApiResponse<List<Post>> GetList() {
-        return new ApiResponse<List<Post>> {
-            Data = _featuredPostRepo.Select.Include(a => a.Post.Category)
-                .ToList(a => a.Post)
-        };
+    public ApiResponse<List<FeaturedPost>> GetList() {
+        return new ApiResponse<List<FeaturedPost>>(
+            _featuredPostRepo.Select.Include(a => a.Post.Category).ToList()
+        );
     }
 
     [HttpGet("{id:int}")]
-    public ApiResponse<Post> Get(int id) {
+    public ApiResponse<FeaturedPost> Get(int id) {
         var item = _featuredPostRepo.Where(a => a.Id == id)
             .Include(a => a.Post).First();
-        return item == null ? ApiResponse.NotFound() : new ApiResponse<Post> {Data = item.Post};
+        return item == null ? ApiResponse.NotFound() : new ApiResponse<FeaturedPost>(item);
     }
 
     [HttpPost]
-    public ApiResponse Add([FromQuery] string postId) {
+    public ApiResponse<FeaturedPost> Add([FromQuery] string postId) {
         var post = _postRepo.Where(a => a.Id == postId).First();
-        if (post == null) return ApiResponse.NotFound();
-        _featuredPostRepo.Insert(new FeaturedPost {PostId = postId});
-        return ApiResponse.Ok();
+        if (post == null) return ApiResponse.NotFound($"博客 {postId} 不存在");
+        var item= _featuredPostRepo.Insert(new FeaturedPost { PostId = postId });
+        return new ApiResponse<FeaturedPost>(item);
     }
 
     [HttpDelete("{id:int}")]
     public ApiResponse Delete(int id) {
         var item = _featuredPostRepo.Where(a => a.Id == id).First();
-        if (item == null) return ApiResponse.NotFound();
+        if (item == null) return ApiResponse.NotFound($"推荐博客记录 {id} 不存在");
         var rows = _featuredPostRepo.Delete(item);
         return ApiResponse.Ok($"deleted {rows} rows.");
     }
