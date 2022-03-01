@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using StarBlog.Data.Models;
 using StarBlog.Web.Extensions;
 using StarBlog.Web.Services;
@@ -11,6 +12,7 @@ namespace StarBlog.Web.Apis;
 /// <summary>
 /// 文章
 /// </summary>
+[Authorize]
 [ApiController]
 [Route("Api/[controller]")]
 [ApiExplorerSettings(GroupName = "blog")]
@@ -23,6 +25,7 @@ public class BlogPostController : ControllerBase {
         _blogService = blogService;
     }
 
+    [AllowAnonymous]
     [HttpGet]
     public ApiResponsePaged<Post> GetList(int categoryId = 0, int page = 1, int pageSize = 10) {
         var pagedList = _postService.GetPagedList(categoryId, page, pageSize);
@@ -33,6 +36,7 @@ public class BlogPostController : ControllerBase {
         };
     }
 
+    [AllowAnonymous]
     [HttpGet("{id}")]
     public ApiResponse<Post> Get(string id) {
         var post = _postService.GetById(id);
