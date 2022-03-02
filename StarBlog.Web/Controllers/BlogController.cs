@@ -44,6 +44,6 @@ public class BlogController : Controller {
         var posts = _postRepo.Select.ToList();
         var rndPost = posts[new Random().Next(posts.Count)];
         _messages.Info($"随机推荐了文章 <b>{rndPost.Title}</b> 给你~");
-        return RedirectToAction(nameof(Data.Models.Post), new {id = rndPost.Id});
+        return RedirectToAction(nameof(Post), new {id = rndPost.Id});
     }
 }
