@@ -36,11 +36,11 @@
 
     <nav aria-label="Page navigation example">
         @Html.PagedListPager(Model.Photos, page => Url.Action(
-            RazorHelper.GetCurrentActionName(ViewContext), new { page }),
+            RazorHelper.GetCurrentActionName(ViewContext), new {page}),
             new PagedListRenderOptions {
-                LiElementClasses = new[] { "page-item" },
-                PageClasses = new[] { "page-link" },
-                UlElementClasses = new[] { "pagination justify-content-center" }
+                LiElementClasses = new[] {"page-item"},
+                PageClasses = new[] {"page-link"},
+                UlElementClasses = new[] {"pagination justify-content-center"}
             })
     </nav>
 </div>
