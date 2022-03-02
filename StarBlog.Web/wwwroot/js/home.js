@@ -32,8 +32,6 @@
             ].join(',') + ')'
         },
         loadWordCloud() {
-            let chart = echarts.init(document.getElementById('word_cloud'))
-
             fetch('/Api/Category/WordCloud').then(res => res.json())
                 .then(res => {
                     const data = res.map(val => ({
@@ -44,43 +42,7 @@
                             }
                         }
                     }))
-
                     console.log('data', data)
-
-                    let option = {
-                        series: [{
-                            type: 'wordCloud',
-                            shape: 'diamond',
-                            left: 'center',
-                            top: 'center',
-                            right: null,
-                            bottom: null,
-                            width: '50%',
-                            height: '50%',
-                            sizeRange: [10, 80],
-                            rotationRange: [-90, 90],
-                            rotationStep: 45,
-                            gridSize: 8,
-                            drawOutOfBound: true,
-                            textStyle: {
-                                normal: {
-                                    fontFamily: 'sans-serif',
-                                    fontWeight: 'normal'
-                                },
-                                emphasis: {
-                                    shadowBlur: 10,
-                                    shadowColor: '#333'
-                                }
-                            },
-                            data,
-                        }]
-                    }
-
-                    console.log('option', option)
-                    console.log('chart', chart)
-
-                    chart.setOption(option)
-
                 })
         }
     }
