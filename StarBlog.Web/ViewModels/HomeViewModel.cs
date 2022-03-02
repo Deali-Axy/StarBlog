@@ -4,6 +4,11 @@ namespace StarBlog.Web.ViewModels;
 
 public class HomeViewModel {
     /// <summary>
+    /// 随机图片
+    /// </summary>
+    public Photo? RandomPhoto { get; set; }
+    
+    /// <summary>
     /// 置顶博客
     /// </summary>
     public Post? TopPost { get; set; }
