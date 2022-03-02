@@ -27,9 +27,8 @@ public class PhotographyController : Controller {
     }
 
     public IActionResult RandomPhoto() {
-        var items = _photoService.GetAll();
-        var rndItem = items[new Random().Next(items.Count)];
-        _messages.Info($"随机推荐了图片 <b>{rndItem.Title}</b> 给你~");
-        return RedirectToAction(nameof(Photo), new {id = rndItem.Id});
+        var item = _photoService.GetRandomPhoto();
+        _messages.Info($"随机推荐了图片 <b>{item.Title}</b> 给你~");
+        return RedirectToAction(nameof(Photo), new {id = item.Id});
     }
 }
