@@ -55,6 +55,20 @@ public class PhotoService {
         return _photoRepo.Insert(photo);
     }
 
+    /// <summary>
+    /// 获取随机一张图片
+    /// </summary>
+    /// <returns></returns>
+    public Photo GetRandomPhoto() {
+        var items = GetAll();
+        return items[new Random().Next(items.Count)];
+    }
+
+    /// <summary>
+    /// 添加推荐图片
+    /// </summary>
+    /// <param name="photo"></param>
+    /// <returns></returns>
     public FeaturedPhoto AddFeaturedPhoto(Photo photo) {
         var item = _featuredPhotoRepo.Where(a => a.PhotoId == photo.Id).First();
         if (item != null) return item;
@@ -63,6 +77,11 @@ public class PhotoService {
         return item;
     }
 
+    /// <summary>
+    /// 删除推荐图片
+    /// </summary>
+    /// <param name="photo"></param>
+    /// <returns></returns>
     public int DeleteFeaturedPhoto(Photo photo) {
         var item = _featuredPhotoRepo.Where(a => a.PhotoId == photo.Id).First();
         return item == null ? 0 : _featuredPhotoRepo.Delete(item);
@@ -119,6 +138,11 @@ public class PhotoService {
         return result;
     }
 
+    /// <summary>
+    /// 获取图片的物理存储路径
+    /// </summary>
+    /// <param name="photo"></param>
+    /// <returns></returns>
     private string GetPhotoFilePath(Photo photo) {
         return Path.Combine(_environment.WebRootPath, "media", photo.FilePath);
     }
