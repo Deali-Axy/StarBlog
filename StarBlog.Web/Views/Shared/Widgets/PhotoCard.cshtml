@@ -4,7 +4,11 @@
     <img class="bd-placeholder-img card-img-top" src="/media/@Model.FilePath" alt="">
 
     <div class="card-body">
-        <h5 class="card-title">@Model.Title</h5>
+        <h5 class="card-title">
+            <a class="stretched-link" asp-controller="Photography" asp-action="Photo" asp-route-id="@Model.Id">
+                @Model.Title
+            </a>
+        </h5>
         <div class="card-text d-flex justify-content-between">
             <span>@Model.Location</span>
             <span>
