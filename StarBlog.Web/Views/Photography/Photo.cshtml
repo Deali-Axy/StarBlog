@@ -1,0 +1,10 @@
+﻿@model Photo
+
+<div class="container px-4 py-3">
+    <h2 class="d-flex w-100 justify-content-between pb-2 mb-3 border-bottom">
+        <div>@Model?.Title</div>
+        <div>@Model?.Location</div>
+    </h2>
+    
+    <partial name="Widgets/PhotoCard" model="@Model"/>
+</div>
