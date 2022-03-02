@@ -12,7 +12,8 @@ public class PhotoService {
     private readonly IBaseRepository<FeaturedPhoto> _featuredPhotoRepo;
     private readonly IWebHostEnvironment _environment;
 
-    public PhotoService(IBaseRepository<Photo> photoRepo, IWebHostEnvironment environment, IBaseRepository<FeaturedPhoto> featuredPhotoRepo) {
+    public PhotoService(IBaseRepository<Photo> photoRepo, IWebHostEnvironment environment,
+        IBaseRepository<FeaturedPhoto> featuredPhotoRepo) {
         _photoRepo = photoRepo;
         _environment = environment;
         _featuredPhotoRepo = featuredPhotoRepo;
@@ -59,9 +60,9 @@ public class PhotoService {
     /// 获取随机一张图片
     /// </summary>
     /// <returns></returns>
-    public Photo GetRandomPhoto() {
+    public Photo? GetRandomPhoto() {
         var items = GetAll();
-        return items[new Random().Next(items.Count)];
+        return items.Count == 0 ? null : items[new Random().Next(items.Count)];
     }
 
     /// <summary>
@@ -72,7 +73,7 @@ public class PhotoService {
     public FeaturedPhoto AddFeaturedPhoto(Photo photo) {
         var item = _featuredPhotoRepo.Where(a => a.PhotoId == photo.Id).First();
         if (item != null) return item;
-        item = new FeaturedPhoto { PhotoId = photo.Id };
+        item = new FeaturedPhoto {PhotoId = photo.Id};
         _featuredPhotoRepo.Insert(item);
         return item;
     }
