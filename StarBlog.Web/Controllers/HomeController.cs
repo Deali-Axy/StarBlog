@@ -17,6 +17,7 @@ public class HomeController : Controller {
 
     public IActionResult Index() {
         return View(new HomeViewModel {
+            RandomPhoto = _photoService.GetRandomPhoto(),
             TopPost = _blogService.GetTopOnePost(),
             FeaturedPosts = _blogService.GetFeaturedPosts(),
             FeaturedPhotos = _photoService.GetFeaturedPhotos(),
