@@ -32,7 +32,7 @@
         <div class="row row-cols-1 row-cols-lg-3 align-items-stretch g-4 py-5">
             @foreach (var photo in Model.FeaturedPhotos) {
                 <div class="col">
-                    <partial name="Widgets/PhotoSmall" model="photo"/>
+                    <partial name="Widgets/PhotoCardSmall" model="photo"/>
                 </div>
             }
         </div>
@@ -40,6 +40,7 @@
     else {
         @await Html.PartialAsync("Widgets/PlaceholderCard", "推荐图片")
     }
+    
 </div>
 
 <div class="container px-4 py-3" id="featured-3">
