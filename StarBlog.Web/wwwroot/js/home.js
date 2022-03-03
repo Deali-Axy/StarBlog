@@ -3,7 +3,15 @@
     data: {
         poem: {},
         hitokoto: {},
-        poemSimple: ''
+        poemSimple: '',
+        chartTypes: ['bubble', 'bar'],
+        currentChartTypeIndex: 0,
+        currentChart: null
+    },
+    computed: {
+        chartElem() {
+            return document.getElementById('myChart')
+        }
     },
     created() {
         fetch('http://dc.sblt.deali.cn:9800/poem/simple')
@@ -24,112 +32,122 @@
     },
     methods: {
         /**
-         * 声明一个可以创建随机颜色的函数，用来给词云加颜色
+         * 生成随机RGB颜色字符串，例如：rgb(123,123,123)
          * @returns {string}
          */
-        randomColor() {
-            return 'rgb(' + [
-                Math.round(Math.random() * 255),
-                Math.round(Math.random() * 255),
-                Math.round(Math.random() * 255)
-            ].join(',') + ')'
+        randomRGB() {
+            return 'rgb(' + this.randomColorArray().join(',') + ')'
         },
-        loadWordCloud() {
-            fetch('/Api/Category/WordCloud').then(res => res.json())
-                .then(res => {
-                    const data = res.map(val => ({
-                        ...val,
-                        textStyle: {
-                            normal: {
-                                color: this.randomColor()
-                            }
-                        }
-                    }))
-                    console.log('data', data)
-                })
+        // 生成随机RGBA字符串，例如：rgba(123,123,123,0.2)
+        randomRGBA(a) {
+            return this.convertRGBA(this.randomColorArray(), a)
+        },
+        // RGB数组转换成RGBA字符串
+        convertRGBA(rgbArray, a) {
+            let color = Array.from(rgbArray)
+            color.push(a)
+            return 'rgba(' + color.join(',') + ')'
+        },
+        randomColorArray() {
+            return [
+                Math.round(Math.random() * 255),
+                Math.round(Math.random() * 255),
+                Math.round(Math.random() * 255),
+            ]
+        },
+        switchChartType() {
+            if (this.currentChartTypeIndex >= this.chartTypes.length - 1)
+                this.currentChartTypeIndex = 0
+            else
+                this.currentChartTypeIndex++
+            if (this.currentChart)
+                this.currentChart.destroy()
+            this.chartElem.setAttribute('style', '')
+            this.loadChart()
         },
         loadChart() {
-            const data = {
-                datasets: [{
-                    label: 'First Dataset',
-                    data: [{
-                        x: 20,
-                        y: 30,
-                        r: 15
-                    }, {
-                        x: 40,
-                        y: 10,
-                        r: 10
-                    }],
-                    backgroundColor: 'rgb(255, 99, 132)'
-                }]
-            };
-            const config = {
-                type: 'bubble',
-                data: data,
-                options: {}
-            };
+            let chartType = this.chartTypes[this.currentChartTypeIndex]
+            switch (chartType) {
+                case 'bubble':
+                    this.loadBubbleChart()
+                    break
+                case 'bar':
+                    this.loadBarChart()
+                    break
+                default:
+            }
+        },
+        loadBubbleChart() {
+            fetch('/Api/Category/WordCloud').then(res => res.json())
+                .then(res => {
+                    let datasets = []
+                    res.data.forEach(item => {
+                        let color = this.randomColorArray()
+                        datasets.push({
+                            label: item.name,
+                            data: [{
+                                x: Math.round(Math.random() * 50),
+                                y: Math.round(Math.random() * 50),
+                                r: item.value
+                            }],
+                            backgroundColor: this.convertRGBA(color, 0.2),
+                            borderColor: this.convertRGBA(color, 1),
+                            borderWidth: 1
+                        })
+                    })
 
-            const labels = [
-                'January',
-                'February',
-                'March',
-                'April',
-                'May',
-                'June',
-            ];
-            const data2 = {
-                labels: labels,
-                datasets: [{
-                    label: 'My First dataset',
-                    backgroundColor: 'rgb(255, 99, 132)',
-                    borderColor: 'rgb(255, 99, 132)',
-                    data: [0, 10, 5, 2, 20, 30, 45],
-                }]
-            };
+                    let data = {
+                        datasets: datasets
+                    };
+                    let config = {
+                        type: 'bubble',
+                        data: data,
+                        options: {
+                            maintainAspectRatio: false,
+                        }
+                    };
 
-            const config2 = {
-                type: 'line',
-                data: data2,
-                options: {}
-            };
-
-            const config3 = {
-                type: 'bar',
-                data: {
-                    labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-                    datasets: [{
-                        label: '# of Votes',
-                        data: [12, 19, 3, 5, 2, 3],
-                        backgroundColor: [
-                            'rgba(255, 99, 132, 0.2)',
-                            'rgba(54, 162, 235, 0.2)',
-                            'rgba(255, 206, 86, 0.2)',
-                            'rgba(75, 192, 192, 0.2)',
-                            'rgba(153, 102, 255, 0.2)',
-                            'rgba(255, 159, 64, 0.2)'
-                        ],
-                        borderColor: [
-                            'rgba(255, 99, 132, 1)',
-                            'rgba(54, 162, 235, 1)',
-                            'rgba(255, 206, 86, 1)',
-                            'rgba(75, 192, 192, 1)',
-                            'rgba(153, 102, 255, 1)',
-                            'rgba(255, 159, 64, 1)'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
+                    this.currentChart = new Chart(this.chartElem, config)
+                    this.currentChart.resize(null, 400)
+                })
+        },
+        loadBarChart() {
+            fetch('/Api/Category/WordCloud').then(res => res.json())
+                .then(res => {
+                    let labels = []
+                    let values = []
+                    let backgroundColors = []
+                    let borderColors = []
+                    res.data.forEach(item => {
+                        labels.push(item.name)
+                        values.push(item.value)
+                        let color = this.randomColorArray()
+                        backgroundColors.push(this.convertRGBA(color, 0.2))
+                        borderColors.push(this.convertRGBA(color, 1))
+                    })
+                    let data = {
+                        labels: labels,
+                        datasets: [{
+                            label: '# of Votes',
+                            data: values,
+                            backgroundColor: backgroundColors,
+                            borderColor: borderColors,
+                            borderWidth: 1
+                        }]
+                    }
+                    let config = {
+                        type: 'bar',
+                        data: data,
+                        options: {
+                            maintainAspectRatio: false,
                         }
                     }
-                }
-            };
 
-            let myChart = new Chart(document.getElementById('myChart'), config3)
+                    this.currentChart = new Chart(this.chartElem, config)
+                    this.currentChart.resize(null, 400)
+                })
+
+
         }
     }
 })

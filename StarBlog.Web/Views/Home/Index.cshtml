@@ -15,7 +15,7 @@
             @*          width="700" height="500" loading="lazy"> *@
             @* } *@
 
-            <canvas class="my-4 w-100" id="myChart" style="height: 400px;width: 100%"></canvas>
+            <canvas class="my-4 w-100" id="myChart" height="400"></canvas>
 
         </div>
         <div class="col-lg-6">
@@ -27,6 +27,7 @@
             <div class="d-grid gap-2 d-md-flex justify-content-md-start">
                 <a class="btn btn-primary btn-lg px-4 me-md-2" asp-controller="Blog" asp-action="RandomPost">看文</a>
                 <a class="btn btn-outline-secondary btn-lg px-4" asp-controller="Photography" asp-action="RandomPhoto">看图</a>
+                <button class="btn btn-outline-secondary btn-lg px-4" @@click="switchChartType">切换图表</button>
             </div>
         </div>
     </div>
