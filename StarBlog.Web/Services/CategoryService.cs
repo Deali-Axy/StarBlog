@@ -34,7 +34,7 @@ public class CategoryService {
         var list = _cRepo.Select.IncludeMany(a => a.Posts).ToList();
         var data = new List<object>();
         foreach (var item in list) {
-            data.Add(new { name = item.Name, value = item.Posts.Count });
+            data.Add(new {name = item.Name, value = item.Posts.Count});
         }
 
         return data;
@@ -76,5 +76,10 @@ public class CategoryService {
 
     public int DeleteFeaturedCategoryById(int id) {
         return _fcRepo.Delete(a => a.Id == id);
+    }
+
+    public int Setvisibility(Category category, bool isVisible) {
+        category.Visible = isVisible;
+        return _cRepo.Update(category);
     }
 }
