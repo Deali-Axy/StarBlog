@@ -24,7 +24,7 @@
                     </span>
                     <span class="fs-5 fw-semibold">ToC</span>
                 </div>
-                
+
                 <div id="custom-toc-container">#custom-toc-container</div>
             </div>
         </div>
@@ -37,7 +37,9 @@
                         @Model.LastUpdateTime.ToLongTimeString()
                     </span>
                     <span>字数：@Model.Content.Length.ToString()</span>
-                    <span>分类：@Model.Category.Name</span>
+                    <span>
+                        分类：<a asp-controller="Blog" asp-action="List" asp-route-categoryId="@Model.Category.Id">@Model.Category.Name</a>
+                    </span>
                 </div>
             </header>
             <div id="test-editormd-view" class="post-content">
