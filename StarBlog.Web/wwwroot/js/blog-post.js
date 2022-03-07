@@ -1,6 +1,7 @@
 ﻿$(function () {
     let testEditormdView = editormd.markdownToHTML("test-editormd-view", {
-        htmlDecode: "style,script,iframe",  // you can filter tags decode
+        // htmlDecode: "style,script,iframe",  // you can filter tags decode
+        htmlDecode: true,
         //toc             : false,
         tocm: true,    // Using [TOCM]
         tocContainer: "#custom-toc-container", // 自定义 ToC 容器层
