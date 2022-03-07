@@ -23,7 +23,8 @@ public class BlogController : Controller {
     }
 
     public IActionResult List(int categoryId = 0, int page = 1, int pageSize = 5) {
-        var categories = _categoryRepo.Select.IncludeMany(a => a.Posts).ToList();
+        var categories = _categoryRepo.Where(a => a.Visible)
+            .IncludeMany(a => a.Posts).ToList();
         categories.Insert(0, new Category {Id = 0, Name = "All", Posts = _postRepo.Select.ToList()});
 
         return View(new BlogListViewModel {
