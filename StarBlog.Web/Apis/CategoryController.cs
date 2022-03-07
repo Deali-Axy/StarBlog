@@ -42,7 +42,7 @@ public class CategoryController : ControllerBase {
     [HttpGet("{id:int}")]
     public IApiResponse Get(int id) {
         var item = _cService.GetById(id);
-        return item == null ? ApiResponse.NotFound() : new ApiResponse<Category> { Data = item };
+        return item == null ? ApiResponse.NotFound() : new ApiResponse<Category> {Data = item};
     }
 
     /// <summary>
@@ -81,5 +81,31 @@ public class CategoryController : ControllerBase {
         if (item == null) return ApiResponse.NotFound($"分类 {id} 不存在");
         var rows = _cService.DeleteFeaturedCategory(item);
         return ApiResponse.Ok($"delete {rows} rows.");
+    }
+
+    /// <summary>
+    /// 设置分类可见
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [HttpPost("{id:int}/[action]")]
+    public ApiResponse SetVisible(int id) {
+        var item = _cService.GetById(id);
+        if (item == null) return ApiResponse.NotFound($"分类 {id} 不存在");
+        var rows = _cService.Setvisibility(item, true);
+        return ApiResponse.Ok($"affect {rows} rows.");
+    }
+
+    /// <summary>
+    /// 设置分类不可见
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [HttpPost("{id:int}/[action]")]
+    public ApiResponse SetInvisible(int id) {
+        var item = _cService.GetById(id);
+        if (item == null) return ApiResponse.NotFound($"分类 {id} 不存在");
+        var rows = _cService.Setvisibility(item, false);
+        return ApiResponse.Ok($"affect {rows} rows.");
     }
 }
