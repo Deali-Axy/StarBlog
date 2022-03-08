@@ -78,7 +78,7 @@ public class CategoryService {
         return _fcRepo.Delete(a => a.Id == id);
     }
 
-    public int Setvisibility(Category category, bool isVisible) {
+    public int SetVisibility(Category category, bool isVisible) {
         category.Visible = isVisible;
         return _cRepo.Update(category);
     }
