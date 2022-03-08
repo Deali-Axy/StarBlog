@@ -92,7 +92,7 @@ public class CategoryController : ControllerBase {
     public ApiResponse SetVisible(int id) {
         var item = _cService.GetById(id);
         if (item == null) return ApiResponse.NotFound($"分类 {id} 不存在");
-        var rows = _cService.Setvisibility(item, true);
+        var rows = _cService.SetVisibility(item, true);
         return ApiResponse.Ok($"affect {rows} rows.");
     }
 
@@ -105,7 +105,7 @@ public class CategoryController : ControllerBase {
     public ApiResponse SetInvisible(int id) {
         var item = _cService.GetById(id);
         if (item == null) return ApiResponse.NotFound($"分类 {id} 不存在");
-        var rows = _cService.Setvisibility(item, false);
+        var rows = _cService.SetVisibility(item, false);
         return ApiResponse.Ok($"affect {rows} rows.");
     }
 }
