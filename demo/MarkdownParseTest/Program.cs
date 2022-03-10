@@ -11,16 +11,12 @@ var md = File.ReadAllText(filepath);
 
 var document = Markdown.Parse(md);
 
-
-// Takes note of all of the Top Level Headers.
 foreach (var node in document.AsEnumerable()) {
-    if (node is ParagraphBlock paragraphBlock) {
-        if (paragraphBlock.Inline != null) {
-            foreach (var inline in paragraphBlock.Inline) {
-                if (inline is LinkInline {IsImage: true} linkInline) {
-                    linkInline.Url = $"http://127.0.0.1:5038/assets/blog/{linkInline.Url}";
-                    Console.WriteLine(linkInline.Url);
-                }
+    if (node is ParagraphBlock { Inline: { } } paragraphBlock) {
+        foreach (var inline in paragraphBlock.Inline) {
+            if (inline is LinkInline {IsImage: true} linkInline) {
+                linkInline.Url = $"http://127.0.0.1:5038/assets/blog/{linkInline.Url}";
+                Console.WriteLine(linkInline.Url);
             }
         }
     }
