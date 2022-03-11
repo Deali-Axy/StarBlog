@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StarBlog.Data.Models;
 using StarBlog.Web.Extensions;
 using StarBlog.Web.Services;
 using StarBlog.Web.ViewModels;
+using StarBlog.Web.ViewModels.Blog;
 using StarBlog.Web.ViewModels.Response;
 using X.PagedList;
 
@@ -17,12 +19,14 @@ namespace StarBlog.Web.Apis;
 [Route("Api/[controller]")]
 [ApiExplorerSettings(GroupName = "blog")]
 public class BlogPostController : ControllerBase {
+    private readonly IMapper _mapper;
     private readonly PostService _postService;
     private readonly BlogService _blogService;
 
-    public BlogPostController(PostService postService, BlogService blogService) {
+    public BlogPostController(PostService postService, BlogService blogService, IMapper mapper) {
         _postService = postService;
         _blogService = blogService;
+        _mapper = mapper;
     }
 
     [AllowAnonymous]
@@ -49,6 +53,21 @@ public class BlogPostController : ControllerBase {
         if (post == null) return ApiResponse.NotFound($"博客 {id} 不存在");
         var rows = _postService.Delete(id);
         return ApiResponse.Ok($"删除了 {rows} 篇博客");
+    }
+
+    [HttpPost]
+    public ApiResponse<Post> Add(Post post) {
+        return new ApiResponse<Post>(_postService.InsertOrUpdate(post));
+    }
+
+    [HttpPut("{id}")]
+    public ApiResponse<Post> Update(string id, PostUpdateDto dto) {
+        var post = _postService.GetById(id);
+        if (post == null) return ApiResponse.NotFound($"博客 {id} 不存在");
+
+        post = _mapper.Map<Post>(dto);
+        post.LastUpdateTime = DateTime.Now;
+        return new ApiResponse<Post>(_postService.InsertOrUpdate(post));
     }
 
     /// <summary>
@@ -87,6 +106,6 @@ public class BlogPostController : ControllerBase {
         var post = _postService.GetById(id);
         if (post == null) return ApiResponse.NotFound($"博客 {id} 不存在");
         var (data, rows) = _blogService.SetTopPost(post);
-        return new ApiResponse<TopPost> {Data = data, Message = $"ok. deleted {rows} old topPosts."};
+        return new ApiResponse<TopPost> { Data = data, Message = $"ok. deleted {rows} old topPosts." };
     }
 }
