@@ -24,6 +24,10 @@ public class PostService {
         return _postRepo.Delete(a => a.Id == id);
     }
 
+    public Post InsertOrUpdate(Post post) {
+        return _postRepo.InsertOrUpdate(post);
+    }
+
     public IPagedList<Post> GetPagedList(int categoryId = 0, int page = 1, int pageSize = 10) {
         List<Post> posts;
         if (categoryId == 0) {
