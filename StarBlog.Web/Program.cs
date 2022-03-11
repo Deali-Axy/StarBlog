@@ -9,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews(options => { options.Filters.Add<ResponseWrapperFilter>(); });
+builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddFreeSql(builder.Configuration);
 builder.Services.AddCors(options => {
     options.AddDefaultPolicy(policyBuilder => {
