@@ -71,6 +71,20 @@ public class BlogPostController : ControllerBase {
     }
 
     /// <summary>
+    /// 上传图片
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="file"></param>
+    /// <returns></returns>
+    [HttpPost("{id}/[action]")]
+    public ApiResponse UploadImage(string id, IFormFile file) {
+        var post = _postService.GetById(id);
+        if (post == null) return ApiResponse.NotFound($"博客 {id} 不存在");
+        var imgUrl = _postService.UploadImage(post, file);
+        return ApiResponse.Ok(new {imgUrl});
+    }
+
+    /// <summary>
     /// 设置为推荐博客
     /// </summary>
     /// <param name="id"></param>
@@ -106,6 +120,6 @@ public class BlogPostController : ControllerBase {
         var post = _postService.GetById(id);
         if (post == null) return ApiResponse.NotFound($"博客 {id} 不存在");
         var (data, rows) = _blogService.SetTopPost(post);
-        return new ApiResponse<TopPost> { Data = data, Message = $"ok. deleted {rows} old topPosts." };
+        return new ApiResponse<TopPost> {Data = data, Message = $"ok. deleted {rows} old topPosts."};
     }
 }
