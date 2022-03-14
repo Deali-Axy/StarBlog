@@ -81,7 +81,19 @@ public class BlogPostController : ControllerBase {
         var post = _postService.GetById(id);
         if (post == null) return ApiResponse.NotFound($"博客 {id} 不存在");
         var imgUrl = _postService.UploadImage(post, file);
-        return ApiResponse.Ok(new {imgUrl});
+        return ApiResponse.Ok(new { imgUrl });
+    }
+
+    /// <summary>
+    /// 获取文章里的图片
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    [HttpGet("{id}/[action]")]
+    public ApiResponse<List<string>> Images(string id) {
+        var post = _postService.GetById(id);
+        if (post == null) return ApiResponse.NotFound($"博客 {id} 不存在");
+        return new ApiResponse<List<string>>(_postService.GetImages(post));
     }
 
     /// <summary>
@@ -120,6 +132,6 @@ public class BlogPostController : ControllerBase {
         var post = _postService.GetById(id);
         if (post == null) return ApiResponse.NotFound($"博客 {id} 不存在");
         var (data, rows) = _blogService.SetTopPost(post);
-        return new ApiResponse<TopPost> {Data = data, Message = $"ok. deleted {rows} old topPosts."};
+        return new ApiResponse<TopPost> { Data = data, Message = $"ok. deleted {rows} old topPosts." };
     }
 }
