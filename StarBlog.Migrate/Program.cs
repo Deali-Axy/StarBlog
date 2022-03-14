@@ -91,6 +91,7 @@ void WalkDirectoryTree(DirectoryInfo root) {
             reader.Close();
 
             // 保存文章
+            // todo 导入文章的时候要一并导入文章里的图片，并对图片相对路径做替换操作
             var post = new Post {
                 Id = GuidUtils.GuidTo16String(),
                 Title = fi.Name.Replace(".md", ""),

@@ -24,6 +24,7 @@ public class PostService {
     }
 
     public Post? GetById(string id) {
+        // todo 获取文章的时候对markdown中的图片地址解析，加上完整地址返回给前端
         return _postRepo.Where(a => a.Id == id).Include(a => a.Category).First();
     }
 
@@ -32,6 +33,7 @@ public class PostService {
     }
 
     public Post InsertOrUpdate(Post post) {
+        // todo 修改文章时，将markdown中的图片地址替换成相对路径再保存
         return _postRepo.InsertOrUpdate(post);
     }
 
@@ -44,6 +46,7 @@ public class PostService {
     public string UploadImage(Post post, IFormFile file) {
         InitPostMediaDir(post);
 
+        //todo 需要检测上传文件是否和已有文件重名
         var fileRelativePath = Path.Combine("media", "blog", post.Id, file.FileName);
         var savePath = Path.Combine(_environment.WebRootPath, fileRelativePath);
         using (var fs = new FileStream(savePath, FileMode.Create)) {
