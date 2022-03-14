@@ -11,12 +11,16 @@ public class PostService {
     private readonly IBaseRepository<Post> _postRepo;
     private readonly IBaseRepository<Category> _categoryRepo;
     private readonly IWebHostEnvironment _environment;
+    private readonly IConfiguration _configuration;
 
+    public string Host => _configuration.GetSection("Server:Host").Value;
 
-    public PostService(IBaseRepository<Post> postRepo, IBaseRepository<Category> categoryRepo, IWebHostEnvironment environment) {
+    public PostService(IBaseRepository<Post> postRepo, IBaseRepository<Category> categoryRepo, IWebHostEnvironment environment,
+        IConfiguration configuration) {
         _postRepo = postRepo;
         _categoryRepo = categoryRepo;
         _environment = environment;
+        _configuration = configuration;
     }
 
     public Post? GetById(string id) {
@@ -46,7 +50,7 @@ public class PostService {
             file.CopyTo(fs);
         }
 
-        return Path.Combine("http://127.0.0.1:5038", fileRelativePath);
+        return Path.Combine(Host, fileRelativePath);
     }
 
     /// <summary>
@@ -58,9 +62,7 @@ public class PostService {
         var data = new List<string>();
         var postDir = InitPostMediaDir(post);
         foreach (var file in Directory.GetFiles(postDir)) {
-            data.Add(Path.Combine(
-                "http://127.0.0.1:5038", "media", "blog", post.Id, file
-            ));
+            data.Add(Path.Combine(Host, "media", "blog", post.Id, Path.GetFileName(file)));
         }
 
         return data;
