@@ -1,6 +1,8 @@
 ﻿using FreeSql;
 using Markdig;
-using Markdown.ColorCode;
+using Markdig.Renderers.Normalize;
+using Markdig.Syntax;
+using Markdig.Syntax.Inlines;
 using StarBlog.Contrib.Utils;
 using StarBlog.Data.Models;
 using StarBlog.Web.ViewModels;
@@ -27,8 +29,10 @@ public class PostService {
     }
 
     public Post? GetById(string id) {
-        // todo 获取文章的时候对markdown中的图片地址解析，加上完整地址返回给前端
-        return _postRepo.Where(a => a.Id == id).Include(a => a.Category).First();
+        // 获取文章的时候对markdown中的图片地址解析，加上完整地址返回给前端
+        var post = _postRepo.Where(a => a.Id == id).Include(a => a.Category).First();
+        post.Content = MdImageLinkConvert(post, true);
+        return post;
     }
 
     public int Delete(string id) {
@@ -36,7 +40,8 @@ public class PostService {
     }
 
     public Post InsertOrUpdate(Post post) {
-        // todo 修改文章时，将markdown中的图片地址替换成相对路径再保存
+        // 修改文章时，将markdown中的图片地址替换成相对路径再保存
+        post.Content = MdImageLinkConvert(post, false);
         return _postRepo.InsertOrUpdate(post);
     }
 
@@ -48,7 +53,7 @@ public class PostService {
     /// <returns></returns>
     public string UploadImage(Post post, IFormFile file) {
         InitPostMediaDir(post);
-        
+
         var fileRelativePath = Path.Combine("media", "blog", post.Id, file.FileName);
         var savePath = Path.Combine(_environment.WebRootPath, fileRelativePath);
         if (File.Exists(savePath)) {
@@ -125,6 +130,11 @@ public class PostService {
         return vm;
     }
 
+    /// <summary>
+    /// 初始化博客文章的资源目录
+    /// </summary>
+    /// <param name="post"></param>
+    /// <returns></returns>
     private string InitPostMediaDir(Post post) {
         var blogMediaDir = Path.Combine(_environment.WebRootPath, "media", "blog");
         var postMediaDir = Path.Combine(_environment.WebRootPath, "media", "blog", post.Id);
@@ -132,5 +142,40 @@ public class PostService {
         if (!Directory.Exists(postMediaDir)) Directory.CreateDirectory(postMediaDir);
 
         return postMediaDir;
+    }
+
+    /// <summary>
+    /// Markdown中的图片链接转换
+    /// </summary>
+    /// <param name="post"></param>
+    /// <param name="isAddPrefix"></param>
+    /// <returns></returns>
+    private string MdImageLinkConvert(Post post, bool isAddPrefix = true) {
+        var document = Markdown.Parse(post.Content);
+
+        foreach (var node in document.AsEnumerable()) {
+            if (node is not ParagraphBlock { Inline: { } } paragraphBlock) continue;
+            foreach (var inline in paragraphBlock.Inline) {
+                if (inline is not LinkInline { IsImage: true } linkInline) continue;
+
+                var imgUrl = linkInline.Url;
+                if (imgUrl == null) continue;
+                if (isAddPrefix && imgUrl.StartsWith("http")) continue;
+                if (isAddPrefix) {
+                    if(imgUrl.StartsWith("http")) continue;
+                    // 设置完整链接
+                    linkInline.Url = $"{Host}/media/blog/{post.Id}/{imgUrl}";
+                }
+                else {
+                    // 设置成相对链接
+                    linkInline.Url = Path.GetFileName(imgUrl);
+                }
+            }
+        }
+
+        using var writer = new StringWriter();
+        var render = new NormalizeRenderer(writer);
+        render.Render(document);
+        return writer.ToString();
     }
 }
