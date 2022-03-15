@@ -1,6 +1,7 @@
 ﻿using FreeSql;
 using Markdig;
 using Markdown.ColorCode;
+using StarBlog.Contrib.Utils;
 using StarBlog.Data.Models;
 using StarBlog.Web.ViewModels;
 using X.PagedList;
@@ -15,7 +16,9 @@ public class PostService {
 
     public string Host => _configuration.GetSection("Server:Host").Value;
 
-    public PostService(IBaseRepository<Post> postRepo, IBaseRepository<Category> categoryRepo, IWebHostEnvironment environment,
+    public PostService(IBaseRepository<Post> postRepo,
+        IBaseRepository<Category> categoryRepo,
+        IWebHostEnvironment environment,
         IConfiguration configuration) {
         _postRepo = postRepo;
         _categoryRepo = categoryRepo;
@@ -45,10 +48,16 @@ public class PostService {
     /// <returns></returns>
     public string UploadImage(Post post, IFormFile file) {
         InitPostMediaDir(post);
-
-        //todo 需要检测上传文件是否和已有文件重名
+        
         var fileRelativePath = Path.Combine("media", "blog", post.Id, file.FileName);
         var savePath = Path.Combine(_environment.WebRootPath, fileRelativePath);
+        if (File.Exists(savePath)) {
+            // 上传文件重名处理
+            var newFilename = $"{Path.GetFileNameWithoutExtension(file.FileName)}-{GuidUtils.GuidTo16String()}.{Path.GetExtension(file.FileName)}";
+            fileRelativePath = Path.Combine("media", "blog", post.Id, newFilename);
+            savePath = Path.Combine(_environment.WebRootPath, fileRelativePath);
+        }
+
         using (var fs = new FileStream(savePath, FileMode.Create)) {
             file.CopyTo(fs);
         }
