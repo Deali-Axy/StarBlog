@@ -21,7 +21,8 @@ function procImages(postId) {
         console.log(res)
         for (const imgElem of document.querySelectorAll('.post-content img')) {
             let originSrc = imgElem.getAttribute('src')
-            let newSrc = `/assets/blog/${res.data.path}/${originSrc}`
+            // let newSrc = `/assets/blog/${res.data.path}/${originSrc}`
+            let newSrc = `/media/blog/${res.data.id}/${originSrc}`
             console.log('originSrc', originSrc)
             console.log('newSrc', newSrc)
             imgElem.setAttribute('src', newSrc)
