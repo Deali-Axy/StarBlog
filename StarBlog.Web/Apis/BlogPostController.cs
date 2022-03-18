@@ -65,7 +65,9 @@ public class BlogPostController : ControllerBase {
         var post = _postService.GetById(id);
         if (post == null) return ApiResponse.NotFound($"博客 {id} 不存在");
 
-        post = _mapper.Map<Post>(dto);
+        // mapper.Map(source) 得到一个全新的对象
+        // mapper.Map(source, dest) 在 source 对象的基础上修改
+        post = _mapper.Map(dto, post);
         post.LastUpdateTime = DateTime.Now;
         return new ApiResponse<Post>(_postService.InsertOrUpdate(post));
     }
@@ -81,7 +83,10 @@ public class BlogPostController : ControllerBase {
         var post = _postService.GetById(id);
         if (post == null) return ApiResponse.NotFound($"博客 {id} 不存在");
         var imgUrl = _postService.UploadImage(post, file);
-        return ApiResponse.Ok(new { imgUrl });
+        return ApiResponse.Ok(new {
+            imgUrl,
+            imgName = Path.GetFileNameWithoutExtension(imgUrl)
+        });
     }
 
     /// <summary>
@@ -132,6 +137,6 @@ public class BlogPostController : ControllerBase {
         var post = _postService.GetById(id);
         if (post == null) return ApiResponse.NotFound($"博客 {id} 不存在");
         var (data, rows) = _blogService.SetTopPost(post);
-        return new ApiResponse<TopPost> { Data = data, Message = $"ok. deleted {rows} old topPosts." };
+        return new ApiResponse<TopPost> {Data = data, Message = $"ok. deleted {rows} old topPosts."};
     }
 }
