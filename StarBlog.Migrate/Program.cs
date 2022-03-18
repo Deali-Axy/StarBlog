@@ -4,9 +4,12 @@ using StarBlog.Contrib.Extensions;
 using StarBlog.Data;
 using StarBlog.Data.Models;
 using StarBlog.Contrib.Utils;
+using StarBlog.Migrate;
 
 // const string importDir = @"E:\Documents\0_Write\0_blog\";
 const string importDir = @"D:\blog\";
+
+var assetsPath = Path.GetFullPath("../../../../StarBlog.Web/wwwroot/media/blog");
 
 var exclusionDirs = new List<string> { ".git", "logseq", "pages" };
 
@@ -91,11 +94,9 @@ void WalkDirectoryTree(DirectoryInfo root) {
             reader.Close();
 
             // 保存文章
-            // todo 导入文章的时候要一并导入文章里的图片，并对图片相对路径做替换操作
             var post = new Post {
                 Id = GuidUtils.GuidTo16String(),
                 Title = fi.Name.Replace(".md", ""),
-                Summary = content.Limit(200),
                 Content = content,
                 Path = postPath,
                 CreationTime = fi.CreationTime,
@@ -103,6 +104,13 @@ void WalkDirectoryTree(DirectoryInfo root) {
                 CategoryId = categories[^1].Id,
                 Categories = string.Join(",", categories.Select(a => a.Id))
             };
+
+            // 处理文章正文内容
+            // 导入文章的时候一并导入文章里的图片，并对图片相对路径做替换操作
+            var processor = new PostProcessor(importDir, assetsPath, post);
+            post.Content = processor.MarkdownParse();
+            post.Summary = processor.GetSummary(200);
+
             postRepo.Insert(post);
         }
     }
