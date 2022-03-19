@@ -6,6 +6,7 @@ using Markdig.Syntax.Inlines;
 using StarBlog.Contrib.Utils;
 using StarBlog.Data.Models;
 using StarBlog.Web.ViewModels;
+using StarBlog.Web.ViewModels.QueryFilters;
 using X.PagedList;
 
 namespace StarBlog.Web.Services;
@@ -58,7 +59,8 @@ public class PostService {
         var savePath = Path.Combine(_environment.WebRootPath, fileRelativePath);
         if (File.Exists(savePath)) {
             // 上传文件重名处理
-            var newFilename = $"{Path.GetFileNameWithoutExtension(file.FileName)}-{GuidUtils.GuidTo16String()}.{Path.GetExtension(file.FileName)}";
+            var newFilename =
+                $"{Path.GetFileNameWithoutExtension(file.FileName)}-{GuidUtils.GuidTo16String()}.{Path.GetExtension(file.FileName)}";
             fileRelativePath = Path.Combine("media", "blog", post.Id, newFilename);
             savePath = Path.Combine(_environment.WebRootPath, fileRelativePath);
         }
@@ -85,22 +87,30 @@ public class PostService {
         return data;
     }
 
-    public IPagedList<Post> GetPagedList(int categoryId = 0, int page = 1, int pageSize = 10) {
-        List<Post> posts;
-        if (categoryId == 0) {
-            posts = _postRepo.Select
-                .OrderByDescending(a => a.LastUpdateTime)
-                .Include(a => a.Category)
-                .ToList();
-        }
-        else {
-            posts = _postRepo.Where(a => a.CategoryId == categoryId)
-                .OrderByDescending(a => a.LastUpdateTime)
-                .Include(a => a.Category)
-                .ToList();
+    public IPagedList<Post> GetPagedList(PostQueryParameters param) {
+        ISelect<Post> querySet;
+
+        // 分类过滤
+        querySet = param.CategoryId == 0
+            ? _postRepo.Select
+            : _postRepo.Where(a => a.CategoryId == param.CategoryId);
+
+        // 关键词过滤
+        if (param.Search != null) {
+            querySet = querySet.Where(a => a.Title.Contains(param.Search));
         }
 
-        return posts.ToPagedList(page, pageSize);
+        // 排序
+        if (param.SortBy != null) {
+            // 是否升序
+            var isAscending = !param.SortBy.StartsWith("-");
+            var orderByProperty = param.SortBy.Trim('-');
+
+            querySet = querySet.OrderByPropertyName(orderByProperty, isAscending);
+        }
+
+        return querySet.Include(a => a.Category).ToList()
+            .ToPagedList(param.Page, param.PageSize);
     }
 
     /// <summary>
@@ -154,15 +164,15 @@ public class PostService {
         var document = Markdown.Parse(post.Content);
 
         foreach (var node in document.AsEnumerable()) {
-            if (node is not ParagraphBlock { Inline: { } } paragraphBlock) continue;
+            if (node is not ParagraphBlock {Inline: { }} paragraphBlock) continue;
             foreach (var inline in paragraphBlock.Inline) {
-                if (inline is not LinkInline { IsImage: true } linkInline) continue;
+                if (inline is not LinkInline {IsImage: true} linkInline) continue;
 
                 var imgUrl = linkInline.Url;
                 if (imgUrl == null) continue;
                 if (isAddPrefix && imgUrl.StartsWith("http")) continue;
                 if (isAddPrefix) {
-                    if(imgUrl.StartsWith("http")) continue;
+                    if (imgUrl.StartsWith("http")) continue;
                     // 设置完整链接
                     linkInline.Url = $"{Host}/media/blog/{post.Id}/{imgUrl}";
                 }
