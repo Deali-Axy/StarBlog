@@ -4,6 +4,7 @@ using StarBlog.Contrib.SiteMessage;
 using StarBlog.Data.Models;
 using StarBlog.Web.Services;
 using StarBlog.Web.ViewModels;
+using StarBlog.Web.ViewModels.QueryFilters;
 using X.PagedList;
 
 namespace StarBlog.Web.Controllers;
@@ -31,7 +32,11 @@ public class BlogController : Controller {
             CurrentCategory = categoryId == 0 ? categories[0] : categories.First(a => a.Id == categoryId),
             CurrentCategoryId = categoryId,
             Categories = categories,
-            Posts = _postService.GetPagedList(categoryId, page, pageSize)
+            Posts = _postService.GetPagedList(new PostQueryParameters {
+                CategoryId = categoryId,
+                Page = page,
+                PageSize = pageSize
+            })
         });
     }
 

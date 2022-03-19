@@ -6,6 +6,7 @@ using StarBlog.Web.Extensions;
 using StarBlog.Web.Services;
 using StarBlog.Web.ViewModels;
 using StarBlog.Web.ViewModels.Blog;
+using StarBlog.Web.ViewModels.QueryFilters;
 using StarBlog.Web.ViewModels.Response;
 using X.PagedList;
 
@@ -31,8 +32,8 @@ public class BlogPostController : ControllerBase {
 
     [AllowAnonymous]
     [HttpGet]
-    public ApiResponsePaged<Post> GetList(int categoryId = 0, int page = 1, int pageSize = 10) {
-        var pagedList = _postService.GetPagedList(categoryId, page, pageSize);
+    public ApiResponsePaged<Post> GetList([FromQuery] PostQueryParameters param) {
+        var pagedList = _postService.GetPagedList(param);
         return new ApiResponsePaged<Post> {
             Message = "Get posts list",
             Data = pagedList.ToList(),
