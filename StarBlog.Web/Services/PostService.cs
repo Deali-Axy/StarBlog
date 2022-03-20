@@ -1,4 +1,5 @@
-﻿using FreeSql;
+﻿using System.Net;
+using FreeSql;
 using Markdig;
 using Markdig.Renderers.Normalize;
 using Markdig.Syntax;
@@ -55,12 +56,12 @@ public class PostService {
     public string UploadImage(Post post, IFormFile file) {
         InitPostMediaDir(post);
 
-        var fileRelativePath = Path.Combine("media", "blog", post.Id, file.FileName);
+        var filename = WebUtility.UrlEncode(file.FileName);
+        var fileRelativePath = Path.Combine("media", "blog", post.Id, filename);
         var savePath = Path.Combine(_environment.WebRootPath, fileRelativePath);
         if (File.Exists(savePath)) {
             // 上传文件重名处理
-            var newFilename =
-                $"{Path.GetFileNameWithoutExtension(file.FileName)}-{GuidUtils.GuidTo16String()}.{Path.GetExtension(file.FileName)}";
+            var newFilename = $"{Path.GetFileNameWithoutExtension(filename)}-{GuidUtils.GuidTo16String()}.{Path.GetExtension(filename)}";
             fileRelativePath = Path.Combine("media", "blog", post.Id, newFilename);
             savePath = Path.Combine(_environment.WebRootPath, fileRelativePath);
         }
