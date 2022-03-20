@@ -27,13 +27,13 @@ public class PostProcessor {
         var document = Markdown.Parse(_post.Content);
 
         foreach (var node in document.AsEnumerable()) {
-            if (node is not ParagraphBlock { Inline: { } } paragraphBlock) continue;
+            if (node is not ParagraphBlock {Inline: { }} paragraphBlock) continue;
             foreach (var inline in paragraphBlock.Inline) {
-                if (inline is not LinkInline { IsImage: true } linkInline) continue;
+                if (inline is not LinkInline {IsImage: true} linkInline) continue;
 
                 if (linkInline.Url == null) continue;
                 if (linkInline.Url.StartsWith("http")) continue;
-                
+
                 // 路径处理
                 var imgPath = Path.Combine(_importPath, _post.Path, linkInline.Url);
                 var imgFilename = Path.GetFileName(linkInline.Url);
@@ -41,8 +41,9 @@ public class PostProcessor {
                 if (!Directory.Exists(destDir)) Directory.CreateDirectory(destDir);
                 var destPath = Path.Combine(destDir, imgFilename);
                 if (File.Exists(destPath)) {
+                    // 图片重名处理
                     var imgId = GuidUtils.GuidTo16String();
-                    imgFilename = $"{imgId}-{Path.GetFileName(linkInline.Url)}";
+                    imgFilename = $"{Path.GetFileNameWithoutExtension(imgFilename)}-{imgId}.{Path.GetExtension(imgFilename)}";
                     destPath = Path.Combine(destDir, imgFilename);
                 }
 
