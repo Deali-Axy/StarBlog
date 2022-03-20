@@ -56,6 +56,7 @@ public class BlogPostController : ControllerBase {
         return ApiResponse.Ok($"删除了 {rows} 篇博客");
     }
 
+    // todo 这个添加文章的参数是不对的，得换成 DTO
     [HttpPost]
     public ApiResponse<Post> Add(Post post) {
         return new ApiResponse<Post>(_postService.InsertOrUpdate(post));
