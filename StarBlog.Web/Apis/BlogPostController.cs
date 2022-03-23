@@ -58,7 +58,26 @@ public class BlogPostController : ControllerBase {
 
     // todo 这个添加文章的参数是不对的，得换成 DTO
     [HttpPost]
-    public ApiResponse<Post> Add(Post post) {
+    public ApiResponse<Post> Add(PostCreationDto dto,
+        [FromServices] CategoryService categoryService) {
+        var post = _mapper.Map<Post>(dto);
+        var category = categoryService.GetById(dto.CategoryId);
+        if (category == null) return ApiResponse.BadRequest($"分类 {dto.CategoryId} 不存在！");
+
+        post.Id = Guid.NewGuid().ToString();
+        post.CreationTime = DateTime.Now;
+        post.LastUpdateTime = DateTime.Now;
+
+        var categories = new List<Category> { category };
+        var parent = category.Parent;
+        while (parent != null) {
+            categories.Add(parent);
+            parent = parent.Parent;
+        }
+
+        categories.Reverse();
+        post.Categories = string.Join(",", categories.Select(a => a.Id));
+
         return new ApiResponse<Post>(_postService.InsertOrUpdate(post));
     }
 
@@ -139,6 +158,6 @@ public class BlogPostController : ControllerBase {
         var post = _postService.GetById(id);
         if (post == null) return ApiResponse.NotFound($"博客 {id} 不存在");
         var (data, rows) = _blogService.SetTopPost(post);
-        return new ApiResponse<TopPost> {Data = data, Message = $"ok. deleted {rows} old topPosts."};
+        return new ApiResponse<TopPost> { Data = data, Message = $"ok. deleted {rows} old topPosts." };
     }
 }

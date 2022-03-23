@@ -23,7 +23,8 @@ public class CategoryService {
     }
 
     public Category? GetById(int id) {
-        return _cRepo.Where(a => a.Id == id).First();
+        return _cRepo.Where(a => a.Id == id)
+            .Include(a => a.Parent).First();
     }
 
     /// <summary>
@@ -34,7 +35,7 @@ public class CategoryService {
         var list = _cRepo.Select.IncludeMany(a => a.Posts).ToList();
         var data = new List<object>();
         foreach (var item in list) {
-            data.Add(new {name = item.Name, value = item.Posts.Count});
+            data.Add(new { name = item.Name, value = item.Posts.Count });
         }
 
         return data;
