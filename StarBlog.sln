@@ -20,6 +20,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarBlog.Contrib", "StarBlo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MarkdownParseTest", "demo\MarkdownParseTest\MarkdownParseTest.csproj", "{151BEDC5-57CC-4C6F-BCEE-6FABAADF06EF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RegTest", "demo\RegTest\RegTest.csproj", "{70FCE492-23CE-44D0-AE8B-E07D8F309EB6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -28,6 +30,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{0512E31F-954B-4E53-B3AF-F2EF206FAE33} = {68E4117F-1EC3-4B1D-B413-888607595781}
 		{151BEDC5-57CC-4C6F-BCEE-6FABAADF06EF} = {68E4117F-1EC3-4B1D-B413-888607595781}
+		{70FCE492-23CE-44D0-AE8B-E07D8F309EB6} = {68E4117F-1EC3-4B1D-B413-888607595781}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{0512E31F-954B-4E53-B3AF-F2EF206FAE33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -54,5 +57,9 @@ Global
 		{151BEDC5-57CC-4C6F-BCEE-6FABAADF06EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{151BEDC5-57CC-4C6F-BCEE-6FABAADF06EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{151BEDC5-57CC-4C6F-BCEE-6FABAADF06EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70FCE492-23CE-44D0-AE8B-E07D8F309EB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70FCE492-23CE-44D0-AE8B-E07D8F309EB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70FCE492-23CE-44D0-AE8B-E07D8F309EB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70FCE492-23CE-44D0-AE8B-E07D8F309EB6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
