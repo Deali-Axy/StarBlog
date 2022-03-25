@@ -42,16 +42,10 @@ void WalkDirectoryTree(DirectoryInfo root) {
     FileInfo[]? files = null;
     DirectoryInfo[]? subDirs = null;
 
-    // First, process all the files directly under this folder
     try {
         files = root.GetFiles("*.md");
     }
-    // This is thrown if even one of the files requires permissions greater
-    // than the application provides.
     catch (UnauthorizedAccessException e) {
-        // This code just writes out the message and continues to recurse.
-        // You may decide to do something different here. For example, you
-        // can try to elevate your privileges and access the file again.
         Console.WriteLine(e.Message);
     }
     catch (DirectoryNotFoundException e) {
@@ -60,10 +54,6 @@ void WalkDirectoryTree(DirectoryInfo root) {
 
     if (files != null) {
         foreach (var fi in files) {
-            // In this example, we only access the existing FileInfo object. If we
-            // want to open, delete or modify the file, then
-            // a try-catch block is required here to handle the case
-            // where the file has been deleted since the call to TraverseTree().
             Console.WriteLine(fi.FullName);
             var postPath = fi.DirectoryName!.Replace(importDir, "");
 
