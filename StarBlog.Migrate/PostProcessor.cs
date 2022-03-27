@@ -1,4 +1,5 @@
-﻿using Markdig;
+﻿using System.Text.RegularExpressions;
+using Markdig;
 using Markdig.Renderers.Normalize;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
@@ -63,7 +64,35 @@ public class PostProcessor {
         return writer.ToString();
     }
 
+    /// <summary>
+    /// 从文章正文提取前 <paramref name="length"/> 字的梗概
+    /// </summary>
+    /// <param name="length"></param>
+    /// <returns></returns>
     public string GetSummary(int length) {
-        return Markdown.ToPlainText(_post.Content).Limit(length);
+        return _post.Content == null
+            ? string.Empty
+            : Markdown.ToPlainText(_post.Content).Limit(length);
+    }
+
+    /// <summary>
+    /// 填充文章状态和标题
+    /// </summary>
+    /// <returns></returns>
+    public (string, string) InflateStatusTitle() {
+        const string pattern = @"（(.+)）(.+)";
+        var status = "已发表";
+        var title = _post.Title;
+        if (title == null) return (status, "");
+        var result = Regex.Match(title, pattern);
+        if (!result.Success) return (status, title);
+        
+        status = result.Groups[1].Value;
+        title = result.Groups[2].Value;
+
+        _post.Status = status;
+        _post.Title = title;
+
+        return (status, title);
     }
 }
