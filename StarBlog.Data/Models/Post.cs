@@ -14,6 +14,11 @@ public class Post {
     /// 标题
     /// </summary>
     public string? Title { get; set; }
+    
+    /// <summary>
+    /// 文章状态
+    /// </summary>
+    public string? Status { get; set; }
 
     /// <summary>
     /// 梗概
