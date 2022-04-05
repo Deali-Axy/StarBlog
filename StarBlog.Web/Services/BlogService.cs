@@ -1,15 +1,43 @@
 ﻿using FreeSql;
 using StarBlog.Data.Models;
+using StarBlog.Web.ViewModels.Blog;
 
 namespace StarBlog.Web.Services;
 
 public class BlogService {
+    private readonly IBaseRepository<Post> _postRepo;
+    private readonly IBaseRepository<Category> _categoryRepo;
+    private readonly IBaseRepository<Photo> _photoRepo;
     private readonly IBaseRepository<TopPost> _topPostRepo;
-    private readonly IBaseRepository<FeaturedPost> _featuredPostRepo;
+    private readonly IBaseRepository<FeaturedPost> _fPostRepo;
+    private readonly IBaseRepository<FeaturedCategory> _fCategoryRepo;
+    private readonly IBaseRepository<FeaturedPhoto> _fPhotoRepo;
 
-    public BlogService(IBaseRepository<TopPost> topPostRepo, IBaseRepository<FeaturedPost> featuredPostRepo) {
+    public BlogService(IBaseRepository<TopPost> topPostRepo, IBaseRepository<FeaturedPost> fPostRepo, IBaseRepository<Post> postRepo,
+        IBaseRepository<Category> categoryRepo, IBaseRepository<Photo> photoRepo, IBaseRepository<FeaturedCategory> fCategoryRepo,
+        IBaseRepository<FeaturedPhoto> fPhotoRepo) {
         _topPostRepo = topPostRepo;
-        _featuredPostRepo = featuredPostRepo;
+        _fPostRepo = fPostRepo;
+        _postRepo = postRepo;
+        _categoryRepo = categoryRepo;
+        _photoRepo = photoRepo;
+        _fCategoryRepo = fCategoryRepo;
+        _fPhotoRepo = fPhotoRepo;
+    }
+
+    /// <summary>
+    /// 获取博客信息概况
+    /// </summary>
+    /// <returns></returns>
+    public BlogOverview Overview() {
+        return new BlogOverview {
+            PostsCount = _postRepo.Select.Count(),
+            CategoriesCount = _categoryRepo.Select.Count(),
+            PhotosCount = _photoRepo.Select.Count(),
+            FeaturedPostsCount = _fPostRepo.Select.Count(),
+            FeaturedCategoriesCount = _fCategoryRepo.Select.Count(),
+            FeaturedPhotosCount = _fPhotoRepo.Select.Count()
+        };
     }
 
     public Post? GetTopOnePost() {
@@ -33,21 +61,21 @@ public class BlogService {
     }
 
     public List<Post> GetFeaturedPosts() {
-        return _featuredPostRepo.Select.Include(a => a.Post.Category)
+        return _fPostRepo.Select.Include(a => a.Post.Category)
             .ToList(a => a.Post);
     }
 
     public FeaturedPost AddFeaturedPost(Post post) {
-        var item = _featuredPostRepo.Where(a => a.PostId == post.Id).First();
+        var item = _fPostRepo.Where(a => a.PostId == post.Id).First();
         if (item != null) return item;
         item = new FeaturedPost {PostId = post.Id};
-        _featuredPostRepo.Insert(item);
+        _fPostRepo.Insert(item);
         return item;
     }
 
     public int DeleteFeaturedPost(Post post) {
-        var item = _featuredPostRepo.Where(a => a.PostId == post.Id).First();
-        return item == null ? 0 : _featuredPostRepo.Delete(item);
+        var item = _fPostRepo.Where(a => a.PostId == post.Id).First();
+        return item == null ? 0 : _fPostRepo.Delete(item);
     }
 
     /// <summary>

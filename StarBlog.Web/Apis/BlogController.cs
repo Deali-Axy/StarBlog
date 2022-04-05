@@ -1,8 +1,10 @@
 ﻿using FreeSql;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StarBlog.Data.Models;
 using StarBlog.Web.Services;
 using StarBlog.Web.ViewModels;
+using StarBlog.Web.ViewModels.Blog;
 using StarBlog.Web.ViewModels.Response;
 
 namespace StarBlog.Web.Apis;
@@ -27,7 +29,7 @@ public class BlogController : ControllerBase {
     /// <returns></returns>
     [HttpGet("Top")]
     public ApiResponse<Post> GetTopOnePost() {
-        return new ApiResponse<Post> { Data = _blogService.GetTopOnePost() };
+        return new ApiResponse<Post> {Data = _blogService.GetTopOnePost()};
     }
 
     /// <summary>
@@ -37,5 +39,15 @@ public class BlogController : ControllerBase {
     [HttpGet("Featured")]
     public ApiResponse<List<Post>> GetFeaturedPostRows() {
         return new ApiResponse<List<Post>>(_blogService.GetFeaturedPosts());
+    }
+
+    /// <summary>
+    /// 博客信息概况
+    /// </summary>
+    /// <returns></returns>
+    // [Authorize]
+    [HttpGet("[action]")]
+    public ApiResponse<BlogOverview> Overview() {
+        return new ApiResponse<BlogOverview>(_blogService.Overview());
     }
 }
