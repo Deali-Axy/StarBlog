@@ -11,10 +11,10 @@ const string importDir = @"D:\blog\";
 
 var assetsPath = Path.GetFullPath("../../../../StarBlog.Web/wwwroot/media/blog");
 
-var exclusionDirs = new List<string> { ".git", "logseq", "pages" };
+var exclusionDirs = new List<string> {".git", "logseq", "pages"};
 
 // 删除旧文件
-var removeFileList = new List<string> { "app.db", "app.db-shm", "app.db-wal" };
+var removeFileList = new List<string> {"app.db", "app.db-shm", "app.db-wal"};
 foreach (var filename in removeFileList.Where(File.Exists)) {
     Console.WriteLine($"删除旧文件：{filename}");
     File.Delete(filename);
@@ -62,7 +62,7 @@ void WalkDirectoryTree(DirectoryInfo root) {
             var categories = new List<Category>();
             if (categoryNames.Length > 0) {
                 var rootCategory = categoryRepo.Where(a => a.Name == categoryNames[0]).First()
-                                   ?? categoryRepo.Insert(new Category { Name = categoryNames[0] });
+                                   ?? categoryRepo.Insert(new Category {Name = categoryNames[0]});
                 categories.Add(rootCategory);
                 Console.WriteLine($"+ 添加分类: {rootCategory.Id}.{rootCategory.Name}");
                 for (var i = 1; i < categoryNames.Length; i++) {
@@ -95,9 +95,14 @@ void WalkDirectoryTree(DirectoryInfo root) {
                 Categories = string.Join(",", categories.Select(a => a.Id))
             };
 
+
+            var processor = new PostProcessor(importDir, assetsPath, post);
+
+            // 处理文章标题和状态
+            processor.InflateStatusTitle();
+
             // 处理文章正文内容
             // 导入文章的时候一并导入文章里的图片，并对图片相对路径做替换操作
-            var processor = new PostProcessor(importDir, assetsPath, post);
             post.Content = processor.MarkdownParse();
             post.Summary = processor.GetSummary(200);
 
