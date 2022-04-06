@@ -4,6 +4,16 @@
 
 后端基于最新的`.Net6`和`Asp.Net Core`框架，遵循RESTFul接口规范，前端基于`Vue`+`ElementUI`开发，可作为 .Net Core 入门项目学习~
 
+配套了一系列的开发笔记记录本项目开发过程，欢迎关注
+
+- [基于.NetCore开发博客项目 StarBlog - (1) 为什么需要自己写一个博客？](https://www.cnblogs.com/deali/p/16104454.html)
+- 更新中...
+
+公众号 | 公众号 |
+------- | ------ | 
+![](https://gitee.com/deali/CodeZone/raw/master/images/coding_lab_logo.jpg) | ![](https://gitee.com/deali/CodeZone/raw/master/images/coding_lab_qr_code.jpg)   |
+
+
 ## 前言
 
 OK，我也来造轮子了
