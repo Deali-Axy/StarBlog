@@ -51,6 +51,43 @@ OK，大概就这些了~ 更多功能可能后面想到了就加上~
 - 管理端：Vue + Vuex + VueRouter
 - 管理端UI：SCSS + ElementUI
 
+## 项目结构
+
+- `StarBlog.Contrib`：一些共享库
+- `StarBlog.Data`：数据模型
+- `StarBlog.Migrate`：博客文章导入，运行该项目可以将markdown文章批量导入
+- `StarBlog.Web`：博客主项目
+
+## Build
+
+本项目基于 .Net6 开发，构建之前请确保已经安装 .Net6 SDK。
+
+本项目的前端资源使用 `NPM` + `Gulp` 管理，可使用 `NPM` 或 `Yarn` 安装依赖：
+
+详情可以查看这篇博客：[Asp-Net-Core开发笔记：使用NPM和gulp管理前端静态文件](https://www.cnblogs.com/deali/p/15905760.html)
+
+在 `StarBlog.Web` 目录下执行命令
+
+```bash
+npm install
+// 或者
+yarn
+```
+
+安装 `gulp-cli` 工具
+
+```bash
+npm install --global gulp-cli
+```
+
+执行gulp任务（同样是在 `StarBlog.Web` 目录下执行命令）
+
+```bash
+gulp move
+```
+
+然后运行 `StarBlog.Web` 项目即可
+
 
 ## 博客截图
 
