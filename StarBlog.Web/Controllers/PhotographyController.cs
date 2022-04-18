@@ -28,7 +28,12 @@ public class PhotographyController : Controller {
 
     public IActionResult RandomPhoto() {
         var item = _photoService.GetRandomPhoto();
+        if (item == null) {
+            _messages.Error("当前没有图片，请先上传！");
+            return RedirectToAction("Index", "Home");
+        }
+
         _messages.Info($"随机推荐了图片 <b>{item.Title}</b> 给你~");
-        return RedirectToAction(nameof(Photo), new {id = item.Id});
+        return RedirectToAction(nameof(Photo), new { id = item.Id });
     }
 }
