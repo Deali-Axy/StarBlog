@@ -81,17 +81,21 @@ public class PostProcessor {
     /// <returns></returns>
     public (string, string) InflateStatusTitle() {
         const string pattern = @"（(.+)）(.+)";
-        var status = "已发表";
+        var status = "已发布";
         var title = _post.Title;
         if (title == null) return (status, "");
         var result = Regex.Match(title, pattern);
         if (!result.Success) return (status, title);
-        
+
         status = result.Groups[1].Value;
         title = result.Groups[2].Value;
 
         _post.Status = status;
         _post.Title = title;
+
+        if (new[] {"已发表", "已发布"}.Contains(_post.Status)) {
+            _post.IsPublish = true;
+        }
 
         return (status, title);
     }
