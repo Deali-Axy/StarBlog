@@ -5,7 +5,6 @@ namespace StarBlog.Data.Models;
 /// <summary>
 /// 博客文章
 /// </summary>
-/// todo 增加文章状态字段
 public class Post {
     [Column(IsIdentity = false, IsPrimary = true)]
     public string? Id { get; set; }
@@ -16,9 +15,16 @@ public class Post {
     public string? Title { get; set; }
     
     /// <summary>
-    /// 文章状态
+    /// 文章状态，提取原markdown文件的文件名前缀，用于区分文章状态，例子如下
+    /// <para>《（未完成）StarBlog博客开发笔记(3)：模型设计》</para>
+    /// <para>《（未发布）StarBlog博客开发笔记(3)：模型设计》</para>
     /// </summary>
     public string? Status { get; set; }
+
+    /// <summary>
+    /// 是否发表（不发表的话就是草稿状态）
+    /// </summary>
+    public bool IsPublish { get; set; }
 
     /// <summary>
     /// 梗概
