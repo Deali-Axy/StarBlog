@@ -85,7 +85,7 @@ public class PostProcessor {
     /// <returns></returns>
     public (string, string) InflateStatusTitle() {
         const string pattern = @"（(.+)）(.+)";
-        var status = "已发布";
+        var status = _post.Status ?? "已发布";
         var title = _post.Title;
         if (title == null) return (status, "");
         var result = Regex.Match(title, pattern);
