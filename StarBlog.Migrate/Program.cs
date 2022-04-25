@@ -86,6 +86,7 @@ void WalkDirectoryTree(DirectoryInfo root) {
             // 保存文章
             var post = new Post {
                 Id = GuidUtils.GuidTo16String(),
+                Status = "已发布",
                 Title = fi.Name.Replace(".md", ""),
                 IsPublish = true,
                 Content = content,
