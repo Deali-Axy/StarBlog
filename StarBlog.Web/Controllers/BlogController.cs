@@ -37,7 +37,8 @@ public class BlogController : Controller {
             Posts = _postService.GetPagedList(new PostQueryParameters {
                 CategoryId = categoryId,
                 Page = page,
-                PageSize = pageSize
+                PageSize = pageSize,
+                OnlyPublished = true
             })
         });
     }
