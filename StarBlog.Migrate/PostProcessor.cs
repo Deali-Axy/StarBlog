@@ -25,12 +25,16 @@ public class PostProcessor {
     /// </summary>
     /// <returns></returns>
     public string MarkdownParse() {
+        if (_post.Content == null) {
+            return string.Empty;
+        }
+
         var document = Markdown.Parse(_post.Content);
 
         foreach (var node in document.AsEnumerable()) {
-            if (node is not ParagraphBlock {Inline: { }} paragraphBlock) continue;
+            if (node is not ParagraphBlock { Inline: { } } paragraphBlock) continue;
             foreach (var inline in paragraphBlock.Inline) {
-                if (inline is not LinkInline {IsImage: true} linkInline) continue;
+                if (inline is not LinkInline { IsImage: true } linkInline) continue;
 
                 if (linkInline.Url == null) continue;
                 if (linkInline.Url.StartsWith("http")) continue;
@@ -93,8 +97,8 @@ public class PostProcessor {
         _post.Status = status;
         _post.Title = title;
 
-        if (new[] {"已发表", "已发布"}.Contains(_post.Status)) {
-            _post.IsPublish = true;
+        if (!new[] { "已发表", "已发布" }.Contains(_post.Status)) {
+            _post.IsPublish = false;
         }
 
         return (status, title);

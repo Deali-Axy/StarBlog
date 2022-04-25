@@ -6,7 +6,7 @@ using Markdig.Renderers.Normalize;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 
-var filepath = @"E:\Documents\0_Write\0_blog\机器学习\多个约束条件下的二维装箱问题——寻找《开罗拉面店》最优布局.md";
+var filepath = @"D:\blog\Django\项目完成小结-Django3.x版本-开发部署小结.md";
 var md = File.ReadAllText(filepath);
 
 var document = Markdown.Parse(md);
@@ -14,7 +14,7 @@ var document = Markdown.Parse(md);
 foreach (var node in document.AsEnumerable()) {
     if (node is ParagraphBlock { Inline: { } } paragraphBlock) {
         foreach (var inline in paragraphBlock.Inline) {
-            if (inline is LinkInline {IsImage: true} linkInline) {
+            if (inline is LinkInline { IsImage: true } linkInline) {
                 linkInline.Url = $"http://127.0.0.1:5038/assets/blog/{linkInline.Url}";
                 Console.WriteLine(linkInline.Url);
             }
@@ -23,10 +23,9 @@ foreach (var node in document.AsEnumerable()) {
 }
 
 
-using (var writer = new StringWriter()) {
-    var render = new NormalizeRenderer(writer);
-    render.Render(document);
-
-    Console.WriteLine(writer.ToString());
-}
-
+// using (var writer = new StringWriter()) {
+//     var render = new NormalizeRenderer(writer);
+//     render.Render(document);
+//
+//     Console.WriteLine(writer.ToString());
+// }

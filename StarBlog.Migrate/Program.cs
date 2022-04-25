@@ -87,6 +87,7 @@ void WalkDirectoryTree(DirectoryInfo root) {
             var post = new Post {
                 Id = GuidUtils.GuidTo16String(),
                 Title = fi.Name.Replace(".md", ""),
+                IsPublish = true,
                 Content = content,
                 Path = postPath,
                 CreationTime = fi.CreationTime,
