@@ -6,8 +6,8 @@ using StarBlog.Data.Models;
 using StarBlog.Contrib.Utils;
 using StarBlog.Migrate;
 
-// const string importDir = @"E:\Documents\0_Write\0_blog\";
-const string importDir = @"D:\blog\";
+const string importDir = @"E:\Documents\0_Write\0_blog\";
+// const string importDir = @"D:\blog\";
 
 var assetsPath = Path.GetFullPath("../../../../StarBlog.Web/wwwroot/media/blog");
 
