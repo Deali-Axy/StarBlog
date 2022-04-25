@@ -84,7 +84,7 @@ public class PostProcessor {
     /// </summary>
     /// <returns></returns>
     public (string, string) InflateStatusTitle() {
-        const string pattern = @"（(.+)）(.+)";
+        const string pattern = @"^（(.+)）(.+)$";
         var status = _post.Status ?? "已发布";
         var title = _post.Title;
         if (title == null) return (status, "");
