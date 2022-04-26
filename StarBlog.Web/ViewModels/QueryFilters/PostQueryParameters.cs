@@ -8,6 +8,11 @@ public class PostQueryParameters : QueryParameters {
     /// 仅请求已发布文章
     /// </summary>
     public bool OnlyPublished { get; set; } = false;
+
+    /// <summary>
+    /// 文章状态
+    /// </summary>
+    public string? Status { get; set; }
     
     /// <summary>
     /// 分类ID

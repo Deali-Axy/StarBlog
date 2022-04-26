@@ -91,8 +91,14 @@ public class PostService {
     public IPagedList<Post> GetPagedList(PostQueryParameters param) {
         var querySet = _postRepo.Select;
 
+        // 是否发布
         if (param.OnlyPublished) {
             querySet = _postRepo.Select.Where(a => a.IsPublish);
+        }
+
+        // 状态过滤
+        if (!string.IsNullOrEmpty(param.Status)) {
+            querySet = querySet.Where(a => a.Status == param.Status);
         }
 
         // 分类过滤
@@ -101,12 +107,12 @@ public class PostService {
         }
 
         // 关键词过滤
-        if (param.Search != null) {
+        if (!string.IsNullOrEmpty(param.Search)) {
             querySet = querySet.Where(a => a.Title.Contains(param.Search));
         }
 
         // 排序
-        if (param.SortBy != null) {
+        if (!string.IsNullOrEmpty(param.SortBy)) {
             // 是否升序
             var isAscending = !param.SortBy.StartsWith("-");
             var orderByProperty = param.SortBy.Trim('-');
@@ -169,9 +175,9 @@ public class PostService {
         var document = Markdown.Parse(post.Content);
 
         foreach (var node in document.AsEnumerable()) {
-            if (node is not ParagraphBlock { Inline: { } } paragraphBlock) continue;
+            if (node is not ParagraphBlock {Inline: { }} paragraphBlock) continue;
             foreach (var inline in paragraphBlock.Inline) {
-                if (inline is not LinkInline { IsImage: true } linkInline) continue;
+                if (inline is not LinkInline {IsImage: true} linkInline) continue;
 
                 var imgUrl = linkInline.Url;
                 if (imgUrl == null) continue;

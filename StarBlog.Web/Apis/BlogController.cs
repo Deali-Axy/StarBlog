@@ -50,4 +50,13 @@ public class BlogController : ControllerBase {
     public ApiResponse<BlogOverview> Overview() {
         return new ApiResponse<BlogOverview>(_blogService.Overview());
     }
+
+    /// <summary>
+    /// 博客文章状态列表
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("[action]")]
+    public ApiResponse GetStatusList() {
+        return ApiResponse.Ok(_blogService.GetStatusList());
+    }
 }

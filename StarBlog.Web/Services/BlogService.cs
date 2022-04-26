@@ -89,4 +89,13 @@ public class BlogService {
         _topPostRepo.Insert(item);
         return (item, rows);
     }
+
+    /// <summary>
+    /// 获取文章的状态列表
+    /// </summary>
+    /// <returns></returns>
+    public List<string?> GetStatusList() {
+        return _postRepo.Select.GroupBy(a => a.Status)
+            .ToList(a => a.Key);
+    }
 }
