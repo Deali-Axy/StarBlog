@@ -87,7 +87,7 @@ public class PostProcessor {
         const string pattern = @"^（(.+)）(.+)$";
         var status = _post.Status ?? "已发布";
         var title = _post.Title;
-        if (string.IsNullOrEmpty(title)) return (status, "");
+        if (string.IsNullOrEmpty(title)) return (status, $"未命名文章{_post.CreationTime.ToLongDateString()}");
         var result = Regex.Match(title, pattern);
         if (!result.Success) return (status, title);
 
