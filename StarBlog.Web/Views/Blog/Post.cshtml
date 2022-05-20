@@ -29,32 +29,38 @@
             </div>
         </div>
         <div class="col-lg-9">
-            <header class="post-header py-3 mb-3 border-bottom">
+            <header class="post-header py-3 mb-3">
                 <div class="post-title h3 font-weight-bold">@Model.Title</div>
+                <div class="border-bottom my-3"></div>
                 <div class="post-meta">
-                    <div>
-                        发布于：
-                        <span>@Model.CreationTime.ToShortDateString()</span>
-                        <span>@Model.CreationTime.ToString("hh:mm")</span>
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            发布于：
+                            <span>@Model.CreationTime.ToShortDateString()</span>
+                            <span>@Model.CreationTime.ToString("hh:mm")</span>
+                        </div>
+                        <div>
+                            更新于：
+                            @Model.LastUpdateTime.ToShortDateString()
+                            @Model.LastUpdateTime.ToString("hh:mm")
+                        </div>                       
                     </div>
-                    <div>
-                        更新于：
-                        @Model.LastUpdateTime.ToLongDateString()
-                        @Model.LastUpdateTime.ToLongTimeString()
-                    </div>
-                    <span>字数：@Model.Content.Length.ToString()</span>
-                    <span>
-                        分类：
-                        @foreach (var category in Model.Categories) {
-                            @if (Model.Categories.IndexOf(category) > 0) {
-                                <span> / </span>
+
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            分类：
+                            @foreach (var category in Model.Categories) {
+                                @if (Model.Categories.IndexOf(category) > 0) {
+                                    <span> / </span>
+                                }
+                                <a asp-controller="Blog" asp-action="List"
+                                   asp-route-categoryId="@category.Id">
+                                    @category.Name
+                                </a>
                             }
-                            <a asp-controller="Blog" asp-action="List"
-                               asp-route-categoryId="@category.Id">
-                                @category.Name
-                            </a>
-                        }
-                    </span>
+                        </div>
+                        <div>字数：@Model.Content.Length.ToString()</div>
+                    </div>
                 </div>
             </header>
             <div id="test-editormd-view" class="post-content">
