@@ -43,6 +43,10 @@ public class BlogController : Controller {
         });
     }
 
+    public IActionResult List2() {
+        return View();
+    }
+
     public IActionResult Post(string id) {
         return View(_postService.GetPostViewModel(_postRepo.Where(a => a.Id == id)
             .Include(a => a.Category)
