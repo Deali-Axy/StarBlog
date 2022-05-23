@@ -35,6 +35,7 @@ const libs = [
     {name: "jquery", dist: "./node_modules/jquery/dist/**/*.*"},
     {name: "popper", dist: "./node_modules/popper.js/dist/**/*.*"},
     {name: "bootstrap", dist: "./node_modules/bootstrap/dist/**/*.*"},
+    {name: "bootstrap-treeview", dist: "./node_modules/bootstrap-treeview/dist/**/*.*"},
     {name: "bootswatch", dist: "./node_modules/bootswatch/dist/**/*.*"},
     {name: "prismjs", dist: "./node_modules/prismjs/**/*.*"},
     {name: 'vue', dist: './node_modules/vue/dist/**/*.*'},
