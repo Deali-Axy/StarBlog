@@ -14,6 +14,18 @@ public class CategoryService {
         _fcRepo = fcRepo;
     }
 
+    public List<CategoryNode>? GetNodes(int parentId = 0) {
+        var categories = _cRepo.Select
+            .Where(a => a.ParentId == parentId).ToList();
+
+        if (categories.Count == 0) return null;
+
+        return categories.Select(category => new CategoryNode {
+            text = category.Name,
+            nodes = GetNodes(category.Id)
+        }).ToList();
+    }
+
     public List<Category> GetAll() {
         return _cRepo.Select.ToList();
     }
