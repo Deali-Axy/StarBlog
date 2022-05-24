@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using StarBlog.Contrib.SiteMessage;
 using StarBlog.Data.Extensions;
 using StarBlog.Web.Extensions;
@@ -23,6 +24,7 @@ builder.Services.AddCors(options => {
 builder.Services.AddSwagger();
 builder.Services.AddSettings(builder.Configuration);
 builder.Services.AddAuth(builder.Configuration);
+builder.Services.AddHttpContextAccessor();
 
 // 自定义服务
 builder.Services.AddScoped<BlogService>();
