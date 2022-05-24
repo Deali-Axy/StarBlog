@@ -1,5 +1,7 @@
 ﻿using FreeSql;
+using Microsoft.AspNetCore.Mvc;
 using StarBlog.Data.Models;
+using StarBlog.Web.Controllers;
 using StarBlog.Web.ViewModels.Categories;
 using X.PagedList;
 
@@ -8,20 +10,31 @@ namespace StarBlog.Web.Services;
 public class CategoryService {
     private readonly IBaseRepository<Category> _cRepo;
     private readonly IBaseRepository<FeaturedCategory> _fcRepo;
+    private readonly IHttpContextAccessor _accessor;
+    private readonly LinkGenerator _generator;
 
-    public CategoryService(IBaseRepository<Category> cRepo, IBaseRepository<FeaturedCategory> fcRepo) {
+    public CategoryService(IBaseRepository<Category> cRepo, IBaseRepository<FeaturedCategory> fcRepo,
+        IHttpContextAccessor accessor, LinkGenerator generator) {
         _cRepo = cRepo;
         _fcRepo = fcRepo;
+        _accessor = accessor;
+        _generator = generator;
     }
 
     public List<CategoryNode>? GetNodes(int parentId = 0) {
         var categories = _cRepo.Select
-            .Where(a => a.ParentId == parentId).ToList();
+            .Where(a => a.ParentId == parentId && a.Visible).ToList();
 
         if (categories.Count == 0) return null;
 
         return categories.Select(category => new CategoryNode {
             text = category.Name,
+            href = _generator.GetUriByAction(
+                _accessor.HttpContext!,
+                nameof(BlogController.List),
+                "Blog",
+                new {categoryId = category.Id}
+            ),
             nodes = GetNodes(category.Id)
         }).ToList();
     }
@@ -47,7 +60,7 @@ public class CategoryService {
         var list = _cRepo.Select.IncludeMany(a => a.Posts).ToList();
         var data = new List<object>();
         foreach (var item in list) {
-            data.Add(new { name = item.Name, value = item.Posts.Count });
+            data.Add(new {name = item.Name, value = item.Posts.Count});
         }
 
         return data;
