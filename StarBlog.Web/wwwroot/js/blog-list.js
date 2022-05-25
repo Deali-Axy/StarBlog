@@ -2,10 +2,9 @@ const initTreeView = function (data) {
     return $('#categories').treeview({
         data: data,
         levels: 1,
-        collapseIcon: "fa fa-caret-down",
         enableLinks: true,
-        expandIcon: "fa fa-caret-right",
-        emptyIcon: 'fa fa-circle-o',
+        highlightSelected: false,
+        showTags: true,
         onNodeSelected: function (event, data) {
             console.log(data)
         },

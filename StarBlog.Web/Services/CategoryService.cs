@@ -13,8 +13,10 @@ public class CategoryService {
     private readonly IHttpContextAccessor _accessor;
     private readonly LinkGenerator _generator;
 
-    public CategoryService(IBaseRepository<Category> cRepo, IBaseRepository<FeaturedCategory> fcRepo,
-        IHttpContextAccessor accessor, LinkGenerator generator) {
+    public CategoryService(IBaseRepository<Category> cRepo,
+        IBaseRepository<FeaturedCategory> fcRepo,
+        IHttpContextAccessor accessor,
+        LinkGenerator generator) {
         _cRepo = cRepo;
         _fcRepo = fcRepo;
         _accessor = accessor;
@@ -23,7 +25,8 @@ public class CategoryService {
 
     public List<CategoryNode>? GetNodes(int parentId = 0) {
         var categories = _cRepo.Select
-            .Where(a => a.ParentId == parentId && a.Visible).ToList();
+            .Where(a => a.ParentId == parentId && a.Visible)
+            .IncludeMany(a => a.Posts).ToList();
 
         if (categories.Count == 0) return null;
 
@@ -33,8 +36,9 @@ public class CategoryService {
                 _accessor.HttpContext!,
                 nameof(BlogController.List),
                 "Blog",
-                new {categoryId = category.Id}
+                new { categoryId = category.Id }
             ),
+            tags = new List<string> { category.Posts.Count.ToString() },
             nodes = GetNodes(category.Id)
         }).ToList();
     }
@@ -60,7 +64,7 @@ public class CategoryService {
         var list = _cRepo.Select.IncludeMany(a => a.Posts).ToList();
         var data = new List<object>();
         foreach (var item in list) {
-            data.Add(new {name = item.Name, value = item.Posts.Count});
+            data.Add(new { name = item.Name, value = item.Posts.Count });
         }
 
         return data;
