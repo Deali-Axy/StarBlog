@@ -31,7 +31,7 @@ public class BlogController : Controller {
     public IActionResult List(int categoryId = 0, int page = 1, int pageSize = 5) {
         var categories = _categoryRepo.Where(a => a.Visible)
             .IncludeMany(a => a.Posts).ToList();
-        categories.Insert(0, new Category {Id = 0, Name = "All", Posts = _postRepo.Select.ToList()});
+        categories.Insert(0, new Category { Id = 0, Name = "All", Posts = _postRepo.Select.ToList() });
 
         return View(new BlogListViewModel {
             CurrentCategory = categoryId == 0 ? categories[0] : categories.First(a => a.Id == categoryId),
@@ -63,5 +63,9 @@ public class BlogController : Controller {
         var rndPost = posts[new Random().Next(posts.Count)];
         _messages.Info($"随机推荐了文章 <b>{rndPost.Title}</b> 给你~");
         return RedirectToAction(nameof(Post), new {id = rndPost.Id});
+    }
+    
+    public IActionResult Temp() {
+        return View();
     }
 }

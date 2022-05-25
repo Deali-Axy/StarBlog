@@ -1,0 +1,64 @@
+﻿@{
+    ViewData["Title"] = "测试页面";
+}
+
+@section head {
+    <style>
+        .dropdown.dropdown-item:active {
+          background-color: inherit;
+        }
+    </style>
+}
+
+
+<div class="container px-4 py-3">
+    <h2 class="d-flex w-100 justify-content-between pb-2 mb-3 border-bottom">
+        <div>Blog / Temp</div>
+    </h2>
+
+    <div class="dropend">
+        <a class="btn dropdown-toggle"> Dropdown link </a>
+        <ul class="dropdown-menu">
+            <div class="dropdown-item dropend">
+                <a class="btn dropdown-toggle"> Dropdown link </a>
+                <ul class="dropdown-menu">
+                    <div class="dropdown-item dropend">
+                        <a class="btn dropdown-toggle"> Dropdown link </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item">Action</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item">Another action</a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item">Something else here</a>
+                            </li>
+                        </ul>
+                    </div>
+                </ul>
+            </div>
+        </ul>
+    </div>
+</div>
+
+
+@section bottom {
+    <script>
+        document.querySelectorAll('.dropend .dropdown-toggle').forEach((a) => {
+          let dropdown;
+          a.addEventListener('click', (e) => {
+            const show = a.classList.contains('show');
+            if (show) {
+              a.classList.remove('show');
+              dropdown.hide();
+            } else {
+              a.setAttribute('data-bs-toggle', 'dropend');
+              dropdown.show();
+              a.removeAttribute('data-bs-toggle');
+            }
+          });
+          dropdown = new bootstrap.Dropdown(a);
+        });
+    </script>
+}
