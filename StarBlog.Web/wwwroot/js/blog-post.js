@@ -16,6 +16,12 @@
     });
 })
 
+/**
+ * 转换文章里的图片链接
+ * 
+ * @deprecated 现在不需要了，直接在后端处理
+ * @param postId
+ */
 function procImages(postId) {
     $.get(`/Api/BlogPost/${postId}/`, function (res) {
         console.log(res)
