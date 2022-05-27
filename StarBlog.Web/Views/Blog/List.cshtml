@@ -33,6 +33,10 @@
         </div>
 
         <div class="col-lg-9">
+            @if (Model.Posts.Count == 0) {
+                <partial name="Widgets/NoPostCard"/>
+            }
+
             @foreach (var post in Model.Posts) {
                 <partial name="Widgets/PostCard" model="post"/>
             }
@@ -41,11 +45,11 @@
 
     <nav aria-label="Page navigation example">
         @Html.PagedListPager(Model.Posts, page => Url.Action(
-            RazorHelper.GetCurrentActionName(ViewContext), new { page, categoryId = Model.CurrentCategoryId }),
+            RazorHelper.GetCurrentActionName(ViewContext), new {page, categoryId = Model.CurrentCategoryId}),
             new PagedListRenderOptions {
-                LiElementClasses = new[] { "page-item" },
-                PageClasses = new[] { "page-link" },
-                UlElementClasses = new[] { "pagination justify-content-center" }
+                LiElementClasses = new[] {"page-item"},
+                PageClasses = new[] {"page-link"},
+                UlElementClasses = new[] {"pagination justify-content-center"}
             })
     </nav>
 </div>

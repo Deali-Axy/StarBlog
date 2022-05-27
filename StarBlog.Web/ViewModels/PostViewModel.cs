@@ -9,6 +9,7 @@ public class PostViewModel {
     public string Content { get; set; }
     public string ContentHtml { get; set; }
     public string Path { get; set; }
+    public string? Url { get; set; }
     public DateTime CreationTime { get; set; }
     public DateTime LastUpdateTime { get; set; }
     public Category Category { get; set; }
