@@ -23,7 +23,13 @@ public class PhotographyController : Controller {
     }
 
     public IActionResult Photo(string id) {
-        return View(_photoService.GetById(id));
+        var photo = _photoService.GetById(id);
+        if (photo == null) {
+            _messages.Error($"图片 {id} 不存在！");
+            return RedirectToAction(nameof(Index));
+        }
+
+        return View(photo);
     }
 
     public IActionResult RandomPhoto() {

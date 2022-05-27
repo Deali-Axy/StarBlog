@@ -12,6 +12,18 @@
     </h2>
 
     <div>
+        @if (Model.Posts.Count == 0) {
+            <div class="d-flex justify-content-center">
+                <div class="card" style="width: 18rem;">
+                    <img src="~/images/codelab.jpg" class="card-img-top" alt="...">
+                    <div class="card-body">
+                        <h5 class="card-title">没有结果</h5>
+                        <p class="card-text">No result.</p>
+                        <a class="btn btn-primary" asp-controller="Home" asp-action="Index">返回主页</a>
+                    </div>
+                </div>
+            </div>
+        }
         @foreach (var post in Model.Posts) {
             <partial name="Widgets/PostCard" model="post"/>
         }
