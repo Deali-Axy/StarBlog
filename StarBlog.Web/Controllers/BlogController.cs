@@ -33,6 +33,18 @@ public class BlogController : Controller {
             .IncludeMany(a => a.Posts).ToList();
         categories.Insert(0, new Category { Id = 0, Name = "All", Posts = _postRepo.Select.ToList() });
 
+        var currentCategory = categoryId == 0 ? categories[0] : _categoryService.GetById(categoryId);
+
+        if (currentCategory == null) {
+            _messages.Error($"分类 {categoryId} 不存在！");
+            return RedirectToAction(nameof(List));
+        }
+
+        if (!currentCategory.Visible) {
+            _messages.Warning($"分类 {categoryId} 暂不开放！");
+            return RedirectToAction(nameof(List));
+        }
+
         return View(new BlogListViewModel {
             CurrentCategory = categoryId == 0 ? categories[0] : categories.First(a => a.Id == categoryId),
             CurrentCategoryId = categoryId,
@@ -48,9 +60,19 @@ public class BlogController : Controller {
     }
 
     public IActionResult Post(string id) {
-        return View(_postService.GetPostViewModel(_postRepo.Where(a => a.Id == id)
-            .Include(a => a.Category)
-            .First()));
+        var post = _postService.GetById(id);
+
+        if (post == null) {
+            _messages.Error($"文章 {id} 不存在！");
+            return RedirectToAction(nameof(List));
+        }
+
+        if (!post.IsPublish) {
+            _messages.Warning($"文章 {id} 未发布！");
+            return RedirectToAction(nameof(List));
+        }
+
+        return View(_postService.GetPostViewModel(post));
     }
 
     public IActionResult RandomPost() {
@@ -62,9 +84,9 @@ public class BlogController : Controller {
 
         var rndPost = posts[new Random().Next(posts.Count)];
         _messages.Info($"随机推荐了文章 <b>{rndPost.Title}</b> 给你~");
-        return RedirectToAction(nameof(Post), new {id = rndPost.Id});
+        return RedirectToAction(nameof(Post), new { id = rndPost.Id });
     }
-    
+
     public IActionResult Temp() {
         return View();
     }

@@ -33,7 +33,8 @@ public class PostService {
     public Post? GetById(string id) {
         // 获取文章的时候对markdown中的图片地址解析，加上完整地址返回给前端
         var post = _postRepo.Where(a => a.Id == id).Include(a => a.Category).First();
-        post.Content = MdImageLinkConvert(post, true);
+        if (post != null) post.Content = MdImageLinkConvert(post, true);
+
         return post;
     }
 
@@ -175,9 +176,9 @@ public class PostService {
         var document = Markdown.Parse(post.Content);
 
         foreach (var node in document.AsEnumerable()) {
-            if (node is not ParagraphBlock {Inline: { }} paragraphBlock) continue;
+            if (node is not ParagraphBlock { Inline: { } } paragraphBlock) continue;
             foreach (var inline in paragraphBlock.Inline) {
-                if (inline is not LinkInline {IsImage: true} linkInline) continue;
+                if (inline is not LinkInline { IsImage: true } linkInline) continue;
 
                 var imgUrl = linkInline.Url;
                 if (imgUrl == null) continue;
