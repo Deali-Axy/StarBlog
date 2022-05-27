@@ -26,7 +26,8 @@ public class CategoryService {
     public List<CategoryNode>? GetNodes(int parentId = 0) {
         var categories = _cRepo.Select
             .Where(a => a.ParentId == parentId && a.Visible)
-            .IncludeMany(a => a.Posts).ToList();
+            .IncludeMany(a => a.Posts)
+            .ToList();
 
         if (categories.Count == 0) return null;
 
