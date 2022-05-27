@@ -17,17 +17,25 @@ public class PostService {
     private readonly IBaseRepository<Category> _categoryRepo;
     private readonly IWebHostEnvironment _environment;
     private readonly IConfiguration _configuration;
+    private readonly IHttpContextAccessor _accessor;
+    private readonly LinkGenerator _generator;
+
 
     public string Host => _configuration.GetSection("Server:Host").Value;
 
     public PostService(IBaseRepository<Post> postRepo,
         IBaseRepository<Category> categoryRepo,
         IWebHostEnvironment environment,
-        IConfiguration configuration) {
+        IConfiguration configuration,
+        IHttpContextAccessor accessor,
+        LinkGenerator generator
+    ) {
         _postRepo = postRepo;
         _categoryRepo = categoryRepo;
         _environment = environment;
         _configuration = configuration;
+        _accessor = accessor;
+        _generator = generator;
     }
 
     public Post? GetById(string id) {
@@ -138,6 +146,11 @@ public class PostService {
             Content = post.Content,
             ContentHtml = Markdig.Markdown.ToHtml(post.Content),
             Path = post.Path,
+            Url = _generator.GetUriByAction(
+                _accessor.HttpContext!,
+                "Post", "Blog",
+                new {Id = post.Id}
+            ),
             CreationTime = post.CreationTime,
             LastUpdateTime = post.LastUpdateTime,
             Category = post.Category,
@@ -176,9 +189,9 @@ public class PostService {
         var document = Markdown.Parse(post.Content);
 
         foreach (var node in document.AsEnumerable()) {
-            if (node is not ParagraphBlock { Inline: { } } paragraphBlock) continue;
+            if (node is not ParagraphBlock {Inline: { }} paragraphBlock) continue;
             foreach (var inline in paragraphBlock.Inline) {
-                if (inline is not LinkInline { IsImage: true } linkInline) continue;
+                if (inline is not LinkInline {IsImage: true} linkInline) continue;
 
                 var imgUrl = linkInline.Url;
                 if (imgUrl == null) continue;
