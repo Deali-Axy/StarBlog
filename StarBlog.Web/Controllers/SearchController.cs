@@ -16,7 +16,7 @@ public class SearchController : Controller {
 
     public IActionResult Blog(string keyword, int categoryId = 0, int page = 1, int pageSize = 5) {
         var posts = _postRepo
-            .Where(a => a.Title.Contains(keyword))
+            .Where(a => a.Title!.Contains(keyword))
             .Include(a => a.Category)
             .ToList();
 
