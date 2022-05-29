@@ -105,14 +105,9 @@
 
 <main id="vue-app">
     <div class="container mt-3">
-        @if (!Messages.IsEmpty) {
-            while (!Messages.IsEmpty) {
-                var message = Messages.Dequeue();
-
-                <div class="alert alert-@message.Tag" role="alert">
-                    @Html.Raw(message.Content)
-                </div>
-            }
+        @while (!Messages.IsEmpty) {
+            var message = Messages.Dequeue();
+            <partial name="Widgets/Alert" model="message"/>
         }
     </div>
     @RenderBody()

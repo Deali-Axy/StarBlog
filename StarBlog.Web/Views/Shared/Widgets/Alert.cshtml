@@ -1,0 +1,28 @@
+﻿@using StarBlog.Contrib.SiteMessage
+@model Message
+
+@if (Model != null) {
+    <div class="alert alert-@Model.Tag d-flex align-items-center alert-dismissible fade show" role="alert">
+        @switch (Model.Tag) {
+            case MessageTags.Debug:
+                <i class="fa fa-question-circle me-2"></i>
+                break;
+            case MessageTags.Info:
+                <i class="fa fa-info-circle me-2"></i>
+                break;
+            case MessageTags.Success:
+                <i class="fa fa-check-circle me-2"></i>
+                break;
+            case MessageTags.Warning:
+                <i class="fa fa-exclamation-triangle me-2"></i>
+                break;
+            case MessageTags.Error:
+                <i class="fa fa-times-circle me-2"></i>
+                break;
+        }
+        <div>
+            @Html.Raw(Model.Content)
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    </div>
+}
