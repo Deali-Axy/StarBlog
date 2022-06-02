@@ -33,8 +33,8 @@ public class PhotoController : ControllerBase {
     [HttpGet("{id}")]
     public ApiResponse<Photo> Get(string id) {
         var photo = _photoService.GetById(id);
-        return photo == null 
-            ? ApiResponse.NotFound($"图片 {id} 不存在") 
+        return photo == null
+            ? ApiResponse.NotFound($"图片 {id} 不存在")
             : new ApiResponse<Photo> { Data = photo };
     }
 
