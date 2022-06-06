@@ -4,6 +4,7 @@ using StarBlog.Contrib.SiteMessage;
 using StarBlog.Data.Extensions;
 using StarBlog.Web.Extensions;
 using StarBlog.Web.Filters;
+using StarBlog.Web.Middlewares;
 using StarBlog.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -66,6 +67,8 @@ if (!app.Environment.IsDevelopment()) {
 
 // app.UseHttpsRedirection();
 app.UseStaticFiles();
+
+app.UseMiddleware<VisitRecordMiddleware>();
 
 app.UseRouting();
 app.UseCors();
