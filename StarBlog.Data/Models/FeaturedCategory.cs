@@ -2,6 +2,10 @@
 
 namespace StarBlog.Data.Models;
 
+/// <summary>
+/// 推荐分类
+/// </summary>
+[Table(Name = "featured_category", OldName = "FeaturedCategory")]
 public class FeaturedCategory {
     [Column(IsIdentity = true, IsPrimary = true)]
     public int Id { get; set; }
