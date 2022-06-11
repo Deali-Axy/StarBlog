@@ -22,6 +22,8 @@
             this.currentTheme = themeName
             localStorage.setItem('currentTheme', themeName)
             localStorage.setItem('currentThemeCssUrl', theme.cssUrl)
+            // 换主题之后最好要刷新页面，不然可能样式冲突
+            location.reload()
         }
     }
 })

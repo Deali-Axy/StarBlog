@@ -1,8 +1,12 @@
 ﻿namespace StarBlog.Web.Services;
 
 public class ThemeService {
+    public const string BootstrapTheme = "Bootstrap";
     private const string CssUrlPrefix = "/lib/bootswatch/dist";
-    public List<Theme> Themes { get; set; } = new List<Theme>();
+
+    public List<Theme> Themes { get; set; } = new() {
+        new Theme {Name = BootstrapTheme, Path = "", CssUrl = ""}
+    };
 
     public ThemeService(IWebHostEnvironment env) {
         var themePath = Path.Combine(env.WebRootPath, "lib", "bootswatch", "dist");
