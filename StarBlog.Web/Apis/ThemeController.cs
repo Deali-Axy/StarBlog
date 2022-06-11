@@ -17,7 +17,7 @@ public class ThemeController : ControllerBase {
     }
 
     [HttpGet]
-    public ActionResult<List<Theme>> GetAll() {
+    public List<Theme> GetAll() {
         return _themeService.Themes;
     }
 }
