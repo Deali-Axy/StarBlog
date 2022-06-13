@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Diagnostics;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 using StarBlog.Contrib.SiteMessage;
 using StarBlog.Data.Extensions;
 using StarBlog.Web.Extensions;
@@ -74,7 +72,6 @@ app.UseRouting();
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
-
 
 app.UseSwagger();
 app.UseSwaggerUI(options => {
