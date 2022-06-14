@@ -32,6 +32,7 @@ paths.concatJsDist = paths.js + "app.min.js";//将所有的 js 压缩到一个 j
 
 //使用 npm 下载的前端组件包
 const libs = [
+    {name: "chart.js", dist: "./node_modules/chart.js/dist/**/*.*"},
     {name: "jquery", dist: "./node_modules/jquery/dist/**/*.*"},
     {name: "popper", dist: "./node_modules/popper.js/dist/**/*.*"},
     {name: "bootstrap", dist: "./node_modules/bootstrap/dist/**/*.*"},
