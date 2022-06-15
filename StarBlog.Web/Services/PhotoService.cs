@@ -155,10 +155,9 @@ public class PhotoService {
     /// <returns></returns>
     private Photo BuildPhotoData(Photo photo) {
         var savePath = GetPhotoFilePath(photo);
-        using (var img = Image.Load(savePath)) {
-            photo.Height = img.Height;
-            photo.Width = img.Width;
-        }
+        var imgInfo = Image.Identify(savePath);
+        photo.Width = imgInfo.Width;
+        photo.Height = imgInfo.Height;
 
         return photo;
     }
