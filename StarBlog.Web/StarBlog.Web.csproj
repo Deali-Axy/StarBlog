@@ -22,7 +22,7 @@
         <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
         <PackageReference Include="Markdig" Version="0.30.2" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.2" />
-        <PackageReference Include="SixLabors.ImageSharp" Version="2.0.0" />
+        <PackageReference Include="SixLabors.ImageSharp" Version="2.1.2" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
         <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="6.2.3" />
         <PackageReference Include="Swashbuckle.AspNetCore.ReDoc" Version="6.2.3" />
