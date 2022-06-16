@@ -5,14 +5,13 @@ using SixLabors.ImageSharp.Processing;
 
 Console.WriteLine("Hello, World!");
 
-var imgPath1 = @"D:\Code\StarBlog\StarBlog.Web\wwwroot\assets\photography\10.jpg";
-var imgPath2 = @"D:\Code\StarBlog\StarBlog.Web\wwwroot\assets\photography\89048309f52ff0d70f51ac3c38a39c80.jpg";
-
+var imageList = new List<string> {
+    "1xdqasb8hblhoo57xthdxu1v6.jpg", "2cs5jqz3o4orwvpr5i5oroyck.jpg", "2hngz6wxz7vzd8ncr6ym1rt7p.jpg", "2kjvh5zl9y0g9ovrqmkodaurt.jpg",
+    "wallhaven-753155.jpg",
+};
 
 void GetImage(string imagePath, int width, int height) {
     using var image = Image.Load(imagePath);
-    int newWidth;
-    int newHeight;
     Rectangle cropRect;
 
     if (image.Width > image.Height) {
@@ -25,7 +24,8 @@ void GetImage(string imagePath, int width, int height) {
     }
 
     image.Mutate(a => a.Crop(cropRect));
-    image.SaveAsPng(@"D:\Code\StarBlog\demo\ImageTest\images\output.png");
+    image.SaveAsPng(@"images\output\output.png");
 }
 
-GetImage(imgPath2, 200, 200);
+var inputImage = Path.Combine("images", imageList[3]);
+GetImage(inputImage, 200, 200);
