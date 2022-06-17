@@ -32,6 +32,7 @@ builder.Services.AddScoped<PhotoService>();
 builder.Services.AddScoped<PostService>();
 builder.Services.AddSingleton<ThemeService>();
 builder.Services.AddSingleton<Messages>();
+builder.Services.AddSingleton<PicLibService>();
 
 var app = builder.Build();
 
