@@ -14,7 +14,8 @@
             </a>
         </div>
         <div class="col-auto d-none d-lg-block">
-            <img class="bd-placeholder-img" src="https://picsum.photos/seed/@Model.Id/200/250" alt="">
+            <img class="bd-placeholder-img" alt=""
+                 src="@Url.Action("GetRandomImage", "PicLib", new { Seed = Model.Id, Width = 200, Height = 250 })">
         </div>
     </div>
 </div>
