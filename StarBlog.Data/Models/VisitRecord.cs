@@ -13,7 +13,7 @@ public class VisitRecord {
     /// <summary>
     /// IP地址
     /// </summary>
-    public string Ip { get; set; }
+    public string? Ip { get; set; }
 
     /// <summary>
     /// 请求路径
