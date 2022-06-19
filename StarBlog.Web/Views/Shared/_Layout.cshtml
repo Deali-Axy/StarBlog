@@ -64,12 +64,20 @@
                             Products
                         </a>
                     </li>
+                    @* <li> *@
+                    @*     <a href="#" class="nav-link text-white"> *@
+                    @*         <div class="bi d-block mx-auto mb-1 text-center"> *@
+                    @*             <i class="fa-solid fa-terminal fa-2xl"></i> *@
+                    @*         </div> *@
+                    @*         Console *@
+                    @*     </a> *@
+                    @* </li> *@
                     <li>
-                        <a href="#" class="nav-link text-white">
+                        <a class="nav-link text-white" asp-controller="About" asp-action="Index">
                             <div class="bi d-block mx-auto mb-1 text-center">
-                                <i class="fa-solid fa-terminal fa-2xl"></i>
+                                <i class="fa-solid fa-circle-info fa-2xl"></i>
                             </div>
-                            Console
+                            About
                         </a>
                     </li>
                 </ul>
@@ -118,24 +126,17 @@
             <div class="row">
                 <div id="footer-content" class="col-md-10 col-md-offset-3 footer-list text-center">
                     <p class="social-icons">
-                        <a target="_blank" rel="nofollow" href="http://weibo.com/axy12">
-                            <i class="fab fa-weibo"></i>
-                        </a>
-                        <a target="_blank" rel="nofollow" href="http://t.qq.com/Deali-Axy">
-                            <i class="fab fa-weixin"></i>
-                        </a>
-                        <a target="_blank" rel="nofollow" href="https://live.bilibili.com/11883038">
-                            <i class="fas fa-tv"></i>
-                        </a>
-                        <a target="_blank" rel="nofollow" href="http://github.com/Deali-Axy">
-                            <i class="fab fa-github"></i>
-                        </a>
-                        <a target="_blank" rel="nofollow" href="https://www.zhihu.com/people/dealiaxy">
-                            <i class="fab fa-zhihu"></i>
-                        </a>
+                        <a target="_blank" rel="nofollow" href="https://www.cnblogs.com/deali/"><i class="fa-solid fa-blog"></i></a>
+                        <a asp-controller="About" asp-action="Index"><i class="fab fa-weixin"></i></a>
+                        <a target="_blank" rel="nofollow" href="https://live.bilibili.com/11883038"><i class="fa-brands fa-bilibili"></i></a>
+                        <a target="_blank" rel="nofollow" href="http://github.com/Deali-Axy"><i class="fab fa-github"></i></a>
+                        <a target="_blank" rel="nofollow" href="https://www.zhihu.com/people/dealiaxy"><i class="fab fa-zhihu"></i></a>
                     </p>
 
-                    <p>Copyright 2022 <a href="http://blog.deali.cn">DealiAxy</a>. All Rights Reserved.</p>
+                    <p>
+                        Copyright © @DateTime.Now.Year.ToString()
+                        <a href="https://github.com/Deali-Axy">DealiAxy</a>. All Rights Reserved.
+                    </p>
                     <p>
                         All content is released under
                         <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/deed.en" rel="external nofollow" target="_blank">
@@ -155,7 +156,8 @@
                         含有程序代码內容的文章 (如 Java, Python, C#, Go) 除外，包含的程序代码皆以 <a href="http://www.gnu.org/licenses/gpl.html" rel="external nofollow" target="_blank">GPL v3</a> 发布。
                     </p>
                     <p>
-                        <a href="http://www.miitbeian.gov.cn/" rel="external nofollow" target="_blank">粤ICP备17103309号</a>
+                        本站使用 <a href="https://github.com/Deali-Axy/StarBlog">StarBlog</a> 开源博客系统，
+                        基于 <a href="https://dotnet.microsoft.com/zh-cn/">.NetCore</a> 技术构建
                     </p>
                 </div>
             </div>
