@@ -8,7 +8,13 @@ using StarBlog.Web.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews(options => { options.Filters.Add<ResponseWrapperFilter>(); });
+var mvcBuilder = builder.Services.AddControllersWithViews(
+    options => { options.Filters.Add<ResponseWrapperFilter>(); }
+);
+if (builder.Environment.IsDevelopment()) {
+    mvcBuilder.AddRazorRuntimeCompilation();
+}
+
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddFreeSql(builder.Configuration);
 builder.Services.AddCors(options => {
