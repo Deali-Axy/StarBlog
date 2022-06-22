@@ -36,6 +36,7 @@ builder.Services.AddScoped<BlogService>();
 builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<PhotoService>();
 builder.Services.AddScoped<PostService>();
+builder.Services.AddScoped<VisitRecordService>();
 builder.Services.AddSingleton<ThemeService>();
 builder.Services.AddSingleton<Messages>();
 builder.Services.AddSingleton<PicLibService>();
@@ -83,6 +84,7 @@ app.UseAuthorization();
 app.UseSwagger();
 app.UseSwaggerUI(options => {
     options.RoutePrefix = "api-docs/swagger";
+    options.SwaggerEndpoint("/swagger/admin/swagger.json", "Admin");
     options.SwaggerEndpoint("/swagger/blog/swagger.json", "Blog");
     options.SwaggerEndpoint("/swagger/auth/swagger.json", "Auth");
     options.SwaggerEndpoint("/swagger/common/swagger.json", "Common");
