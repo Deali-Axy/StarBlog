@@ -6,6 +6,11 @@ namespace StarBlog.Web.Extensions;
 public static class ConfigureSwagger {
     public static void AddSwagger(this IServiceCollection services) {
         services.AddSwaggerGen(options => {
+            options.SwaggerDoc("admin", new OpenApiInfo {
+                Version = "v1",
+                Title = "Admin APIs",
+                Description = "管理员相关接口"
+            });
             options.SwaggerDoc("common", new OpenApiInfo {
                 Version = "v1",
                 Title = "Common APIs",
@@ -35,7 +40,7 @@ public static class ConfigureSwagger {
                 Type = SecuritySchemeType.ApiKey
             };
             options.AddSecurityDefinition("oauth2", security);
-            options.AddSecurityRequirement(new OpenApiSecurityRequirement {{security, new List<string>()}});
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement { { security, new List<string>() } });
             options.OperationFilter<AddResponseHeadersFilter>();
             options.OperationFilter<AppendAuthorizeToSummaryOperationFilter>();
             options.OperationFilter<SecurityRequirementsOperationFilter>();
