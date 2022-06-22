@@ -14,26 +14,26 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\StarBlog.Contrib\StarBlog.Contrib.csproj"/>
-        <ProjectReference Include="..\StarBlog.Data\StarBlog.Data.csproj"/>
+        <ProjectReference Include="..\StarBlog.Contrib\StarBlog.Contrib.csproj" />
+        <ProjectReference Include="..\StarBlog.Data\StarBlog.Data.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <Content Update="wwwroot/assets/**/*" CopyToPublishDirectory="Never" CopyToOutputDirectory="Never"/>
-        <Content Update="wwwroot/media/**/*" CopyToPublishDirectory="Never" CopyToOutputDirectory="Never"/>
+        <Content Update="wwwroot/assets/**/*" CopyToPublishDirectory="Never" CopyToOutputDirectory="Never" />
+        <Content Update="wwwroot/media/**/*" CopyToPublishDirectory="Never" CopyToOutputDirectory="Never" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0"/>
-        <PackageReference Include="Markdig" Version="0.30.2"/>
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.2"/>
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.6"/>
-        <PackageReference Include="SixLabors.ImageSharp" Version="2.1.2"/>
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3"/>
-        <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="6.2.3"/>
-        <PackageReference Include="Swashbuckle.AspNetCore.ReDoc" Version="6.2.3"/>
-        <PackageReference Include="X.PagedList" Version="8.1.0"/>
-        <PackageReference Include="X.PagedList.Mvc.Core" Version="8.1.0"/>
+        <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
+        <PackageReference Include="Markdig" Version="0.30.2" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.2" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.6" />
+        <PackageReference Include="SixLabors.ImageSharp" Version="2.1.2" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+        <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="6.2.3" />
+        <PackageReference Include="Swashbuckle.AspNetCore.ReDoc" Version="6.2.3" />
+        <PackageReference Include="X.PagedList" Version="8.1.0" />
+        <PackageReference Include="X.PagedList.Mvc.Core" Version="8.1.0" />
     </ItemGroup>
 
 </Project>
