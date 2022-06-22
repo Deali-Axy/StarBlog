@@ -1,6 +1,7 @@
 ﻿using FreeSql;
 using StarBlog.Contrib.SiteMessage;
 using StarBlog.Data.Models;
+using StarBlog.Web.Extensions;
 using X.PagedList;
 
 namespace StarBlog.Web.Middlewares;
@@ -17,7 +18,7 @@ public class VisitRecordMiddleware {
         var response = context.Response;
 
         visitRecordRepo.InsertAsync(new VisitRecord {
-            Ip = context.Connection.RemoteIpAddress?.ToString().Split(":").Last(),
+            Ip = context.GetRemoteIPAddress()?.ToString().Split(":")?.Last(),
             RequestPath = request.Path,
             RequestQueryString = request.QueryString.Value,
             RequestMethod = request.Method,
