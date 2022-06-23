@@ -12,7 +12,7 @@ public class Post {
     /// <summary>
     /// 标题
     /// </summary>
-    public string? Title { get; set; }
+    public string Title { get; set; }
     
     /// <summary>
     /// 文章状态，提取原markdown文件的文件名前缀，用于区分文章状态，例子如下
