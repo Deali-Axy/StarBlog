@@ -1,5 +1,7 @@
 ﻿using FreeSql;
 using StarBlog.Data.Models;
+using StarBlog.Web.ViewModels.QueryFilters;
+using X.PagedList;
 
 namespace StarBlog.Web.Services;
 
@@ -16,6 +18,25 @@ public class VisitRecordService {
     }
 
     public List<VisitRecord> GetAll() {
-        return _repo.Select.ToList();
+        return _repo.Select.OrderByDescending(a => a.Time).ToList();
+    }
+
+    public IPagedList<VisitRecord> GetPagedList(VisitRecordQueryParameters param) {
+        var querySet = _repo.Select;
+
+        // 搜索
+        if (!string.IsNullOrEmpty(param.Search)) {
+            querySet = querySet.Where(a => a.RequestPath.Contains(param.Search));
+        }
+
+        // 排序
+        if (!string.IsNullOrEmpty(param.SortBy)) {
+            // 是否升序
+            var isAscending = !param.SortBy.StartsWith("-");
+            var orderByProperty = param.SortBy.Trim('-');
+            querySet = querySet.OrderByPropertyName(orderByProperty, isAscending);
+        }
+
+        return querySet.ToList().ToPagedList(param.Page, param.PageSize);
     }
 }
