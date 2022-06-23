@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using StarBlog.Data.Models;
 using StarBlog.Web.Services;
+using StarBlog.Web.ViewModels.QueryFilters;
 using StarBlog.Web.ViewModels.Response;
 
 namespace StarBlog.Web.Apis;
@@ -15,6 +16,12 @@ public class VisitRecordController : ControllerBase {
 
     public VisitRecordController(VisitRecordService service) {
         _service = service;
+    }
+
+    [HttpGet]
+    public ApiResponsePaged<VisitRecord> GetList([FromQuery] VisitRecordQueryParameters param) {
+        var pagedList = _service.GetPagedList(param);
+        return new ApiResponsePaged<VisitRecord>(pagedList);
     }
 
     [HttpGet("All")]
