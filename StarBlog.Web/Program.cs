@@ -72,7 +72,9 @@ if (!app.Environment.IsDevelopment()) {
 // });
 
 // app.UseHttpsRedirection();
-app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions {
+    ServeUnknownFileTypes = true
+});
 
 app.UseMiddleware<VisitRecordMiddleware>();
 
