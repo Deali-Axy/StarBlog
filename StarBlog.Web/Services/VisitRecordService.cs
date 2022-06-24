@@ -39,4 +39,31 @@ public class VisitRecordService {
 
         return querySet.ToList().ToPagedList(param.Page, param.PageSize);
     }
+
+    /// <summary>
+    /// 总览数据
+    /// </summary>
+    /// <returns></returns>
+    public object Overview() {
+        var querySet = _repo.Where(a => !a.RequestPath.StartsWith("/Api"));
+
+        return new {
+            TotalVisit = querySet.Count(),
+            TodayVisit = querySet.Where(a => a.Time.Date == DateTime.Today).Count()
+        };
+    }
+
+    /// <summary>
+    /// 统计数据
+    /// </summary>
+    /// <returns></returns>
+    public object Stats(DateTime date) {
+        var data = _repo.Where(
+            a => a.Time.Date == date.Date
+                 && !a.RequestPath.StartsWith("/Api")
+        );
+        return new {
+            Count = data.Count()
+        };
+    }
 }
