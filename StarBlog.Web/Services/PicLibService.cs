@@ -122,9 +122,7 @@ public class PicLibService {
     async Task<(Image, IImageFormat)> GenerateSizedImageAsync(string imagePath, int width, int height) {
         await using var fileStream = new FileStream(imagePath, FileMode.Open);
         var (image, format) = await Image.LoadWithFormatAsync(fileStream);
-
-        Console.WriteLine($"origin image={image.Width},{image.Height}");
-
+        
         // 输出尺寸超出原图片尺寸，放大
         if (width > image.Width && height > image.Height) {
             image.Mutate(a => a.Resize(width, height));
@@ -136,9 +134,7 @@ public class PicLibService {
             else
                 image.Mutate(a => a.Resize(width, 0));
         }
-
-        Console.WriteLine($"Resize={image.Width},{image.Height}");
-
+        
         // 将输入的尺寸作为裁剪比例
         var (scaleWidth, scaleHeight) = GetPhotoScale(width, height);
         var cropWidth = image.Width;
@@ -149,7 +145,6 @@ public class PicLibService {
         }
 
         var cropRect = new Rectangle((image.Width - cropWidth) / 2, (image.Height - cropHeight) / 2, cropWidth, cropHeight);
-        Console.WriteLine(cropRect.ToString());
         image.Mutate(a => a.Crop(cropRect));
         image.Mutate(a => a.Resize(width, height));
 
