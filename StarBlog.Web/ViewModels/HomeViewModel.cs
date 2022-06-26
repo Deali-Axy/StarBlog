@@ -7,7 +7,12 @@ public class HomeViewModel {
     /// 随机图片
     /// </summary>
     public Photo? RandomPhoto { get; set; }
-    
+
+    /// <summary>
+    /// 是否显示 Chart
+    /// </summary>
+    public bool ChartVisible { get; set; } = false;
+
     /// <summary>
     /// 置顶博客
     /// </summary>
@@ -17,7 +22,7 @@ public class HomeViewModel {
     /// 推荐博客
     /// </summary>
     public List<Post> FeaturedPosts { get; set; } = new();
-    
+
     /// <summary>
     /// 推荐照片，原则上只能三个
     /// </summary>

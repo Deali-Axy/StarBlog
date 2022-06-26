@@ -7,7 +7,7 @@
 <div class="container col-xxl-8 py-3">
     <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
         <div class="col-10 col-sm-8 col-lg-6">
-            @* @if (@Model.RandomPhoto != null) { *@
+            @* @if (Model.RandomPhoto != null) { *@
             @*     <partial name="Widgets/PhotoCardSmallPure" model="@Model.RandomPhoto"/> *@
             @* } *@
             @* else { *@
@@ -15,8 +15,9 @@
             @*          width="700" height="500" loading="lazy"> *@
             @* } *@
 
-            <canvas class="my-4 w-100" id="myChart" height="400"></canvas>
-
+            @if (Model.ChartVisible) {
+                <canvas class="my-4 w-100" id="myChart" height="400"></canvas>
+            }
         </div>
         <div class="col-lg-6">
             <h1 class="display-5 fw-bold lh-1 mb-3">DealiAxy's Blog</h1>
@@ -27,7 +28,9 @@
             <div class="d-grid gap-2 d-md-flex justify-content-md-start">
                 <a class="btn btn-primary btn-lg px-4" asp-controller="Blog" asp-action="RandomPost">看文</a>
                 <a class="btn btn-outline-secondary btn-lg px-4" asp-controller="Photography" asp-action="RandomPhoto">看图</a>
-                <button class="btn btn-outline-secondary btn-lg px-4" @@click="switchChartType">切换图表</button>
+                @if (Model.ChartVisible) {
+                    <button class="btn btn-outline-secondary btn-lg px-4" @@click="switchChartType">切换图表</button>
+                }
             </div>
         </div>
     </div>
@@ -91,5 +94,11 @@
 
 @section bottom {
     <script src="~/lib/chart.js/dist/chart.min.js"></script>
+    @if (Model.ChartVisible) {
+        <script>const CHART_VISIBLE = true</script>
+    }
+    else {
+        <script>const CHART_VISIBLE = false</script>
+    }
     <script type="module" src="~/js/home.js"></script>
 }
