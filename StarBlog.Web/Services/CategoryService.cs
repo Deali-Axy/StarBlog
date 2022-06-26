@@ -37,9 +37,9 @@ public class CategoryService {
                 _accessor.HttpContext!,
                 nameof(BlogController.List),
                 "Blog",
-                new { categoryId = category.Id }
+                new {categoryId = category.Id}
             ),
-            tags = new List<string> { category.Posts.Count.ToString() },
+            tags = new List<string> {category.Posts.Count.ToString()},
             nodes = GetNodes(category.Id)
         }).ToList();
     }
@@ -62,10 +62,12 @@ public class CategoryService {
     /// </summary>
     /// <returns></returns>
     public List<object> GetWordCloud() {
-        var list = _cRepo.Select.IncludeMany(a => a.Posts).ToList();
+        var list = _cRepo.Select
+            .Where(a => a.Visible && a.ParentId == 0)
+            .IncludeMany(a => a.Posts).ToList();
         var data = new List<object>();
         foreach (var item in list) {
-            data.Add(new { name = item.Name, value = item.Posts.Count });
+            data.Add(new {name = item.Name, value = item.Posts.Count});
         }
 
         return data;
