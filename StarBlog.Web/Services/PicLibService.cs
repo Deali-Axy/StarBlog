@@ -22,17 +22,14 @@ public class PicLibService {
             ImageList.Add(file.FullName);
         }
     }
-
-    /// <summary>
-    /// 生成指定尺寸图片
-    /// </summary>
-    /// <param name="imagePath"></param>
-    /// <param name="width"></param>
-    /// <param name="height"></param>
-    /// <returns></returns>
-    public static async Task<(Image, IImageFormat)> GenerateSizedImageAsync(string imagePath, int width, int height) {
+    
+    [Obsolete("有些图片会破坏比例、或者裁剪失败")]
+    public static async Task<(Image, IImageFormat)> GenerateSizedImageAsyncOld(string imagePath, int width, int height) {
         await using var fileStream = new FileStream(imagePath, FileMode.Open);
         var (image, format) = await Image.LoadWithFormatAsync(fileStream);
+
+        var originWidth = image.Width;
+        var originHeight = image.Height;
 
         Rectangle cropRect;
         int newWidth;
@@ -46,7 +43,8 @@ public class PicLibService {
             }
             else {
                 newHeight = height;
-                newWidth = image.Width / image.Height * newHeight;
+                // 按比例放大后转换为int类型会丢失小数部分，所以需要+1
+                newWidth = image.Width / image.Height * newHeight + 1;
             }
 
             cropRect = new Rectangle((newWidth - width) / 2, 0, width, height);
@@ -59,14 +57,101 @@ public class PicLibService {
             }
             else {
                 newWidth = width;
-                newHeight = newWidth * image.Height / image.Width;
+                newHeight = newWidth * image.Height / image.Width + 1;
             }
 
             cropRect = new Rectangle(0, (newHeight - height) / 2, width, height);
         }
 
         image.Mutate(a => a.Resize(newWidth, newHeight));
+
+        try {
+            image.Mutate(a => a.Crop(cropRect));
+        }
+        catch (Exception ex) {
+            Console.WriteLine($"crop image error: {ex.Message}");
+            Console.WriteLine($"image size={originWidth}, {originHeight}; " +
+                              $"new size={newWidth},{newHeight}; " +
+                              $"crop size={width},{height}");
+        }
+
+        return (image, format);
+    }
+
+    /// <summary>
+    /// 求最大公约数和最小公倍数
+    /// </summary>
+    /// <param name="num1"></param>
+    /// <param name="num2"></param>
+    /// <returns>最大公约数, 最小公倍数</returns>
+    private static (int, int) GetGreatestCommonDivisor(int num1, int num2) {
+        //定义变量保存两数乘积
+        var product = num1 * num2;
+
+        //定义变量临时保存除余结果
+        var temp = num1 % num2;
+        // 辗转相除法
+        do {
+            num1 = num2;
+            num2 = temp;
+            temp = num1 % num2;
+        } while (temp != 0);
+
+        // 最大公约数, 最小公倍数
+        return (num2, product / num2);
+    }
+
+    /// <summary>
+    /// 获取图片比例
+    /// </summary>
+    /// <param name="width"></param>
+    /// <param name="height"></param>
+    /// <returns>宽度 x 高度</returns>
+    private static (double, double) GetPhotoScale(int width, int height) {
+        var (gcd, _) = GetGreatestCommonDivisor(width, height);
+        return ((double) width / gcd, (double) height / gcd);
+    }
+
+    /// <summary>
+    /// 生成指定尺寸图片
+    /// </summary>
+    /// <param name="imagePath"></param>
+    /// <param name="width"></param>
+    /// <param name="height"></param>
+    /// <returns></returns>
+    async Task<(Image, IImageFormat)> GenerateSizedImageAsync(string imagePath, int width, int height) {
+        await using var fileStream = new FileStream(imagePath, FileMode.Open);
+        var (image, format) = await Image.LoadWithFormatAsync(fileStream);
+
+        Console.WriteLine($"origin image={image.Width},{image.Height}");
+
+        // 输出尺寸超出原图片尺寸，放大
+        if (width > image.Width && height > image.Height) {
+            image.Mutate(a => a.Resize(width, height));
+        }
+        else if (width > image.Width || height > image.Height) {
+            // 改变比例大的边
+            if (width / image.Width < height / image.Height)
+                image.Mutate(a => a.Resize(0, height));
+            else
+                image.Mutate(a => a.Resize(width, 0));
+        }
+
+        Console.WriteLine($"Resize={image.Width},{image.Height}");
+
+        // 将输入的尺寸作为裁剪比例
+        var (scaleWidth, scaleHeight) = GetPhotoScale(width, height);
+        var cropWidth = image.Width;
+        var cropHeight = (int) (image.Width / scaleWidth * scaleHeight);
+        if (cropHeight > image.Height) {
+            cropHeight = image.Height;
+            cropWidth = (int) (image.Height / scaleHeight * scaleWidth);
+        }
+
+        var cropRect = new Rectangle((image.Width - cropWidth) / 2, (image.Height - cropHeight) / 2, cropWidth, cropHeight);
+        Console.WriteLine(cropRect.ToString());
         image.Mutate(a => a.Crop(cropRect));
+        image.Mutate(a => a.Resize(width, height));
 
         return (image, format);
     }
