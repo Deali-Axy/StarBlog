@@ -31,7 +31,7 @@ public class BlogController : Controller {
     public IActionResult List(int categoryId = 0, int page = 1, int pageSize = 5) {
         var categories = _categoryRepo.Where(a => a.Visible)
             .IncludeMany(a => a.Posts).ToList();
-        categories.Insert(0, new Category { Id = 0, Name = "All", Posts = _postRepo.Select.ToList() });
+        categories.Insert(0, new Category {Id = 0, Name = "All", Posts = _postRepo.Select.ToList()});
 
         var currentCategory = categoryId == 0 ? categories[0] : _categoryService.GetById(categoryId);
 
@@ -76,7 +76,7 @@ public class BlogController : Controller {
     }
 
     public IActionResult RandomPost() {
-        var posts = _postRepo.Select.ToList();
+        var posts = _postRepo.Where(a => a.IsPublish).ToList();
         if (posts.Count == 0) {
             _messages.Error("当前没有文章，请先添加文章！");
             return RedirectToAction("Index", "Home");
@@ -84,7 +84,7 @@ public class BlogController : Controller {
 
         var rndPost = posts[new Random().Next(posts.Count)];
         _messages.Info($"随机推荐了文章 <b>{rndPost.Title}</b> 给你~");
-        return RedirectToAction(nameof(Post), new { id = rndPost.Id });
+        return RedirectToAction(nameof(Post), new {id = rndPost.Id});
     }
 
     public IActionResult Temp() {
