@@ -108,6 +108,7 @@ public class PicLibService {
     /// <param name="height"></param>
     /// <returns>宽度 x 高度</returns>
     private static (double, double) GetPhotoScale(int width, int height) {
+        if (width == height) return (1, 1);
         var (gcd, _) = GetGreatestCommonDivisor(width, height);
         return ((double) width / gcd, (double) height / gcd);
     }
