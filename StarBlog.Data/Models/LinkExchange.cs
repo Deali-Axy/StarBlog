@@ -1,9 +1,14 @@
-﻿namespace StarBlog.Data.Models;
+﻿using FreeSql.DataAnnotations;
+
+namespace StarBlog.Data.Models;
 
 /// <summary>
 /// 友情链接申请记录
 /// </summary>
 public class LinkExchange {
+    [Column(IsIdentity = true, IsPrimary = true)]
+    public int Id { get; set; }
+
     /// <summary>
     /// 网站名称
     /// </summary>
@@ -33,10 +38,10 @@ public class LinkExchange {
     /// 是否已验证
     /// <para>友情链接需要验证后才显示在网站上</para>
     /// </summary>
-    public bool Verified { get; set; }
+    public bool Verified { get; set; } = false;
 
     /// <summary>
     /// 申请时间
     /// </summary>
-    public DateTime ApplyTime { get; set; }
+    public DateTime ApplyTime { get; set; } = DateTime.Now;
 }
