@@ -32,4 +32,9 @@ public class HomeViewModel {
     /// 推荐分类，原则上三个
     /// </summary>
     public List<FeaturedCategory> FeaturedCategories { get; set; } = new();
+
+    /// <summary>
+    /// 友情链接
+    /// </summary>
+    public List<Link> Links { get; set; } = new();
 }
