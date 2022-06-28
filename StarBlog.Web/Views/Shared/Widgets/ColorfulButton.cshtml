@@ -1,0 +1,19 @@
+﻿@model ColorfulButtonViewModel
+
+@{
+    var rnd = Random.Shared;
+    var colorList = new[] {
+        "btn-outline-primary",
+        "btn-outline-secondary",
+        "btn-outline-success",
+        "btn-outline-danger",
+        "btn-outline-warning",
+        "btn-outline-info",
+        "btn-outline-dark",
+    };
+    var btnColor = colorList[rnd.Next(0, colorList.Length)];
+}
+
+<a href="@Model.Url" role="button" class="btn btn-sm @btnColor mb-1" target="@Model.Target">
+    @Model.Name
+</a>
