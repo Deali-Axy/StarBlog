@@ -94,11 +94,17 @@
 
 <div class="container px-4 py-3">
     <h2 class="pb-2 border-bottom">Link Exchange</h2>
-    <div class="d-grid gap-2 d-md-block">
-        @for (var i = 0; i < 30; i++) {
-            <button type="button" class="btn btn-outline-primary">Primary</button>
-        }
-    </div>
+    @if (Model.Links.Count > 0) {
+        <div class="d-grid gap-2 d-md-block">
+            @foreach (var link in Model.Links) {
+                @await Html.PartialAsync("Widgets/ColorfulButton",
+                    new ColorfulButtonViewModel { Name = link.Name, Url = link.Url })
+            }
+        </div>
+    }
+    else {
+        @await Html.PartialAsync("Widgets/PlaceholderCard", "友情链接")
+    }
 </div>
 
 @section bottom {
