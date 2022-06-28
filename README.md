@@ -4,6 +4,10 @@
 
 后端基于最新的`.Net6`和`Asp.Net Core`框架，遵循RESTFul接口规范，前端基于`Vue`+`ElementUI`开发，可作为 .Net Core 入门项目学习~
 
+博客已经上线，网址：http://blog.deali.cn
+
+配套的管理后台（Vue + ElementUI）前端项目：https://github.com/Deali-Axy/StarBlog-Admin
+
 配套了一系列的开发笔记记录本项目开发过程，欢迎关注
 
 - [基于.NetCore开发博客项目 StarBlog - (1) 为什么需要自己写一个博客？](https://www.cnblogs.com/deali/p/16104454.html)
@@ -17,6 +21,8 @@
 - [基于.NetCore开发博客项目 StarBlog - (9) 图片批量导入](https://www.cnblogs.com/deali/p/16328825.html)
 - [基于.NetCore开发博客项目 StarBlog - (10) 图片瀑布流](https://www.cnblogs.com/deali/p/16335162.html)
 - [基于.NetCore开发博客项目 StarBlog - (11) 实现访问统计](https://www.cnblogs.com/deali/p/16349155.html)
+- [基于.NetCore开发博客项目 StarBlog - (12) Razor页面动态编译](https://www.cnblogs.com/deali/p/16391656.html)
+- [基于.NetCore开发博客项目 StarBlog - (13) 加入友情链接功能](https://www.cnblogs.com/deali/p/16421699.html)
 - ...
 
 公众号 | 公众号 |
