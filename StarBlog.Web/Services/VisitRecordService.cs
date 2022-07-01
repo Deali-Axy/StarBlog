@@ -45,11 +45,16 @@ public class VisitRecordService {
     /// </summary>
     /// <returns></returns>
     public object Overview() {
-        var querySet = _repo.Where(a => !a.RequestPath.StartsWith("/Api"));
+        ISelect<VisitRecord> GetQuerySet() => _repo.Where(a => !a.RequestPath.StartsWith("/Api"));
 
         return new {
-            TotalVisit = querySet.Count(),
-            TodayVisit = querySet.Where(a => a.Time.Date == DateTime.Today).Count()
+            TotalVisit = GetQuerySet().Count(),
+            TodayVisit = GetQuerySet().Where(a => a.Time.Date == DateTime.Today).Count(),
+            YesterdayVisit = GetQuerySet().Where(a => a.Time.Date == DateTime.Today.AddDays(-2).Date).Count(),
+            Daily = GetQuerySet().GroupBy(a => a.Time.Date).ToList(a => new {
+                time = $"{a.Key.Year}-{a.Key.Month}-{a.Key.Day}",
+                count = a.Count()
+            })
         };
     }
 
