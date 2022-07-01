@@ -49,6 +49,16 @@ public class VisitRecordController : ControllerBase {
     }
 
     /// <summary>
+    /// 趋势数据
+    /// </summary>
+    /// <param name="days">查看最近几天的数据，默认7天</param>
+    /// <returns></returns>
+    [HttpGet("[action]")]
+    public ApiResponse Trend(int days = 7) {
+        return ApiResponse.Ok(_service.Trend(days));
+    }
+
+    /// <summary>
     /// 统计接口
     /// </summary>
     /// <returns></returns>
