@@ -51,11 +51,23 @@ public class VisitRecordService {
             TotalVisit = GetQuerySet().Count(),
             TodayVisit = GetQuerySet().Where(a => a.Time.Date == DateTime.Today).Count(),
             YesterdayVisit = GetQuerySet().Where(a => a.Time.Date == DateTime.Today.AddDays(-2).Date).Count(),
-            Daily = GetQuerySet().GroupBy(a => a.Time.Date).ToList(a => new {
-                time = $"{a.Key.Year}-{a.Key.Month}-{a.Key.Day}",
-                count = a.Count()
-            })
         };
+    }
+
+    /// <summary>
+    /// 趋势数据
+    /// </summary>
+    /// <param name="days">查看最近几天的数据，默认7天</param>
+    /// <returns></returns>
+    public object Trend(int days = 7) {
+        return _repo.Where(a => !a.RequestPath.StartsWith("/Api"))
+            .Where(a => a.Time.Date > DateTime.Today.AddDays(-days).Date)
+            .GroupBy(a => a.Time.Date)
+            .ToList(a => new {
+                time = a.Key,
+                date = $"{a.Key.Month}-{a.Key.Day}",
+                count = a.Count()
+            });
     }
 
     /// <summary>
