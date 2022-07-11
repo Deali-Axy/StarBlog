@@ -2,6 +2,9 @@
 
 namespace StarBlog.Data.Models;
 
+/// <summary>
+/// 配置项目
+/// </summary>
 public class ConfigItem {
     [Column(IsIdentity = true, IsPrimary = true)]
     public int Id { get; set; }
