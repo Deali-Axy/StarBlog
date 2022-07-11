@@ -16,22 +16,25 @@ List<string> ScanImages() {
     return data;
 }
 
-// 求最大公约数和最小公倍数
-(int, int) Test(int num1, int num2) {
-    //定义变量保存两数乘积
-    var product = num1 * num2;
+// 求最大公约数
+int GetGreatestCommonDivisor(int m, int n) {
+    if (m < n) {
+        (n, m) = (m, n);
+    }
 
-    //定义变量临时保存除余结果
-    var temp = num1 % num2;
-    // 辗转相除法
-    do {
-        num1 = num2;
-        num2 = temp;
-        temp = num1 % num2;
-    } while (temp != 0);
+    while (n != 0) {
+        var r = m % n;
+        m = n;
+        n = r;
+    }
 
-    // 最大公约数, 最小公倍数
-    return (num2, product / num2);
+    return m;
+}
+
+(double, double) GetPhotoScale(int width, int height) {
+    if (width == height) return (1, 1);
+    var gcd = GetGreatestCommonDivisor(width, height);
+    return ((double)width / gcd, (double)height / gcd);
 }
 
 void GetImage(string imagePath, int width, int height) {
@@ -94,13 +97,12 @@ async Task<(Image, IImageFormat)> GetImage2(string imagePath, int width, int hei
     Console.WriteLine($"Resize={image.Width},{image.Height}");
 
     // 将输入的尺寸作为裁剪比例
-    var (temp, _) = Test(width, height);
-    var (scaleWidth, scaleHeight) = (width / temp, height / temp);
+    var (scaleWidth, scaleHeight) = GetPhotoScale(width, height);
     var cropWidth = image.Width;
-    var cropHeight = image.Width / scaleWidth * scaleHeight;
+    var cropHeight = (int)(image.Width / scaleWidth * scaleHeight);
     if (cropHeight > image.Height) {
         cropHeight = image.Height;
-        cropWidth = image.Height / scaleHeight * scaleWidth;
+        cropWidth = (int)(image.Height / scaleHeight * scaleWidth);
     }
 
     var cropRect = new Rectangle((image.Width - cropWidth) / 2, (image.Height - cropHeight) / 2, cropWidth, cropHeight);
@@ -112,12 +114,11 @@ async Task<(Image, IImageFormat)> GetImage2(string imagePath, int width, int hei
 }
 
 async void Run() {
-    var (image, _) = await GetImage2(ScanImages()[0], 200, 250);
+    var (image, _) = await GetImage2(ScanImages()[1], 200, 300);
     await image.SaveAsJpegAsync(@"images\output\output.jpg");
     Console.WriteLine("saved.");
 }
 
 Run();
-
 
 Console.Read();
