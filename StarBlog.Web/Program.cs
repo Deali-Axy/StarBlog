@@ -34,6 +34,7 @@ builder.Services.AddHttpContextAccessor();
 // 自定义服务
 builder.Services.AddScoped<BlogService>();
 builder.Services.AddScoped<CategoryService>();
+builder.Services.AddScoped<ConfigService>();
 builder.Services.AddScoped<LinkExchangeService>();
 builder.Services.AddScoped<LinkService>();
 builder.Services.AddScoped<PhotoService>();
