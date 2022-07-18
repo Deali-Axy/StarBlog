@@ -7,6 +7,9 @@ using StarBlog.Web.ViewModels.Response;
 
 namespace StarBlog.Web.Apis;
 
+/// <summary>
+/// 访问记录
+/// </summary>
 [Authorize]
 [ApiController]
 [Route("Api/[controller]")]
