@@ -60,7 +60,8 @@ public class ConfigService {
             return item == null ? "" : item.Value;
         }
         set {
-            var item = GetByKey(key) ?? new ConfigItem { Key = key, Value = value };
+            var item = GetByKey(key) ?? new ConfigItem { Key = key };
+            item.Value = value;
             AddOrUpdate(item);
         }
     }
