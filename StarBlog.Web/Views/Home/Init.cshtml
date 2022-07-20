@@ -1,0 +1,49 @@
+﻿@model InitViewModel
+@{
+    ViewData["Title"] = "Init";
+}
+
+<div class="container px-4 py-3">
+    <h2 class="d-flex w-100 justify-content-between pb-2 mb-3 border-bottom">
+        <div>Blog Init</div>
+        <div>系统初始化</div>
+    </h2>
+
+    <div class="card px-1">
+        <form enctype="multipart/form-data" class="card-body row" asp-controller="Home" asp-action="Init" method="post">
+            <div class="text-danger" asp-validation-summary="All"></div>
+            
+            <div class="col-xl-6 py-3">
+                <h5 class="card-title">创建管理员账号</h5>
+                <h6 class="card-subtitle mb-3 text-muted">用于登录管理后台</h6>
+                <div class="mb-3">
+                    <label asp-for="Username" class="form-label">用户名</label>
+                    <input asp-for="Username" class="form-control" aria-describedby="usernameHelp">
+                    <div id="usernameHelp" class="form-text">设置个用户名给管理员用</div>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Password" class="form-label">密码</label>
+                    <input asp-for="Password" class="form-control" aria-describedby="passwordHelp">
+                    <div id="passwordHelp" class="form-text">得有密码才能登录</div>
+                </div>
+            </div>
+
+            <div class="col-xl-6 py-3">
+                <h5 class="card-title">系统配置</h5>
+                <h6 class="card-subtitle mb-3 text-muted">一些初始化的配置</h6>
+                <div class="mb-3">
+                    <label asp-for="Host" class="form-label">Host</label>
+                    <input asp-for="Host" class="form-control" aria-describedby="hostHelp">
+                    <div id="hostHelp" class="form-text">设置链接前缀，之后可以在管理后台修改</div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <button type="reset" class="btn btn-outline-warning">重置</button>
+                <button type="submit" class="btn btn-outline-primary">提交</button>
+            </div>
+        </form>
+    </div>
+
+
+</div>
