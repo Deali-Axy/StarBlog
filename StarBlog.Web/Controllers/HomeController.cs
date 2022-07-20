@@ -18,6 +18,10 @@ public class HomeController : Controller {
     }
 
     public IActionResult Index() {
+        if (Request.QueryString.HasValue) {
+            return BadRequest();
+        }
+
         return View(new HomeViewModel {
             RandomPhoto = _photoService.GetRandomPhoto(),
             TopPost = _blogService.GetTopOnePost(),
