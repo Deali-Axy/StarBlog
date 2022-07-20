@@ -16,26 +16,25 @@ public class PostService {
     private readonly IBaseRepository<Post> _postRepo;
     private readonly IBaseRepository<Category> _categoryRepo;
     private readonly IWebHostEnvironment _environment;
-    private readonly IConfiguration _configuration;
     private readonly IHttpContextAccessor _accessor;
     private readonly LinkGenerator _generator;
+    private readonly ConfigService _conf;
 
 
-    public string Host => _configuration.GetSection("Server:Host").Value;
+    public string Host => _conf["host"];
 
     public PostService(IBaseRepository<Post> postRepo,
         IBaseRepository<Category> categoryRepo,
         IWebHostEnvironment environment,
-        IConfiguration configuration,
         IHttpContextAccessor accessor,
-        LinkGenerator generator
-    ) {
+        LinkGenerator generator,
+        ConfigService conf) {
         _postRepo = postRepo;
         _categoryRepo = categoryRepo;
         _environment = environment;
-        _configuration = configuration;
         _accessor = accessor;
         _generator = generator;
+        _conf = conf;
     }
 
     public Post? GetById(string id) {
