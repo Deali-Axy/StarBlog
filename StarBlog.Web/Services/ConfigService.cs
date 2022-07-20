@@ -4,10 +4,12 @@ using StarBlog.Data.Models;
 namespace StarBlog.Web.Services;
 
 public class ConfigService {
+    private readonly IConfiguration _conf;
     private readonly IBaseRepository<ConfigItem> _repo;
 
-    public ConfigService(IBaseRepository<ConfigItem> repo) {
+    public ConfigService(IBaseRepository<ConfigItem> repo, IConfiguration conf) {
         _repo = repo;
+        _conf = conf;
     }
 
     public List<ConfigItem> GetAll() {
@@ -19,7 +21,16 @@ public class ConfigService {
     }
 
     public ConfigItem? GetByKey(string key) {
-        return _repo.Where(a => a.Key == key).First();
+        var item = _repo.Where(a => a.Key == key).First();
+        if (item == null) {
+            // 尝试读取初始化配置
+            var section = _conf.GetSection($"StarBlog:Initial:{key}");
+            if (!section.Exists()) return null;
+            item = new ConfigItem { Key = key, Value = section.Value, Description = "Initial" };
+            item = AddOrUpdate(item);
+        }
+
+        return item;
     }
 
     public ConfigItem AddOrUpdate(ConfigItem item) {
