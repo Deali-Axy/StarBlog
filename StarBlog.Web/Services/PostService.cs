@@ -143,6 +143,7 @@ public class PostService {
             Title = post.Title,
             Summary = post.Summary,
             Content = post.Content,
+            // todo 研究一下后端渲染Markdown
             ContentHtml = Markdig.Markdown.ToHtml(post.Content),
             Path = post.Path,
             Url = _generator.GetUriByAction(
@@ -180,9 +181,11 @@ public class PostService {
 
     /// <summary>
     /// Markdown中的图片链接转换
+    /// <para>支持添加或去除Markdown中的图片URL前缀</para>
+    /// todo 如果Markdown中包含外部图片URL，则下载到本地且进行替换
     /// </summary>
     /// <param name="post"></param>
-    /// <param name="isAddPrefix"></param>
+    /// <param name="isAddPrefix">是否添加本站的完整URL前缀</param>
     /// <returns></returns>
     private string MdImageLinkConvert(Post post, bool isAddPrefix = true) {
         var document = Markdown.Parse(post.Content);
