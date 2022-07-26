@@ -6,26 +6,52 @@ using Markdig.Renderers.Normalize;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 
-var filepath = @"D:\blog\Django\项目完成小结-Django3.x版本-开发部署小结.md";
-var md = File.ReadAllText(filepath);
 
-var document = Markdown.Parse(md);
+async Task<string> DownloadImage(string url) {
+    using var httpClient = new HttpClient();
+    var resp = await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+    var fileName = Guid.NewGuid().ToString("N") +
+                   Path.GetExtension(url);
+    var filePath = Path.Combine("data", "images", fileName);
+    using (var fs = new FileStream(filePath, FileMode.OpenOrCreate, FileAccess.Write)) {
+        await resp.Content.CopyToAsync(fs);
+    }
 
-foreach (var node in document.AsEnumerable()) {
-    if (node is ParagraphBlock { Inline: { } } paragraphBlock) {
-        foreach (var inline in paragraphBlock.Inline) {
-            if (inline is LinkInline { IsImage: true } linkInline) {
-                linkInline.Url = $"http://127.0.0.1:5038/assets/blog/{linkInline.Url}";
-                Console.WriteLine(linkInline.Url);
+    return fileName;
+}
+
+async void Run() {
+    var filepath = "data/test.md";
+    var md = File.ReadAllText(filepath);
+
+    var document = Markdown.Parse(md);
+
+    foreach (var node in document.AsEnumerable()) {
+        if (node is ParagraphBlock {Inline: { }} paragraphBlock) {
+            foreach (var inline in paragraphBlock.Inline) {
+                if (inline is LinkInline {IsImage: true} linkInline) {
+                    if (linkInline.Url == null) continue;
+
+                    Console.WriteLine("download {0}", linkInline.Url);
+                    var fileName = await DownloadImage(linkInline.Url);
+                    linkInline.Url = Path.Combine("images", fileName);
+                    Console.WriteLine("save to {0}", linkInline.Url);
+                }
             }
         }
     }
+
+    using (var writer = new StringWriter()) {
+        var render = new NormalizeRenderer(writer);
+        render.Render(document);
+
+        using (var sw = new StreamWriter("data/output.md")) {
+            await sw.WriteAsync(writer.ToString());
+        }
+
+        Console.WriteLine("write to file.");
+    }
 }
 
-
-// using (var writer = new StringWriter()) {
-//     var render = new NormalizeRenderer(writer);
-//     render.Render(document);
-//
-//     Console.WriteLine(writer.ToString());
-// }
+Run();
+Console.Read();
