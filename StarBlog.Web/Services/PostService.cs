@@ -13,6 +13,7 @@ using X.PagedList;
 namespace StarBlog.Web.Services;
 
 public class PostService {
+    private readonly ILogger<PostService> _logger;
     private readonly IBaseRepository<Post> _postRepo;
     private readonly IBaseRepository<Category> _categoryRepo;
     private readonly IWebHostEnvironment _environment;
@@ -30,7 +31,7 @@ public class PostService {
         IHttpContextAccessor accessor,
         LinkGenerator generator,
         ConfigService conf,
-        CommonService commonService) {
+        CommonService commonService, ILogger<PostService> logger) {
         _postRepo = postRepo;
         _categoryRepo = categoryRepo;
         _environment = environment;
@@ -38,6 +39,7 @@ public class PostService {
         _generator = generator;
         _conf = conf;
         _commonService = commonService;
+        _logger = logger;
     }
 
     public Post? GetById(string id) {
@@ -52,10 +54,20 @@ public class PostService {
         return _postRepo.Delete(a => a.Id == id);
     }
 
-    public Post InsertOrUpdate(Post post) {
+    public async Task<Post> InsertOrUpdateAsync(Post post) {
+        // 是新文章的话，先保存到数据库
+        if (await _postRepo.Where(a => a.Id == post.Id).CountAsync() == 0) {
+            post = await _postRepo.InsertAsync(post);
+        }
+
+        // 检查文章中的外部图片，下载并进行替换
+        post.Content = await MdExternalUrlDownloadAsync(post);
         // 修改文章时，将markdown中的图片地址替换成相对路径再保存
         post.Content = MdImageLinkConvert(post, false);
-        return _postRepo.InsertOrUpdate(post);
+
+        // 处理完内容再更新一次
+        await _postRepo.UpdateAsync(post);
+        return post;
     }
 
     /// <summary>
@@ -68,12 +80,12 @@ public class PostService {
         InitPostMediaDir(post);
 
         var filename = WebUtility.UrlEncode(file.FileName);
-        var fileRelativePath = Path.Combine("media", "blog", post.Id, filename);
+        var fileRelativePath = Path.Combine("media", "blog", post.Id!, filename);
         var savePath = Path.Combine(_environment.WebRootPath, fileRelativePath);
         if (File.Exists(savePath)) {
             // 上传文件重名处理
             var newFilename = $"{Path.GetFileNameWithoutExtension(filename)}-{GuidUtils.GuidTo16String()}.{Path.GetExtension(filename)}";
-            fileRelativePath = Path.Combine("media", "blog", post.Id, newFilename);
+            fileRelativePath = Path.Combine("media", "blog", post.Id!, newFilename);
             savePath = Path.Combine(_environment.WebRootPath, fileRelativePath);
         }
 
@@ -152,7 +164,7 @@ public class PostService {
             Url = _generator.GetUriByAction(
                 _accessor.HttpContext!,
                 "Post", "Blog",
-                new { Id = post.Id }
+                new {Id = post.Id}
             ),
             CreationTime = post.CreationTime,
             LastUpdateTime = post.LastUpdateTime,
@@ -183,25 +195,20 @@ public class PostService {
     }
 
     /// <summary>
-    /// <para>Markdown中的图片链接转换</para>
-    /// <list type="number">
-    ///     <listheader>功能</listheader>
-    ///     <item>支持添加或去除Markdown中的图片URL前缀</item>
-    ///     <item>如果Markdown中包含外部图片URL，则下载到本地且进行URL替换</item>
-    /// </list>
+    /// Markdown中的图片链接转换
+    /// <para>支持添加或去除Markdown中的图片URL前缀</para>
     /// </summary>
     /// <param name="post"></param>
     /// <param name="isAddPrefix">是否添加本站的完整URL前缀</param>
-    /// <param name="isDownloadExternalUrl">是否下载外部链接的图片</param>
     /// <returns></returns>
-    private string MdImageLinkConvert(Post post, bool isAddPrefix = true, bool isDownloadExternalUrl = false) {
+    private string MdImageLinkConvert(Post post, bool isAddPrefix = true) {
         if (post.Content == null) return string.Empty;
         var document = Markdown.Parse(post.Content);
 
         foreach (var node in document.AsEnumerable()) {
-            if (node is not ParagraphBlock { Inline: { } } paragraphBlock) continue;
+            if (node is not ParagraphBlock {Inline: { }} paragraphBlock) continue;
             foreach (var inline in paragraphBlock.Inline) {
-                if (inline is not LinkInline { IsImage: true } linkInline) continue;
+                if (inline is not LinkInline {IsImage: true} linkInline) continue;
 
                 var imgUrl = linkInline.Url;
                 if (imgUrl == null) continue;
@@ -216,20 +223,47 @@ public class PostService {
                 }
                 // 设置成相对链接
                 else {
-                    if (!isDownloadExternalUrl) {
-                        linkInline.Url = Path.GetFileName(imgUrl);
-                        continue;
-                    }
-                    
-                    // 下载图片
-                    var savePath = Path.Combine(_environment.WebRootPath);
-                    // todo 完成下载图片逻辑
-                    // var fileName= await _commonService.DownloadFileAsync(imgUrl, savePath);
+                    linkInline.Url = Path.GetFileName(imgUrl);
                 }
             }
         }
 
         using var writer = new StringWriter();
+        var render = new NormalizeRenderer(writer);
+        render.Render(document);
+        return writer.ToString();
+    }
+
+    /// <summary>
+    /// Markdown中外部图片下载
+    /// <para>如果Markdown中包含外部图片URL，则下载到本地且进行URL替换</para>
+    /// </summary>
+    /// <param name="post"></param>
+    /// <returns></returns>
+    private async Task<string> MdExternalUrlDownloadAsync(Post post) {
+        if (post.Content == null) return string.Empty;
+
+        // 得先初始化目录
+        InitPostMediaDir(post);
+        
+        var document = Markdown.Parse(post.Content);
+        foreach (var node in document.AsEnumerable()) {
+            if (node is not ParagraphBlock {Inline: { }} paragraphBlock) continue;
+            foreach (var inline in paragraphBlock.Inline) {
+                if (inline is not LinkInline {IsImage: true} linkInline) continue;
+
+                var imgUrl = linkInline.Url;
+                if (imgUrl == null) continue;
+
+                // 下载图片
+                _logger.LogDebug("文章：{Title}，下载图片：{Url}", post.Title, imgUrl);
+                var savePath = Path.Combine(_environment.WebRootPath, "media", "blog", post.Id!);
+                var fileName = await _commonService.DownloadFileAsync(imgUrl, savePath);
+                linkInline.Url = fileName;
+            }
+        }
+
+        await using var writer = new StringWriter();
         var render = new NormalizeRenderer(writer);
         render.Render(document);
         return writer.ToString();

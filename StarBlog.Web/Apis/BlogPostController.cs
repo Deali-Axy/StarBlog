@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using StarBlog.Contrib.Utils;
 using StarBlog.Data.Models;
 using StarBlog.Web.Extensions;
 using StarBlog.Web.Services;
@@ -56,19 +57,18 @@ public class BlogPostController : ControllerBase {
         return ApiResponse.Ok($"删除了 {rows} 篇博客");
     }
 
-    // todo 这个添加文章的参数是不对的，得换成 DTO
     [HttpPost]
-    public ApiResponse<Post> Add(PostCreationDto dto,
+    public async Task<ApiResponse<Post>> Add(PostCreationDto dto,
         [FromServices] CategoryService categoryService) {
         var post = _mapper.Map<Post>(dto);
         var category = categoryService.GetById(dto.CategoryId);
         if (category == null) return ApiResponse.BadRequest($"分类 {dto.CategoryId} 不存在！");
 
-        post.Id = Guid.NewGuid().ToString();
+        post.Id = GuidUtils.GuidTo16String();
         post.CreationTime = DateTime.Now;
         post.LastUpdateTime = DateTime.Now;
 
-        var categories = new List<Category> { category };
+        var categories = new List<Category> {category};
         var parent = category.Parent;
         while (parent != null) {
             categories.Add(parent);
@@ -78,11 +78,11 @@ public class BlogPostController : ControllerBase {
         categories.Reverse();
         post.Categories = string.Join(",", categories.Select(a => a.Id));
 
-        return new ApiResponse<Post>(_postService.InsertOrUpdate(post));
+        return new ApiResponse<Post>(await _postService.InsertOrUpdateAsync(post));
     }
 
     [HttpPut("{id}")]
-    public ApiResponse<Post> Update(string id, PostUpdateDto dto) {
+    public async Task<ApiResponse<Post>> Update(string id, PostUpdateDto dto) {
         var post = _postService.GetById(id);
         if (post == null) return ApiResponse.NotFound($"博客 {id} 不存在");
 
@@ -90,7 +90,7 @@ public class BlogPostController : ControllerBase {
         // mapper.Map(source, dest) 在 source 对象的基础上修改
         post = _mapper.Map(dto, post);
         post.LastUpdateTime = DateTime.Now;
-        return new ApiResponse<Post>(_postService.InsertOrUpdate(post));
+        return new ApiResponse<Post>(await _postService.InsertOrUpdateAsync(post));
     }
 
     /// <summary>
@@ -158,6 +158,6 @@ public class BlogPostController : ControllerBase {
         var post = _postService.GetById(id);
         if (post == null) return ApiResponse.NotFound($"博客 {id} 不存在");
         var (data, rows) = _blogService.SetTopPost(post);
-        return new ApiResponse<TopPost> { Data = data, Message = $"ok. deleted {rows} old topPosts." };
+        return new ApiResponse<TopPost> {Data = data, Message = $"ok. deleted {rows} old topPosts."};
     }
 }
