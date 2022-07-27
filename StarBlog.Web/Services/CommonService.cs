@@ -21,7 +21,7 @@ public class CommonService {
     /// <param name="url"></param>
     /// <param name="savePath">保存路径，需要完整路径</param>
     /// <returns></returns>
-    public async Task<string?> DownloadFile(string url, string savePath) {
+    public async Task<string?> DownloadFileAsync(string url, string savePath) {
         var httpClient = _httpClientFactory.CreateClient();
         try {
             var resp = await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
