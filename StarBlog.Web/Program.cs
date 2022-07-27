@@ -7,10 +7,10 @@ using StarBlog.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 var mvcBuilder = builder.Services.AddControllersWithViews(
     options => { options.Filters.Add<ResponseWrapperFilter>(); }
 );
+// 开发模式启用Razor页面动态编译
 if (builder.Environment.IsDevelopment()) {
     mvcBuilder.AddRazorRuntimeCompilation();
 }
@@ -30,8 +30,10 @@ builder.Services.AddSwagger();
 builder.Services.AddSettings(builder.Configuration);
 builder.Services.AddAuth(builder.Configuration);
 builder.Services.AddHttpContextAccessor();
+// 注册 IHttpClientFactory，参考：https://docs.microsoft.com/zh-cn/dotnet/core/extensions/http-client
+builder.Services.AddHttpClient();
 
-// 自定义服务
+// 注册自定义服务
 builder.Services.AddScoped<BlogService>();
 builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<ConfigService>();
@@ -40,9 +42,11 @@ builder.Services.AddScoped<LinkService>();
 builder.Services.AddScoped<PhotoService>();
 builder.Services.AddScoped<PostService>();
 builder.Services.AddScoped<VisitRecordService>();
-builder.Services.AddSingleton<ThemeService>();
+builder.Services.AddSingleton<CommonService>();
 builder.Services.AddSingleton<Messages>();
+builder.Services.AddSingleton<ThemeService>();
 builder.Services.AddSingleton<PicLibService>();
+
 
 var app = builder.Build();
 
