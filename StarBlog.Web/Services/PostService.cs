@@ -19,6 +19,7 @@ public class PostService {
     private readonly IHttpContextAccessor _accessor;
     private readonly LinkGenerator _generator;
     private readonly ConfigService _conf;
+    private readonly CommonService _commonService;
 
 
     public string Host => _conf["host"];
@@ -28,13 +29,15 @@ public class PostService {
         IWebHostEnvironment environment,
         IHttpContextAccessor accessor,
         LinkGenerator generator,
-        ConfigService conf) {
+        ConfigService conf,
+        CommonService commonService) {
         _postRepo = postRepo;
         _categoryRepo = categoryRepo;
         _environment = environment;
         _accessor = accessor;
         _generator = generator;
         _conf = conf;
+        _commonService = commonService;
     }
 
     public Post? GetById(string id) {
@@ -149,7 +152,7 @@ public class PostService {
             Url = _generator.GetUriByAction(
                 _accessor.HttpContext!,
                 "Post", "Blog",
-                new {Id = post.Id}
+                new { Id = post.Id }
             ),
             CreationTime = post.CreationTime,
             LastUpdateTime = post.LastUpdateTime,
@@ -180,32 +183,48 @@ public class PostService {
     }
 
     /// <summary>
-    /// Markdown中的图片链接转换
-    /// <para>支持添加或去除Markdown中的图片URL前缀</para>
-    /// todo 如果Markdown中包含外部图片URL，则下载到本地且进行替换
+    /// <para>Markdown中的图片链接转换</para>
+    /// <list type="number">
+    ///     <listheader>功能</listheader>
+    ///     <item>支持添加或去除Markdown中的图片URL前缀</item>
+    ///     <item>如果Markdown中包含外部图片URL，则下载到本地且进行URL替换</item>
+    /// </list>
     /// </summary>
     /// <param name="post"></param>
     /// <param name="isAddPrefix">是否添加本站的完整URL前缀</param>
+    /// <param name="isDownloadExternalUrl">是否下载外部链接的图片</param>
     /// <returns></returns>
-    private string MdImageLinkConvert(Post post, bool isAddPrefix = true) {
+    private string MdImageLinkConvert(Post post, bool isAddPrefix = true, bool isDownloadExternalUrl = false) {
+        if (post.Content == null) return string.Empty;
         var document = Markdown.Parse(post.Content);
 
         foreach (var node in document.AsEnumerable()) {
-            if (node is not ParagraphBlock {Inline: { }} paragraphBlock) continue;
+            if (node is not ParagraphBlock { Inline: { } } paragraphBlock) continue;
             foreach (var inline in paragraphBlock.Inline) {
-                if (inline is not LinkInline {IsImage: true} linkInline) continue;
+                if (inline is not LinkInline { IsImage: true } linkInline) continue;
 
                 var imgUrl = linkInline.Url;
                 if (imgUrl == null) continue;
-                if (isAddPrefix && imgUrl.StartsWith("http")) continue;
+
+                // 已有Host前缀，跳过
+                if (isAddPrefix && imgUrl.StartsWith(Host)) continue;
+
+                // 设置完整链接
                 if (isAddPrefix) {
                     if (imgUrl.StartsWith("http")) continue;
-                    // 设置完整链接
                     linkInline.Url = $"{Host}/media/blog/{post.Id}/{imgUrl}";
                 }
+                // 设置成相对链接
                 else {
-                    // 设置成相对链接
-                    linkInline.Url = Path.GetFileName(imgUrl);
+                    if (!isDownloadExternalUrl) {
+                        linkInline.Url = Path.GetFileName(imgUrl);
+                        continue;
+                    }
+                    
+                    // 下载图片
+                    var savePath = Path.Combine(_environment.WebRootPath);
+                    // todo 完成下载图片逻辑
+                    // var fileName= await _commonService.DownloadFileAsync(imgUrl, savePath);
                 }
             }
         }
