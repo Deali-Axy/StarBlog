@@ -57,6 +57,7 @@ public class BlogPostController : ControllerBase {
         return ApiResponse.Ok($"删除了 {rows} 篇博客");
     }
 
+    // todo 发表文章需要同时设置已发布状态
     [HttpPost]
     public async Task<ApiResponse<Post>> Add(PostCreationDto dto,
         [FromServices] CategoryService categoryService) {
