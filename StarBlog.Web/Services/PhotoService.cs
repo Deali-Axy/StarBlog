@@ -59,9 +59,9 @@ public class PhotoService {
             image.Save(savePath);
         }
 
-        // using (var fs = new FileStream(savePath, FileMode.Create)) {
-        //     photoFile.CopyTo(fs);
-        // }
+        using (var fs = new FileStream(savePath, FileMode.Create)) {
+            photoFile.CopyTo(fs);
+        }
 
         photo = BuildPhotoData(photo);
 
