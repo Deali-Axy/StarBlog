@@ -45,13 +45,12 @@ public class VisitRecordService {
     /// </summary>
     /// <returns></returns>
     public object Overview() {
-        ISelect<VisitRecord> GetQuerySet() => _repo.Where(a => !a.RequestPath.StartsWith("/Api"));
-
-        return new {
-            TotalVisit = GetQuerySet().Count(),
-            TodayVisit = GetQuerySet().Where(a => a.Time.Date == DateTime.Today).Count(),
-            YesterdayVisit = GetQuerySet().Where(a => a.Time.Date == DateTime.Today.AddDays(-2).Date).Count(),
-        };
+        return _repo.Where(a => !a.RequestPath.StartsWith("/Api"))
+            .ToAggregate(g => new {
+                TotalVisit = g.Count(),
+                TodayVisit = g.Sum(g.Key.Time.Date == DateTime.Today ? 1 : 0),
+                YesterdayVisit = g.Sum(g.Key.Time.Date == DateTime.Today.AddDays(-1).Date ? 1 : 0)
+            });
     }
 
     /// <summary>
@@ -75,12 +74,11 @@ public class VisitRecordService {
     /// </summary>
     /// <returns></returns>
     public object Stats(DateTime date) {
-        var data = _repo.Where(
+        return _repo.Where(
             a => a.Time.Date == date.Date
                  && !a.RequestPath.StartsWith("/Api")
-        );
-        return new {
-            Count = data.Count()
-        };
+        ).ToAggregate(g => new {
+            Count = g.Count()
+        });
     }
 }
