@@ -245,7 +245,7 @@ public class PostService {
 
         // 得先初始化目录
         InitPostMediaDir(post);
-        
+
         var document = Markdown.Parse(post.Content);
         foreach (var node in document.AsEnumerable()) {
             if (node is not ParagraphBlock {Inline: { }} paragraphBlock) continue;
@@ -253,7 +253,10 @@ public class PostService {
                 if (inline is not LinkInline {IsImage: true} linkInline) continue;
 
                 var imgUrl = linkInline.Url;
+                // 跳过空链接
                 if (imgUrl == null) continue;
+                // 跳过本站地址的图片
+                if (imgUrl.StartsWith(Host)) continue;
 
                 // 下载图片
                 _logger.LogDebug("文章：{Title}，下载图片：{Url}", post.Title, imgUrl);
