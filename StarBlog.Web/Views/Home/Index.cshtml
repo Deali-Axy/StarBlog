@@ -38,8 +38,8 @@
 
 <div class="container px-4 py-3" id="custom-cards">
     <h2 class="pb-2 border-bottom">Photography</h2>
-
-    @if (Model.FeaturedPhotos.Count > 0) {
+    
+    @if (Model.FeaturedPhotos.Any()) {
         <div class="row row-cols-1 row-cols-lg-3 align-items-stretch g-4 py-5">
             @foreach (var photo in Model.FeaturedPhotos) {
                 <div class="col">
@@ -56,7 +56,7 @@
 
 <div class="container px-4 py-3" id="featured-3">
     <h2 class="pb-2 border-bottom">Blog Categories</h2>
-    @if (Model.FeaturedCategories.Count > 0) {
+    @if (Model.FeaturedCategories.Any()) {
         <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
             @foreach (var fc in Model.FeaturedCategories) {
                 @await Html.PartialAsync("Widgets/FeaturedCategoryCard", fc)
@@ -80,7 +80,7 @@
     }
 
 
-    @if (Model.FeaturedPosts.Count > 0) {
+    @if (Model.FeaturedPosts.Any()) {
         <div class="row mb-2">
             @foreach (var post in @Model.FeaturedPosts) {
                 <partial name="Widgets/FeaturedPostCard" model="post"/>
@@ -94,7 +94,7 @@
 
 <div class="container px-4 py-3">
     <h2 class="pb-2 border-bottom">Link Exchange</h2>
-    @if (Model.Links.Count > 0) {
+    @if (Model.Links.Any()) {
         <div class="d-grid gap-2 d-md-block">
             @foreach (var link in Model.Links) {
                 @await Html.PartialAsync("Widgets/ColorfulButton",

@@ -9,22 +9,10 @@
 <div class="container px-4 py-3">
     <h2 class="d-flex w-100 justify-content-between pb-2 mb-3 border-bottom">
         <div>Photography</div>
-        <div>@Model?.Photos.TotalItemCount.ToString() Photos</div>
+        <div>@Model.Photos.TotalItemCount.ToString() Photos</div>
     </h2>
 
-    @if (Model?.Photos == null || Model?.Photos.Count == 0) {
-        <div class="d-flex justify-content-center">
-            <div class="card" style="width: 18rem;">
-                <img src="~/images/codelab.jpg" class="card-img-top" alt="...">
-                <div class="card-body">
-                    <h5 class="card-title">当前没有图片数据</h5>
-                    <p class="card-text">No photos.</p>
-                    <a class="btn btn-primary" asp-controller="Home" asp-action="Index">返回主页</a>
-                </div>
-            </div>
-        </div>
-    }
-    else {
+    @if (Model.Photos.Any()) {
         <div class="row" data-masonry='{"percentPosition": true }'>
             @foreach (var photo in Model.Photos) {
                 <div class="col-sm-6 col-lg-4 mb-4">
@@ -42,6 +30,18 @@
                     UlElementClasses = new[] {"pagination justify-content-center"}
                 })
         </nav>
+    }
+    else {
+        <div class="d-flex justify-content-center">
+            <div class="card" style="width: 18rem;">
+                <img src="~/images/codelab.jpg" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">当前没有图片数据</h5>
+                    <p class="card-text">No photos.</p>
+                    <a class="btn btn-primary" asp-controller="Home" asp-action="Index">返回主页</a>
+                </div>
+            </div>
+        </div>
     }
 
 
