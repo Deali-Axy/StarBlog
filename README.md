@@ -83,6 +83,8 @@ OK，大概就这些了~ 更多功能可能后面想到了就加上~
 
 本项目基于 .Net6 开发，构建之前请确保已经安装 .Net6 SDK。
 
+### 前端资源
+
 本项目的前端资源使用 `NPM` + `Gulp` 管理，可使用 `NPM` 或 `Yarn` 安装依赖：
 
 详情可以查看这篇博客：[Asp-Net-Core开发笔记：使用NPM和gulp管理前端静态文件](https://www.cnblogs.com/deali/p/15905760.html)
@@ -108,6 +110,16 @@ gulp move
 ```
 
 然后运行 `StarBlog.Web` 项目即可
+
+### 初始化
+
+项目启动之后，需要进入初始化页面进行管理员创建等操作。
+
+初始化入口：`/Home/Init`
+
+**PS：初始化操作只能进行一次**
+
+详情可以查看这篇文章：[基于.NetCore开发博客项目 StarBlog - (16) 一些新功能 (监控/统计/配置/初始化)](https://www.cnblogs.com/deali/p/16523157.html)
 
 
 ## 博客截图
