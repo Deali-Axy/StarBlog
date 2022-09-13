@@ -1,4 +1,6 @@
-﻿using FreeSql;
+﻿using System.IO.Compression;
+using System.Text;
+using FreeSql;
 using StarBlog.Data.Models;
 using StarBlog.Web.ViewModels.Blog;
 
@@ -97,5 +99,25 @@ public class BlogService {
     public List<string?> GetStatusList() {
         return _postRepo.Select.GroupBy(a => a.Status)
             .ToList(a => a.Key);
+    }
+
+    /// <summary>
+    /// 上传博客
+    /// todo 只完成了解压部分，导入部分待实现
+    /// </summary>
+    /// <returns></returns>
+    public async Task<Post> Upload(PostCreationDto dto, IFormFile file) {
+        var tempFile = Path.GetTempFileName();
+        await using (var fs = new FileStream(tempFile, FileMode.Create)) {
+            await file.CopyToAsync(fs);
+        }
+
+        var extractPath = Path.Combine(Path.GetTempPath(), "StarBlog", Guid.NewGuid().ToString());
+        // 使用 GBK 编码解压，防止中文文件名乱码
+        // 参考：https://www.cnblogs.com/liguix/p/11883248.html
+        Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+        ZipFile.ExtractToDirectory(tempFile, extractPath, Encoding.GetEncoding("GBK"));
+
+        throw new NotImplementedException();
     }
 }

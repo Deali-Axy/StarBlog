@@ -59,4 +59,27 @@ public class BlogController : ControllerBase {
     public ApiResponse GetStatusList() {
         return ApiResponse.Ok(_blogService.GetStatusList());
     }
+
+    /// <summary>
+    /// 上传博客压缩包 + 导入
+    /// </summary>
+    /// <returns></returns>
+    [HttpPost("[action]")]
+    public async Task<ApiResponse<Post>> Upload([FromForm] PostCreationDto dto, IFormFile file,
+        [FromServices] CategoryService categoryService
+    ) {
+        if (!file.FileName.EndsWith(".zip")) {
+            return ApiResponse.BadRequest("只能上传zip格式的文件哦~");
+        }
+
+        var category = categoryService.GetById(dto.CategoryId);
+        if (category == null) return ApiResponse.BadRequest($"分类 {dto.CategoryId} 不存在！");
+
+        try {
+            return new ApiResponse<Post>(await _blogService.Upload(dto, file));
+        }
+        catch (Exception ex) {
+            return ApiResponse.Error($"解压文件出错：{ex.Message}");
+        }
+    }
 }
