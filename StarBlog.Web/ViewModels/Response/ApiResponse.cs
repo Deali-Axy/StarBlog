@@ -36,6 +36,11 @@ public class ApiResponse : IApiResponse, IApiErrorResponse {
     public bool Successful { get; set; } = true;
     public string? Message { get; set; }
     public object? Data { get; set; }
+
+    /// <summary>
+    /// 可序列化的错误
+    /// <para>用于保存模型验证失败的错误信息</para>
+    /// </summary>
     public SerializableError? ErrorData { get; set; }
 
     public ApiResponse() {
@@ -96,11 +101,20 @@ public class ApiResponse : IApiResponse, IApiErrorResponse {
         };
     }
 
-    public static ApiResponse Error(HttpResponse httpResponse, string message = "Error") {
-        httpResponse.StatusCode = StatusCodes.Status500InternalServerError;
+    public static ApiResponse Error(string message = "Error", Exception? exception = null) {
+        object? data = null;
+        if (exception != null) {
+            data = new {
+                exception.Message,
+                exception.Data
+            };
+        }
+
         return new ApiResponse {
-            StatusCode = httpResponse.StatusCode,
-            Successful = false, Message = message
+            StatusCode = StatusCodes.Status500InternalServerError,
+            Successful = false,
+            Message = message,
+            Data = data
         };
     }
 }
