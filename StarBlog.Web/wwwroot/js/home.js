@@ -16,14 +16,14 @@ let homeApp = new Vue({
         }
     },
     created() {
-        fetch('http://dc.sblt.deali.cn:9800/poem/simple')
+        fetch('http://www.sblt.deali.cn:15911/poem/simple')
             .then(res => res.text()).then(data => this.poemSimple = data)
-        fetch('http://dc.sblt.deali.cn:9800/poem/tang')
+        fetch('http://www.sblt.deali.cn:15911/poem/tang')
             .then(res => res.json())
             .then(data => {
                 this.poem = data.data
             })
-        fetch('http://dc.sblt.deali.cn:9800/hitokoto/get')
+        fetch('http://www.sblt.deali.cn:15911/hitokoto/get')
             .then(res => res.json())
             .then(data => {
                 this.hitokoto = data.data[0]
