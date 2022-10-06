@@ -4,7 +4,7 @@ using StarBlog.Contrib.Extensions;
 using StarBlog.Data;
 using StarBlog.Data.Models;
 using StarBlog.Contrib.Utils;
-using StarBlog.Migrate;
+using StarBlog.Share;
 
 const string importDir = @"E:\Documents\0_Write\0_blog\";
 // const string importDir = @"D:\blog\";
