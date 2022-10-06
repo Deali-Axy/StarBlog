@@ -56,7 +56,7 @@ public class PhotoController : ControllerBase {
         var rows = _photoService.DeleteById(id);
         return rows > 0
             ? ApiResponse.Ok($"deleted {rows} rows.")
-            : ApiResponse.Error(Response, "deleting failed.");
+            : ApiResponse.Error("deleting failed.");
     }
 
     /// <summary>

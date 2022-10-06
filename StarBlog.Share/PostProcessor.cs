@@ -7,7 +7,7 @@ using StarBlog.Contrib.Extensions;
 using StarBlog.Contrib.Utils;
 using StarBlog.Data.Models;
 
-namespace StarBlog.Migrate;
+namespace StarBlog.Share;
 
 public class PostProcessor {
     private readonly Post _post;
