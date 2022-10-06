@@ -69,6 +69,7 @@ public class BlogPostController : ControllerBase {
         post.CreationTime = DateTime.Now;
         post.LastUpdateTime = DateTime.Now;
 
+        // todo 这里冗余代码得优化一下
         var categories = new List<Category> {category};
         var parent = category.Parent;
         while (parent != null) {

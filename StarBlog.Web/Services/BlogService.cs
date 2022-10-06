@@ -1,12 +1,15 @@
 ﻿using System.IO.Compression;
 using System.Text;
 using FreeSql;
+using StarBlog.Contrib.Utils;
 using StarBlog.Data.Models;
+using StarBlog.Share;
 using StarBlog.Web.ViewModels.Blog;
 
 namespace StarBlog.Web.Services;
 
 public class BlogService {
+    private readonly IWebHostEnvironment _environment;
     private readonly IBaseRepository<Post> _postRepo;
     private readonly IBaseRepository<Category> _categoryRepo;
     private readonly IBaseRepository<Photo> _photoRepo;
@@ -17,7 +20,7 @@ public class BlogService {
 
     public BlogService(IBaseRepository<TopPost> topPostRepo, IBaseRepository<FeaturedPost> fPostRepo, IBaseRepository<Post> postRepo,
         IBaseRepository<Category> categoryRepo, IBaseRepository<Photo> photoRepo, IBaseRepository<FeaturedCategory> fCategoryRepo,
-        IBaseRepository<FeaturedPhoto> fPhotoRepo) {
+        IBaseRepository<FeaturedPhoto> fPhotoRepo, IWebHostEnvironment environment) {
         _topPostRepo = topPostRepo;
         _fPostRepo = fPostRepo;
         _postRepo = postRepo;
@@ -25,6 +28,7 @@ public class BlogService {
         _photoRepo = photoRepo;
         _fCategoryRepo = fCategoryRepo;
         _fPhotoRepo = fPhotoRepo;
+        _environment = environment;
     }
 
     /// <summary>
@@ -103,7 +107,7 @@ public class BlogService {
 
     /// <summary>
     /// 上传博客
-    /// todo 只完成了解压部分，导入部分待实现
+    /// todo 初步完成了这个功能，但太多冗余代码了，需要优化
     /// </summary>
     /// <returns></returns>
     public async Task<Post> Upload(PostCreationDto dto, IFormFile file) {
@@ -118,6 +122,55 @@ public class BlogService {
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
         ZipFile.ExtractToDirectory(tempFile, extractPath, Encoding.GetEncoding("GBK"));
 
-        throw new NotImplementedException();
+        var dir = new DirectoryInfo(extractPath);
+        var files = dir.GetFiles("*.md");
+        var mdFile = files.First();
+
+        using var reader = mdFile.OpenText();
+        var content = await reader.ReadToEndAsync();
+        var post = new Post {
+            Id = GuidUtils.GuidTo16String(),
+            Status = "已发布",
+            Title = dto.Title ?? $"{DateTime.Now.ToLongDateString()} 文章",
+            IsPublish = true,
+            Content = content,
+            Path = "",
+            CreationTime = DateTime.Now,
+            LastUpdateTime = DateTime.Now,
+            CategoryId = dto.CategoryId,
+        };
+
+        // 处理多级分类
+        var category = await _categoryRepo.Where(a => a.Id == dto.CategoryId).FirstAsync();
+        if (category == null) {
+            post.Categories = "0";
+        }
+        else {
+            var categories = new List<Category> {category};
+            var parent = category.Parent;
+            while (parent != null) {
+                categories.Add(parent);
+                parent = parent.Parent;
+            }
+
+            categories.Reverse();
+            post.Categories = string.Join(",", categories.Select(a => a.Id));
+        }
+
+        var assetsPath = Path.Combine(_environment.WebRootPath, "media", "blog");
+        var processor = new PostProcessor(extractPath, assetsPath, post);
+
+        // 处理文章标题和状态
+        processor.InflateStatusTitle();
+
+        // 处理文章正文内容
+        // 导入文章的时候一并导入文章里的图片，并对图片相对路径做替换操作
+        post.Content = processor.MarkdownParse();
+        post.Summary = processor.GetSummary(200);
+
+        // 存入数据库
+        post = await _postRepo.InsertAsync(post);
+
+        return post;
     }
 }
