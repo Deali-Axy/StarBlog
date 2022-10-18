@@ -132,6 +132,7 @@ public class BlogService {
             Id = GuidUtils.GuidTo16String(),
             Status = "已发布",
             Title = dto.Title ?? $"{DateTime.Now.ToLongDateString()} 文章",
+            Summary = dto.Summary,
             IsPublish = true,
             Content = content,
             Path = "",
@@ -166,7 +167,9 @@ public class BlogService {
         // 处理文章正文内容
         // 导入文章的时候一并导入文章里的图片，并对图片相对路径做替换操作
         post.Content = processor.MarkdownParse();
-        post.Summary = processor.GetSummary(200);
+        if (string.IsNullOrEmpty(post.Summary)) {
+            post.Summary = processor.GetSummary(200);
+        }
 
         // 存入数据库
         post = await _postRepo.InsertAsync(post);

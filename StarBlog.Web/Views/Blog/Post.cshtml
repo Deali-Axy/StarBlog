@@ -94,6 +94,9 @@
                     </div>
                 </div>
             </header>
+            <div class="post-content">
+                @Html.Raw(Model.ContentHtml)
+            </div>
             <div id="test-editormd-view" class="post-content">
                 <textarea id="append-test" style="display:none;">@Model.Content</textarea>
             </div>
