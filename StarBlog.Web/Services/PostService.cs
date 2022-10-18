@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using FreeSql;
 using Markdig;
+using Markdig.Extensions.AutoLinks;
 using Markdig.Renderers.Normalize;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
@@ -61,6 +62,7 @@ public class PostService {
         }
 
         // 检查文章中的外部图片，下载并进行替换
+        // todo 将外部图片下载放到异步任务中执行，以免保存文章的时候太慢
         post.Content = await MdExternalUrlDownloadAsync(post);
         // 修改文章时，将markdown中的图片地址替换成相对路径再保存
         post.Content = MdImageLinkConvert(post, false);
@@ -150,17 +152,13 @@ public class PostService {
     /// <summary>
     /// 将 Post 对象转换为 PostViewModel 对象
     /// </summary>
-    /// <param name="post"></param>
-    /// <returns></returns>
-    public PostViewModel GetPostViewModel(Post post) {
+    public PostViewModel GetPostViewModel(Post post, bool md2html = true) {
         var vm = new PostViewModel {
             Id = post.Id,
             Title = post.Title,
-            Summary = post.Summary,
-            Content = post.Content,
-            // todo 研究一下后端渲染Markdown
-            ContentHtml = Markdig.Markdown.ToHtml(post.Content),
-            Path = post.Path,
+            Summary = post.Summary ?? "（没有介绍）",
+            Content = post.Content ?? "（没有内容）",
+            Path = post.Path ?? string.Empty,
             Url = _generator.GetUriByAction(
                 _accessor.HttpContext!,
                 "Post", "Blog",
@@ -171,6 +169,16 @@ public class PostService {
             Category = post.Category,
             Categories = new List<Category>()
         };
+
+        if (md2html) {
+            // todo 研究一下后端渲染Markdown
+            // 这部分一些参考资料：
+            // - 关于前端渲染 MarkDown 样式：https://blog.csdn.net/sprintline/article/details/122849907
+            // - https://github.com/showdownjs/showdown
+            
+            var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
+            vm.ContentHtml = Markdown.ToHtml(vm.Content, pipeline);
+        }
 
         foreach (var itemId in post.Categories.Split(",").Select(int.Parse)) {
             var item = _categoryRepo.Where(a => a.Id == itemId).First();
