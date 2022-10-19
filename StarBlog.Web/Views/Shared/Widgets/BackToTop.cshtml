@@ -1,0 +1,35 @@
+﻿@model BackToTopViewModel
+
+<div class="position-fixed top-0 end-0 p-3" style="z-index: 11">
+    <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <img src="~/images/codelab.jpg" class="rounded me-2" alt="..." style="width: 20px;height: 20px;">
+            <strong class="me-auto">程序设计实验室</strong>
+            <small>微信公众号</small>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            <div class="card border-0">
+                <img src="~/images/qrcode_sm.jpg" alt="qrcode" class="card-img-top">
+                <div class="card-body">
+                    <h6 class="card-title">一个技术探索与知识分享的平台~</h6>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="btn-group-vertical position-fixed bottom-0 end-0 me-3 mb-3" role="group" aria-label="右下角工具" style="z-index: 11">
+    <button type="button" class="btn btn-success" id="liveToastBtn">
+        <i class="fa-brands fa-weixin"></i>
+        @if (Model.IsShowText) {
+            <span>微信公众号</span>
+        }
+    </button>
+    <a class="btn btn-primary" href="#" role="button">
+        <i class="fa-solid fa-arrow-up"></i>
+        @if (Model.IsShowText) {
+            <span>返回顶部</span>
+        }
+    </a>
+</div>
