@@ -8,15 +8,6 @@ if (toastTrigger) {
     })
 }
 
-class TocNode {
-    constructor(text, href, tags, nodes) {
-        this.text = text
-        this.href = href
-        this.tags = tags
-        this.nodes = nodes
-    }
-}
-
 $(function () {
     let editorMdView = editormd.markdownToHTML("post-markdown-content", {
         // htmlDecode: "style,script,iframe",  // you can filter tags decode
@@ -34,31 +25,8 @@ $(function () {
         sequenceDiagram: true,  // 默认不解析
     });
 
-    let toc = editorMdView.markdownToC
-    for (let i = 0; i < toc.length; i++) {
-        let item = toc[i]
-        item.id = i
-        item.pid = -1
-        for (let j = i; j >= 0; j--) {
-            let preItem = toc[j]
-            if (item.level === preItem.level + 1) {
-                item.pid = j
-                break
-            }
-        }
-    }
-
-    function getNodes(pid = -1) {
-        let nodes = toc.filter(item => item.pid === pid)
-        if (nodes.length === 0) return null
-
-        return nodes.map(item => new TocNode(item.text, `#${item.text}`, null, getNodes(item.id)))
-    }
-
-    let nodes = getNodes()
-
     $('#post-toc-container').treeview({
-        data: nodes,
+        data: editorMdView.markdownTocTree,
         levels: 2,
         enableLinks: true,
         highlightSelected: false,
