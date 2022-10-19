@@ -31,7 +31,6 @@ $(function () {
         enableLinks: true,
         highlightSelected: false,
         showTags: true,
-        enableIndent: false,
         onNodeSelected: function (event, data) {
             console.log(data)
         },
