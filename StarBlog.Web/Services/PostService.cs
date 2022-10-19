@@ -171,11 +171,10 @@ public class PostService {
         };
 
         if (md2html) {
-            // todo 研究一下后端渲染Markdown
+            // todo 研究一下后端渲染Markdown (PS: 虽然前端渲染轮子更多、效果更好，但后端渲染不会有割裂感）
             // 这部分一些参考资料：
             // - 关于前端渲染 MarkDown 样式：https://blog.csdn.net/sprintline/article/details/122849907
             // - https://github.com/showdownjs/showdown
-            
             var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
             vm.ContentHtml = Markdown.ToHtml(vm.Content, pipeline);
         }
