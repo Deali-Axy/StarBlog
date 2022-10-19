@@ -685,10 +685,10 @@
         itemWrapper: '<li class="list-group-item d-flex justify-content-between align-items-start"></li>',
         itemLeftElem: '<div class="w-100"></div>',
         itemRightElem: '<div></div>',
-        indent: '<span class="mx-2"></span>',
+        indent: '<span class="mx-1"></span>',
         icon: '<span class="icon"></span>',
         link: '<a class="w-75" href="#" style="display:inline-block; color:inherit; text-decoration:none;"></a>',
-        badge: '<span class="ms-1 badge bg-primary rounded-pill"></span>'
+        badge: '<span class="ml-1 badge bg-primary rounded-pill"></span>'
     };
 
     Tree.prototype.css = '.treeview .list-group-item{cursor:pointer}' +
