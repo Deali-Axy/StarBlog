@@ -1,9 +1,12 @@
 StarBlog.Web/wwwroot/lib/
 StarBlog.Web/wwwroot/assets
 StarBlog.Web/wwwroot/media
+StarBlog.Web/package-lock.json
+StarBlog.Web/yarn.lock
 app.db
 app.db-shm
 app.db-wal
+app.db.*
 *.min.css
 *.min.js
 

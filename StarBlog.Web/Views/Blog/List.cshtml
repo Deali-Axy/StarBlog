@@ -5,6 +5,9 @@
 @{
     ViewData["Title"] = "博客列表";
 }
+
+@await Html.PartialAsync("Widgets/BackToTop", new BackToTopViewModel {IsShowText = false})
+
 <div class="container px-4 py-3">
     <h2 class="d-flex w-100 justify-content-between pb-2 mb-3 border-bottom">
         <div>Blog / @Model.CurrentCategory.Name</div>

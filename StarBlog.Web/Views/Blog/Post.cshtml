@@ -4,7 +4,8 @@
 }
 
 @section head {
-    <link rel="stylesheet" href="~/lib/editormd/css/editormd.preview.min.css">
+    @* <link rel="stylesheet" href="~/lib/editormd/css/editormd.preview.min.css"> *@
+    <link rel="stylesheet" href="~/lib/editormd/css/editormd.preview.css">
     <style>
         .post-content {
             padding: 0;
@@ -13,35 +14,7 @@
     </style>
 }
 
-<div class="position-fixed top-0 end-0 p-3" style="z-index: 11">
-    <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="toast-header">
-            <img src="~/images/codelab.jpg" class="rounded me-2" alt="..." style="width: 20px;height: 20px;">
-            <strong class="me-auto">程序设计实验室</strong>
-            <small>微信公众号</small>
-            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
-        </div>
-        <div class="toast-body">
-            <div class="card border-0">
-                <img src="~/images/qrcode_sm.jpg" alt="qrcode" class="card-img-top">
-                <div class="card-body">
-                    <h6 class="card-title">一个技术探索与知识分享的平台~</h6>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="btn-group-vertical position-fixed bottom-0 end-0 me-3 mb-3" role="group" aria-label="右下角工具">
-    <button type="button" class="btn btn-outline-success" id="liveToastBtn">
-        <i class="fa-brands fa-weixin"></i>
-        <span>微信公众号</span>
-    </button>
-    <a class="btn btn-outline-primary" href="#" role="button">
-        <i class="fa-solid fa-arrow-up"></i>
-        <span>返回顶部</span>
-    </a>
-</div>
+@await Html.PartialAsync("Widgets/BackToTop", new BackToTopViewModel {IsShowText = false})
 
 <div class="container">
     <div class="row">
@@ -52,10 +25,10 @@
                     <span class="bi me-2">
                         <i class="fa-solid fa-table-list fa-2xl"></i>
                     </span>
-                    <span class="fs-5 fw-semibold">ToC</span>
+                    <span class="fs-5 fw-semibold">文章目录</span>
                 </div>
 
-                <div id="custom-toc-container">#custom-toc-container</div>
+                <div id="post-toc-container"></div>
             </div>
         </div>
         <div class="col-lg-9">
@@ -94,7 +67,7 @@
                     </div>
                 </div>
             </header>
-            <div id="test-editormd-view" class="post-content">
+            <div id="post-markdown-content" class="post-content">
                 <textarea id="append-test" style="display:none;">@Model.Content</textarea>
             </div>
 
@@ -139,7 +112,9 @@
 </div>
 
 @section bottom {
-    <script src="~/lib/editormd/examples/js/jquery.min.js"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    @* <script src="~/lib/editormd/examples/js/jquery.min.js"></script> *@
+    <script src="~/js/bootstrap-treeview.js"></script>
     <script src="~/lib/editormd/lib/marked.min.js"></script>
     <script src="~/lib/editormd/lib/prettify.min.js"></script>
 
