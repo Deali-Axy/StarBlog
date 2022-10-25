@@ -4,6 +4,8 @@
 }
 
 @section head {
+    @* <link rel="stylesheet" href="~/lib/editormd/css/editormd.preview.min.css"> *@
+    <link rel="stylesheet" href="~/lib/editormd/css/editormd.preview.css">
     <style>
         .post-content {
             padding: 0;
@@ -65,8 +67,8 @@
                     </div>
                 </div>
             </header>
-            <div class="post-content">
-                @Html.Raw(Model.ContentHtml)
+            <div id="post-markdown-content" class="post-content">
+                <textarea id="append-test" style="display:none;">@Model.Content</textarea>
             </div>
 
             <div class="my-3 text-center">
@@ -110,17 +112,18 @@
 </div>
 
 @section bottom {
-    <environment include="Development">
-        <script src="~/lib/jquery/dist/jquery.js"></script>
-    </environment>
-    <environment exclude="Development">
-        <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    </environment>
-    <script src="~/lib/bootstrap5-treeview/dist/bootstrap-treeview.min.js"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    @* <script src="~/lib/editormd/examples/js/jquery.min.js"></script> *@
+    <script src="~/js/bootstrap-treeview.js"></script>
+    <script src="~/lib/editormd/lib/marked.min.js"></script>
+    <script src="~/lib/editormd/lib/prettify.min.js"></script>
+
+    <script src="~/lib/editormd/lib/raphael.min.js"></script>
+    <script src="~/lib/editormd/lib/underscore.min.js"></script>
+    <script src="~/lib/editormd/lib/sequence-diagram.min.js"></script>
+    <script src="~/lib/editormd/lib/flowchart.min.js"></script>
+    <script src="~/lib/editormd/lib/jquery.flowchart.min.js"></script>
+
+    <script src="~/lib/editormd/editormd.js"></script>
     <script src="~/js/blog-post.js"></script>
-    <script>
-        const nodes = '@Html.Raw(Model.TocNodesJson)'
-        console.log(JSON.parse(nodes))
-        initTreeView(nodes);
-    </script>
 }
