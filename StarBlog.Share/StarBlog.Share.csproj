@@ -7,12 +7,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\StarBlog.Contrib\StarBlog.Contrib.csproj"/>
-        <ProjectReference Include="..\StarBlog.Data\StarBlog.Data.csproj"/>
+        <ProjectReference Include="..\StarBlog.Contrib\StarBlog.Contrib.csproj" />
+        <ProjectReference Include="..\StarBlog.Data\StarBlog.Data.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Markdig" Version="0.30.2"/>
+        <PackageReference Include="Markdig" Version="0.30.2" />
     </ItemGroup>
 
 </Project>

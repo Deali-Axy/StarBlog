@@ -5,7 +5,7 @@ using StarBlog.Data.Models;
 using StarBlog.Web.ViewModels.Categories;
 using X.PagedList;
 
-namespace StarBlog.Web.ViewModels;
+namespace StarBlog.Web.ViewModels.Blog;
 
 public class BlogListViewModel {
     public Category CurrentCategory { get; set; }
