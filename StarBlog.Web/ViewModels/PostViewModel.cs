@@ -1,6 +1,9 @@
-﻿using StarBlog.Data.Models;
+﻿using System.Text.Encodings.Web;
+using System.Text.Json;
+using StarBlog.Data.Models;
+using StarBlog.Share.MarkdownExtensions;
 
-namespace StarBlog.Web.ViewModels; 
+namespace StarBlog.Web.ViewModels;
 
 public class PostViewModel {
     public string Id { get; set; }
@@ -14,4 +17,14 @@ public class PostViewModel {
     public DateTime LastUpdateTime { get; set; }
     public Category Category { get; set; }
     public List<Category> Categories { get; set; }
+    public List<TocNode>? TocNodes { get; set; }
+
+    public string TocNodesJson => JsonSerializer.Serialize(
+        TocNodes,
+        new JsonSerializerOptions {
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            PropertyNameCaseInsensitive = false,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        }
+    );
 }

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using StarBlog.Contrib.SiteMessage;
 using StarBlog.Data.Models;
 using StarBlog.Web.Services;
-using StarBlog.Web.ViewModels;
+using StarBlog.Web.ViewModels.Blog;
 using StarBlog.Web.ViewModels.QueryFilters;
 using X.PagedList;
 
