@@ -10,6 +10,9 @@
             font-size: 1.2em;
         }
     </style>
+    <link rel="stylesheet" href="~/lib/github-markdown-css/github-markdown-light.css">
+    @* <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/default.min.css"> *@
+    <link rel="stylesheet" href="~/lib/highlight/styles/tokyo-night-dark.min.css">
 }
 
 @await Html.PartialAsync("Widgets/BackToTop", new BackToTopViewModel {IsShowText = false})
@@ -123,4 +126,8 @@
         console.log(JSON.parse(nodes))
         initTreeView(nodes);
     </script>
+    @* <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/highlight.min.js"></script> *@
+    <script src="~/lib/highlight/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+
 }
