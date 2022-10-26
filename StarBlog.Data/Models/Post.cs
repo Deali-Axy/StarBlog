@@ -7,7 +7,7 @@ namespace StarBlog.Data.Models;
 /// </summary>
 public class Post {
     [Column(IsIdentity = false, IsPrimary = true)]
-    public string? Id { get; set; }
+    public string Id { get; set; }
 
     /// <summary>
     /// 标题
