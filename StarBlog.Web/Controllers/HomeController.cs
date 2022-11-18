@@ -45,7 +45,8 @@ public class HomeController : Controller {
         }
 
         return View(new InitViewModel {
-            Host = conf["host"]
+            Host = conf["host"],
+            DefaultRender = conf["default_render"]
         });
     }
 
@@ -55,6 +56,7 @@ public class HomeController : Controller {
 
         // 保存配置
         conf["host"] = vm.Host;
+        conf["default_render"] = vm.DefaultRender;
         conf["is_init"] = "true";
 
         // 创建用户
