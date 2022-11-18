@@ -47,14 +47,14 @@ const libs = [
 
 // 使用 npm 下载的前端组件，自定义存放位置
 const customLibs = [
-    {name: "editormd", dist: "./node_modules/editor.md/*.js"},
-    {name: "editormd/css", dist: "./node_modules/editor.md/css/*.*"},
-    {name: "editormd/fonts", dist: "./node_modules/editor.md/fonts/*.*"},
-    {name: "editormd/images", dist: "./node_modules/editor.md/images/*.*"},
-    {name: "editormd/languages", dist: "./node_modules/editor.md/languages/*.*"},
-    {name: "editormd/lib", dist: "./node_modules/editor.md/lib/*.*"},
-    {name: "editormd/plugins", dist: "./node_modules/editor.md/plugins/*.*"},
-    {name: "editormd/examples/js", dist: "./node_modules/editor.md/examples/js/*.js"},
+    {name: "editormd", dist: "./node_modules/editor.md-ext/*.js"},
+    {name: "editormd/css", dist: "./node_modules/editor.md-ext/css/*.*"},
+    {name: "editormd/fonts", dist: "./node_modules/editor.md-ext/fonts/*.*"},
+    {name: "editormd/images", dist: "./node_modules/editor.md-ext/images/*.*"},
+    {name: "editormd/languages", dist: "./node_modules/editor.md-ext/languages/*.*"},
+    {name: "editormd/lib", dist: "./node_modules/editor.md-ext/lib/*.*"},
+    {name: "editormd/plugins", dist: "./node_modules/editor.md-ext/plugins/*.*"},
+    {name: "editormd/examples/js", dist: "./node_modules/editor.md-ext/examples/js/*.js"},
     {name: 'font-awesome', dist: './node_modules/@fortawesome/fontawesome-free/**/*.*'},
     {name: 'highlight.js', dist: './node_modules/highlight.js/**/*.*'},
     {name: 'github-markdown-css', dist: './node_modules/github-markdown-css/*.css'},

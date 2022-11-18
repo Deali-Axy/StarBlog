@@ -15,23 +15,26 @@ public class BlogController : Controller {
     private readonly IBaseRepository<Category> _categoryRepo;
     private readonly PostService _postService;
     private readonly CategoryService _categoryService;
+    private readonly ConfigService _configService;
 
     public BlogController(IBaseRepository<Post> postRepo,
         IBaseRepository<Category> categoryRepo,
         PostService postService,
         Messages messages,
-        CategoryService categoryService) {
+        CategoryService categoryService,
+        ConfigService configService) {
         _postRepo = postRepo;
         _categoryRepo = categoryRepo;
         _postService = postService;
         _messages = messages;
         _categoryService = categoryService;
+        _configService = configService;
     }
 
     public IActionResult List(int categoryId = 0, int page = 1, int pageSize = 5) {
         var categories = _categoryRepo.Where(a => a.Visible)
             .IncludeMany(a => a.Posts).ToList();
-        categories.Insert(0, new Category {Id = 0, Name = "All", Posts = _postRepo.Select.ToList()});
+        categories.Insert(0, new Category { Id = 0, Name = "All", Posts = _postRepo.Select.ToList() });
 
         var currentCategory = categoryId == 0 ? categories[0] : _categoryService.GetById(categoryId);
 
@@ -72,7 +75,12 @@ public class BlogController : Controller {
             return RedirectToAction(nameof(List));
         }
 
-        return View(_postService.GetPostViewModel(post));
+        var viewName = "Post.FrontendRender";
+        if (_configService["default_render"] == "backend") {
+            viewName = "Post.BackendRender";
+        }
+
+        return View(viewName, _postService.GetPostViewModel(post));
     }
 
     public IActionResult RandomPost() {
@@ -83,8 +91,9 @@ public class BlogController : Controller {
         }
 
         var rndPost = posts[new Random().Next(posts.Count)];
-        _messages.Info($"随机推荐了文章 <b>{rndPost.Title}</b> 给你~");
-        return RedirectToAction(nameof(Post), new {id = rndPost.Id});
+        _messages.Info($"随机推荐了文章 <b>{rndPost.Title}</b> 给你~" +
+                       $"<span class='ps-3'><a href=\"{Url.Action(nameof(RandomPost))}\">再来一次</a></span>");
+        return RedirectToAction(nameof(Post), new { id = rndPost.Id });
     }
 
     public IActionResult Temp() {
