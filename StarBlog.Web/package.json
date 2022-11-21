@@ -25,6 +25,7 @@
     "chart.js": "^3.8.0",
     "editor.md-ext": "^1.5.4",
     "github-markdown-css": "^5.1.0",
+    "imagesloaded": "^5.0.0",
     "jquery": "^3.6.0",
     "masonry-layout": "^4.2.2",
     "vue": "^2.6.14"

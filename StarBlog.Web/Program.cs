@@ -1,3 +1,4 @@
+using SixLabors.ImageSharp.Web.DependencyInjection;
 using StarBlog.Contrib.SiteMessage;
 using StarBlog.Data.Extensions;
 using StarBlog.Web.Extensions;
@@ -32,7 +33,7 @@ builder.Services.AddAuth(builder.Configuration);
 builder.Services.AddHttpContextAccessor();
 // 注册 IHttpClientFactory，参考：https://docs.microsoft.com/zh-cn/dotnet/core/extensions/http-client
 builder.Services.AddHttpClient();
-
+builder.Services.AddImageSharp();
 // 注册自定义服务
 builder.Services.AddScoped<BlogService>();
 builder.Services.AddScoped<CategoryService>();
@@ -57,27 +58,7 @@ if (!app.Environment.IsDevelopment()) {
     app.UseHsts();
 }
 
-// app.UseExceptionHandler(exceptionHandlerApp => {
-//     exceptionHandlerApp.Run(async context => {
-//         context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-//
-//         context.Response.ContentType = System.Net.Mime.MediaTypeNames.Text.Plain;
-//
-//         await context.Response.WriteAsync("An exception was thrown.");
-//
-//         var exceptionHandlerPathFeature =
-//             context.Features.Get<IExceptionHandlerPathFeature>();
-//
-//         if (exceptionHandlerPathFeature?.Error is FileNotFoundException) {
-//             await context.Response.WriteAsync(" The file was not found.");
-//         }
-//
-//         if (exceptionHandlerPathFeature?.Path == "/") {
-//             await context.Response.WriteAsync(" Page: Home.");
-//         }
-//     });
-// });
-
+app.UseImageSharp();
 // app.UseHttpsRedirection();
 app.UseStaticFiles(new StaticFileOptions {
     ServeUnknownFileTypes = true
