@@ -58,6 +58,7 @@ const customLibs = [
     {name: 'font-awesome', dist: './node_modules/@fortawesome/fontawesome-free/**/*.*'},
     {name: 'highlight.js', dist: './node_modules/highlight.js/**/*.*'},
     {name: 'github-markdown-css', dist: './node_modules/github-markdown-css/*.css'},
+    {name: 'imagesloaded', dist: './node_modules/imagesloaded/*.js'},
 ]
 
 //清除压缩后的文件
