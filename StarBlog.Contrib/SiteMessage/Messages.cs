@@ -1,5 +1,8 @@
 ﻿namespace StarBlog.Contrib.SiteMessage; 
 
+/// <summary>
+/// todo 需要升级一下，换成使用session来区分message
+/// </summary>
 public class Messages {
     private Queue<Message> MessagesQueue { get; set; } = new Queue<Message>();
 

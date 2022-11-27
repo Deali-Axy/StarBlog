@@ -1,7 +1,8 @@
 ﻿@model Photo
 
 <div class="card">
-    <img class="bd-placeholder-img card-img-top" src="/media/@Model.FilePath" alt="">
+    <img class="bd-placeholder-img card-img-top" alt=""
+         src="@Url.Action("GetThumb", "Photo", new {id = Model.Id, width = 300})">
 
     <div class="card-body">
         <h5 class="card-title">

@@ -12,19 +12,19 @@
     <div class="card px-1">
         <form enctype="multipart/form-data" class="card-body row" asp-controller="Home" asp-action="Init" method="post">
             <div class="text-danger" asp-validation-summary="All"></div>
-            
+
             <div class="col-xl-6 py-3">
                 <h5 class="card-title">创建管理员账号</h5>
                 <h6 class="card-subtitle mb-3 text-muted">用于登录管理后台</h6>
                 <div class="mb-3">
-                    <label asp-for="Username" class="form-label">用户名</label>
+                    <label asp-for="Username" class="form-label"></label>
                     <input asp-for="Username" class="form-control" aria-describedby="usernameHelp">
-                    <div id="usernameHelp" class="form-text">设置个用户名给管理员用</div>
+                    <div class="form-text">设置个用户名给管理员用</div>
                 </div>
                 <div class="mb-3">
-                    <label asp-for="Password" class="form-label">密码</label>
+                    <label asp-for="Password" class="form-label"></label>
                     <input asp-for="Password" class="form-control" aria-describedby="passwordHelp">
-                    <div id="passwordHelp" class="form-text">得有密码才能登录</div>
+                    <div class="form-text">得有密码才能登录</div>
                 </div>
             </div>
 
@@ -32,9 +32,22 @@
                 <h5 class="card-title">系统配置</h5>
                 <h6 class="card-subtitle mb-3 text-muted">一些初始化的配置</h6>
                 <div class="mb-3">
-                    <label asp-for="Host" class="form-label">Host</label>
+                    <label asp-for="Host" class="form-label"></label>
                     <input asp-for="Host" class="form-control" aria-describedby="hostHelp">
-                    <div id="hostHelp" class="form-text">设置链接前缀，之后可以在管理后台修改</div>
+                    <div class="form-text">设置链接前缀，之后可以在管理后台修改</div>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="DefaultRender" class="form-label"></label>
+                    <select asp-for="DefaultRender" class="form-select">
+                        <option value="frontend" selected>前端渲染</option>
+                        <option value="backend">后端渲染（Alpha）</option>
+                    </select>
+                    <span asp-validation-for="DefaultRender" class="form-text text-danger"></span>
+                    <div class="form-text">
+                        设置博客文章的渲染方式，前端渲染使用Editor.md实现，后端渲染一致性更好。<br>
+                        具体区别可以查看<a href="https://www.cnblogs.com/deali/p/16834452.html" target="_blank">这篇文章</a>。
+                        设置之后可以在管理后台修改
+                    </div>
                 </div>
             </div>
 
