@@ -1,12 +1,12 @@
 ﻿using System.Net;
 using FreeSql;
 using Markdig;
-using Markdig.Extensions.AutoLinks;
 using Markdig.Renderers.Normalize;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 using StarBlog.Contrib.Utils;
 using StarBlog.Data.Models;
+using StarBlog.Share.MarkdownExtensions;
 using StarBlog.Web.ViewModels;
 using StarBlog.Web.ViewModels.QueryFilters;
 using X.PagedList;
@@ -22,9 +22,8 @@ public class PostService {
     private readonly LinkGenerator _generator;
     private readonly ConfigService _conf;
     private readonly CommonService _commonService;
-
-
-    public string Host => _conf["host"];
+    
+    private string Host => _conf["host"];
 
     public PostService(IBaseRepository<Post> postRepo,
         IBaseRepository<Category> categoryRepo,
@@ -56,8 +55,9 @@ public class PostService {
     }
 
     public async Task<Post> InsertOrUpdateAsync(Post post) {
+        var postId = post.Id;
         // 是新文章的话，先保存到数据库
-        if (await _postRepo.Where(a => a.Id == post.Id).CountAsync() == 0) {
+        if (await _postRepo.Where(a => a.Id == postId).CountAsync() == 0) {
             post = await _postRepo.InsertAsync(post);
         }
 
@@ -82,12 +82,12 @@ public class PostService {
         InitPostMediaDir(post);
 
         var filename = WebUtility.UrlEncode(file.FileName);
-        var fileRelativePath = Path.Combine("media", "blog", post.Id!, filename);
+        var fileRelativePath = Path.Combine("media", "blog", post.Id, filename);
         var savePath = Path.Combine(_environment.WebRootPath, fileRelativePath);
         if (File.Exists(savePath)) {
             // 上传文件重名处理
             var newFilename = $"{Path.GetFileNameWithoutExtension(filename)}-{GuidUtils.GuidTo16String()}.{Path.GetExtension(filename)}";
-            fileRelativePath = Path.Combine("media", "blog", post.Id!, newFilename);
+            fileRelativePath = Path.Combine("media", "blog", post.Id, newFilename);
             savePath = Path.Combine(_environment.WebRootPath, fileRelativePath);
         }
 
@@ -152,8 +152,8 @@ public class PostService {
     /// <summary>
     /// 将 Post 对象转换为 PostViewModel 对象
     /// </summary>
-    public PostViewModel GetPostViewModel(Post post, bool md2html = true) {
-        var vm = new PostViewModel {
+    public PostViewModel GetPostViewModel(Post post, bool md2Html = true) {
+        var model = new PostViewModel {
             Id = post.Id,
             Title = post.Title,
             Summary = post.Summary ?? "（没有介绍）",
@@ -162,29 +162,32 @@ public class PostService {
             Url = _generator.GetUriByAction(
                 _accessor.HttpContext!,
                 "Post", "Blog",
-                new {Id = post.Id}
+                new {post.Id}
             ),
             CreationTime = post.CreationTime,
             LastUpdateTime = post.LastUpdateTime,
             Category = post.Category,
-            Categories = new List<Category>()
+            Categories = new List<Category>(),
+            TocNodes = post.ExtractToc()
         };
 
-        if (md2html) {
+        if (md2Html) {
             // todo 研究一下后端渲染Markdown (PS: 虽然前端渲染轮子更多、效果更好，但后端渲染不会有割裂感）
             // 这部分一些参考资料：
             // - 关于前端渲染 MarkDown 样式：https://blog.csdn.net/sprintline/article/details/122849907
             // - https://github.com/showdownjs/showdown
-            var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
-            vm.ContentHtml = Markdown.ToHtml(vm.Content, pipeline);
+            var pipeline = new MarkdownPipelineBuilder()
+                .UseAdvancedExtensions()
+                .Build();
+            model.ContentHtml = Markdown.ToHtml(model.Content, pipeline);
         }
 
         foreach (var itemId in post.Categories.Split(",").Select(int.Parse)) {
             var item = _categoryRepo.Where(a => a.Id == itemId).First();
-            if (item != null) vm.Categories.Add(item);
+            if (item != null) model.Categories.Add(item);
         }
 
-        return vm;
+        return model;
     }
 
     /// <summary>

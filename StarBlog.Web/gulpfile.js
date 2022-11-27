@@ -36,7 +36,7 @@ const libs = [
     {name: "jquery", dist: "./node_modules/jquery/dist/**/*.*"},
     {name: "popper", dist: "./node_modules/popper.js/dist/**/*.*"},
     {name: "bootstrap", dist: "./node_modules/bootstrap/dist/**/*.*"},
-    {name: "bootstrap-treeview", dist: "./node_modules/bootstrap-treeview/dist/**/*.*"},
+    {name: "bootstrap5-treeview", dist: "./node_modules/bootstrap5-treeview/dist/**/*.*"},
     {name: "bootswatch", dist: "./node_modules/bootswatch/dist/**/*.*"},
     {name: "prismjs", dist: "./node_modules/prismjs/**/*.*"},
     {name: 'vue', dist: './node_modules/vue/dist/**/*.*'},
@@ -47,15 +47,18 @@ const libs = [
 
 // 使用 npm 下载的前端组件，自定义存放位置
 const customLibs = [
-    {name: "editormd", dist: "./node_modules/editor.md/*.js"},
-    {name: "editormd/css", dist: "./node_modules/editor.md/css/*.*"},
-    {name: "editormd/fonts", dist: "./node_modules/editor.md/fonts/*.*"},
-    {name: "editormd/images", dist: "./node_modules/editor.md/images/*.*"},
-    {name: "editormd/languages", dist: "./node_modules/editor.md/languages/*.*"},
-    {name: "editormd/lib", dist: "./node_modules/editor.md/lib/*.*"},
-    {name: "editormd/plugins", dist: "./node_modules/editor.md/plugins/*.*"},
-    {name: "editormd/examples/js", dist: "./node_modules/editor.md/examples/js/*.js"},
+    {name: "editormd", dist: "./node_modules/editor.md-ext/*.js"},
+    {name: "editormd/css", dist: "./node_modules/editor.md-ext/css/*.*"},
+    {name: "editormd/fonts", dist: "./node_modules/editor.md-ext/fonts/*.*"},
+    {name: "editormd/images", dist: "./node_modules/editor.md-ext/images/*.*"},
+    {name: "editormd/languages", dist: "./node_modules/editor.md-ext/languages/*.*"},
+    {name: "editormd/lib", dist: "./node_modules/editor.md-ext/lib/*.*"},
+    {name: "editormd/plugins", dist: "./node_modules/editor.md-ext/plugins/*.*"},
+    {name: "editormd/examples/js", dist: "./node_modules/editor.md-ext/examples/js/*.js"},
     {name: 'font-awesome', dist: './node_modules/@fortawesome/fontawesome-free/**/*.*'},
+    {name: 'highlight.js', dist: './node_modules/highlight.js/**/*.*'},
+    {name: 'github-markdown-css', dist: './node_modules/github-markdown-css/*.css'},
+    {name: 'imagesloaded', dist: './node_modules/imagesloaded/*.js'},
 ]
 
 //清除压缩后的文件
