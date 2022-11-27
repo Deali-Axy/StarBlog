@@ -1,4 +1,5 @@
 ﻿using FreeSql;
+using ImageMagick;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using StarBlog.Contrib.Utils;
@@ -25,7 +26,8 @@ public class PhotoService {
     }
 
     public IPagedList<Photo> GetPagedList(int page = 1, int pageSize = 10) {
-        return _photoRepo.Select.ToList().ToPagedList(page, pageSize);
+        return _photoRepo.Select.OrderByDescending(a => a.CreateTime)
+            .ToList().ToPagedList(page, pageSize);
     }
 
     public List<Photo> GetFeaturedPhotos() {
@@ -35,6 +37,42 @@ public class PhotoService {
 
     public Photo? GetById(string id) {
         return _photoRepo.Where(a => a.Id == id).First();
+    }
+
+    public async Task<Photo?> GetNext(string id) {
+        var photo = await _photoRepo.Where(a => a.Id == id).FirstAsync();
+        if (photo == null) return null;
+        var next = await _photoRepo
+            .Where(a => a.CreateTime < photo.CreateTime && a.Id != id)
+            .OrderByDescending(a => a.CreateTime)
+            .FirstAsync();
+        return next;
+    }
+
+    public async Task<Photo?> GetPrevious(string id) {
+        var photo = await _photoRepo.Where(a => a.Id == id).FirstAsync();
+        if (photo == null) return null;
+        var next = await _photoRepo
+            .Where(a => a.CreateTime > photo.CreateTime && a.Id != id)
+            .OrderBy(a => a.CreateTime)
+            .FirstAsync();
+        return next;
+    }
+
+    /// <summary>
+    /// 生成Progressive JPEG缩略图 （使用 MagickImage）
+    /// </summary>
+    /// <param name="width">设置为0则不调整大小</param>
+    public async Task<byte[]> GetThumb(string id, int width = 0) {
+        var photo = await _photoRepo.Where(a => a.Id == id).FirstAsync();
+        using (var image = new MagickImage(GetPhotoFilePath(photo))) {
+            image.Format = MagickFormat.Pjpeg;
+            if (width != 0) {
+                image.Resize(width, 0);
+            }
+
+            return image.ToByteArray();
+        }
     }
 
     public Photo Add(PhotoCreationDto dto, IFormFile photoFile) {

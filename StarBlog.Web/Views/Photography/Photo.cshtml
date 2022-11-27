@@ -1,10 +1,51 @@
 ﻿@model Photo
+@{
+    ViewBag.Title = "查看图片详情";
+    var pjpeg = false;
+
+    var imageUrl = "/media/" + Model?.FilePath.Replace("\\", "/");
+    if (pjpeg) {
+        imageUrl = Url.Action("GetThumb", "Photo", new {id = Model.Id, width = 1000});
+    }
+}
 
 <div class="container px-4 py-3">
     <h2 class="d-flex w-100 justify-content-between pb-2 mb-3 border-bottom">
-        <div>@Model?.Title</div>
-        <div>@Model?.Location</div>
+        <div>Photo</div>
+        <button class="btn btn-outline-primary" onclick="history.back()">back</button>
     </h2>
-    
-    <partial name="Widgets/PhotoCard" model="@Model"/>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <img class="bd-placeholder-img card-img-top" alt="" src="@imageUrl">
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">@Model?.Title</h5>
+                    <div class="card-text">拍摄地点：@Model?.Location</div>
+                    <div class="card-text">时间：@Model?.CreateTime</div>
+                </div>
+            </div>
+            <div class="card mt-3">
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a class="btn btn-outline-info" role="button"
+                           asp-action="Previous" asp-route-id="@Model?.Id">
+                            上一张
+                        </a>
+                        <a class="btn btn-outline-info" role="button"
+                           asp-action="Next" asp-route-id="@Model?.Id">
+                            下一张
+                        </a>
+                        <a class="btn btn-outline-secondary" role="button" asp-action="RandomPhoto">随机推荐</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 </div>

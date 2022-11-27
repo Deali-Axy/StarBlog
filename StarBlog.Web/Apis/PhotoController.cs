@@ -35,7 +35,13 @@ public class PhotoController : ControllerBase {
         var photo = _photoService.GetById(id);
         return photo == null
             ? ApiResponse.NotFound($"图片 {id} 不存在")
-            : new ApiResponse<Photo> { Data = photo };
+            : new ApiResponse<Photo> {Data = photo};
+    }
+
+    [HttpGet("{id}/Thumb")]
+    public async Task<IActionResult> GetThumb(string id, [FromQuery] int width = 300) {
+        var data = await _photoService.GetThumb(id, width);
+        return new FileContentResult(data, "image/jpeg");
     }
 
     [Authorize]
