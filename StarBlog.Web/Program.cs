@@ -18,6 +18,7 @@ if (builder.Environment.IsDevelopment()) {
 
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddFreeSql(builder.Configuration);
+builder.Services.AddHttpClient();
 builder.Services.AddCors(options => {
     options.AddDefaultPolicy(policyBuilder => {
         policyBuilder.AllowCredentials();
@@ -44,6 +45,7 @@ builder.Services.AddScoped<PhotoService>();
 builder.Services.AddScoped<PostService>();
 builder.Services.AddScoped<VisitRecordService>();
 builder.Services.AddSingleton<CommonService>();
+builder.Services.AddSingleton<CrawlService>();
 builder.Services.AddSingleton<Messages>();
 builder.Services.AddSingleton<ThemeService>();
 builder.Services.AddSingleton<PicLibService>();
