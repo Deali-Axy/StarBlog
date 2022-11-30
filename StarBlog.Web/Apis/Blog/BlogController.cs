@@ -7,7 +7,7 @@ using StarBlog.Web.ViewModels;
 using StarBlog.Web.ViewModels.Blog;
 using StarBlog.Web.ViewModels.Response;
 
-namespace StarBlog.Web.Apis;
+namespace StarBlog.Web.Apis.Blog;
 
 /// <summary>
 /// 博客

@@ -3,13 +3,15 @@ using Microsoft.Extensions.FileProviders;
 
 namespace StarBlog.Web.Apis;
 
+/// <summary>
+/// 用于测试 DataWrapper 的功能
+/// </summary>
 [ApiController]
 [Route("Api/[controller]/[action]")]
 [ApiExplorerSettings(GroupName = "test")]
 public class DataWrapperTestController : ControllerBase {
     private readonly IFileProvider _fileProvider;
-
-    //该控制器用于测试DataWrapper的功能
+    
     public DataWrapperTestController(IWebHostEnvironment env) {
         _fileProvider = env.WebRootFileProvider;
     }

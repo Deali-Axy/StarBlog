@@ -4,7 +4,7 @@ using SixLabors.ImageSharp.Advanced;
 using SixLabors.ImageSharp.Formats;
 using StarBlog.Web.Services;
 
-namespace StarBlog.Web.Apis;
+namespace StarBlog.Web.Apis.Common;
 
 /// <summary>
 /// 图片库

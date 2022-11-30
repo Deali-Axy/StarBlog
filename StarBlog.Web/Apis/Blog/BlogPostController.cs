@@ -11,7 +11,7 @@ using StarBlog.Web.ViewModels.QueryFilters;
 using StarBlog.Web.ViewModels.Response;
 using X.PagedList;
 
-namespace StarBlog.Web.Apis;
+namespace StarBlog.Web.Apis.Blog;
 
 /// <summary>
 /// 文章
