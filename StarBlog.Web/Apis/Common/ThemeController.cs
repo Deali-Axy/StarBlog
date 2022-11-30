@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using StarBlog.Web.Services;
 
-namespace StarBlog.Web.Apis; 
+namespace StarBlog.Web.Apis.Common; 
 
 /// <summary>
 /// 页面主题
