@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using StarBlog.Contrib.CLRStats;
 using StarBlog.Web.ViewModels.Response;
 
-namespace StarBlog.Web.Apis;
+namespace StarBlog.Web.Apis.Common;
 
 [Authorize]
 [ApiController]
