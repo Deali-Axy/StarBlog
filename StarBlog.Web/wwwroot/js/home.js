@@ -16,23 +16,21 @@ let homeApp = new Vue({
         }
     },
     created() {
-        fetch('http://www.sblt.deali.cn:15911/poem/simple')
-            .then(res => res.text()).then(data => this.poemSimple = data)
-        fetch('http://www.sblt.deali.cn:15911/poem/tang')
-            .then(res => res.json())
-            .then(data => {
-                this.poem = data.data
-            })
-        fetch('http://www.sblt.deali.cn:15911/hitokoto/get')
-            .then(res => res.json())
-            .then(data => {
-                this.hitokoto = data.data[0]
-            })
+        this.loadPoem()
+        this.loadHitokoto()
     },
     mounted() {
         if (CHART_VISIBLE === true) this.loadChart()
     },
     methods: {
+        loadPoem() {
+            fetch('/Api/DataAcq/Poem')
+                .then(res => res.json()).then(res => this.poemSimple = res.data)
+        },
+        loadHitokoto() {
+            fetch('/Api/DataAcq/Hitokoto')
+                .then(res => res.json()).then(res => this.hitokoto = res.data)
+        },
         /**
          * 生成随机RGB颜色字符串，例如：rgb(123,123,123)
          * @returns {string}
