@@ -5,7 +5,7 @@ using StarBlog.Data.Models;
 using StarBlog.Web.Services;
 using StarBlog.Web.ViewModels.Response;
 
-namespace StarBlog.Web.Apis;
+namespace StarBlog.Web.Apis.Blog;
 
 /// <summary>
 /// 推荐图片

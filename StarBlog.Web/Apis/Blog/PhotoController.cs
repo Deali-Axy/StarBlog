@@ -6,7 +6,7 @@ using StarBlog.Web.Services;
 using StarBlog.Web.ViewModels.Photography;
 using StarBlog.Web.ViewModels.Response;
 
-namespace StarBlog.Web.Apis;
+namespace StarBlog.Web.Apis.Blog;
 
 /// <summary>
 /// 摄影

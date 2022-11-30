@@ -5,7 +5,7 @@ using StarBlog.Web.Services;
 using StarBlog.Web.ViewModels.QueryFilters;
 using StarBlog.Web.ViewModels.Response;
 
-namespace StarBlog.Web.Apis;
+namespace StarBlog.Web.Apis.Admin;
 
 /// <summary>
 /// 访问记录
