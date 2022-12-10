@@ -11,7 +11,12 @@ public class HomeViewModel {
     /// <summary>
     /// 是否显示 Chart
     /// </summary>
-    public bool ChartVisible { get; set; } = false;
+    public bool ChartVisible { get; set; } = true;
+
+    /// <summary>
+    /// 是否显示随机图片
+    /// </summary>
+    public bool RandomPhotoVisible { get; set; } = false;
 
     /// <summary>
     /// 置顶博客
