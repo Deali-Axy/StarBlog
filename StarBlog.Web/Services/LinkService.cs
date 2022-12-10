@@ -29,6 +29,13 @@ public class LinkService {
         return _repo.Where(a => a.Name == name).First();
     }
 
+    /// <summary>
+    /// 查询 id 是否存在
+    /// </summary>
+    public bool HasId(int id) {
+        return _repo.Where(a => a.Id == id).Any();
+    }
+
     public Link AddOrUpdate(Link item) {
         return _repo.InsertOrUpdate(item);
     }
