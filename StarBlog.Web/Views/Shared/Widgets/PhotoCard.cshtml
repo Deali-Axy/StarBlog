@@ -1,8 +1,11 @@
 ﻿@model Photo
+@{
+    // var imageSrc = @Url.Action("GetThumb", "Photo", new {id = Model.Id, width = 300});
+    var imageSrc = "media/" + Model.FilePath.Replace("\\", "/") + "?width=300";
+}
 
 <div class="card">
-    <img class="bd-placeholder-img card-img-top" alt=""
-         src="@Url.Action("GetThumb", "Photo", new {id = Model.Id, width = 300})">
+    <img class="bd-placeholder-img card-img-top" alt="@Model.Title" src="@imageSrc">
 
     <div class="card-body">
         <h5 class="card-title">

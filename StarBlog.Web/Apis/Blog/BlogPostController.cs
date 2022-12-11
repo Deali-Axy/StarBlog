@@ -89,7 +89,7 @@ public class BlogPostController : ControllerBase {
         if (post == null) return ApiResponse.NotFound($"博客 {id} 不存在");
 
         // mapper.Map(source) 得到一个全新的对象
-        // mapper.Map(source, dest) 在 source 对象的基础上修改
+        // mapper.Map(source, dest) 在 dest 对象的基础上修改
         post = _mapper.Map(dto, post);
         post.LastUpdateTime = DateTime.Now;
         return new ApiResponse<Post>(await _postService.InsertOrUpdateAsync(post));

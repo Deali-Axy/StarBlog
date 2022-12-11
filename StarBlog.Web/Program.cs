@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.HttpOverrides;
+using RobotsTxt;
 using SixLabors.ImageSharp.Web.DependencyInjection;
 using StarBlog.Contrib.SiteMessage;
 using StarBlog.Data.Extensions;
@@ -28,6 +30,13 @@ builder.Services.AddCors(options => {
         policyBuilder.WithOrigins("http://localhost:8080");
     });
 });
+builder.Services.AddStaticRobotsTxt(builder => builder
+    .AddSection(section => section.AddUserAgent("Googlebot").Allow("/"))
+    .AddSection(section => section.AddUserAgent("bingbot").Allow("/"))
+    .AddSection(section => section.AddUserAgent("Bytespider").Allow("/"))
+    .AddSection(section => section.AddUserAgent("Sogou web spider").Allow("/"))
+    .AddSection(section => section.AddUserAgent("*").Disallow("/"))
+);
 builder.Services.AddSwagger();
 builder.Services.AddSettings(builder.Configuration);
 builder.Services.AddAuth(builder.Configuration);
@@ -60,6 +69,10 @@ if (!app.Environment.IsDevelopment()) {
     app.UseHsts();
 }
 
+app.UseForwardedHeaders(new ForwardedHeadersOptions {
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
+
 app.UseImageSharp();
 // app.UseHttpsRedirection();
 app.UseStaticFiles(new StaticFileOptions {
@@ -67,7 +80,7 @@ app.UseStaticFiles(new StaticFileOptions {
 });
 
 app.UseMiddleware<VisitRecordMiddleware>();
-
+app.UseRobotsTxt();
 app.UseRouting();
 app.UseCors();
 app.UseAuthentication();
