@@ -100,6 +100,12 @@ npm install
 yarn
 ```
 
+> PS：因为本项目依赖 [bootstrap5-treeview](https://www.npmjs.com/package/bootstrap5-treeview) 组件
+> 如果在执行 `yarn install` 或 `npm install` 过程中出错，请先安装 [bower](https://bower.io/)
+> ```bash
+> npm i -g bower
+> ```
+
 安装 `gulp-cli` 工具
 
 ```bash
