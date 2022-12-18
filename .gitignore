@@ -11,6 +11,8 @@ app.db.*
 *.min.css
 *.min.js
 
+.idea
+
 bin/
 obj/
 /packages/
