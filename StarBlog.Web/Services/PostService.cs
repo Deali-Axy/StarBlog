@@ -22,7 +22,7 @@ public class PostService {
     private readonly LinkGenerator _generator;
     private readonly ConfigService _conf;
     private readonly CommonService _commonService;
-    
+
     private string Host => _conf["host"];
 
     public PostService(IBaseRepository<Post> postRepo,
@@ -31,7 +31,8 @@ public class PostService {
         IHttpContextAccessor accessor,
         LinkGenerator generator,
         ConfigService conf,
-        CommonService commonService, ILogger<PostService> logger) {
+        CommonService commonService,
+        ILogger<PostService> logger) {
         _postRepo = postRepo;
         _categoryRepo = categoryRepo;
         _environment = environment;
@@ -162,7 +163,7 @@ public class PostService {
             Url = _generator.GetUriByAction(
                 _accessor.HttpContext!,
                 "Post", "Blog",
-                new {post.Id}
+                new { post.Id }
             ),
             CreationTime = post.CreationTime,
             LastUpdateTime = post.LastUpdateTime,
@@ -216,9 +217,9 @@ public class PostService {
         var document = Markdown.Parse(post.Content);
 
         foreach (var node in document.AsEnumerable()) {
-            if (node is not ParagraphBlock {Inline: { }} paragraphBlock) continue;
+            if (node is not ParagraphBlock { Inline: { } } paragraphBlock) continue;
             foreach (var inline in paragraphBlock.Inline) {
-                if (inline is not LinkInline {IsImage: true} linkInline) continue;
+                if (inline is not LinkInline { IsImage: true } linkInline) continue;
 
                 var imgUrl = linkInline.Url;
                 if (imgUrl == null) continue;
@@ -258,9 +259,9 @@ public class PostService {
 
         var document = Markdown.Parse(post.Content);
         foreach (var node in document.AsEnumerable()) {
-            if (node is not ParagraphBlock {Inline: { }} paragraphBlock) continue;
+            if (node is not ParagraphBlock { Inline: { } } paragraphBlock) continue;
             foreach (var inline in paragraphBlock.Inline) {
-                if (inline is not LinkInline {IsImage: true} linkInline) continue;
+                if (inline is not LinkInline { IsImage: true } linkInline) continue;
 
                 var imgUrl = linkInline.Url;
                 // 跳过空链接

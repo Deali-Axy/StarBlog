@@ -68,17 +68,10 @@ public class BlogPostController : ControllerBase {
         post.Id = GuidUtils.GuidTo16String();
         post.CreationTime = DateTime.Now;
         post.LastUpdateTime = DateTime.Now;
+        post.IsPublish = true;
 
-        // todo 这里冗余代码得优化一下
-        var categories = new List<Category> {category};
-        var parent = category.Parent;
-        while (parent != null) {
-            categories.Add(parent);
-            parent = parent.Parent;
-        }
-
-        categories.Reverse();
-        post.Categories = string.Join(",", categories.Select(a => a.Id));
+        // 获取分类的层级结构
+        post.Categories = categoryService.GetCategoryBreadcrumb(category);
 
         return new ApiResponse<Post>(await _postService.InsertOrUpdateAsync(post));
     }

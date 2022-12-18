@@ -23,6 +23,9 @@ public class CategoryService {
         _generator = generator;
     }
 
+    /// <summary>
+    /// 生成文章分类树
+    /// </summary>
     public List<CategoryNode>? GetNodes(int parentId = 0) {
         var categories = _cRepo.Select
             .Where(a => a.ParentId == parentId && a.Visible)
@@ -37,9 +40,9 @@ public class CategoryService {
                 _accessor.HttpContext!,
                 nameof(BlogController.List),
                 "Blog",
-                new {categoryId = category.Id}
+                new { categoryId = category.Id }
             ),
-            tags = new List<string> {category.Posts.Count.ToString()},
+            tags = new List<string> { category.Posts.Count.ToString() },
             nodes = GetNodes(category.Id)
         }).ToList();
     }
@@ -67,7 +70,7 @@ public class CategoryService {
             .IncludeMany(a => a.Posts).ToList();
         var data = new List<object>();
         foreach (var item in list) {
-            data.Add(new {name = item.Name, value = item.Posts.Count});
+            data.Add(new { name = item.Name, value = item.Posts.Count });
         }
 
         return data;
@@ -114,5 +117,21 @@ public class CategoryService {
     public int SetVisibility(Category category, bool isVisible) {
         category.Visible = isVisible;
         return _cRepo.Update(category);
+    }
+
+    /// <summary>
+    /// 获取指定分类的层级结构
+    /// <para>形式：1,3,5,7,9</para>
+    /// </summary>
+    public string GetCategoryBreadcrumb(Category item) {
+        var categories = new List<Category> { item };
+        var parent = item.Parent;
+        while (parent != null) {
+            categories.Add(parent);
+            parent = parent.Parent;
+        }
+
+        categories.Reverse();
+        return string.Join(",", categories.Select(a => a.Id));;
     }
 }
