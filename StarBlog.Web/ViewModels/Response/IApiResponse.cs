@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-namespace StarBlog.Web.ViewModels.Response;
+﻿namespace StarBlog.Web.ViewModels.Response;
 
 public interface IApiResponse {
     public int StatusCode { get; set; }
@@ -13,5 +11,5 @@ public interface IApiResponse<T> : IApiResponse {
 }
 
 public interface IApiErrorResponse {
-    public SerializableError ErrorData { get; set; }
+    public Dictionary<string,object> ErrorData { get; set; }
 }
