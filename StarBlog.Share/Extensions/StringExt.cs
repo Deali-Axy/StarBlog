@@ -1,4 +1,4 @@
-﻿namespace StarBlog.Contrib.Extensions; 
+﻿namespace StarBlog.Share.Extensions; 
 
 public static class StringExt {
     public static string Limit(this string str,int length) {

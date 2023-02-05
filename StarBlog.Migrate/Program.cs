@@ -1,6 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using StarBlog.Contrib.Extensions;
+using StarBlog.Share.Extensions;
 using StarBlog.Data;
 using StarBlog.Data.Models;
 using StarBlog.Contrib.Utils;

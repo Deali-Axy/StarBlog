@@ -3,7 +3,7 @@ using Markdig;
 using Markdig.Renderers.Normalize;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
-using StarBlog.Contrib.Extensions;
+using StarBlog.Share.Extensions;
 using StarBlog.Contrib.Utils;
 using StarBlog.Data.Models;
 

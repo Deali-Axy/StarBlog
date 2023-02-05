@@ -6,7 +6,7 @@ using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 using StarBlog.Contrib.Utils;
 using StarBlog.Data.Models;
-using StarBlog.Share.MarkdownExtensions;
+using StarBlog.Share.Extensions.Markdown;
 using StarBlog.Web.ViewModels;
 using StarBlog.Web.ViewModels.QueryFilters;
 using X.PagedList;

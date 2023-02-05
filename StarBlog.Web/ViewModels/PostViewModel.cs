@@ -1,7 +1,7 @@
 ﻿using System.Text.Encodings.Web;
 using System.Text.Json;
 using StarBlog.Data.Models;
-using StarBlog.Share.MarkdownExtensions;
+using StarBlog.Share.Extensions.Markdown;
 
 namespace StarBlog.Web.ViewModels;
 

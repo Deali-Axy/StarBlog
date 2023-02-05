@@ -1,9 +1,8 @@
 ﻿using System.Text.RegularExpressions;
-using Markdig;
 using Markdig.Syntax;
 using StarBlog.Data.Models;
 
-namespace StarBlog.Share.MarkdownExtensions;
+namespace StarBlog.Share.Extensions.Markdown;
 
 class Heading {
     public int Id { get; set; }
@@ -64,7 +63,7 @@ public static class ToC {
 
     public static List<TocNode>? ExtractToc(this Post post) {
         if (post.Content == null) return null;
-        var doc = Markdown.Parse(post.Content);
+        var doc = Markdig.Markdown.Parse(post.Content);
         return doc.ExtractToc();
     }
 }
