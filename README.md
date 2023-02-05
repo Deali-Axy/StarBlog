@@ -150,31 +150,31 @@ gulp move
 
 ### 博客主页
 
-![](https://img2022.cnblogs.com/blog/866942/202204/866942-20220405225022304-2138815081.png)
+![](docs/images/home.png)
 
 ### 文章列表
 
-![](https://img2022.cnblogs.com/blog/866942/202204/866942-20220405225035489-449753828.png)
+![](docs/images/posts.png)
 
 ### 摄影页面~~（虽然现在还没把拍的照片放上去就是了）~~
 
-![](https://img2022.cnblogs.com/blog/866942/202204/866942-20220405225044985-638927928.png)
+![](docs/images/photos.png)
 
 ### 管理后台主页
 
-![](https://img2022.cnblogs.com/blog/866942/202204/866942-20220405225109051-1879120729.png)
+![](docs/images/admin.png)
 
 ### 后台文章列表
 
-![](https://img2022.cnblogs.com/blog/866942/202204/866942-20220405225117978-1439315393.png)
+![](docs/images/admin-posts.png)
 
 ### 文章编辑界面
 
-![](https://img2022.cnblogs.com/blog/866942/202204/866942-20220405225126462-1862916154.png)
+![](docs/images/admin-post-edit.png)
 
 ### 后台图片列表
 
-![](https://img2022.cnblogs.com/blog/866942/202204/866942-20220405225135800-677882287.png)
+![](docs/images/admin-photos.png)
 
 篇幅关系就放这些图片了~
 
