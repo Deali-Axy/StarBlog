@@ -193,3 +193,11 @@ gulp move
 所以最终我的markdown渲染HTML以及代码高亮由`Editor.md`承包！
 
 （PS：`Markdig`组件先保留吧）
+
+## Thanks
+
+![](https://resources.jetbrains.com/storage/products/company/brand/logos/Rider.png)
+
+感谢 [Jetbrains OpenSourceSupport](https://jb.gg/OpenSourceSupport) 提供的免费开发工具Rider，超级好用！
+
+
