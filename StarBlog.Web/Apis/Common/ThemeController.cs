@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using StarBlog.Web.Extensions;
 using StarBlog.Web.Services;
 
 namespace StarBlog.Web.Apis.Common; 
@@ -8,7 +9,7 @@ namespace StarBlog.Web.Apis.Common;
 /// </summary>
 [ApiController]
 [Route("Api/[controller]")]
-[ApiExplorerSettings(GroupName = "common")]
+[ApiExplorerSettings(GroupName = ApiGroups.Common)]
 public class ThemeController : ControllerBase {
     private readonly ThemeService _themeService;
 

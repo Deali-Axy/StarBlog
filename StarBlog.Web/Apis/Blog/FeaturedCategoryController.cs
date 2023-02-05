@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StarBlog.Data.Models;
+using StarBlog.Web.Extensions;
 using StarBlog.Web.Services;
 using StarBlog.Web.ViewModels.Categories;
 
@@ -13,7 +14,7 @@ namespace StarBlog.Web.Apis.Blog;
 [Authorize]
 [ApiController]
 [Route("Api/[controller]")]
-[ApiExplorerSettings(GroupName = "blog")]
+[ApiExplorerSettings(GroupName = ApiGroups.Blog)]
 public class FeaturedCategoryController : ControllerBase {
     private readonly CategoryService _categoryService;
 

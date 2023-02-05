@@ -2,6 +2,7 @@
 using FreeSql;
 using Microsoft.AspNetCore.Mvc;
 using StarBlog.Data.Models;
+using StarBlog.Web.Extensions;
 using StarBlog.Web.ViewModels;
 
 namespace StarBlog.Web.Apis.Blog;
@@ -11,7 +12,7 @@ namespace StarBlog.Web.Apis.Blog;
 /// </summary>
 [ApiController]
 [Route("Api/[controller]")]
-[ApiExplorerSettings(GroupName = "blog")]
+[ApiExplorerSettings(GroupName = ApiGroups.Blog)]
 public class FeaturedPostController : ControllerBase {
     private readonly IBaseRepository<Post> _postRepo;
     private readonly IBaseRepository<FeaturedPost> _featuredPostRepo;

@@ -3,6 +3,7 @@ using FreeSql;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StarBlog.Data.Models;
+using StarBlog.Web.Extensions;
 using StarBlog.Web.Services;
 
 namespace StarBlog.Web.Apis.Blog;
@@ -13,7 +14,7 @@ namespace StarBlog.Web.Apis.Blog;
 [Authorize]
 [ApiController]
 [Route("Api/[controller]")]
-[ApiExplorerSettings(GroupName = "blog")]
+[ApiExplorerSettings(GroupName = ApiGroups.Blog)]
 public class FeaturedPhotoController : ControllerBase {
     private readonly PhotoService _photoService;
     private readonly IBaseRepository<FeaturedPhoto> _fpRepo;

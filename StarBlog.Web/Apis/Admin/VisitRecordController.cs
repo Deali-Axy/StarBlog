@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StarBlog.Data.Models;
+using StarBlog.Web.Extensions;
 using StarBlog.Web.Services;
 using StarBlog.Web.ViewModels.QueryFilters;
 
@@ -13,7 +14,7 @@ namespace StarBlog.Web.Apis.Admin;
 [Authorize]
 [ApiController]
 [Route("Api/[controller]")]
-[ApiExplorerSettings(GroupName = "admin")]
+[ApiExplorerSettings(GroupName = ApiGroups.Admin)]
 public class VisitRecordController : ControllerBase {
     private readonly VisitRecordService _service;
 

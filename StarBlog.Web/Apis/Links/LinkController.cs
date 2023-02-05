@@ -3,6 +3,7 @@ using CodeLab.Share.ViewModels.Response;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StarBlog.Data.Models;
+using StarBlog.Web.Extensions;
 using StarBlog.Web.Services;
 using StarBlog.Web.ViewModels.Links;
 
@@ -14,7 +15,7 @@ namespace StarBlog.Web.Apis.Links;
 [Authorize]
 [ApiController]
 [Route("Api/[controller]")]
-[ApiExplorerSettings(GroupName = "blog")]
+[ApiExplorerSettings(GroupName = ApiGroups.Blog)]
 public class LinkController : ControllerBase {
     private readonly LinkService _service;
     private readonly IMapper _mapper;

@@ -14,7 +14,7 @@ namespace StarBlog.Web.Apis.Blog;
 /// </summary>
 [ApiController]
 [Route("Api/[controller]")]
-[ApiExplorerSettings(GroupName = "blog")]
+[ApiExplorerSettings(GroupName = ApiGroups.Blog)]
 public class PhotoController : ControllerBase {
     private readonly PhotoService _photoService;
 

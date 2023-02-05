@@ -15,7 +15,7 @@ namespace StarBlog.Web.Apis.Blog;
 [Authorize]
 [ApiController]
 [Route("Api/[controller]")]
-[ApiExplorerSettings(GroupName = "blog")]
+[ApiExplorerSettings(GroupName = ApiGroups.Blog)]
 public class CategoryController : ControllerBase {
     private readonly CategoryService _cService;
 

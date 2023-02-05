@@ -86,19 +86,7 @@ app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseSwagger();
-app.UseSwaggerUI(options => {
-    options.RoutePrefix = "api-docs/swagger";
-    options.SwaggerEndpoint("/swagger/admin/swagger.json", "Admin");
-    options.SwaggerEndpoint("/swagger/blog/swagger.json", "Blog");
-    options.SwaggerEndpoint("/swagger/auth/swagger.json", "Auth");
-    options.SwaggerEndpoint("/swagger/common/swagger.json", "Common");
-    options.SwaggerEndpoint("/swagger/test/swagger.json", "Test");
-});
-app.UseReDoc(options => {
-    options.RoutePrefix = "api-docs/redoc";
-    options.SpecUrl = "/swagger/blog/swagger.json";
-});
+app.UseSwaggerPkg();
 
 app.MapControllerRoute(
     name: "default",

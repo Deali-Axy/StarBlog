@@ -1,36 +1,30 @@
 ﻿using Microsoft.OpenApi.Models;
+using StarBlog.Web.Models;
 using Swashbuckle.AspNetCore.Filters;
+using Swashbuckle.AspNetCore.SwaggerUI;
 
 namespace StarBlog.Web.Extensions;
 
+public static class ApiGroups {
+    public const string Admin = "admin";
+    public const string Auth = "auth";
+    public const string Common = "common";
+    public const string Blog = "blog";
+    public const string Test = "test";
+}
+
 public static class ConfigureSwagger {
+    public static readonly List<SwaggerGroup> Groups = new() {
+        new SwaggerGroup(ApiGroups.Admin, "Admin APIs", "管理员相关接口"),
+        new SwaggerGroup(ApiGroups.Auth, "Auth APIs", "授权接口"),
+        new SwaggerGroup(ApiGroups.Common, "Common APIs", "通用公共接口"),
+        new SwaggerGroup(ApiGroups.Blog, "Blog APIs", "博客管理接口"),
+        new SwaggerGroup(ApiGroups.Test, "Test APIs", "测试接口")
+    };
+
     public static void AddSwagger(this IServiceCollection services) {
         services.AddSwaggerGen(options => {
-            options.SwaggerDoc("admin", new OpenApiInfo {
-                Version = "v1",
-                Title = "Admin APIs",
-                Description = "管理员相关接口"
-            });
-            options.SwaggerDoc("common", new OpenApiInfo {
-                Version = "v1",
-                Title = "Common APIs",
-                Description = "通用公共接口"
-            });
-            options.SwaggerDoc("auth", new OpenApiInfo {
-                Version = "v1",
-                Title = "Auth APIs",
-                Description = "授权接口"
-            });
-            options.SwaggerDoc("blog", new OpenApiInfo {
-                Version = "v1",
-                Title = "Blog APIs",
-                Description = "博客管理接口"
-            });
-            options.SwaggerDoc("test", new OpenApiInfo {
-                Version = "v1",
-                Title = "Test APIs",
-                Description = "测试接口"
-            });
+            Groups.ForEach(group => options.SwaggerDoc(group.Name, group.ToOpenApiInfo()));
 
             // 开启小绿锁
             var security = new OpenApiSecurityScheme {
@@ -40,14 +34,28 @@ public static class ConfigureSwagger {
                 Type = SecuritySchemeType.ApiKey
             };
             options.AddSecurityDefinition("oauth2", security);
-            options.AddSecurityRequirement(new OpenApiSecurityRequirement { { security, new List<string>() } });
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement {{security, new List<string>()}});
             options.OperationFilter<AddResponseHeadersFilter>();
             options.OperationFilter<AppendAuthorizeToSummaryOperationFilter>();
             options.OperationFilter<SecurityRequirementsOperationFilter>();
 
             // XML注释
-            var filePath = Path.Combine(System.AppContext.BaseDirectory, $"{typeof(Program).Assembly.GetName().Name}.xml");
+            var filePath = Path.Combine(AppContext.BaseDirectory, $"{typeof(Program).Assembly.GetName().Name}.xml");
             options.IncludeXmlComments(filePath, true);
+        });
+    }
+
+    public static void UseSwaggerPkg(this IApplicationBuilder app) {
+        app.UseSwagger();
+        app.UseSwaggerUI(opt => {
+            opt.RoutePrefix = "api-docs/swagger";
+            // 模型的默认扩展深度，设置为 -1 完全隐藏模型
+            opt.DefaultModelsExpandDepth(-1);
+            // API文档仅展开标记
+            opt.DocExpansion(DocExpansion.List);
+            opt.DocumentTitle = "StarBlog APIs";
+            // 分组
+            Groups.ForEach(group => opt.SwaggerEndpoint($"/swagger/{group.Name}/swagger.json", group.Name));
         });
     }
 }

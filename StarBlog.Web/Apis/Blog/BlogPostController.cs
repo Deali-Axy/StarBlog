@@ -20,7 +20,7 @@ namespace StarBlog.Web.Apis.Blog;
 [Authorize]
 [ApiController]
 [Route("Api/[controller]")]
-[ApiExplorerSettings(GroupName = "blog")]
+[ApiExplorerSettings(GroupName = ApiGroups.Blog)]
 public class BlogPostController : ControllerBase {
     private readonly IMapper _mapper;
     private readonly PostService _postService;

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using StarBlog.Web.Extensions;
 using StarBlog.Web.Services;
 
 namespace StarBlog.Web.Apis.Common;
@@ -8,7 +9,7 @@ namespace StarBlog.Web.Apis.Common;
 /// </summary>
 [ApiController]
 [Route("Api/[controller]/[action]")]
-[ApiExplorerSettings(GroupName = "common")]
+[ApiExplorerSettings(GroupName = ApiGroups.Common)]
 public class DataAcqController : ControllerBase {
     private readonly CrawlService _crawlService;
 

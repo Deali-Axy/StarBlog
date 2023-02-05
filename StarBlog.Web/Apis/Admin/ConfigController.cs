@@ -1,6 +1,7 @@
 ﻿using CodeLab.Share.ViewModels.Response;
 using Microsoft.AspNetCore.Mvc;
 using StarBlog.Data.Models;
+using StarBlog.Web.Extensions;
 using StarBlog.Web.Services;
 
 namespace StarBlog.Web.Apis.Admin;
@@ -10,7 +11,7 @@ namespace StarBlog.Web.Apis.Admin;
 /// </summary>
 [ApiController]
 [Route("Api/[controller]")]
-[ApiExplorerSettings(GroupName = "admin")]
+[ApiExplorerSettings(GroupName = ApiGroups.Admin)]
 public class ConfigController : ControllerBase {
     private readonly ConfigService _service;
 

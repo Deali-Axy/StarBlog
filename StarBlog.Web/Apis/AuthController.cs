@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StarBlog.Data.Models;
+using StarBlog.Web.Extensions;
 using StarBlog.Web.Services;
 using StarBlog.Web.ViewModels.Auth;
 
@@ -12,7 +13,7 @@ namespace StarBlog.Web.Apis;
 /// </summary>
 [ApiController]
 [Route("Api/[controller]")]
-[ApiExplorerSettings(GroupName = "auth")]
+[ApiExplorerSettings(GroupName = ApiGroups.Auth)]
 public class AuthController : ControllerBase {
     private readonly AuthService _authService;
 

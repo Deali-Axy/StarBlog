@@ -3,6 +3,7 @@ using FreeSql;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StarBlog.Data.Models;
+using StarBlog.Web.Extensions;
 using StarBlog.Web.Services;
 using StarBlog.Web.ViewModels;
 using StarBlog.Web.ViewModels.Blog;
@@ -14,7 +15,7 @@ namespace StarBlog.Web.Apis.Blog;
 /// </summary>
 [ApiController]
 [Route("Api/[controller]")]
-[ApiExplorerSettings(GroupName = "blog")]
+[ApiExplorerSettings(GroupName = ApiGroups.Blog)]
 public class BlogController : ControllerBase {
     private readonly BlogService _blogService;
 
