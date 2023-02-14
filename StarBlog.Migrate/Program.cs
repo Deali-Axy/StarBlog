@@ -21,7 +21,9 @@ foreach (var filename in removeFileList.Where(File.Exists)) {
 }
 
 // 数据库
-var freeSql = FreeSqlFactory.Create("Data Source=app.db;Synchronous=Off;Cache Size=5000;");
+// var freeSql = FreeSqlFactory.Create("Data Source=app.db;Synchronous=Off;Cache Size=5000;");
+var freeSql = FreeSqlFactory.CreateMySql(
+    "Data Source=sbtimi.com;Port=3306;User ID=root;Password=6Mynaom7Eejj0U0fqoqh; Initial Catalog=starblog;Charset=utf8mb4; SslMode=none;Min pool size=1");
 var postRepo = freeSql.GetRepository<Post>();
 var categoryRepo = freeSql.GetRepository<Category>();
 
@@ -30,9 +32,10 @@ WalkDirectoryTree(new DirectoryInfo(importDir));
 
 // 覆盖数据库
 var destFile = Path.GetFullPath("../../../../StarBlog.Web/app.db");
-Console.WriteLine($"覆盖数据库：{destFile}");
-File.Copy("app.db", destFile, true);
-
+if (File.Exists("app.db") && File.Exists(destFile)) {
+    Console.WriteLine($"覆盖数据库：{destFile}");
+    File.Copy("app.db", destFile, true);   
+}
 
 void WalkDirectoryTree(DirectoryInfo root) {
     // 参考资料：https://docs.microsoft.com/zh-cn/dotnet/csharp/programming-guide/file-system/how-to-iterate-through-a-directory-tree

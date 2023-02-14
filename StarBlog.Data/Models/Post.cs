@@ -1,4 +1,5 @@
-﻿using FreeSql.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using FreeSql.DataAnnotations;
 
 namespace StarBlog.Data.Models;
 
@@ -34,6 +35,7 @@ public class Post {
     /// <summary>
     /// 内容（markdown格式）
     /// </summary>
+    [MaxLength(-1)]
     public string? Content { get; set; }
 
     /// <summary>
