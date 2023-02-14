@@ -35,19 +35,19 @@ public class BlogService {
     /// 获取博客信息概况
     /// </summary>
     /// <returns></returns>
-    public BlogOverview Overview() {
+    public async Task<BlogOverview> Overview() {
         return new BlogOverview {
-            PostsCount = _postRepo.Select.Count(),
-            CategoriesCount = _categoryRepo.Select.Count(),
-            PhotosCount = _photoRepo.Select.Count(),
-            FeaturedPostsCount = _fPostRepo.Select.Count(),
-            FeaturedCategoriesCount = _fCategoryRepo.Select.Count(),
-            FeaturedPhotosCount = _fPhotoRepo.Select.Count()
+            PostsCount = await _postRepo.Select.CountAsync(),
+            CategoriesCount = await _categoryRepo.Select.CountAsync(),
+            PhotosCount = await _photoRepo.Select.CountAsync(),
+            FeaturedPostsCount = await _fPostRepo.Select.CountAsync(),
+            FeaturedCategoriesCount = await _fCategoryRepo.Select.CountAsync(),
+            FeaturedPhotosCount = await _fPhotoRepo.Select.CountAsync()
         };
     }
 
-    public Post? GetTopOnePost() {
-        return _topPostRepo.Select.Include(a => a.Post.Category).First()?.Post;
+    public async Task<Post?> GetTopOnePost() {
+        return (await _topPostRepo.Select.Include(a => a.Post.Category).FirstAsync())?.Post;
     }
 
     /// <summary>
@@ -55,10 +55,10 @@ public class BlogService {
     /// </summary>
     /// <returns></returns>
     [Obsolete("不需要分出来row了，直接使用 GetFeaturedPosts() 即可")]
-    public List<List<Post>> GetFeaturedPostRows() {
+    public async Task<List<List<Post>>> GetFeaturedPostRows() {
         var data = new List<List<Post>>();
 
-        var posts = GetFeaturedPosts();
+        var posts = await GetFeaturedPosts();
         for (var i = 0; i < posts.Count; i += 2) {
             data.Add(new List<Post> {posts[i], posts[i + 1]});
         }
@@ -66,22 +66,22 @@ public class BlogService {
         return data;
     }
 
-    public List<Post> GetFeaturedPosts() {
-        return _fPostRepo.Select.Include(a => a.Post.Category)
-            .ToList(a => a.Post);
+    public async Task<List<Post>> GetFeaturedPosts() {
+        return await _fPostRepo.Select.Include(a => a.Post.Category)
+            .ToListAsync(a => a.Post);
     }
 
-    public FeaturedPost AddFeaturedPost(Post post) {
-        var item = _fPostRepo.Where(a => a.PostId == post.Id).First();
+    public async Task<FeaturedPost> AddFeaturedPost(Post post) {
+        var item = await _fPostRepo.Where(a => a.PostId == post.Id).FirstAsync();
         if (item != null) return item;
         item = new FeaturedPost {PostId = post.Id};
-        _fPostRepo.Insert(item);
+        await _fPostRepo.InsertAsync(item);
         return item;
     }
 
-    public int DeleteFeaturedPost(Post post) {
-        var item = _fPostRepo.Where(a => a.PostId == post.Id).First();
-        return item == null ? 0 : _fPostRepo.Delete(item);
+    public async Task<int> DeleteFeaturedPost(Post post) {
+        var items = await _fPostRepo.Where(a => a.PostId == post.Id).CountAsync();
+        return items == 0 ? 0 : await _fPostRepo.Where(a => a.PostId == post.Id).ToDelete().ExecuteAffrowsAsync();
     }
 
     /// <summary>
@@ -89,10 +89,10 @@ public class BlogService {
     /// </summary>
     /// <param name="post"></param>
     /// <returns>返回 <see cref="TopPost"/> 对象和删除原有置顶博客的行数</returns>
-    public (TopPost, int) SetTopPost(Post post) {
-        var rows = _topPostRepo.Select.ToDelete().ExecuteAffrows();
+    public async Task<(TopPost, int)> SetTopPost(Post post) {
+        var rows = await _topPostRepo.Select.ToDelete().ExecuteAffrowsAsync();
         var item = new TopPost {PostId = post.Id};
-        _topPostRepo.Insert(item);
+        await _topPostRepo.InsertAsync(item);
         return (item, rows);
     }
 
@@ -100,9 +100,9 @@ public class BlogService {
     /// 获取文章的状态列表
     /// </summary>
     /// <returns></returns>
-    public List<string?> GetStatusList() {
-        return _postRepo.Select.GroupBy(a => a.Status)
-            .ToList(a => a.Key);
+    public async Task<List<string?>> GetStatusList() {
+        return await _postRepo.Select.GroupBy(a => a.Status)
+            .ToListAsync(a => a.Key);
     }
 
     /// <summary>

@@ -24,24 +24,24 @@ public class FeaturedCategoryController : ControllerBase {
 
     [AllowAnonymous]
     [HttpGet]
-    public ApiResponse<List<FeaturedCategory>> GetAll() {
-        return new ApiResponse<List<FeaturedCategory>>(_categoryService.GetFeaturedCategories());
+    public async Task<List<FeaturedCategory>> GetAll() {
+        return await _categoryService.GetFeaturedCategories();
     }
 
     [AllowAnonymous]
     [HttpGet("{id:int}")]
-    public ApiResponse<FeaturedCategory> Get(int id) {
-        var item = _categoryService.GetFeaturedCategoryById(id);
+    public async Task<ApiResponse<FeaturedCategory>> Get(int id) {
+        var item = await _categoryService.GetFeaturedCategoryById(id);
         return item == null
             ? ApiResponse.NotFound($"推荐分类记录 {id} 不存在")
             : new ApiResponse<FeaturedCategory>(item);
     }
 
     [HttpPost]
-    public ApiResponse<FeaturedCategory> Add(FeaturedCategoryCreationDto2 dto2) {
-        var category = _categoryService.GetById(dto2.CategoryId);
+    public async Task<ApiResponse<FeaturedCategory>> Add(FeaturedCategoryCreationDto2 dto2) {
+        var category = await _categoryService.GetById(dto2.CategoryId);
         if (category == null) return ApiResponse.NotFound($"分类 {dto2.CategoryId} 不存在");
-        var item = _categoryService.AddOrUpdateFeaturedCategory(category, new FeaturedCategoryCreationDto {
+        var item = await _categoryService.AddOrUpdateFeaturedCategory(category, new FeaturedCategoryCreationDto {
             Name = dto2.Name, Description = dto2.Description, IconCssClass = dto2.IconCssClass
         });
         return new ApiResponse<FeaturedCategory>(item);

@@ -31,12 +31,12 @@ public class BlogController : Controller {
         _configService = configService;
     }
 
-    public IActionResult List(int categoryId = 0, int page = 1, int pageSize = 5) {
-        var categories = _categoryRepo.Where(a => a.Visible)
-            .IncludeMany(a => a.Posts).ToList();
+    public async Task<IActionResult> List(int categoryId = 0, int page = 1, int pageSize = 5) {
+        var categories = await _categoryRepo.Where(a => a.Visible)
+            .IncludeMany(a => a.Posts).ToListAsync();
         categories.Insert(0, new Category { Id = 0, Name = "All", Posts = _postRepo.Select.ToList() });
 
-        var currentCategory = categoryId == 0 ? categories[0] : _categoryService.GetById(categoryId);
+        var currentCategory = categoryId == 0 ? categories[0] : await _categoryService.GetById(categoryId);
 
         if (currentCategory == null) {
             _messages.Error($"分类 {categoryId} 不存在！");
@@ -52,7 +52,7 @@ public class BlogController : Controller {
             CurrentCategory = categoryId == 0 ? categories[0] : categories.First(a => a.Id == categoryId),
             CurrentCategoryId = categoryId,
             Categories = categories,
-            CategoryNodes = _categoryService.GetNodes(),
+            CategoryNodes = await _categoryService.GetNodes(),
             Posts = _postService.GetPagedList(new PostQueryParameters {
                 CategoryId = categoryId,
                 Page = page,

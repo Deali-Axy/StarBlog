@@ -10,6 +10,10 @@ public class ThemeService {
 
     public ThemeService(IWebHostEnvironment env) {
         var themePath = Path.Combine(env.WebRootPath, "lib", "bootswatch", "dist");
+        if (!Directory.Exists(themePath)) {
+            return;
+        }
+
         foreach (var item in Directory.GetDirectories(themePath)) {
             var name = Path.GetFileName(item);
             Themes.Add(new Theme {

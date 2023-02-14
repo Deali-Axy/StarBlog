@@ -28,8 +28,8 @@ public class AuthController : ControllerBase {
     /// <returns></returns>
     [HttpPost]
     [ProducesResponseType(typeof(ApiResponse<LoginToken>), StatusCodes.Status200OK)]
-    public ApiResponse Login(LoginUser loginUser) {
-        var user = _authService.GetUserByName(loginUser.Username);
+    public async Task<ApiResponse> Login(LoginUser loginUser) {
+        var user = await _authService.GetUserByName(loginUser.Username);
         if (user == null) return ApiResponse.Unauthorized("用户名或密码错误");
         if (loginUser.Password != user.Password) return ApiResponse.Unauthorized("用户名或密码错误");
         return ApiResponse.Ok(_authService.GenerateLoginToken(user));

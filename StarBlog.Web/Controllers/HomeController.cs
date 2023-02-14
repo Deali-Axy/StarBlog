@@ -22,17 +22,17 @@ public class HomeController : Controller {
         _messages = messages;
     }
 
-    public IActionResult Index() {
+    public async Task<IActionResult> Index() {
         if (Request.QueryString.HasValue) {
             return BadRequest();
         }
 
         return View(new HomeViewModel {
             RandomPhoto = _photoService.GetRandomPhoto(),
-            TopPost = _blogService.GetTopOnePost(),
-            FeaturedPosts = _blogService.GetFeaturedPosts(),
+            TopPost = await _blogService.GetTopOnePost(),
+            FeaturedPosts = await _blogService.GetFeaturedPosts(),
             FeaturedPhotos = _photoService.GetFeaturedPhotos(),
-            FeaturedCategories = _categoryService.GetFeaturedCategories(),
+            FeaturedCategories = await _categoryService.GetFeaturedCategories(),
             Links = _linkService.GetAll()
         });
     }

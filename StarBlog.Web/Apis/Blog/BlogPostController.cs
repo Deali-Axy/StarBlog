@@ -63,7 +63,7 @@ public class BlogPostController : ControllerBase {
     public async Task<ApiResponse<Post>> Add(PostCreationDto dto,
         [FromServices] CategoryService categoryService) {
         var post = _mapper.Map<Post>(dto);
-        var category = categoryService.GetById(dto.CategoryId);
+        var category = await categoryService.GetById(dto.CategoryId);
         if (category == null) return ApiResponse.BadRequest($"分类 {dto.CategoryId} 不存在！");
 
         post.Id = GuidUtils.GuidTo16String();
@@ -124,11 +124,11 @@ public class BlogPostController : ControllerBase {
     /// <param name="id"></param>
     /// <returns></returns>
     [HttpPost("{id}/[action]")]
-    public ApiResponse<FeaturedPost> SetFeatured(string id) {
+    public async Task<ApiResponse<FeaturedPost>> SetFeatured(string id) {
         var post = _postService.GetById(id);
         return post == null
             ? ApiResponse.NotFound()
-            : new ApiResponse<FeaturedPost>(_blogService.AddFeaturedPost(post));
+            : new ApiResponse<FeaturedPost>(await _blogService.AddFeaturedPost(post));
     }
 
     /// <summary>
@@ -137,10 +137,10 @@ public class BlogPostController : ControllerBase {
     /// <param name="id"></param>
     /// <returns></returns>
     [HttpPost("{id}/[action]")]
-    public ApiResponse CancelFeatured(string id) {
+    public async Task<ApiResponse> CancelFeatured(string id) {
         var post = _postService.GetById(id);
         if (post == null) return ApiResponse.NotFound($"博客 {id} 不存在");
-        var rows = _blogService.DeleteFeaturedPost(post);
+        var rows = await _blogService.DeleteFeaturedPost(post);
         return ApiResponse.Ok($"delete {rows} rows.");
     }
 
@@ -150,10 +150,10 @@ public class BlogPostController : ControllerBase {
     /// <param name="id"></param>
     /// <returns></returns>
     [HttpPost("{id}/[action]")]
-    public ApiResponse<TopPost> SetTop(string id) {
+    public async Task<ApiResponse<TopPost>> SetTop(string id) {
         var post = _postService.GetById(id);
         if (post == null) return ApiResponse.NotFound($"博客 {id} 不存在");
-        var (data, rows) = _blogService.SetTopPost(post);
+        var (data, rows) = await _blogService.SetTopPost(post);
         return new ApiResponse<TopPost> {Data = data, Message = $"ok. deleted {rows} old topPosts."};
     }
 }

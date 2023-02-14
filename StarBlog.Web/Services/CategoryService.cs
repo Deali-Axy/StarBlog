@@ -23,13 +23,19 @@ public class CategoryService {
         _generator = generator;
     }
 
+    public async Task<List<CategoryNode>?> GetNodes() {
+        var categoryList = await _cRepo.Select
+            .IncludeMany(a => a.Posts.Select(p => new Post {Id = p.Id}))
+            .ToListAsync();
+        return GetNodes(categoryList, 0);
+    }
+
     /// <summary>
     /// 生成文章分类树
     /// </summary>
-    public List<CategoryNode>? GetNodes(int parentId = 0) {
-        var categories = _cRepo.Select
+    public List<CategoryNode>? GetNodes(List<Category> categoryList, int parentId = 0) {
+        var categories = categoryList
             .Where(a => a.ParentId == parentId && a.Visible)
-            .IncludeMany(a => a.Posts)
             .ToList();
 
         if (categories.Count == 0) return null;
@@ -40,53 +46,51 @@ public class CategoryService {
                 _accessor.HttpContext!,
                 nameof(BlogController.List),
                 "Blog",
-                new { categoryId = category.Id }
+                new {categoryId = category.Id}
             ),
-            tags = new List<string> { category.Posts.Count.ToString() },
-            nodes = GetNodes(category.Id)
+            tags = new List<string> {category.Posts.Count.ToString()},
+            nodes = GetNodes(categoryList, category.Id)
         }).ToList();
     }
 
-    public List<Category> GetAll() {
-        return _cRepo.Select.ToList();
+    public async Task<List<Category>> GetAll() {
+        return await _cRepo.Select.ToListAsync();
     }
 
-    public IPagedList<Category> GetPagedList(int page = 1, int pageSize = 10) {
-        return _cRepo.Select.ToList().ToPagedList(page, pageSize);
+    public async Task<IPagedList<Category>> GetPagedList(int page = 1, int pageSize = 10) {
+        return (await _cRepo.Select.ToListAsync()).ToPagedList(page, pageSize);
     }
 
-    public Category? GetById(int id) {
-        return _cRepo.Where(a => a.Id == id)
-            .Include(a => a.Parent).First();
+    public async Task<Category?> GetById(int id) {
+        return await _cRepo.Where(a => a.Id == id)
+            .Include(a => a.Parent).FirstAsync();
     }
 
     /// <summary>
     /// 生成分类词云数据
     /// </summary>
     /// <returns></returns>
-    public List<object> GetWordCloud() {
-        var list = _cRepo.Select
+    public async Task<List<object>> GetWordCloud() {
+        var list = await _cRepo.Select
             .Where(a => a.Visible && a.ParentId == 0)
-            .IncludeMany(a => a.Posts).ToList();
-        var data = new List<object>();
-        foreach (var item in list) {
-            data.Add(new { name = item.Name, value = item.Posts.Count });
-        }
+            .IncludeMany(a => a.Posts).ToListAsync();
+
+        var data = list.Select(item => new {name = item.Name, value = item.Posts.Count}).ToList<object>();
 
         return data;
     }
 
-    public List<FeaturedCategory> GetFeaturedCategories() {
-        return _fcRepo.Select.Include(a => a.Category).ToList();
+    public async Task<List<FeaturedCategory>> GetFeaturedCategories() {
+        return await _fcRepo.Select.Include(a => a.Category).ToListAsync();
     }
 
-    public FeaturedCategory? GetFeaturedCategoryById(int id) {
-        return _fcRepo.Where(a => a.Id == id)
-            .Include(a => a.Category).First();
+    public async Task<FeaturedCategory?> GetFeaturedCategoryById(int id) {
+        return await _fcRepo.Where(a => a.Id == id)
+            .Include(a => a.Category).FirstAsync();
     }
 
-    public FeaturedCategory AddOrUpdateFeaturedCategory(Category category, FeaturedCategoryCreationDto dto) {
-        var item = _fcRepo.Where(a => a.CategoryId == category.Id).First();
+    public async Task<FeaturedCategory> AddOrUpdateFeaturedCategory(Category category, FeaturedCategoryCreationDto dto) {
+        var item = await _fcRepo.Where(a => a.CategoryId == category.Id).FirstAsync();
         if (item == null) {
             item = new FeaturedCategory {
                 CategoryId = category.Id,
@@ -101,22 +105,21 @@ public class CategoryService {
             item.IconCssClass = dto.IconCssClass;
         }
 
-        _fcRepo.InsertOrUpdate(item);
+        await _fcRepo.InsertOrUpdateAsync(item);
         return item;
     }
 
-    public int DeleteFeaturedCategory(Category category) {
-        var item = _fcRepo.Where(a => a.CategoryId == category.Id).First();
-        return item == null ? 0 : _fcRepo.Delete(item);
+    public async Task<int> DeleteFeaturedCategory(Category category) {
+        return await _fcRepo.Where(a => a.CategoryId == category.Id).ToDelete().ExecuteAffrowsAsync();
     }
 
-    public int DeleteFeaturedCategoryById(int id) {
-        return _fcRepo.Delete(a => a.Id == id);
+    public async Task<int> DeleteFeaturedCategoryById(int id) {
+        return await _fcRepo.DeleteAsync(a => a.Id == id);
     }
 
-    public int SetVisibility(Category category, bool isVisible) {
+    public async Task<int> SetVisibility(Category category, bool isVisible) {
         category.Visible = isVisible;
-        return _cRepo.Update(category);
+        return await _cRepo.UpdateAsync(category);
     }
 
     /// <summary>
@@ -124,7 +127,7 @@ public class CategoryService {
     /// <para>形式：1,3,5,7,9</para>
     /// </summary>
     public string GetCategoryBreadcrumb(Category item) {
-        var categories = new List<Category> { item };
+        var categories = new List<Category> {item};
         var parent = item.Parent;
         while (parent != null) {
             categories.Add(parent);
@@ -132,6 +135,6 @@ public class CategoryService {
         }
 
         categories.Reverse();
-        return string.Join(",", categories.Select(a => a.Id));;
+        return string.Join(",", categories.Select(a => a.Id));
     }
 }
