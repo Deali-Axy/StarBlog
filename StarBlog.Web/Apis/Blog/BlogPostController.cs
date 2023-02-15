@@ -34,8 +34,8 @@ public class BlogPostController : ControllerBase {
 
     [AllowAnonymous]
     [HttpGet]
-    public ApiResponsePaged<Post> GetList([FromQuery] PostQueryParameters param) {
-        var pagedList = _postService.GetPagedList(param);
+    public async Task<ApiResponsePaged<Post>> GetList([FromQuery] PostQueryParameters param) {
+        var pagedList = await _postService.GetPagedList(param);
         return new ApiResponsePaged<Post> {
             Message = "Get posts list",
             Data = pagedList.ToList(),
@@ -45,14 +45,14 @@ public class BlogPostController : ControllerBase {
 
     [AllowAnonymous]
     [HttpGet("{id}")]
-    public ApiResponse<Post> Get(string id) {
-        var post = _postService.GetById(id);
+    public async Task<ApiResponse<Post>> Get(string id) {
+        var post = await _postService.GetById(id);
         return post == null ? ApiResponse.NotFound() : new ApiResponse<Post>(post);
     }
 
     [HttpDelete("{id}")]
-    public ApiResponse Delete(string id) {
-        var post = _postService.GetById(id);
+    public async Task<ApiResponse> Delete(string id) {
+        var post = await _postService.GetById(id);
         if (post == null) return ApiResponse.NotFound($"博客 {id} 不存在");
         var rows = _postService.Delete(id);
         return ApiResponse.Ok($"删除了 {rows} 篇博客");
@@ -79,7 +79,7 @@ public class BlogPostController : ControllerBase {
 
     [HttpPut("{id}")]
     public async Task<ApiResponse<Post>> Update(string id, PostUpdateDto dto) {
-        var post = _postService.GetById(id);
+        var post = await _postService.GetById(id);
         if (post == null) return ApiResponse.NotFound($"博客 {id} 不存在");
 
         // mapper.Map(source) 得到一个全新的对象
@@ -96,10 +96,10 @@ public class BlogPostController : ControllerBase {
     /// <param name="file"></param>
     /// <returns></returns>
     [HttpPost("{id}/[action]")]
-    public ApiResponse UploadImage(string id, IFormFile file) {
-        var post = _postService.GetById(id);
+    public async Task<ApiResponse> UploadImage(string id, IFormFile file) {
+        var post = await _postService.GetById(id);
         if (post == null) return ApiResponse.NotFound($"博客 {id} 不存在");
-        var imgUrl = _postService.UploadImage(post, file);
+        var imgUrl = await _postService.UploadImage(post, file);
         return ApiResponse.Ok(new {
             imgUrl,
             imgName = Path.GetFileNameWithoutExtension(imgUrl)
@@ -112,8 +112,8 @@ public class BlogPostController : ControllerBase {
     /// <param name="id"></param>
     /// <returns></returns>
     [HttpGet("{id}/[action]")]
-    public ApiResponse<List<string>> Images(string id) {
-        var post = _postService.GetById(id);
+    public async Task<ApiResponse<List<string>>> Images(string id) {
+        var post = await _postService.GetById(id);
         if (post == null) return ApiResponse.NotFound($"博客 {id} 不存在");
         return new ApiResponse<List<string>>(_postService.GetImages(post));
     }
@@ -125,7 +125,7 @@ public class BlogPostController : ControllerBase {
     /// <returns></returns>
     [HttpPost("{id}/[action]")]
     public async Task<ApiResponse<FeaturedPost>> SetFeatured(string id) {
-        var post = _postService.GetById(id);
+        var post = await _postService.GetById(id);
         return post == null
             ? ApiResponse.NotFound()
             : new ApiResponse<FeaturedPost>(await _blogService.AddFeaturedPost(post));
@@ -138,7 +138,7 @@ public class BlogPostController : ControllerBase {
     /// <returns></returns>
     [HttpPost("{id}/[action]")]
     public async Task<ApiResponse> CancelFeatured(string id) {
-        var post = _postService.GetById(id);
+        var post = await _postService.GetById(id);
         if (post == null) return ApiResponse.NotFound($"博客 {id} 不存在");
         var rows = await _blogService.DeleteFeaturedPost(post);
         return ApiResponse.Ok($"delete {rows} rows.");
@@ -151,7 +151,7 @@ public class BlogPostController : ControllerBase {
     /// <returns></returns>
     [HttpPost("{id}/[action]")]
     public async Task<ApiResponse<TopPost>> SetTop(string id) {
-        var post = _postService.GetById(id);
+        var post = await _postService.GetById(id);
         if (post == null) return ApiResponse.NotFound($"博客 {id} 不存在");
         var (data, rows) = await _blogService.SetTopPost(post);
         return new ApiResponse<TopPost> {Data = data, Message = $"ok. deleted {rows} old topPosts."};

@@ -21,9 +21,7 @@ foreach (var filename in removeFileList.Where(File.Exists)) {
 }
 
 // 数据库
-// var freeSql = FreeSqlFactory.Create("Data Source=app.db;Synchronous=Off;Cache Size=5000;");
-var freeSql = FreeSqlFactory.CreateMySql(
-    "Data Source=sbtimi.com;Port=3306;User ID=root;Password=6Mynaom7Eejj0U0fqoqh; Initial Catalog=starblog;Charset=utf8mb4; SslMode=none;Min pool size=1");
+var freeSql = FreeSqlFactory.Create("Data Source=app.db;Synchronous=Off;Cache Size=5000;");
 var postRepo = freeSql.GetRepository<Post>();
 var categoryRepo = freeSql.GetRepository<Category>();
 

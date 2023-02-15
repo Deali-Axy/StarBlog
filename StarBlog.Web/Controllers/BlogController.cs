@@ -33,8 +33,8 @@ public class BlogController : Controller {
 
     public async Task<IActionResult> List(int categoryId = 0, int page = 1, int pageSize = 5) {
         var currentCategory = categoryId == 0
-            ? new Category {Id = 0, Name = "All", Posts = _postRepo.Select.ToList()}
-            : await _categoryService.GetById(categoryId);
+            ? new Category { Id = 0, Name = "All" }
+            : await _categoryRepo.Where(a => a.Id == categoryId).FirstAsync();
 
         if (currentCategory == null) {
             _messages.Error($"分类 {categoryId} 不存在！");
@@ -50,7 +50,7 @@ public class BlogController : Controller {
             CurrentCategory = currentCategory,
             CurrentCategoryId = categoryId,
             CategoryNodes = await _categoryService.GetNodes(),
-            Posts = _postService.GetPagedList(new PostQueryParameters {
+            Posts = await _postService.GetPagedList(new PostQueryParameters {
                 CategoryId = categoryId,
                 Page = page,
                 PageSize = pageSize,
@@ -59,8 +59,8 @@ public class BlogController : Controller {
         });
     }
 
-    public IActionResult Post(string id) {
-        var post = _postService.GetById(id);
+    public async Task<IActionResult> Post(string id) {
+        var post = await _postService.GetById(id);
 
         if (post == null) {
             _messages.Error($"文章 {id} 不存在！");
@@ -90,7 +90,7 @@ public class BlogController : Controller {
         var rndPost = posts[new Random().Next(posts.Count)];
         _messages.Info($"随机推荐了文章 <b>{rndPost.Title}</b> 给你~" +
                        $"<span class='ps-3'><a href=\"{Url.Action(nameof(RandomPost))}\">再来一次</a></span>");
-        return RedirectToAction(nameof(Post), new {id = rndPost.Id});
+        return RedirectToAction(nameof(Post), new { id = rndPost.Id });
     }
 
     public IActionResult Temp() {
