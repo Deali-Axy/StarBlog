@@ -23,8 +23,8 @@ public class PhotoController : ControllerBase {
     }
 
     [HttpGet]
-    public ApiResponsePaged<Photo> GetList(int page = 1, int pageSize = 10) {
-        var paged = _photoService.GetPagedList(page, pageSize);
+    public async Task<ApiResponsePaged<Photo>> GetList(int page = 1, int pageSize = 10) {
+        var paged = await _photoService.GetPagedList(page, pageSize);
         return new ApiResponsePaged<Photo> {
             Pagination = paged.ToPaginationMetadata(),
             Data = paged.ToList()
@@ -32,11 +32,11 @@ public class PhotoController : ControllerBase {
     }
 
     [HttpGet("{id}")]
-    public ApiResponse<Photo> Get(string id) {
-        var photo = _photoService.GetById(id);
+    public async Task<ApiResponse<Photo>> Get(string id) {
+        var photo = await _photoService.GetById(id);
         return photo == null
             ? ApiResponse.NotFound($"图片 {id} 不存在")
-            : new ApiResponse<Photo> { Data = photo };
+            : new ApiResponse<Photo> {Data = photo};
     }
 
     [HttpGet("{id}/Thumb")]
@@ -47,8 +47,8 @@ public class PhotoController : ControllerBase {
 
     [Authorize]
     [HttpPost]
-    public ApiResponse<Photo> Add([FromForm] PhotoCreationDto dto, IFormFile file) {
-        var photo = _photoService.Add(dto, file);
+    public async Task<ApiResponse<Photo>> Add([FromForm] PhotoCreationDto dto, IFormFile file) {
+        var photo = await _photoService.Add(dto, file);
 
         return !ModelState.IsValid
             ? ApiResponse.BadRequest(ModelState)
@@ -57,10 +57,10 @@ public class PhotoController : ControllerBase {
 
     [Authorize]
     [HttpDelete("{id}")]
-    public ApiResponse Delete(string id) {
-        var photo = _photoService.GetById(id);
+    public async Task<ApiResponse> Delete(string id) {
+        var photo = await _photoService.GetById(id);
         if (photo == null) return ApiResponse.NotFound($"图片 {id} 不存在");
-        var rows = _photoService.DeleteById(id);
+        var rows = await _photoService.DeleteById(id);
         return rows > 0
             ? ApiResponse.Ok($"deleted {rows} rows.")
             : ApiResponse.Error("deleting failed.");
@@ -72,11 +72,11 @@ public class PhotoController : ControllerBase {
     /// <param name="id"></param>
     /// <returns></returns>
     [HttpPost("{id}/[action]")]
-    public ApiResponse<FeaturedPhoto> SetFeatured(string id) {
-        var photo = _photoService.GetById(id);
+    public async Task<ApiResponse<FeaturedPhoto>> SetFeatured(string id) {
+        var photo = await _photoService.GetById(id);
         return photo == null
             ? ApiResponse.NotFound($"图片 {id} 不存在")
-            : new ApiResponse<FeaturedPhoto>(_photoService.AddFeaturedPhoto(photo));
+            : new ApiResponse<FeaturedPhoto>(await _photoService.AddFeaturedPhoto(photo));
     }
 
     /// <summary>
@@ -85,10 +85,10 @@ public class PhotoController : ControllerBase {
     /// <param name="id"></param>
     /// <returns></returns>
     [HttpPost("{id}/[action]")]
-    public ApiResponse CancelFeatured(string id) {
-        var photo = _photoService.GetById(id);
+    public async Task<ApiResponse> CancelFeatured(string id) {
+        var photo = await _photoService.GetById(id);
         if (photo == null) return ApiResponse.NotFound($"图片 {id} 不存在");
-        var rows = _photoService.DeleteFeaturedPhoto(photo);
+        var rows = await _photoService.DeleteFeaturedPhoto(photo);
         return ApiResponse.Ok($"deleted {rows} rows.");
     }
 
@@ -98,9 +98,9 @@ public class PhotoController : ControllerBase {
     /// <returns></returns>
     [Authorize]
     [HttpPost("[action]")]
-    public ApiResponse ReBuildData() {
+    public async Task<ApiResponse> ReBuildData() {
         return ApiResponse.Ok(new {
-            Rows = _photoService.ReBuildData()
+            Rows = await _photoService.ReBuildData()
         }, "重建图片库数据");
     }
 
@@ -110,8 +110,8 @@ public class PhotoController : ControllerBase {
     /// <returns></returns>
     [Authorize]
     [HttpPost("[action]")]
-    public ApiResponse<List<Photo>> BatchImport() {
-        var result = _photoService.BatchImport();
+    public async Task<ApiResponse<List<Photo>>> BatchImport() {
+        var result = await _photoService.BatchImport();
         return new ApiResponse<List<Photo>> {
             Data = result,
             Message = $"成功导入{result.Count}张图片"

@@ -1,4 +1,5 @@
-﻿@model Photo
+﻿@using StarBlog.Share.Extensions
+@model Photo
 @{
     // var imageSrc = @Url.Action("GetThumb", "Photo", new {id = Model.Id, width = 300});
     var imageSrc = "media/" + Model.FilePath.Replace("\\", "/") + "?width=300";
@@ -10,11 +11,11 @@
     <div class="card-body">
         <h5 class="card-title">
             <a class="stretched-link" asp-controller="Photography" asp-action="Photo" asp-route-id="@Model.Id">
-                @Model.Title
+                @Model.Title.Limit(20)
             </a>
         </h5>
-        <div class="card-text d-flex justify-content-between">
-            <span>@Model.Location</span>
+        <div class="card-text d-flex justify-content-between small">
+            <span>@Model.Location.Limit(10)</span>
             <span>
                 @Model.CreateTime.ToShortDateString()
                 @Model.CreateTime.ToShortTimeString()

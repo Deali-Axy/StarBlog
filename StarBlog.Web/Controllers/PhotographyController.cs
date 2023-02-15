@@ -16,14 +16,14 @@ public class PhotographyController : Controller {
         _messages = messages;
     }
 
-    public IActionResult Index(int page = 1, int pageSize = 10) {
+    public async Task<IActionResult> Index(int page = 1, int pageSize = 10) {
         return View(new PhotographyViewModel {
-            Photos = _photoService.GetPagedList(page, pageSize)
+            Photos = await _photoService.GetPagedList(page, pageSize)
         });
     }
 
-    public IActionResult Photo(string id) {
-        var photo = _photoService.GetById(id);
+    public async Task<IActionResult> Photo(string id) {
+        var photo = await _photoService.GetById(id);
         if (photo == null) {
             _messages.Error($"图片 {id} 不存在！");
             return RedirectToAction(nameof(Index));
@@ -41,7 +41,7 @@ public class PhotographyController : Controller {
 
         return RedirectToAction(nameof(Photo), new {id = item.Id});
     }
-    
+
     public async Task<IActionResult> Previous(string id) {
         var item = await _photoService.GetPrevious(id);
         if (item == null) {
@@ -52,8 +52,8 @@ public class PhotographyController : Controller {
         return RedirectToAction(nameof(Photo), new {id = item.Id});
     }
 
-    public IActionResult RandomPhoto() {
-        var item = _photoService.GetRandomPhoto();
+    public async Task<IActionResult> RandomPhoto() {
+        var item = await _photoService.GetRandomPhoto();
         if (item == null) {
             _messages.Error("当前没有图片，请先上传！");
             return RedirectToAction("Index", "Home");

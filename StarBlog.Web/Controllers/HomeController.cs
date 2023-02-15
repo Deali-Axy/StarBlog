@@ -14,7 +14,8 @@ public class HomeController : Controller {
     private readonly LinkService _linkService;
     private readonly Messages _messages;
 
-    public HomeController(BlogService blogService, PhotoService photoService, CategoryService categoryService, LinkService linkService, Messages messages) {
+    public HomeController(BlogService blogService, PhotoService photoService, CategoryService categoryService, LinkService linkService,
+        Messages messages) {
         _blogService = blogService;
         _photoService = photoService;
         _categoryService = categoryService;
@@ -28,12 +29,12 @@ public class HomeController : Controller {
         }
 
         return View(new HomeViewModel {
-            RandomPhoto = _photoService.GetRandomPhoto(),
+            RandomPhoto = await _photoService.GetRandomPhoto(),
             TopPost = await _blogService.GetTopOnePost(),
             FeaturedPosts = await _blogService.GetFeaturedPosts(),
-            FeaturedPhotos = _photoService.GetFeaturedPhotos(),
+            FeaturedPhotos = await _photoService.GetFeaturedPhotos(),
             FeaturedCategories = await _categoryService.GetFeaturedCategories(),
-            Links = _linkService.GetAll()
+            Links = await _linkService.GetAll()
         });
     }
 

@@ -12,30 +12,30 @@ public class LinkExchangeService {
         _linkService = linkService;
     }
 
-    public List<LinkExchange> GetAll() {
-        return _repo.Select.ToList();
+    public async Task<List<LinkExchange>> GetAll() {
+        return await _repo.Select.ToListAsync();
     }
 
-    public LinkExchange? GetById(int id) {
-        return _repo.Where(a => a.Id == id).First();
+    public async Task<LinkExchange?> GetById(int id) {
+        return await _repo.Where(a => a.Id == id).FirstAsync();
     }
 
-    public LinkExchange AddOrUpdate(LinkExchange item) {
-        return _repo.InsertOrUpdate(item);
+    public async Task<LinkExchange> AddOrUpdate(LinkExchange item) {
+        return await _repo.InsertOrUpdateAsync(item);
     }
 
-    public LinkExchange? SetVerifyStatus(int id, bool status) {
-        var item = GetById(id);
+    public async Task<LinkExchange?> SetVerifyStatus(int id, bool status) {
+        var item =await GetById(id);
         if (item == null) return null;
 
         item.Verified = status;
-        _repo.Update(item);
+        await _repo.UpdateAsync(item);
 
 
-        var link = _linkService.GetByName(item.Name);
+        var link = await _linkService.GetByName(item.Name);
         if (status) {
             if (link == null) {
-                _linkService.AddOrUpdate(new Link {
+                await _linkService.AddOrUpdate(new Link {
                     Name = item.Name,
                     Description = item.Description,
                     Url = item.Url,
@@ -43,17 +43,17 @@ public class LinkExchangeService {
                 });
             }
             else {
-                _linkService.SetVisibility(link.Id, true);
+                await _linkService.SetVisibility(link.Id, true);
             }
         }
         else {
-            if (link != null) _linkService.DeleteById(link.Id);
+            if (link != null) await _linkService.DeleteById(link.Id);
         }
 
-        return GetById(id);
+        return await GetById(id);
     }
 
-    public int DeleteById(int id) {
-        return _repo.Delete(a => a.Id == id);
+    public async Task<int> DeleteById(int id) {
+        return await _repo.DeleteAsync(a => a.Id == id);
     }
 }

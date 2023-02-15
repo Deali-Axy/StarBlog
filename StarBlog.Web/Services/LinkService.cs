@@ -15,40 +15,40 @@ public class LinkService {
     /// </summary>
     /// <param name="onlyVisible">只获取显示的链接</param>
     /// <returns></returns>
-    public List<Link> GetAll(bool onlyVisible = true) {
+    public async Task<List<Link>> GetAll(bool onlyVisible = true) {
         return onlyVisible
-            ? _repo.Where(a => a.Visible).ToList()
-            : _repo.Select.ToList();
+            ? await _repo.Where(a => a.Visible).ToListAsync()
+            : await _repo.Select.ToListAsync();
     }
 
-    public Link? GetById(int id) {
-        return _repo.Where(a => a.Id == id).First();
+    public async Task<Link?> GetById(int id) {
+        return await _repo.Where(a => a.Id == id).FirstAsync();
     }
 
-    public Link? GetByName(string name) {
-        return _repo.Where(a => a.Name == name).First();
+    public async Task<Link?> GetByName(string name) {
+        return await _repo.Where(a => a.Name == name).FirstAsync();
     }
 
     /// <summary>
     /// 查询 id 是否存在
     /// </summary>
-    public bool HasId(int id) {
-        return _repo.Where(a => a.Id == id).Any();
+    public async Task<bool> HasId(int id) {
+        return await _repo.Where(a => a.Id == id).AnyAsync();
     }
 
-    public Link AddOrUpdate(Link item) {
-        return _repo.InsertOrUpdate(item);
+    public async Task<Link> AddOrUpdate(Link item) {
+        return await _repo.InsertOrUpdateAsync(item);
     }
 
-    public Link? SetVisibility(int id, bool visible) {
-        var item = GetById(id);
+    public async Task<Link?> SetVisibility(int id, bool visible) {
+        var item = await GetById(id);
         if (item == null) return null;
         item.Visible = visible;
-        _repo.Update(item);
-        return GetById(id);
+        await _repo.UpdateAsync(item);
+        return item;
     }
 
-    public int DeleteById(int id) {
-        return _repo.Delete(a => a.Id == id);
+    public async Task<int> DeleteById(int id) {
+        return await _repo.DeleteAsync(a => a.Id == id);
     }
 }
