@@ -12,16 +12,16 @@ public class VisitRecordService {
         _repo = repo;
     }
 
-    public VisitRecord? GetById(int id) {
-        var item = _repo.Where(a => a.Id == id).First();
+    public async Task<VisitRecord?> GetById(int id) {
+        var item = await _repo.Where(a => a.Id == id).FirstAsync();
         return item;
     }
 
-    public List<VisitRecord> GetAll() {
-        return _repo.Select.OrderByDescending(a => a.Time).ToList();
+    public async Task<List<VisitRecord>> GetAll() {
+        return await _repo.Select.OrderByDescending(a => a.Time).ToListAsync();
     }
 
-    public IPagedList<VisitRecord> GetPagedList(VisitRecordQueryParameters param) {
+    public async Task<IPagedList<VisitRecord>> GetPagedList(VisitRecordQueryParameters param) {
         var querySet = _repo.Select;
 
         // 搜索
@@ -37,16 +37,16 @@ public class VisitRecordService {
             querySet = querySet.OrderByPropertyName(orderByProperty, isAscending);
         }
 
-        return querySet.ToList().ToPagedList(param.Page, param.PageSize);
+        return (await querySet.ToListAsync()).ToPagedList(param.Page, param.PageSize);
     }
 
     /// <summary>
     /// 总览数据
     /// </summary>
     /// <returns></returns>
-    public object Overview() {
-        return _repo.Where(a => !a.RequestPath.StartsWith("/Api"))
-            .ToAggregate(g => new {
+    public async Task<object> Overview() {
+        return await _repo.Where(a => !a.RequestPath.StartsWith("/Api"))
+            .ToAggregateAsync(g => new {
                 TotalVisit = g.Count(),
                 TodayVisit = g.Sum(g.Key.Time.Date == DateTime.Today ? 1 : 0),
                 YesterdayVisit = g.Sum(g.Key.Time.Date == DateTime.Today.AddDays(-1).Date ? 1 : 0)
@@ -58,11 +58,11 @@ public class VisitRecordService {
     /// </summary>
     /// <param name="days">查看最近几天的数据，默认7天</param>
     /// <returns></returns>
-    public object Trend(int days = 7) {
-        return _repo.Where(a => !a.RequestPath.StartsWith("/Api"))
+    public async Task<object> Trend(int days = 7) {
+        return await _repo.Where(a => !a.RequestPath.StartsWith("/Api"))
             .Where(a => a.Time.Date > DateTime.Today.AddDays(-days).Date)
             .GroupBy(a => a.Time.Date)
-            .ToList(a => new {
+            .ToListAsync(a => new {
                 time = a.Key,
                 date = $"{a.Key.Month}-{a.Key.Day}",
                 count = a.Count()
@@ -73,11 +73,11 @@ public class VisitRecordService {
     /// 统计数据
     /// </summary>
     /// <returns></returns>
-    public object Stats(DateTime date) {
-        return _repo.Where(
+    public async Task<object> Stats(DateTime date) {
+        return await _repo.Where(
             a => a.Time.Date == date.Date
                  && !a.RequestPath.StartsWith("/Api")
-        ).ToAggregate(g => new {
+        ).ToAggregateAsync(g => new {
             Count = g.Count()
         });
     }

@@ -153,7 +153,7 @@ public class PostService {
     /// <summary>
     /// 将 Post 对象转换为 PostViewModel 对象
     /// </summary>
-    public PostViewModel GetPostViewModel(Post post, bool md2Html = true) {
+    public async Task<PostViewModel> GetPostViewModel(Post post, bool md2Html = true) {
         var model = new PostViewModel {
             Id = post.Id,
             Title = post.Title,
@@ -163,7 +163,7 @@ public class PostService {
             Url = _generator.GetUriByAction(
                 _accessor.HttpContext!,
                 "Post", "Blog",
-                new { post.Id }
+                new {post.Id}
             ),
             CreationTime = post.CreationTime,
             LastUpdateTime = post.LastUpdateTime,
@@ -183,9 +183,11 @@ public class PostService {
             model.ContentHtml = Markdown.ToHtml(model.Content, pipeline);
         }
 
-        foreach (var itemId in post.Categories.Split(",").Select(int.Parse)) {
-            var item = _categoryRepo.Where(a => a.Id == itemId).First();
-            if (item != null) model.Categories.Add(item);
+        if (post.Categories != null) {
+            foreach (var itemId in post.Categories.Split(",").Select(int.Parse)) {
+                var item = await _categoryRepo.Where(a => a.Id == itemId).FirstAsync();
+                if (item != null) model.Categories.Add(item);
+            }
         }
 
         return model;
@@ -217,9 +219,9 @@ public class PostService {
         var document = Markdown.Parse(post.Content);
 
         foreach (var node in document.AsEnumerable()) {
-            if (node is not ParagraphBlock { Inline: { } } paragraphBlock) continue;
+            if (node is not ParagraphBlock {Inline: { }} paragraphBlock) continue;
             foreach (var inline in paragraphBlock.Inline) {
-                if (inline is not LinkInline { IsImage: true } linkInline) continue;
+                if (inline is not LinkInline {IsImage: true} linkInline) continue;
 
                 var imgUrl = linkInline.Url;
                 if (imgUrl == null) continue;
@@ -259,9 +261,9 @@ public class PostService {
 
         var document = Markdown.Parse(post.Content);
         foreach (var node in document.AsEnumerable()) {
-            if (node is not ParagraphBlock { Inline: { } } paragraphBlock) continue;
+            if (node is not ParagraphBlock {Inline: { }} paragraphBlock) continue;
             foreach (var inline in paragraphBlock.Inline) {
-                if (inline is not LinkInline { IsImage: true } linkInline) continue;
+                if (inline is not LinkInline {IsImage: true} linkInline) continue;
 
                 var imgUrl = linkInline.Url;
                 // 跳过空链接

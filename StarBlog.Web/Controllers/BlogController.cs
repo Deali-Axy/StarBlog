@@ -33,7 +33,7 @@ public class BlogController : Controller {
 
     public async Task<IActionResult> List(int categoryId = 0, int page = 1, int pageSize = 5) {
         var currentCategory = categoryId == 0
-            ? new Category { Id = 0, Name = "All" }
+            ? new Category {Id = 0, Name = "All"}
             : await _categoryRepo.Where(a => a.Id == categoryId).FirstAsync();
 
         if (currentCategory == null) {
@@ -77,7 +77,7 @@ public class BlogController : Controller {
             viewName = "Post.BackendRender";
         }
 
-        return View(viewName, _postService.GetPostViewModel(post));
+        return View(viewName, await _postService.GetPostViewModel(post));
     }
 
     public IActionResult RandomPost() {
@@ -90,7 +90,7 @@ public class BlogController : Controller {
         var rndPost = posts[new Random().Next(posts.Count)];
         _messages.Info($"随机推荐了文章 <b>{rndPost.Title}</b> 给你~" +
                        $"<span class='ps-3'><a href=\"{Url.Action(nameof(RandomPost))}\">再来一次</a></span>");
-        return RedirectToAction(nameof(Post), new { id = rndPost.Id });
+        return RedirectToAction(nameof(Post), new {id = rndPost.Id});
     }
 
     public IActionResult Temp() {

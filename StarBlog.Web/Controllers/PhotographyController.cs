@@ -59,7 +59,8 @@ public class PhotographyController : Controller {
             return RedirectToAction("Index", "Home");
         }
 
-        _messages.Info($"随机推荐了图片 <b>{item.Title}</b> 给你~");
+        _messages.Info($"随机推荐了图片 <b>{item.Title}</b> 给你~" +
+                       $"<span class='ps-3'><a href=\"{Url.Action(nameof(RandomPhoto))}\">再来一次</a></span>");
         return RedirectToAction(nameof(Photo), new {id = item.Id});
     }
 }
