@@ -28,6 +28,7 @@ builder.Services.AddCors(options => {
         policyBuilder.AllowAnyMethod();
         // policyBuilder.AllowAnyOrigin();
         policyBuilder.WithOrigins("http://localhost:8080");
+        policyBuilder.WithOrigins("https://deali.cn");
     });
 });
 builder.Services.AddStaticRobotsTxt(builder => builder
