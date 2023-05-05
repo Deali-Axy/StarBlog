@@ -1,4 +1,5 @@
 ﻿using CodeLab.Share.ViewModels.Response;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StarBlog.Data.Models;
 using StarBlog.Web.Extensions;
@@ -9,6 +10,7 @@ namespace StarBlog.Web.Apis.Admin;
 /// <summary>
 /// 配置中心
 /// </summary>
+[Authorize]
 [ApiController]
 [Route("Api/[controller]")]
 [ApiExplorerSettings(GroupName = ApiGroups.Admin)]

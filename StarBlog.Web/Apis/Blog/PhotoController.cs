@@ -12,6 +12,7 @@ namespace StarBlog.Web.Apis.Blog;
 /// <summary>
 /// 摄影
 /// </summary>
+[Authorize]
 [ApiController]
 [Route("Api/[controller]")]
 [ApiExplorerSettings(GroupName = ApiGroups.Blog)]
@@ -22,6 +23,7 @@ public class PhotoController : ControllerBase {
         _photoService = photoService;
     }
 
+    [AllowAnonymous]
     [HttpGet]
     public async Task<ApiResponsePaged<Photo>> GetList(int page = 1, int pageSize = 10) {
         var paged = await _photoService.GetPagedList(page, pageSize);
@@ -31,6 +33,7 @@ public class PhotoController : ControllerBase {
         };
     }
 
+    [AllowAnonymous]
     [HttpGet("{id}")]
     public async Task<ApiResponse<Photo>> Get(string id) {
         var photo = await _photoService.GetById(id);
@@ -39,13 +42,13 @@ public class PhotoController : ControllerBase {
             : new ApiResponse<Photo> {Data = photo};
     }
 
+    [AllowAnonymous]
     [HttpGet("{id}/Thumb")]
     public async Task<IActionResult> GetThumb(string id, [FromQuery] int width = 300) {
         var data = await _photoService.GetThumb(id, width);
         return new FileContentResult(data, "image/jpeg");
     }
 
-    [Authorize]
     [HttpPost]
     public async Task<ApiResponse<Photo>> Add([FromForm] PhotoCreationDto dto, IFormFile file) {
         var photo = await _photoService.Add(dto, file);
@@ -55,7 +58,6 @@ public class PhotoController : ControllerBase {
             : new ApiResponse<Photo>(photo);
     }
 
-    [Authorize]
     [HttpDelete("{id}")]
     public async Task<ApiResponse> Delete(string id) {
         var photo = await _photoService.GetById(id);
@@ -69,8 +71,6 @@ public class PhotoController : ControllerBase {
     /// <summary>
     /// 设置为推荐图片
     /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
     [HttpPost("{id}/[action]")]
     public async Task<ApiResponse<FeaturedPhoto>> SetFeatured(string id) {
         var photo = await _photoService.GetById(id);
@@ -82,8 +82,6 @@ public class PhotoController : ControllerBase {
     /// <summary>
     /// 取消推荐
     /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
     [HttpPost("{id}/[action]")]
     public async Task<ApiResponse> CancelFeatured(string id) {
         var photo = await _photoService.GetById(id);
@@ -95,8 +93,6 @@ public class PhotoController : ControllerBase {
     /// <summary>
     /// 重建图片库数据（重新扫描每张图片的大小等数据）
     /// </summary>
-    /// <returns></returns>
-    [Authorize]
     [HttpPost("[action]")]
     public async Task<ApiResponse> ReBuildData() {
         return ApiResponse.Ok(new {
@@ -107,8 +103,6 @@ public class PhotoController : ControllerBase {
     /// <summary>
     /// 批量导入图片
     /// </summary>
-    /// <returns></returns>
-    [Authorize]
     [HttpPost("[action]")]
     public async Task<ApiResponse<List<Photo>>> BatchImport() {
         var result = await _photoService.BatchImport();
