@@ -53,6 +53,11 @@ public class HomeController : Controller {
 
     [HttpPost]
     public IActionResult Init([FromServices] ConfigService conf, [FromServices] IBaseRepository<User> userRepo, InitViewModel vm) {
+        if (conf["is_init"] == "true") {
+            _messages.Error("已经完成初始化！");
+            return RedirectToAction(nameof(Index));
+        }
+        
         if (!ModelState.IsValid) return View();
 
         // 保存配置

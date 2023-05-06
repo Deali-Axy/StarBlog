@@ -65,6 +65,7 @@ public class BlogController : ControllerBase {
     /// 上传博客压缩包 + 导入
     /// </summary>
     /// <returns></returns>
+    [Authorize]
     [HttpPost("[action]")]
     public async Task<ApiResponse<Post>> Upload([FromForm] PostCreationDto dto, IFormFile file,
         [FromServices] CategoryService categoryService

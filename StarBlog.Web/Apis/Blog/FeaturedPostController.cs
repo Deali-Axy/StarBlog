@@ -1,5 +1,6 @@
 ﻿using CodeLab.Share.ViewModels.Response;
 using FreeSql;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StarBlog.Data.Models;
 using StarBlog.Web.Extensions;
@@ -10,6 +11,7 @@ namespace StarBlog.Web.Apis.Blog;
 /// <summary>
 /// 推荐博客
 /// </summary>
+[Authorize]
 [ApiController]
 [Route("Api/[controller]")]
 [ApiExplorerSettings(GroupName = ApiGroups.Blog)]
@@ -22,6 +24,7 @@ public class FeaturedPostController : ControllerBase {
         _postRepo = postRepo;
     }
 
+    [AllowAnonymous]
     [HttpGet]
     public ApiResponse<List<FeaturedPost>> GetList() {
         return new ApiResponse<List<FeaturedPost>>(
@@ -29,6 +32,7 @@ public class FeaturedPostController : ControllerBase {
         );
     }
 
+    [AllowAnonymous]
     [HttpGet("{id:int}")]
     public ApiResponse<FeaturedPost> Get(int id) {
         var item = _featuredPostRepo.Where(a => a.Id == id)

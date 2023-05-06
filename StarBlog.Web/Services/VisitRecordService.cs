@@ -37,6 +37,7 @@ public class VisitRecordService {
             querySet = querySet.OrderByPropertyName(orderByProperty, isAscending);
         }
 
+        // todo 不能这样分页，得用数据库分页，不然性能很差
         return (await querySet.ToListAsync()).ToPagedList(param.Page, param.PageSize);
     }
 

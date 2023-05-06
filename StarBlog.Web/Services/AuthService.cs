@@ -11,25 +11,25 @@ using StarBlog.Web.ViewModels.Auth;
 namespace StarBlog.Web.Services;
 
 public class AuthService {
-    private readonly SecuritySettings _securitySettings;
+    private readonly Auth _auth;
     private readonly IBaseRepository<User> _userRepo;
 
-    public AuthService(IOptions<SecuritySettings> options, IBaseRepository<User> userRepo) {
-        _securitySettings = options.Value;
+    public AuthService(IOptions<Auth> options, IBaseRepository<User> userRepo) {
+        _auth = options.Value;
         _userRepo = userRepo;
     }
 
     public LoginToken GenerateLoginToken(User user) {
         var claims = new List<Claim> {
-            new("username", user.Name),
-            new(JwtRegisteredClaimNames.Name, user.Id), // User.Identity.Name
+            new(JwtRegisteredClaimNames.Sub, user.Id), // User.Identity.Name
+            new(JwtRegisteredClaimNames.GivenName, user.Name),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()), // JWT ID
         };
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_securitySettings.Token.Key));
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_auth.Jwt.Key));
         var signCredential = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
         var jwtToken = new JwtSecurityToken(
-            issuer: _securitySettings.Token.Issuer,
-            audience: _securitySettings.Token.Audience,
+            issuer: _auth.Jwt.Issuer,
+            audience: _auth.Jwt.Audience,
             claims: claims,
             expires: DateTime.Now.AddDays(7),
             signingCredentials: signCredential);
@@ -49,8 +49,9 @@ public class AuthService {
     }
 
     public User? GetUser(ClaimsPrincipal userClaim) {
-        var userId = userClaim.Identity?.Name;
-        var userName = userClaim.Claims.FirstOrDefault(c => c.Type == "username")?.Value;
+        var userId = userClaim.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Sub)?.Value;
+        var userName = userClaim.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.GivenName)?.Value;
+        var temp = userClaim.FindFirst(JwtRegisteredClaimNames.Name)?.Value;
         if (userId == null || userName == null) return null;
         return new User { Id = userId, Name = userName };
     }
