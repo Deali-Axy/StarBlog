@@ -3,6 +3,9 @@ using StarBlog.Data.Models;
 
 namespace StarBlog.Web.Services;
 
+/// <summary>
+/// 友情链接申请
+/// </summary>
 public class LinkExchangeService {
     private readonly IBaseRepository<LinkExchange> _repo;
     private readonly LinkService _linkService;
@@ -10,6 +13,17 @@ public class LinkExchangeService {
     public LinkExchangeService(IBaseRepository<LinkExchange> repo, LinkService linkService) {
         _repo = repo;
         _linkService = linkService;
+    }
+    
+    /// <summary>
+    /// 查询 id 是否存在
+    /// </summary>
+    public async Task<bool> HasId(int id) {
+        return await _repo.Where(a => a.Id == id).AnyAsync();
+    }
+
+    public async Task<bool> HasUrl(string url) {
+        return await _repo.Where(a => a.Url.Contains(url)).AnyAsync();
     }
 
     public async Task<List<LinkExchange>> GetAll() {
@@ -24,11 +38,12 @@ public class LinkExchangeService {
         return await _repo.InsertOrUpdateAsync(item);
     }
 
-    public async Task<LinkExchange?> SetVerifyStatus(int id, bool status) {
-        var item =await GetById(id);
+    public async Task<LinkExchange?> SetVerifyStatus(int id, bool status, string? reason = null) {
+        var item = await GetById(id);
         if (item == null) return null;
 
         item.Verified = status;
+        item.Reason = reason;
         await _repo.UpdateAsync(item);
 
 

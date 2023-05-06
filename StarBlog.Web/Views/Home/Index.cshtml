@@ -94,12 +94,15 @@
 </div>
 
 <div class="container px-4 py-3">
-    <h2 class="pb-2 border-bottom">Link Exchange</h2>
+    <div class="d-flex justify-content-between mb-2 border-bottom">
+        <h2>友情链接</h2>
+        <a class="btn btn-link" asp-controller="LinkExchange" asp-action="Add">申请友链</a>
+    </div>
     @if (Model.Links.Any()) {
         <div class="d-grid gap-2 d-md-block">
             @foreach (var link in Model.Links) {
                 @await Html.PartialAsync("Widgets/ColorfulButton",
-                    new ColorfulButtonViewModel { Name = link.Name, Url = link.Url })
+                           new ColorfulButtonViewModel { Name = link.Name, Url = link.Url })
             }
         </div>
     }

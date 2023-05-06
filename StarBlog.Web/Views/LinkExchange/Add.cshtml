@@ -1,0 +1,102 @@
+﻿@model StarBlog.Web.ViewModels.LinkExchange.LinkExchangeAddViewModel
+@{
+    ViewData["Title"] = "申请友链";
+}
+
+
+<div class="container px-4 py-3">
+    <h2 class="d-flex w-100 justify-content-between pb-2 mb-3 border-bottom">
+        <div>申请友链</div>
+        <div>Link Exchange</div>
+    </h2>
+
+    <div class="card px-1 py-3">
+        <form enctype="multipart/form-data" class="card-body row" asp-controller="LinkExchange" asp-action="Add" method="post">
+            <div class="col-xl-6">
+                <div class="mb-4">
+                    <h4 class="card-title">友链信息</h4>
+                    <h6 class="card-subtitle mb-3 text-muted">请输入您的网站信息，方便后续联系</h6>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label"></label>
+                    <input asp-for="Name" class="form-control">
+                    <span asp-validation-for="Name" class="form-text text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label"></label>
+                    <input asp-for="Description" class="form-control">
+                    <span asp-validation-for="Description" class="form-text text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Url" class="form-label"></label>
+                    <input asp-for="Url" class="form-control">
+                    <span asp-validation-for="Url" class="form-text text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="WebMaster" class="form-label"></label>
+                    <input asp-for="WebMaster" class="form-control">
+                    <span asp-validation-for="WebMaster" class="form-text text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label"></label>
+                    <input asp-for="Email" class="form-control">
+                    <span asp-validation-for="Email" class="form-text text-danger"></span>
+                </div>
+            </div>
+
+            <div class="col-xl-6">
+                <div class="ms-3 mb-4">
+                    <h4 class="card-title">注意事项</h4>
+                    <h6 class="card-subtitle mb-3 text-muted">申请友情链接需符合以下几点要求</h6>
+                </div>
+
+                <ul class="list-group list-group-flush list-group-numbered">
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                        <div class="ms-2 me-auto">
+                            <div class="fw-bold">相互性</div>
+                            请先在您的网站添加本站链接，再进行友链申请
+                        </div>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                        <div class="ms-2 me-auto">
+                            <div class="fw-bold">内容类别</div>
+                            本站优先招同类原创、内容相近的博客或网站
+                        </div>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                        <div class="ms-2 me-auto">
+                            <div class="fw-bold">SEO</div>
+                            Baidu和Google有正常收录，有近期快照的网站优先
+                        </div>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                        <div class="ms-2 me-auto">
+                            <div class="fw-bold">合法性</div>
+                            不含有违反相关国家法律内容的合法网站，不接受TB客等垃圾站的链接
+                        </div>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                        <div class="ms-2 me-auto">
+                            <div class="fw-bold">更新及时性</div>
+                            不接受原创内容很少，且长期不更新的网站
+                        </div>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                        <div class="ms-2 me-auto">
+                            <div class="fw-bold">可访问性</div>
+                            如您的网站无法访问，将会暂时撤销友情链接，如需恢复请联系站长处理
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-outline-primary">提交</button>
+                <button type="reset" class="btn btn-outline-warning">重置</button>
+            </div>
+        </form>
+    </div>
+
+
+</div>

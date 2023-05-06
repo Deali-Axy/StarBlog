@@ -15,7 +15,7 @@ namespace StarBlog.Web.Apis.Links;
 [Authorize]
 [ApiController]
 [Route("Api/[controller]")]
-[ApiExplorerSettings(GroupName = ApiGroups.Blog)]
+[ApiExplorerSettings(GroupName = ApiGroups.Link)]
 public class LinkController : ControllerBase {
     private readonly LinkService _service;
     private readonly IMapper _mapper;

@@ -41,6 +41,12 @@ public class LinkExchange {
     public bool Verified { get; set; } = false;
 
     /// <summary>
+    /// 原因
+    /// <para>如果验证不通过的话，可能会附上原因</para>
+    /// </summary>
+    public string? Reason { get; set; }
+
+    /// <summary>
     /// 申请时间
     /// </summary>
     public DateTime ApplyTime { get; set; } = DateTime.Now;

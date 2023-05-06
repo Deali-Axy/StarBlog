@@ -3,6 +3,9 @@ using StarBlog.Data.Models;
 
 namespace StarBlog.Web.Services;
 
+/// <summary>
+/// 友情链接
+/// </summary>
 public class LinkService {
     private IBaseRepository<Link> _repo;
 
@@ -14,7 +17,6 @@ public class LinkService {
     /// 获取全部友情链接
     /// </summary>
     /// <param name="onlyVisible">只获取显示的链接</param>
-    /// <returns></returns>
     public async Task<List<Link>> GetAll(bool onlyVisible = true) {
         return onlyVisible
             ? await _repo.Where(a => a.Visible).ToListAsync()
