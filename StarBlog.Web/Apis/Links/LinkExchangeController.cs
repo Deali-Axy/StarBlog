@@ -40,11 +40,7 @@ public class LinkExchangeController : ControllerBase {
 
     [HttpPost("{id:int}/[action]")]
     public async Task<ApiResponse> Accept(int id, [FromBody] LinkExchangeVerityDto dto) {
-        var item = await _service.GetById(id);
-        if (item != null) {
-            return ApiResponse.NotFound();
-        }
-
+        if (!await _service.HasId(id)) return ApiResponse.NotFound();
         await _service.SetVerifyStatus(id, true, dto.Reason);
         return ApiResponse.Ok();
     }
