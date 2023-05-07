@@ -1,5 +1,6 @@
 ﻿using FreeSql;
 using Microsoft.AspNetCore.Mvc;
+using StarBlog.Contrib.Security;
 using StarBlog.Contrib.SiteMessage;
 using StarBlog.Data.Models;
 using StarBlog.Web.Services;
@@ -66,11 +67,11 @@ public class HomeController : Controller {
         conf["is_init"] = "true";
 
         // 创建用户
-        // todo 这里暂时存储明文密码，后期要换成MD5加密存储
+        // to do 这里暂时存储明文密码，后期要换成MD5加密存储。2023-5-7 搞定
         userRepo.Insert(new User {
             Id = Guid.NewGuid().ToString(),
             Name = vm.Username,
-            Password = vm.Password
+            Password = vm.Password.ToMd5String()
         });
 
         _messages.Success("初始化完成！");
