@@ -11,11 +11,11 @@
     <div class="card-body">
         <h5 class="card-title">
             <a class="stretched-link" asp-controller="Photography" asp-action="Photo" asp-route-id="@Model.Id">
-                @Model.Title.Limit(20)
+                @Model.Title.Limit(8)
             </a>
         </h5>
         <div class="card-text d-flex justify-content-between small">
-            <span>@Model.Location.Limit(10)</span>
+            <span>@Model.Location.Limit(8)</span>
             <span>
                 @Model.CreateTime.ToShortDateString()
                 @Model.CreateTime.ToShortTimeString()
