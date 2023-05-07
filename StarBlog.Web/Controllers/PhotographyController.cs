@@ -1,9 +1,7 @@
-﻿using FreeSql;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using StarBlog.Contrib.SiteMessage;
-using StarBlog.Data.Models;
 using StarBlog.Web.Services;
-using StarBlog.Web.ViewModels;
+using StarBlog.Web.ViewModels.Photography;
 
 namespace StarBlog.Web.Controllers;
 
