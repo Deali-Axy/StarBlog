@@ -14,6 +14,7 @@
     var btnColor = colorList[rnd.Next(0, colorList.Length)];
 }
 
-<a href="@Model.Url" role="button" class="btn btn-sm @btnColor mb-1" target="@Model.Target">
+<a href="@Model.Url" role="button" class="btn btn-sm @btnColor mb-1" target="@Model.Target"
+   data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="@Model.Tooltips">
     @Model.Name
 </a>

@@ -39,7 +39,7 @@
 
 <div class="container px-4 py-3" id="custom-cards">
     <h2 class="pb-2 border-bottom">Photography</h2>
-    
+
     @if (Model.FeaturedPhotos.Any()) {
         <div class="row row-cols-1 row-cols-lg-3 align-items-stretch g-4 py-5">
             @foreach (var photo in Model.FeaturedPhotos) {
@@ -102,7 +102,7 @@
         <div class="d-grid gap-2 d-md-block">
             @foreach (var link in Model.Links) {
                 @await Html.PartialAsync("Widgets/ColorfulButton",
-                           new ColorfulButtonViewModel { Name = link.Name, Url = link.Url })
+                           new ColorfulButtonViewModel {Name = link.Name, Url = link.Url, Tooltips = link.Description})
             }
         </div>
     }
