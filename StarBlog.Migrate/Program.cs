@@ -3,7 +3,7 @@
 using StarBlog.Share.Extensions;
 using StarBlog.Data;
 using StarBlog.Data.Models;
-using StarBlog.Contrib.Utils;
+using StarBlog.Share.Utils;
 using StarBlog.Share;
 
 const string importDir = @"E:\Documents\0_Write\0_blog\";
@@ -28,11 +28,11 @@ var categoryRepo = freeSql.GetRepository<Category>();
 // 数据导入
 WalkDirectoryTree(new DirectoryInfo(importDir));
 
-// 覆盖数据库
+// 复制数据库
 var destFile = Path.GetFullPath("../../../../StarBlog.Web/app.db");
-if (File.Exists("app.db") && File.Exists(destFile)) {
-    Console.WriteLine($"覆盖数据库：{destFile}");
-    File.Copy("app.db", destFile, true);   
+if (File.Exists("app.db")) {
+    Console.WriteLine($"复制数据库：{destFile}");
+    File.Copy("app.db", destFile, true);
 }
 
 void WalkDirectoryTree(DirectoryInfo root) {
@@ -116,16 +116,18 @@ void WalkDirectoryTree(DirectoryInfo root) {
     // Now find all the subdirectories under this directory.
     subDirs = root.GetDirectories();
 
-    foreach (var dirInfo in subDirs) {
-        if (exclusionDirs.Contains(dirInfo.Name)) {
-            continue;
-        }
+    if (subDirs != null) {
+        foreach (var dirInfo in subDirs) {
+            if (exclusionDirs.Contains(dirInfo.Name)) {
+                continue;
+            }
 
-        if (dirInfo.Name.EndsWith(".assets")) {
-            continue;
-        }
+            if (dirInfo.Name.EndsWith(".assets")) {
+                continue;
+            }
 
-        // Resursive call for each subdirectory.
-        WalkDirectoryTree(dirInfo);
+            // Resursive call for each subdirectory.
+            WalkDirectoryTree(dirInfo);
+        }
     }
 }

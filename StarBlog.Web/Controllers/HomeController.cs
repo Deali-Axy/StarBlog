@@ -1,8 +1,8 @@
 ﻿using FreeSql;
 using Microsoft.AspNetCore.Mvc;
-using StarBlog.Contrib.Security;
 using StarBlog.Contrib.SiteMessage;
 using StarBlog.Data.Models;
+using StarBlog.Share.Extensions;
 using StarBlog.Web.Services;
 using StarBlog.Web.ViewModels;
 
@@ -71,7 +71,7 @@ public class HomeController : Controller {
         userRepo.Insert(new User {
             Id = Guid.NewGuid().ToString(),
             Name = vm.Username,
-            Password = vm.Password.ToMd5String()
+            Password = vm.Password.ToSHA256()
         });
 
         _messages.Success("初始化完成！");

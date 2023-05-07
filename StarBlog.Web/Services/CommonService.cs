@@ -1,5 +1,5 @@
 ﻿using System.Net;
-using StarBlog.Contrib.Utils;
+using StarBlog.Share.Utils;
 
 namespace StarBlog.Web.Services;
 

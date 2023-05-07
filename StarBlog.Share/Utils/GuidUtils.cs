@@ -1,4 +1,4 @@
-﻿namespace StarBlog.Contrib.Utils;
+﻿namespace StarBlog.Share.Utils;
 
 public static class GuidUtils {
     /// <summary>

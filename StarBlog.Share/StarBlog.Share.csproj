@@ -12,6 +12,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="MailKit" Version="4.0.0" />
         <PackageReference Include="Markdig" Version="0.30.2" />
     </ItemGroup>
 

@@ -1,8 +1,8 @@
 ﻿using CodeLab.Share.ViewModels.Response;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using StarBlog.Contrib.Security;
 using StarBlog.Data.Models;
+using StarBlog.Share.Extensions;
 using StarBlog.Web.Extensions;
 using StarBlog.Web.Services;
 using StarBlog.Web.ViewModels.Auth;
@@ -32,7 +32,7 @@ public class AuthController : ControllerBase {
     public async Task<ApiResponse> Login(LoginUser loginUser) {
         var user = await _authService.GetUserByName(loginUser.Username);
         if (user == null) return ApiResponse.Unauthorized("用户名或密码错误");
-        if (loginUser.Password.ToMd5String() != user.Password) return ApiResponse.Unauthorized("用户名或密码错误");
+        if (loginUser.Password.ToSHA256() != user.Password) return ApiResponse.Unauthorized("用户名或密码错误");
         return ApiResponse.Ok(_authService.GenerateLoginToken(user));
     }
 

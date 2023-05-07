@@ -4,7 +4,7 @@ using Markdig;
 using Markdig.Renderers.Normalize;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
-using StarBlog.Contrib.Utils;
+using StarBlog.Share.Utils;
 using StarBlog.Data.Models;
 using StarBlog.Share.Extensions.Markdown;
 using StarBlog.Web.ViewModels;
