@@ -36,7 +36,10 @@ public class LinkExchangeController : Controller {
         }
 
         var item = _mapper.Map<LinkExchange>(vm);
-        await _service.AddOrUpdate(item);
+        item = await _service.AddOrUpdate(item);
+
+        // 发送邮件通知
+        await _service.SendEmailOnAdd(item);
 
         _messages.Info("友链申请已提交，正在处理中，请及时关注邮件通知~");
         return RedirectToAction("Index", "Home");
