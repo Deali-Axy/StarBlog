@@ -120,7 +120,7 @@ public class BlogService {
         // 使用 GBK 编码解压，防止中文文件名乱码
         // 参考：https://www.cnblogs.com/liguix/p/11883248.html
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-        ZipFile.ExtractToDirectory(tempFile, extractPath, Encoding.GetEncoding("GBK"));
+        ZipFile.ExtractToDirectory(tempFile, extractPath);
 
         var dir = new DirectoryInfo(extractPath);
         var files = dir.GetFiles("*.md");
