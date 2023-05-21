@@ -27,7 +27,7 @@ public class LinkController : ControllerBase {
 
     [HttpGet]
     public async Task<List<Link>> GetAll() {
-        return await _service.GetAll();
+        return await _service.GetAll(false);
     }
 
     [HttpGet("{id:int}")]
