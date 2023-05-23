@@ -117,10 +117,10 @@ public class BlogService {
         }
 
         var extractPath = Path.Combine(Path.GetTempPath(), "StarBlog", Guid.NewGuid().ToString());
-        // 使用 GBK 编码解压，防止中文文件名乱码
-        // 参考：https://www.cnblogs.com/liguix/p/11883248.html
+
+        // 使用指定编码解压，防止中文文件名乱码
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-        ZipFile.ExtractToDirectory(tempFile, extractPath);
+        ZipFile.ExtractToDirectory(tempFile, extractPath, Encoding.GetEncoding(dto.ZipEncoding));
 
         var dir = new DirectoryInfo(extractPath);
         var files = dir.GetFiles("*.md");
