@@ -29,17 +29,27 @@ public static class ToC {
         }
 
         var chineseTitleCount = 0;
+        var slugMap = new Dictionary<string, int>();
         for (var i = 0; i < headings.Count; i++) {
             var item = headings[i];
             item.Id = i;
 
             var text = item.Text ?? "";
-            if (Regex.IsMatch(text, "[\u4e00-\u9fbb]")) {
+            // 包含中文且不包含英文的转换为 section-1 格式
+            if (Regex.IsMatch(text, "^((?![a-zA-Z]).)*[\u4e00-\u9fbb]((?![a-zA-Z]).)*$")) {
                 item.Slug = chineseTitleCount == 0 ? "section" : $"section-{chineseTitleCount}";
                 chineseTitleCount++;
             }
+            // 其他情况处理为只包含英文数字格式
             else {
-                item.Slug = text.Replace(" ", "-").ToLower();
+                item.Slug = Regex.Replace(text, @"[^a-zA-Z0-9\s]+", "")
+                    .Trim().Replace(" ", "-").ToLower();
+                if (slugMap.ContainsKey(item.Slug)) {
+                    item.Slug = $"{item.Slug}-{slugMap[item.Slug]++}";
+                }
+                else {
+                    slugMap[item.Slug] = 1;
+                }
             }
 
             for (var j = i; j >= 0; j--) {
