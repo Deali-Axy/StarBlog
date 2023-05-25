@@ -31,7 +31,7 @@ public class BlogController : Controller {
         _configService = configService;
     }
 
-    public async Task<IActionResult> List(int categoryId = 0, int page = 1, int pageSize = 5) {
+    public async Task<IActionResult> List(int categoryId = 0, int page = 1, int pageSize = 6) {
         var currentCategory = categoryId == 0
             ? new Category {Id = 0, Name = "All"}
             : await _categoryRepo.Where(a => a.Id == categoryId).FirstAsync();
