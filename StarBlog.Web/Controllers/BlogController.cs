@@ -87,7 +87,7 @@ public class BlogController : Controller {
             return RedirectToAction("Index", "Home");
         }
 
-        var rndPost = posts[new Random().Next(posts.Count)];
+        var rndPost = posts[Random.Shared.Next(posts.Count)];
         _messages.Info($"随机推荐了文章 <b>{rndPost.Title}</b> 给你~" +
                        $"<span class='ps-3'><a href=\"{Url.Action(nameof(RandomPost))}\">再来一次</a></span>");
         return RedirectToAction(nameof(Post), new {id = rndPost.Id});
