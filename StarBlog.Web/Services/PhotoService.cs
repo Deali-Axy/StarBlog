@@ -112,7 +112,7 @@ public class PhotoService {
             return null;
         }
 
-        return await _photoRepo.Select.Take(1).Offset(new Random().Next((int) count)).FirstAsync();
+        return await _photoRepo.Select.Take(1).Offset(Random.Shared.Next((int) count)).FirstAsync();
     }
 
     /// <summary>
