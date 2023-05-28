@@ -14,6 +14,12 @@ public class Post {
     /// 标题
     /// </summary>
     public string Title { get; set; }
+
+    /// <summary>
+    /// 文章链接，设置后可以通过以下形式访问文章
+    /// <para> http://starblog.com/p/post-slug1 </para>
+    /// </summary>
+    public string? Slug { get; set; }
     
     /// <summary>
     /// 文章状态，提取原markdown文件的文件名前缀，用于区分文章状态，例子如下
@@ -64,5 +70,8 @@ public class Post {
     /// </summary>
     public Category? Category { get; set; }
 
+    /// <summary>
+    /// 文章的分类层级, 其内容类似这样 `1,2,3` , 用逗号分隔开分类ID
+    /// </summary>
     public string? Categories { get; set; }
 }

@@ -1,7 +1,7 @@
 ﻿using FreeSql;
 using Microsoft.AspNetCore.Mvc;
-using StarBlog.Contrib.SiteMessage;
 using StarBlog.Data.Models;
+using StarBlog.Web.Contrib.SiteMessage;
 using StarBlog.Web.Services;
 using StarBlog.Web.ViewModels.Blog;
 using StarBlog.Web.ViewModels.QueryFilters;
@@ -10,7 +10,7 @@ using X.PagedList;
 namespace StarBlog.Web.Controllers;
 
 public class BlogController : Controller {
-    private readonly Messages _messages;
+    private readonly MessageService _messages;
     private readonly IBaseRepository<Post> _postRepo;
     private readonly IBaseRepository<Category> _categoryRepo;
     private readonly PostService _postService;
@@ -20,7 +20,7 @@ public class BlogController : Controller {
     public BlogController(IBaseRepository<Post> postRepo,
         IBaseRepository<Category> categoryRepo,
         PostService postService,
-        Messages messages,
+        MessageService messages,
         CategoryService categoryService,
         ConfigService configService) {
         _postRepo = postRepo;

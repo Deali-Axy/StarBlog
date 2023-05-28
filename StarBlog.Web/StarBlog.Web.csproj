@@ -57,4 +57,8 @@
         <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap-treeview\dist\bootstrap-treeview.min.js" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Contrib\" />
+    </ItemGroup>
+
 </Project>

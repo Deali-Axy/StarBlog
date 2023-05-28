@@ -1,8 +1,8 @@
 ﻿using FreeSql;
 using Microsoft.AspNetCore.Mvc;
-using StarBlog.Contrib.SiteMessage;
 using StarBlog.Data.Models;
 using StarBlog.Share.Extensions;
+using StarBlog.Web.Contrib.SiteMessage;
 using StarBlog.Web.Services;
 using StarBlog.Web.ViewModels;
 
@@ -13,10 +13,10 @@ public class HomeController : Controller {
     private readonly PhotoService _photoService;
     private readonly CategoryService _categoryService;
     private readonly LinkService _linkService;
-    private readonly Messages _messages;
+    private readonly MessageService _messages;
 
     public HomeController(BlogService blogService, PhotoService photoService, CategoryService categoryService, LinkService linkService,
-        Messages messages) {
+        MessageService messages) {
         _blogService = blogService;
         _photoService = photoService;
         _categoryService = categoryService;

@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.HttpOverrides;
 using RobotsTxt;
 using SixLabors.ImageSharp.Web.DependencyInjection;
-using StarBlog.Contrib.SiteMessage;
 using StarBlog.Data.Extensions;
+using StarBlog.Web.Contrib.SiteMessage;
 using StarBlog.Web.Extensions;
 using StarBlog.Web.Filters;
 using StarBlog.Web.Middlewares;
@@ -18,6 +18,12 @@ if (builder.Environment.IsDevelopment()) {
     mvcBuilder.AddRazorRuntimeCompilation();
 }
 
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddSession(options => {
+    options.IdleTimeout = TimeSpan.FromHours(1);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddFreeSql(builder.Configuration);
 builder.Services.AddHttpClient();
@@ -41,7 +47,6 @@ builder.Services.AddStaticRobotsTxt(builder => builder
 builder.Services.AddSwagger();
 builder.Services.AddSettings(builder.Configuration);
 builder.Services.AddAuth(builder.Configuration);
-builder.Services.AddHttpContextAccessor();
 // 注册 IHttpClientFactory，参考：https://docs.microsoft.com/zh-cn/dotnet/core/extensions/http-client
 builder.Services.AddHttpClient();
 builder.Services.AddImageSharp();
@@ -56,7 +61,7 @@ builder.Services.AddScoped<PostService>();
 builder.Services.AddScoped<VisitRecordService>();
 builder.Services.AddSingleton<CommonService>();
 builder.Services.AddSingleton<CrawlService>();
-builder.Services.AddSingleton<Messages>();
+builder.Services.AddSingleton<MessageService>();
 builder.Services.AddSingleton<ThemeService>();
 builder.Services.AddSingleton<PicLibService>();
 
@@ -86,6 +91,8 @@ app.UseRouting();
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseSession();
 
 app.UseSwaggerPkg();
 

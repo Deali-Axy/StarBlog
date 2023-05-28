@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using StarBlog.Contrib.SiteMessage;
+using StarBlog.Web.Contrib.SiteMessage;
 using StarBlog.Web.Services;
 using StarBlog.Web.ViewModels.Photography;
 
@@ -7,9 +7,9 @@ namespace StarBlog.Web.Controllers;
 
 public class PhotographyController : Controller {
     private readonly PhotoService _photoService;
-    private readonly Messages _messages;
+    private readonly MessageService _messages;
 
-    public PhotographyController(PhotoService photoService, Messages messages) {
+    public PhotographyController(PhotoService photoService, MessageService messages) {
         _photoService = photoService;
         _messages = messages;
     }
