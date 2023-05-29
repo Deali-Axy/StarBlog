@@ -172,6 +172,14 @@ public class PostService {
             TocNodes = post.ExtractToc()
         };
 
+        if (post.Slug != null) {
+            model.Url = Host + _generator.GetPathByAction(
+                _accessor.HttpContext!,
+                "PostBySlug", "Blog",
+                new {post.Slug}
+            );
+        }
+
         if (md2Html) {
             // todo 研究一下后端渲染Markdown (PS: 虽然前端渲染轮子更多、效果更好，但后端渲染不会有割裂感）
             // 这部分一些参考资料：
