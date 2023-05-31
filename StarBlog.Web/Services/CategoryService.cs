@@ -66,6 +66,10 @@ public class CategoryService {
             .Include(a => a.Parent).FirstAsync();
     }
 
+    public async Task<Category> AddOrUpdate(Category item) {
+        return await _cRepo.InsertOrUpdateAsync(item);
+    }
+
     /// <summary>
     /// 生成分类词云数据
     /// </summary>

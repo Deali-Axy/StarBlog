@@ -1,4 +1,5 @@
-﻿using CodeLab.Share.Extensions;
+﻿using AutoMapper;
+using CodeLab.Share.Extensions;
 using CodeLab.Share.ViewModels.Response;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,11 +19,16 @@ namespace StarBlog.Web.Apis.Blog;
 [ApiExplorerSettings(GroupName = ApiGroups.Blog)]
 public class CategoryController : ControllerBase {
     private readonly CategoryService _cService;
+    private readonly IMapper _mapper;
 
-    public CategoryController(CategoryService cService) {
+    public CategoryController(CategoryService cService, IMapper mapper) {
         _cService = cService;
+        _mapper = mapper;
     }
 
+    /// <summary>
+    /// 获取分录目录树
+    /// </summary>
     [AllowAnonymous]
     [HttpGet("Nodes")]
     public async Task<List<CategoryNode>?> GetNodes() {
@@ -47,10 +53,26 @@ public class CategoryController : ControllerBase {
 
     [AllowAnonymous]
     [HttpGet("{id:int}")]
-    public async Task<IApiResponse> Get(int id) {
+    public async Task<ApiResponse<Category>> Get(int id) {
         var item = await _cService.GetById(id);
         return item == null ? ApiResponse.NotFound() : new ApiResponse<Category> {Data = item};
     }
+
+    [HttpPost]
+    public async Task<ApiResponse<Category>> Add(CategoryCreationDto dto) {
+        var item = _mapper.Map<Category>(dto);
+        return new ApiResponse<Category>(await _cService.AddOrUpdate(item));
+    }
+
+    [HttpPut("{id:int}")]
+    public async Task<ApiResponse<Category>> Update(int id, [FromBody] CategoryCreationDto dto) {
+        var item = await _cService.GetById(id);
+        if (item == null) return ApiResponse.NotFound();
+
+        item = _mapper.Map(dto, item);
+        return new ApiResponse<Category>(await _cService.AddOrUpdate(item));
+    }
+
 
     /// <summary>
     /// 分类词云
