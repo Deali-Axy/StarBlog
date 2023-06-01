@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using CodeLab.Share.Extensions;
 using CodeLab.Share.ViewModels.Response;
+using FreeSql;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StarBlog.Data.Models;
@@ -20,10 +21,12 @@ namespace StarBlog.Web.Apis.Blog;
 public class CategoryController : ControllerBase {
     private readonly CategoryService _cService;
     private readonly IMapper _mapper;
+    private readonly IBaseRepository<Post> _postRepo;
 
-    public CategoryController(CategoryService cService, IMapper mapper) {
+    public CategoryController(CategoryService cService, IMapper mapper, IBaseRepository<Post> postRepo) {
         _cService = cService;
         _mapper = mapper;
+        _postRepo = postRepo;
     }
 
     /// <summary>
@@ -73,6 +76,18 @@ public class CategoryController : ControllerBase {
         return new ApiResponse<Category>(await _cService.AddOrUpdate(item));
     }
 
+    [HttpDelete("{id:int}")]
+    public async Task<ApiResponse> Delete(int id) {
+        var item = await _cService.GetById(id);
+        if (item == null) return ApiResponse.NotFound();
+
+        if (await _postRepo.Where(a => a.CategoryId == id).AnyAsync())
+            return ApiResponse.BadRequest("所选分类下有文章，不能删除！");
+
+        var rows = await _cService.Delete(item);
+        return ApiResponse.Ok($"已删除 {rows} 数据");
+    }
+
 
     /// <summary>
     /// 分类词云
@@ -108,7 +123,7 @@ public class CategoryController : ControllerBase {
     public async Task<ApiResponse> CancelFeatured(int id) {
         var item = await _cService.GetById(id);
         if (item == null) return ApiResponse.NotFound($"分类 {id} 不存在");
-        var rows = _cService.DeleteFeaturedCategory(item);
+        var rows = await _cService.DeleteFeaturedCategory(item);
         return ApiResponse.Ok($"delete {rows} rows.");
     }
 
@@ -134,7 +149,7 @@ public class CategoryController : ControllerBase {
     public async Task<ApiResponse> SetInvisible(int id) {
         var item = await _cService.GetById(id);
         if (item == null) return ApiResponse.NotFound($"分类 {id} 不存在");
-        var rows = _cService.SetVisibility(item, false);
+        var rows = await _cService.SetVisibility(item, false);
         return ApiResponse.Ok($"affect {rows} rows.");
     }
 }

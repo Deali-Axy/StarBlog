@@ -9,6 +9,7 @@ using X.PagedList;
 
 namespace StarBlog.Web.Controllers;
 
+[ApiExplorerSettings(IgnoreApi = true)]
 public class BlogController : Controller {
     private readonly MessageService _messages;
     private readonly IBaseRepository<Post> _postRepo;
