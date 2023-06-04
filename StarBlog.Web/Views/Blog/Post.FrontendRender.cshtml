@@ -32,81 +32,13 @@
             </div>
         </div>
         <div class="col-lg-9">
-            <header class="post-header py-3 mb-3">
-                <div class="post-title h3 font-weight-bold">@Model.Title</div>
-                <div class="border-bottom my-3"></div>
-                <div class="post-meta">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            发布：
-                            <span>@Model.CreationTime.ToShortDateString()</span>
-                            <span>@Model.CreationTime.ToString("hh:mm")</span>
-                        </div>
-                        <div>
-                            更新：
-                            @Model.LastUpdateTime.ToShortDateString()
-                            @Model.LastUpdateTime.ToString("hh:mm")
-                        </div>
-                    </div>
-
-                    <div class="d-flex justify-content-between">
-                        <nav aria-label="breadcrumb">
-                            <ol class="breadcrumb">
-                                <li class="breadcrumb-item active">博客</li>
-                                @foreach (var category in Model.Categories) {
-                                    <li class="breadcrumb-item">
-                                        <a asp-controller="Blog" asp-action="List"
-                                           asp-route-categoryId="@category.Id">
-                                            @category.Name
-                                        </a>
-                                    </li>
-                                }
-                            </ol>
-                        </nav>
-                        <div>字数：@Model.Content.Length.ToString()</div>
-                    </div>
-                </div>
-            </header>
+            <partial name="Widgets/PostHeader"/>
+            
             <div id="post-markdown-content" class="post-content">
                 <textarea id="append-test" style="display:none;">@Model.Content</textarea>
             </div>
 
-            <div class="my-3 text-center">
-                <span style="font-size: 1.5em; color: #bababa">_EOF_</span>
-            </div>
-
-            <div class="card my-3">
-                <div class="row g-0">
-                    <div class="col-md-2">
-                        <img src="~/images/qrcode_sm.jpg" class="img-fluid rounded-start" width="200" alt="">
-                    </div>
-                    <div class="col-md-10">
-                        <div class="card-body">
-                            <h5 class="card-title">@Model.Title</h5>
-                            <div class="card-text">
-                                <b>本文作者：</b> 程序设计实验室
-                            </div>
-                            <div class="card-text">
-                                <b>本文链接：</b>
-                                <a href="@Model.Url">@Model.Url</a>
-                            </div>
-                            <div class="card-text">
-                                <b>版权声明：</b>
-                                本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/">BY-NC-SA</a> 许可协议。转载请注明出处！
-                            </div>
-                            <div class="card-text">
-                                <b>关于博主：</b> 欢迎扫码关注公众号，交流技术 & 分享经验！
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="my-3">
-                <span class="text-muted">
-                    微信公众号：「程序设计实验室」 专注于互联网热门新技术探索与团队敏捷开发实践，包括架构设计、机器学习与数据分析算法、移动端开发、Linux、Web前后端开发等，欢迎一起探讨技术，分享学习实践经验。
-                </span>
-            </div>
+            <partial name="Widgets/PostBottom"/>
         </div>
     </div>
 </div>
