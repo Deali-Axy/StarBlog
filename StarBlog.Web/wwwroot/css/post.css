@@ -1,55 +1,58 @@
+:root {
+    --theme-color: #5e72e4;
+    --blog-bg-color: #fff;
+    --text-color: #596172;
+    --border-color: #eef2f8;
+    --catalog-bg-color: #fff;
+    --panel-bg-color: #f8f8f8;
+    --code-bg-color: #f1f3f4;
+    --code-color: #bababa;
+    --pane-box-shadow: 0px 1px 15px #e6e6e6;
+    --toolbar-box-shadow: 0 2px 4px 1px #e8e8e8;
+    --loading-bg-color: #fff;
+    --olcb-folder-code-block-max-height: 80vh;
+    --cnb-code-bg: rgb(30, 30, 30);
+    --cnb-code-font-size: 13px;
+    --cnb-code-color: rgb(220, 220, 220);
+}
+
 body {
-    background: #efefef;
-}
-
-.post-container {
-    padding: 0 15px 18px;
-    margin: 0 0 30px 0;
-    /*border: #DEDFDE solid 1px;*/
-}
-
-.navbar {
-    width: 100%;
-}
-
-.navbar input {
-    outline: none !important;
-    background: #efefef;
-}
-
-.navbar button {
-    background: #efefef;
-    border: #b2b2b2 solid 1px;
-    color: #b2b2b2;
-}
-
-.navbar .nav-item {
-    font-size: 1.5em;
-}
-
-
-.post-header {
-    margin: 0 0 35px 0;
-}
-
-.post-title {
-    color: #333;
-}
-
-.post-meta {
-    margin: 10px -5px;
-    color: #777;
-}
-
-.post-meta span{
-    margin: 0 5px;
+    background: var(--blog-bg-color);
 }
 
 .post-content {
-    margin: 0 0 20px 0;
-    color: #1a1a1a;
+    font-weight: 300;
+    font-family: Lato, PingFang SC, Microsoft YaHei, sans-serif;
+    color: var(--text-color);
 }
 
-pre {
-    padding: 10px 18px;
+.post-content > p {
+    margin: 1.1rem 0;
+}
+
+.post-content > table {
+    display: block;
+    overflow-x: auto;
+    width: 100%;
+    margin: 15px 0;
+    border: none;
+    border-collapse: collapse;
+    word-break: break-word;
+    border-spacing: 0;
+    box-sizing: border-box;
+    text-indent: initial;
+}
+
+blockquote {
+    border: none;
+    margin: 1rem 0;
+    color: inherit;
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    border-left: 4px solid var(--theme-color);
+    background-color: var(--panel-bg-color);
+}
+
+blockquote > p {
+    margin: 0.5rem 0;
 }

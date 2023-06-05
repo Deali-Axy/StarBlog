@@ -76,21 +76,13 @@ public class PostService {
     /// <summary>
     /// 指定文章上传图片
     /// </summary>
-    /// <param name="post"></param>
-    /// <param name="file"></param>
-    /// <returns></returns>
     public async Task<string> UploadImage(Post post, IFormFile file) {
         InitPostMediaDir(post);
 
-        var filename = WebUtility.UrlEncode(file.FileName);
+        // 直接生成唯一文件名，不保留原始文件名了。——2023-6-5 21:21:46
+        var filename = GuidUtils.GuidTo16String() + Path.GetExtension(file.FileName);
         var fileRelativePath = Path.Combine("media", "blog", post.Id, filename);
         var savePath = Path.Combine(_environment.WebRootPath, fileRelativePath);
-        if (File.Exists(savePath)) {
-            // 上传文件重名处理
-            var newFilename = $"{Path.GetFileNameWithoutExtension(filename)}-{GuidUtils.GuidTo16String()}.{Path.GetExtension(filename)}";
-            fileRelativePath = Path.Combine("media", "blog", post.Id, newFilename);
-            savePath = Path.Combine(_environment.WebRootPath, fileRelativePath);
-        }
 
         await using (var fs = new FileStream(savePath, FileMode.Create)) {
             await file.CopyToAsync(fs);
@@ -102,8 +94,6 @@ public class PostService {
     /// <summary>
     /// 获取指定文章的图片资源
     /// </summary>
-    /// <param name="post"></param>
-    /// <returns></returns>
     public List<string> GetImages(Post post) {
         var data = new List<string>();
         var postDir = InitPostMediaDir(post);
@@ -187,6 +177,7 @@ public class PostService {
             // - https://github.com/showdownjs/showdown
             var pipeline = new MarkdownPipelineBuilder()
                 .UseAdvancedExtensions()
+                .UseBootstrap5()
                 .Build();
             model.ContentHtml = Markdown.ToHtml(model.Content, pipeline);
         }

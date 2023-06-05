@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="~/lib/github-markdown-css/github-markdown-light.css">
     @* <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.6.0/styles/default.min.css"> *@
     <link rel="stylesheet" href="~/lib/highlight/styles/tokyo-night-dark.min.css">
+    <link rel="stylesheet" href="~/css/post.css">
 }
 
 @await Html.PartialAsync("Widgets/BackToTop", new BackToTopViewModel {IsShowText = false})
@@ -36,13 +37,7 @@
             <partial name="Widgets/PostHeader" model="Model"/>
 
             <div class="post-content">
-                <div id="topics">
-                    <div class="post">
-                        <div class="postBody">
-                            @Html.Raw(Model.ContentHtml)
-                        </div>
-                    </div>
-                </div>
+                @Html.Raw(Model.ContentHtml)
             </div>
 
             <partial name="Widgets/PostBottom"/>
