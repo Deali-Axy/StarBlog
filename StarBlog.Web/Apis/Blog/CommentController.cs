@@ -4,6 +4,7 @@ using StarBlog.Data.Models;
 using StarBlog.Web.Extensions;
 using StarBlog.Web.Services;
 using StarBlog.Web.ViewModels.Comments;
+using StarBlog.Web.ViewModels.QueryFilters;
 
 namespace StarBlog.Web.Apis.Blog;
 
@@ -14,6 +15,15 @@ public class CommentController : ControllerBase {
 
     public CommentController(CommentService commentService) {
         _commentService = commentService;
+    }
+
+    /// <summary>
+    /// 获取分页评论
+    /// </summary>
+    [HttpGet]
+    public async Task<ApiResponsePaged<Comment>> GetPagedList([FromQuery] CommentQueryParameters @params) {
+        var (data, meta) = await _commentService.GetPagedList(@params);
+        return new ApiResponsePaged<Comment>(data, meta);
     }
 
     /// <summary>

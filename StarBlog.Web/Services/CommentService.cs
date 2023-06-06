@@ -1,10 +1,12 @@
 ﻿using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
+using CodeLab.Share.ViewModels;
 using FreeSql;
 using Microsoft.Extensions.Caching.Memory;
 using StarBlog.Data.Models;
 using StarBlog.Share.Utils;
+using StarBlog.Web.ViewModels.QueryFilters;
 
 namespace StarBlog.Web.Services;
 
@@ -42,10 +44,42 @@ public class CommentService {
         return GetCommentsTree(comments);
     }
 
+    public async Task<(List<Comment>, PaginationMetadata)> GetPagedList(CommentQueryParameters param) {
+        var querySet = _commentRepo.Select;
+
+        if (param.PostId != null) {
+            querySet = querySet.Where(a => a.PostId == param.PostId);
+        }
+
+        if (param.Search != null) {
+            querySet = querySet.Where(a => a.Content.Contains(param.Search));
+        }
+
+        // 排序
+        if (!string.IsNullOrEmpty(param.SortBy)) {
+            // 是否升序
+            var isAscending = !param.SortBy.StartsWith("-");
+            var orderByProperty = param.SortBy.Trim('-');
+
+            querySet = querySet.OrderByPropertyName(orderByProperty, isAscending);
+        }
+
+        var data = await querySet.Page(param.Page, param.PageSize)
+            .Include(a => a.AnonymousUser)
+            .ToListAsync();
+
+        var pagination = new PaginationMetadata {
+            PageNumber = param.Page,
+            PageSize = param.PageSize,
+            TotalItemCount = await querySet.CountAsync(),
+        };
+        return (data, pagination);
+    }
+
     public async Task<AnonymousUser> GetOrCreateAnonymousUser(string name, string email, string? url, string? ip) {
         var item =
             await _anonymousRepo.Where(a => a.Email == email).FirstAsync() ??
-            new AnonymousUser {Email = email};
+            new AnonymousUser {Id = GuidUtils.GuidTo16String(), Email = email};
 
         item.Name = name;
         item.Ip = ip;

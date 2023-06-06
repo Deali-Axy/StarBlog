@@ -35,7 +35,6 @@
 
     <ItemGroup>
         <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
-        <PackageReference Include="CodeLab.Share" Version="1.0.1" />
         <PackageReference Include="Magick.NET-Q8-x64" Version="12.2.1" />
         <PackageReference Include="Markdig" Version="0.30.2" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.8" />
@@ -53,12 +52,9 @@
     </ItemGroup>
 
     <ItemGroup>
-        <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap-treeview\dist\bootstrap-treeview.min.css" />
-        <_ContentIncludedByDefault Remove="wwwroot\lib\bootstrap-treeview\dist\bootstrap-treeview.min.js" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Contrib\" />
+      <Reference Include="CodeLab.Share">
+        <HintPath>..\..\..\CodeLabProject\CodeLab\CodeLab.Share\bin\Debug\net6.0\CodeLab.Share.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>

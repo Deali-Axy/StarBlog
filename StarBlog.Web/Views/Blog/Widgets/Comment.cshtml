@@ -1,4 +1,6 @@
-﻿<div class="mt-5">
+﻿@model PostViewModel
+
+<div class="mt-5" id="vue-comment">
     <div class="d-flex justify-content-between border-bottom pb-1">
         <h5>评论</h5>
         <button class="btn btn-link">刷新</button>
@@ -10,6 +12,21 @@
             <textarea class="form-control" id="content"aria-describedby="commentContent"placeholder="友善的评论是交流的起点"></textarea>
             <div class="form-text">良言一句三冬暖，恶语伤人六月寒。</div>
         </div>
-        <button class="btn btn-outline-primary float-end">发表评论</button>
+        <div class="d-flex justify-content-end">
+            <button class="btn btn-outline-primary">发表评论</button>
+        </div>
     </form>
+
+    <div class="list-group mt-3">
+        <div class="list-group-item" v-for="comment in comments">
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">{{comment.anonymousUser.name}}</h5>
+                <small class="text-muted">{{comment.createdTime}}</small>
+            </div>
+            <p class="mb-1">{{comment.content}}</p>
+            <small class="text-muted">{{comment.anonymousUser.url}}</small>
+        </div>
+    </div>
 </div>
+
+<script>const POST_ID = '@Model.Id'</script>
