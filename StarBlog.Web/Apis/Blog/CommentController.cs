@@ -27,6 +27,25 @@ public class CommentController : ControllerBase {
     }
 
     /// <summary>
+    /// 根据邮箱和验证码，获取匿名用户信息
+    /// </summary>
+    [HttpGet("[action]")]
+    public async Task<ApiResponse> GetAnonymousUser(string email, string otp) {
+        if (!CommentService.IsValidEmail(email)) return ApiResponse.BadRequest("提供的邮箱地址无效");
+
+        var verified = _commentService.VerifyOtp(email, otp);
+        if (!verified) return ApiResponse.BadRequest("验证码无效");
+
+        var anonymous = await _commentService.GetAnonymousUser(email);
+        var (_, newOtp) = await _commentService.GenerateOtp(email, true);
+
+        return ApiResponse.Ok(new {
+            AnonymousUser = anonymous,
+            NewOtp = newOtp
+        });
+    }
+
+    /// <summary>
     /// 获取邮件验证码
     /// </summary>
     [HttpGet("[action]")]
@@ -35,7 +54,7 @@ public class CommentController : ControllerBase {
             return ApiResponse.BadRequest("提供的邮箱地址无效");
         }
 
-        var result = await _commentService.GenerateOtp(email);
+        var (result, _) = await _commentService.GenerateOtp(email);
         return result
             ? ApiResponse.Ok("发送邮件验证码成功，五分钟内有效")
             : ApiResponse.BadRequest("上一个验证码还在有效期内，请勿重复请求验证码");
@@ -47,7 +66,7 @@ public class CommentController : ControllerBase {
             return ApiResponse.BadRequest("提供的邮箱地址无效");
         }
 
-        if (!await _commentService.VerifyOtp(dto.Email, dto.EmailOtp)) {
+        if (!_commentService.VerifyOtp(dto.Email, dto.EmailOtp)) {
             return ApiResponse.BadRequest("验证码无效");
         }
 
@@ -57,6 +76,7 @@ public class CommentController : ControllerBase {
         );
 
         var comment = new Comment {
+            ParentId = dto.ParentId,
             PostId = dto.PostId,
             AnonymousUserId = anonymousUser.Id,
             UserAgent = Request.Headers.UserAgent,

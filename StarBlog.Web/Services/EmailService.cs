@@ -25,20 +25,23 @@ public class EmailService {
     /// <summary>
     /// 发送邮箱验证码
     /// <returns>生成随机验证码</returns>
+    /// <param name="mock">只生成验证码，不发邮件</param>
     /// </summary>
-    public async Task<string> SendOtpMail(string email) {
+    public async Task<string> SendOtpMail(string email, bool mock = false) {
         var otp = Random.Shared.NextInt64(1000, 9999).ToString();
 
         var sb = new StringBuilder();
         sb.AppendLine($"<p>欢迎访问StarBlog！验证码：{otp}</p>");
         sb.AppendLine($"<p>如果您没有进行任何操作，请忽略此邮件。</p>");
 
-        await SendEmailAsync(
-            "[StarBlog]邮箱验证码",
-            sb.ToString(),
-            email,
-            email
-        );
+        if (!mock) {
+            await SendEmailAsync(
+                "[StarBlog]邮箱验证码",
+                sb.ToString(),
+                email,
+                email
+            );
+        }
 
         return otp;
     }

@@ -44,11 +44,8 @@ public class Bootstrap5Extension : IMarkdownExtension {
                     case Figure:
                         node.GetAttributes().AddClass("figure");
                         break;
-                    case ListBlock:
-                        node.GetAttributes().AddClass("list-group list-group-flush list-group-numbered my-3");
-                        break;
                     case ListItemBlock:
-                        node.GetAttributes().AddClass("list-group-item");
+                        node.GetAttributes().AddClass("my-1");
                         break;
                 }
             }

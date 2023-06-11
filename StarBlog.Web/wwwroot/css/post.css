@@ -24,6 +24,8 @@ body {
     font-weight: 300;
     font-family: Lato, PingFang SC, Microsoft YaHei, sans-serif;
     color: var(--text-color);
+    padding: 0;
+    font-size: 1.2em;
 }
 
 .post-content > p {

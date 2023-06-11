@@ -66,6 +66,7 @@ public class CommentService {
 
         var data = await querySet.Page(param.Page, param.PageSize)
             .Include(a => a.AnonymousUser)
+            .Include(a => a.Parent.AnonymousUser)
             .ToListAsync();
 
         var pagination = new PaginationMetadata {
@@ -74,6 +75,10 @@ public class CommentService {
             TotalItemCount = await querySet.CountAsync(),
         };
         return (data, pagination);
+    }
+
+    public async Task<AnonymousUser?> GetAnonymousUser(string email) {
+        return await _anonymousRepo.Where(a => a.Email == email).FirstAsync();
     }
 
     public async Task<AnonymousUser> GetOrCreateAnonymousUser(string name, string email, string? url, string? ip) {
@@ -104,23 +109,27 @@ public class CommentService {
     /// <summary>
     /// 生成邮箱验证码，发送验证码邮件
     /// </summary>
-    public async Task<bool> GenerateOtp(string email) {
+    public async Task<(bool, string?)> GenerateOtp(string email, bool mock = false) {
         var cacheKey = $"comment-otp-{email}";
-        var hasCache = _memoryCache.TryGetValue(cacheKey, out _);
-        if (hasCache) return false;
+        var hasCache = _memoryCache.TryGetValue<string>(cacheKey, out var existingValue);
+        if (hasCache) return (false, existingValue);
 
-        var otp = await _emailService.SendOtpMail(email);
+        var otp = await _emailService.SendOtpMail(email, mock);
         _memoryCache.Set<string>(cacheKey, otp, new MemoryCacheEntryOptions {
             AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
         });
 
-        return true;
+        return (true, otp);
     }
 
-    public async Task<bool> VerifyOtp(string email, string otp) {
+    public bool VerifyOtp(string email, string otp) {
         var cacheKey = $"comment-otp-{email}";
         _memoryCache.TryGetValue<string>(cacheKey, out var value);
-        return otp == value;
+
+        if (otp != value) return false;
+
+        _memoryCache.Remove(cacheKey);
+        return true;
     }
 
     public async Task<Comment> Add(Comment comment) {
