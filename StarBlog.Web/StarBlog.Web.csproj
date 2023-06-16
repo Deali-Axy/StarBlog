@@ -35,6 +35,7 @@
 
     <ItemGroup>
         <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
+        <PackageReference Include="CodeLab.Share" Version="1.2.0" />
         <PackageReference Include="Magick.NET-Q8-x64" Version="12.2.1" />
         <PackageReference Include="Markdig" Version="0.30.2" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.8" />
@@ -49,12 +50,6 @@
         <PackageReference Include="Swashbuckle.AspNetCore.ReDoc" Version="6.4.0" />
         <PackageReference Include="X.PagedList" Version="8.4.3" />
         <PackageReference Include="X.PagedList.Mvc.Core" Version="8.4.3" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Reference Include="CodeLab.Share">
-        <HintPath>..\..\..\CodeLabProject\CodeLab\CodeLab.Share\bin\Debug\net6.0\CodeLab.Share.dll</HintPath>
-      </Reference>
     </ItemGroup>
 
 </Project>
