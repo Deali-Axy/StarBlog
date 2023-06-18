@@ -8,8 +8,8 @@ const gulp = require("gulp"),
     cssmin = require("gulp-clean-css"),
     rename = require("gulp-rename"),
     uglify = require("gulp-uglify"),
-    changed = require("gulp-changed");
-
+    changed = require("gulp-changed"),
+    obfuscate = require('gulp-obfuscate');
 
 //定义 wwwroot 下的各文件存放路径
 const paths = {
