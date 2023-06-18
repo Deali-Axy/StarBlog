@@ -21,6 +21,8 @@
         submitDisabled: true,
         replyDisabled: true,
         replyComment: null,
+        getEmailOtpText: '获取',
+        otpInterval: null,
         form: {
             parentId: '',
             postId: POST_ID,
@@ -30,7 +32,28 @@
             url: '',
             content: '',
         },
-        formRules: {},
+        formRules: {
+            userName: [
+                {required: true, message: '请输入用户名称', trigger: 'blur'},
+                {min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur'}
+            ],
+            email: [
+                {required: true, message: '请输入邮箱', trigger: 'blur'},
+                {type: 'email', message: '邮箱格式不正确'}
+            ],
+            emailOtp: [
+                {required: true, message: '请输入邮箱验证码', trigger: 'change'},
+                {len: 4, message: '长度 4 个字符', trigger: 'change'}
+            ],
+            url: [
+                {type: 'url', message: `请输入正确的url`, trigger: 'blur'},
+            ],
+            content: [
+                {required: true, message: '请输入评论内容', trigger: 'blur'},
+                {min: 1, max: 300, message: '长度 在 1 到 300 个字符', trigger: 'blur'},
+                // {whitespace: true, message: '评论内容只存在空格', trigger: 'blur'},
+            ]
+        },
     },
     created: async function () {
         await this.getComments()
@@ -75,7 +98,7 @@
                                 updatedTime: dayjs(e.updatedTime).format('YYYY-MM-DD'),
                                 avatar: `/Api/PicLib/Random/100/100?Seed=${e.anonymousUserId}`,
                             }
-                            
+
                             if (e.parent) {
                                 item.replyUser = e.parent.anonymousUser.name
                             }
@@ -112,8 +135,26 @@
             this.getEmailOtpLoading = true
             let res = await this.getEmailOtp(this.form.email)
             this.getEmailOtpLoading = false
-            if (res.successful) this.$message.success(res.message)
-            else this.$message.error(res.message)
+            if (res.successful) {
+                this.$message.success(res.message)
+                // 发送成功，显示倒计时
+                let countdown = 60 * 5
+                this.getEmailOtpText = `${countdown}s`
+                this.otpInterval = setInterval(() => {
+                    countdown--
+                    if (countdown > 0) {
+                        this.getEmailOtpText = `${countdown}s`
+                        this.getEmailOtpDisabled = true
+                    } else {
+                        countdown = 60 * 5
+                        this.getEmailOtpText = '获取'
+                        if (this.otpInterval) clearInterval(this.otpInterval)
+                        this.getEmailOtpDisabled = false
+                    }
+                }, 1000)
+            } else {
+                this.$message.error(res.message)
+            }
         },
         async handleEmailOtpChange(value) {
             console.log('handleEmailOtpChange', value)
@@ -143,8 +184,14 @@
             this.userNameLoading = false
             this.urlLoading = false
         },
+        handleUrlBlur() {
+            if (!this.form.url.startsWith('http'))
+                this.form.url = `http://${this.form.url}`
+        },
         handleReset() {
             this.$refs.form.resetFields()
+            if (this.otpInterval) clearInterval(this.otpInterval)
+            this.getEmailOtpText = '获取'
             this.emailDisabled = false
             this.emailOtpDisabled = false
             this.getEmailOtpDisabled = false
@@ -157,16 +204,20 @@
             this.replyComment = null
         },
         async handleSubmit() {
-            this.submitLoading = true
-            let res = await this.submitComment(this.form)
-            if (res.successful) {
-                this.$message.success(res.message)
-                let email = `${this.form.email}`
-                this.handleReset()
-                this.form.email = email
-            } else this.$message.error(res.message)
-            this.submitLoading = false
-            await this.getComments()
+            this.$refs.form.validate(async (valid) => {
+                if (valid) {
+                    this.submitLoading = true
+                    let res = await this.submitComment(this.form)
+                    if (res.successful) {
+                        this.$message.success(res.message)
+                        let email = `${this.form.email}`
+                        this.handleReset()
+                        this.form.email = email
+                    } else this.$message.error(res.message)
+                    this.submitLoading = false
+                    await this.getComments()
+                }
+            })
         },
         async handleSizeChange(value) {
             this.pageSize = value

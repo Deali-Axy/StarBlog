@@ -44,8 +44,12 @@ public class CommentService {
         return GetCommentsTree(comments);
     }
 
-    public async Task<(List<Comment>, PaginationMetadata)> GetPagedList(CommentQueryParameters param) {
+    public async Task<(List<Comment>, PaginationMetadata)> GetPagedList(CommentQueryParameters param, bool onlyVisible = true) {
         var querySet = _commentRepo.Select;
+
+        if (onlyVisible) {
+            querySet = querySet.Where(a => a.Visible);
+        }
 
         if (param.PostId != null) {
             querySet = querySet.Where(a => a.PostId == param.PostId);

@@ -58,6 +58,7 @@ builder.Services.AddSingleton<EmailService>();
 builder.Services.AddSingleton<MessageService>();
 builder.Services.AddSingleton<ThemeService>();
 builder.Services.AddSingleton<PicLibService>();
+builder.Services.AddSingleton<TempFilterService>();
 builder.Services.AddScoped<BlogService>();
 builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<CommentService>();

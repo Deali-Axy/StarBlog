@@ -1,4 +1,6 @@
-﻿using CodeLab.Share.ViewModels.Response;
+﻿using System.Text.Json;
+using CodeLab.Share.Contrib.StopWords;
+using CodeLab.Share.ViewModels.Response;
 using Microsoft.AspNetCore.Mvc;
 using StarBlog.Data.Models;
 using StarBlog.Web.Extensions;
@@ -12,9 +14,11 @@ namespace StarBlog.Web.Apis.Blog;
 [ApiController]
 public class CommentController : ControllerBase {
     private readonly CommentService _commentService;
+    private readonly TempFilterService _filter;
 
-    public CommentController(CommentService commentService) {
+    public CommentController(CommentService commentService, TempFilterService filter) {
         _commentService = commentService;
+        _filter = filter;
     }
 
     /// <summary>
@@ -62,10 +66,6 @@ public class CommentController : ControllerBase {
 
     [HttpPost]
     public async Task<ApiResponse<Comment>> Add(CommentCreationDto dto) {
-        if (!CommentService.IsValidEmail(dto.Email)) {
-            return ApiResponse.BadRequest("提供的邮箱地址无效");
-        }
-
         if (!_commentService.VerifyOtp(dto.Email, dto.EmailOtp)) {
             return ApiResponse.BadRequest("验证码无效");
         }
@@ -82,8 +82,26 @@ public class CommentController : ControllerBase {
             UserAgent = Request.Headers.UserAgent,
             Content = dto.Content
         };
-        return new ApiResponse<Comment>(await _commentService.Add(comment)) {
-            Message = "评论已提交，将在审核通过后展示"
+
+        string msg;
+        if (_filter.CheckBadWord(dto.Content)) {
+            comment.Visible = false;
+            msg = "小管家发现您可能使用了不良用语，该评论将在审核通过后展示~";
+        }
+        else {
+            comment.Visible = true;
+            msg = "评论由小管家审核通过，感谢您参与讨论~";
+        }
+
+        comment = await _commentService.Add(comment);
+
+        return new ApiResponse<Comment>(comment) {
+            Message = msg
         };
+    }
+
+    [HttpGet("[action]")]
+    public async Task<ApiResponse> CheckBadWord(string word) {
+        return ApiResponse.Ok(_filter.CheckBadWord(word).ToString());
     }
 }

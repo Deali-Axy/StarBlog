@@ -15,8 +15,8 @@
             </div>
             <div class="col-2">
                 <el-form-item prop="emailOtp">
-                    <el-input type="text" v-model="form.emailOtp" placeholder="验证码" autocomplete="off" clearable maxlength="4" @@change="handleEmailOtpChange" :disabled="emailOtpDisabled">
-                        <el-button type="text" class="pe-2" :loading="getEmailOtpLoading" slot="suffix" @@click="handleGetEmailOtp" :disabled="getEmailOtpDisabled">获取</el-button>
+                    <el-input type="text" v-model="form.emailOtp" placeholder="验证码" autocomplete="off" maxlength="4" @@change="handleEmailOtpChange" :disabled="emailOtpDisabled">
+                        <el-button type="text" class="pe-2" :loading="getEmailOtpLoading" slot="suffix" @@click="handleGetEmailOtp" :disabled="getEmailOtpDisabled">{{getEmailOtpText}}</el-button>
                     </el-input>
                 </el-form-item>
             </div>
@@ -27,8 +27,10 @@
             </div>
             <div class="col-4">
                 <el-form-item prop="url">
-                    <el-input type="text" v-model="form.url" placeholder="网址" :disabled="urlDisabled" v-loading="urlLoading">
-                        <template slot="prepend">http://</template>
+                    <el-input type="text" v-model="form.url" placeholder="网址" :disabled="urlDisabled" v-loading="urlLoading" @@blur="handleUrlBlur">
+                        <template slot="prepend">
+                            <i class="el-icon-ship"></i>
+                        </template>
                     </el-input>
                 </el-form-item>
             </div>
