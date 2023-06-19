@@ -99,9 +99,4 @@ public class CommentController : ControllerBase {
             Message = msg
         };
     }
-
-    [HttpGet("[action]")]
-    public async Task<ApiResponse> CheckBadWord(string word) {
-        return ApiResponse.Ok(_filter.CheckBadWord(word).ToString());
-    }
 }
