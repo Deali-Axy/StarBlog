@@ -44,7 +44,8 @@ public class CommentService {
         return GetCommentsTree(comments);
     }
 
-    public async Task<(List<Comment>, PaginationMetadata)> GetPagedList(CommentQueryParameters param, bool onlyVisible = true) {
+    public async Task<(List<Comment>, PaginationMetadata)> GetPagedList(CommentQueryParameters param,
+        bool onlyVisible = true) {
         var querySet = _commentRepo.Select;
 
         if (onlyVisible) {
@@ -88,7 +89,7 @@ public class CommentService {
     public async Task<AnonymousUser> GetOrCreateAnonymousUser(string name, string email, string? url, string? ip) {
         var item =
             await _anonymousRepo.Where(a => a.Email == email).FirstAsync() ??
-            new AnonymousUser {Id = GuidUtils.GuidTo16String(), Email = email};
+            new AnonymousUser { Id = GuidUtils.GuidTo16String(), Email = email };
 
         item.Name = name;
         item.Ip = ip;
@@ -126,13 +127,17 @@ public class CommentService {
         return (true, otp);
     }
 
-    public bool VerifyOtp(string email, string otp) {
+    /// <summary>
+    /// 验证一次性密码
+    /// </summary>
+    /// <param name="clear">验证通过后是否清除</param>
+    public bool VerifyOtp(string email, string otp, bool clear = true) {
         var cacheKey = $"comment-otp-{email}";
         _memoryCache.TryGetValue<string>(cacheKey, out var value);
 
         if (otp != value) return false;
 
-        _memoryCache.Remove(cacheKey);
+        if (clear) _memoryCache.Remove(cacheKey);
         return true;
     }
 

@@ -37,15 +37,16 @@ public class CommentController : ControllerBase {
     public async Task<ApiResponse> GetAnonymousUser(string email, string otp) {
         if (!CommentService.IsValidEmail(email)) return ApiResponse.BadRequest("提供的邮箱地址无效");
 
-        var verified = _commentService.VerifyOtp(email, otp);
+        var verified = _commentService.VerifyOtp(email, otp, clear: false);
         if (!verified) return ApiResponse.BadRequest("验证码无效");
 
         var anonymous = await _commentService.GetAnonymousUser(email);
-        var (_, newOtp) = await _commentService.GenerateOtp(email, true);
+        // 暂时不使用生成新验证码的功能，避免用户体验割裂
+        // var (_, newOtp) = await _commentService.GenerateOtp(email, true);
 
         return ApiResponse.Ok(new {
             AnonymousUser = anonymous,
-            NewOtp = newOtp
+            NewOtp = otp
         });
     }
 
