@@ -171,15 +171,7 @@ public class PostService {
         }
 
         if (md2Html) {
-            // todo 研究一下后端渲染Markdown (PS: 虽然前端渲染轮子更多、效果更好，但后端渲染不会有割裂感）
-            // 这部分一些参考资料：
-            // - 关于前端渲染 MarkDown 样式：https://blog.csdn.net/sprintline/article/details/122849907
-            // - https://github.com/showdownjs/showdown
-            var pipeline = new MarkdownPipelineBuilder()
-                .UseAdvancedExtensions()
-                .UseBootstrap5()
-                .Build();
-            model.ContentHtml = Markdown.ToHtml(model.Content, pipeline);
+            model.ContentHtml = GetContentHtml(post);
         }
 
         if (post.Categories != null) {
@@ -190,6 +182,18 @@ public class PostService {
         }
 
         return model;
+    }
+
+    public static string GetContentHtml(Post post) {
+        // todo 研究一下后端渲染Markdown (PS: 虽然前端渲染轮子更多、效果更好，但后端渲染不会有割裂感）
+        // 这部分一些参考资料：
+        // - 关于前端渲染 MarkDown 样式：https://blog.csdn.net/sprintline/article/details/122849907
+        // - https://github.com/showdownjs/showdown
+        var pipeline = new MarkdownPipelineBuilder()
+            .UseAdvancedExtensions()
+            .UseBootstrap5()
+            .Build();
+        return Markdown.ToHtml(post.Content ?? "", pipeline);
     }
 
     /// <summary>
