@@ -1,0 +1,22 @@
+﻿@{
+    ViewData["Title"] = "RSS Feed";
+}
+
+<div class="container px-4 py-3">
+    <h2 class="d-flex w-100 justify-content-between pb-2 mb-3 border-bottom">
+        <div>RSS Feed</div>
+        <div>订阅内容</div>
+    </h2>
+
+    <div class="card" style="height: 25rem;">
+        <div class="card-body">
+            <div class="h-100 w-100 d-flex align-items-center">
+                <div class="text-center w-100">
+                    <h4 class="card-title">订阅地址</h4>
+                    <p class="card-text">@ViewBag.FeedUrl</p>
+                    <p class="text-muted">将订阅地址添加到RSS阅读器即可</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
