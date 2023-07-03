@@ -4,7 +4,6 @@ using System.Xml;
 using FreeSql;
 using Microsoft.AspNetCore.Mvc;
 using StarBlog.Data.Models;
-using StarBlog.Web.Extensions;
 using StarBlog.Web.Services;
 
 namespace StarBlog.Web.Controllers;
@@ -21,7 +20,7 @@ public class RssController : Controller {
 
     [HttpGet]
     public IActionResult Index() {
-        var feedUrl = $"{_conf["Host"]}/feed";
+        var feedUrl = Path.Combine(_conf["host"], "feed");
         ViewBag.FeedUrl = feedUrl;
         return View();
     }
