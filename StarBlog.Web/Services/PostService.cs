@@ -162,7 +162,7 @@ public class PostService {
             TocNodes = post.ExtractToc()
         };
 
-        if (post.Slug != null) {
+        if (!string.IsNullOrWhiteSpace(post.Slug)) {
             model.Url = Host + _generator.GetPathByAction(
                 _accessor.HttpContext!,
                 "PostBySlug", "Blog",
