@@ -113,7 +113,7 @@ public class PostService {
         }
 
         // 状态过滤
-        if (!string.IsNullOrEmpty(param.Status)) {
+        if (!string.IsNullOrWhiteSpace(param.Status)) {
             querySet = querySet.Where(a => a.Status == param.Status);
         }
 
@@ -123,12 +123,12 @@ public class PostService {
         }
 
         // 关键词过滤
-        if (!string.IsNullOrEmpty(param.Search)) {
+        if (!string.IsNullOrWhiteSpace(param.Search)) {
             querySet = querySet.Where(a => a.Title.Contains(param.Search));
         }
 
         // 排序
-        if (!string.IsNullOrEmpty(param.SortBy)) {
+        if (!string.IsNullOrWhiteSpace(param.SortBy)) {
             // 是否升序
             var isAscending = !param.SortBy.StartsWith("-");
             var orderByProperty = param.SortBy.Trim('-');

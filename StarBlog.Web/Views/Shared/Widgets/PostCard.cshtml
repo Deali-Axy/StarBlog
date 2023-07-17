@@ -9,7 +9,7 @@
         <p class="card-text">
             @Model.Summary
         </p>
-        @if (Model.Slug != null) {
+        @if (!string.IsNullOrWhiteSpace(Model.Slug)) {
             <a class="btn btn-outline-secondary stretched-link" href="/p/@Model.Slug">
                 查看全文
             </a>
