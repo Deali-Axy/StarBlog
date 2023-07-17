@@ -8,10 +8,11 @@ using StarBlog.Web.Services;
 using StarBlog.Web.ViewModels.Comments;
 using StarBlog.Web.ViewModels.QueryFilters;
 
-namespace StarBlog.Web.Apis.Blog;
+namespace StarBlog.Web.Apis.Comments;
 
-[Route("Api/[controller]")]
 [ApiController]
+[Route("Api/[controller]")]
+[ApiExplorerSettings(GroupName = ApiGroups.Comment)]
 public class CommentController : ControllerBase {
     private readonly CommentService _commentService;
     private readonly TempFilterService _filter;
