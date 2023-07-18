@@ -81,6 +81,7 @@ public class HomeController : Controller {
 
         // 创建用户
         // to do 这里暂时存储明文密码，后期要换成MD5加密存储。2023-5-7 搞定
+        // todo 使用加盐的hash密码 https://www.ais.com/how-to-generate-a-jwt-token-using-net-6/
         userRepo.Insert(new User {
             Id = Guid.NewGuid().ToString(),
             Name = vm.Username,
