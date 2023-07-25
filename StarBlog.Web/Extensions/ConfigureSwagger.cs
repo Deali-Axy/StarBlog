@@ -12,6 +12,7 @@ public static class ApiGroups {
     public const string Comment = "comment";
     public const string Common = "common";
     public const string Link = "link";
+    public const string Photo = "photo";
     public const string Test = "test";
 }
 
@@ -23,6 +24,7 @@ public static class ConfigureSwagger {
         new SwaggerGroup(ApiGroups.Comment, "Comment APIs", "评论接口"),
         new SwaggerGroup(ApiGroups.Common, "Common APIs", "通用公共接口"),
         new SwaggerGroup(ApiGroups.Link, "Link APIs", "友情链接接口"),
+        new SwaggerGroup(ApiGroups.Photo, "Photo APIs", "图片管理接口"),
         new SwaggerGroup(ApiGroups.Test, "Test APIs", "测试接口")
     };
 
@@ -38,7 +40,7 @@ public static class ConfigureSwagger {
                 Type = SecuritySchemeType.ApiKey
             };
             options.AddSecurityDefinition("oauth2", security);
-            options.AddSecurityRequirement(new OpenApiSecurityRequirement {{security, new List<string>()}});
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement { { security, new List<string>() } });
             options.OperationFilter<AddResponseHeadersFilter>();
             options.OperationFilter<AppendAuthorizeToSummaryOperationFilter>();
             options.OperationFilter<SecurityRequirementsOperationFilter>();

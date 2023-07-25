@@ -7,15 +7,15 @@ using StarBlog.Web.Extensions;
 using StarBlog.Web.Services;
 using StarBlog.Web.ViewModels.Photography;
 
-namespace StarBlog.Web.Apis.Blog;
+namespace StarBlog.Web.Apis.Photography;
 
 /// <summary>
-/// 摄影
+/// 摄影/图片
 /// </summary>
 [Authorize]
 [ApiController]
 [Route("Api/[controller]")]
-[ApiExplorerSettings(GroupName = ApiGroups.Blog)]
+[ApiExplorerSettings(GroupName = ApiGroups.Photo)]
 public class PhotoController : ControllerBase {
     private readonly PhotoService _photoService;
 
@@ -39,9 +39,12 @@ public class PhotoController : ControllerBase {
         var photo = await _photoService.GetById(id);
         return photo == null
             ? ApiResponse.NotFound($"图片 {id} 不存在")
-            : new ApiResponse<Photo> {Data = photo};
+            : new ApiResponse<Photo> { Data = photo };
     }
 
+    /// <summary>
+    /// 获取指定宽度的缩略图
+    /// </summary>
     [AllowAnonymous]
     [HttpGet("{id}/Thumb")]
     public async Task<IActionResult> GetThumb(string id, [FromQuery] int width = 300) {
@@ -56,6 +59,14 @@ public class PhotoController : ControllerBase {
         return !ModelState.IsValid
             ? ApiResponse.BadRequest(ModelState)
             : new ApiResponse<Photo>(photo);
+    }
+
+    [HttpPut("{id}")]
+    public async Task<ApiResponse<Photo>> Update(string id, [FromBody] PhotoUpdateDto dto) {
+        var photo = await _photoService.GetById(id);
+        if (photo == null) return ApiResponse.NotFound($"图片 {id} 不存在");
+        dto.Id = id;
+        return new ApiResponse<Photo>(await _photoService.Update(dto)) { Message = "修改照片信息成功。" };
     }
 
     [HttpDelete("{id}")]

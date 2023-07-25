@@ -1,4 +1,5 @@
-﻿using FreeSql;
+﻿using AutoMapper;
+using FreeSql;
 using ImageMagick;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
@@ -13,12 +14,14 @@ public class PhotoService {
     private readonly IBaseRepository<Photo> _photoRepo;
     private readonly IBaseRepository<FeaturedPhoto> _featuredPhotoRepo;
     private readonly IWebHostEnvironment _environment;
+    private readonly IMapper _mapper;
 
     public PhotoService(IBaseRepository<Photo> photoRepo, IWebHostEnvironment environment,
-        IBaseRepository<FeaturedPhoto> featuredPhotoRepo) {
+        IBaseRepository<FeaturedPhoto> featuredPhotoRepo, IMapper mapper) {
         _photoRepo = photoRepo;
         _environment = environment;
         _featuredPhotoRepo = featuredPhotoRepo;
+        _mapper = mapper;
     }
 
     public async Task<List<Photo>> GetAll() {
@@ -76,6 +79,13 @@ public class PhotoService {
         }
     }
 
+    public async Task<Photo> Update(PhotoUpdateDto dto) {
+        var photo = await GetById(dto.Id);
+        photo = _mapper.Map(dto, photo);
+        await _photoRepo.UpdateAsync(photo);
+        return photo;
+    }
+
     public async Task<Photo> Add(PhotoCreationDto dto, IFormFile photoFile) {
         var photoId = GuidUtils.GuidTo16String();
         var photo = new Photo {
@@ -112,7 +122,7 @@ public class PhotoService {
             return null;
         }
 
-        return await _photoRepo.Select.Take(1).Offset(Random.Shared.Next((int) count)).FirstAsync();
+        return await _photoRepo.Select.Take(1).Offset(Random.Shared.Next((int)count)).FirstAsync();
     }
 
     /// <summary>
@@ -121,7 +131,7 @@ public class PhotoService {
     public async Task<FeaturedPhoto> AddFeaturedPhoto(Photo photo) {
         var item = await _featuredPhotoRepo.Where(a => a.PhotoId == photo.Id).FirstAsync();
         if (item != null) return item;
-        item = new FeaturedPhoto {PhotoId = photo.Id};
+        item = new FeaturedPhoto { PhotoId = photo.Id };
         await _featuredPhotoRepo.InsertAsync(item);
         return item;
     }
@@ -184,9 +194,9 @@ public class PhotoService {
 
             // 没调整过大小则直接保存上传的图片
             if (!resizeFlag) {
-                file.CopyTo(savePath, true);   
+                file.CopyTo(savePath, true);
             }
-            
+
             photo = await BuildPhotoData(photo);
             await _photoRepo.InsertAsync(photo);
             result.Add(photo);
