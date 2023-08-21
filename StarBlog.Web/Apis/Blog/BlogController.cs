@@ -17,11 +17,13 @@ namespace StarBlog.Web.Apis.Blog;
 [Route("Api/[controller]")]
 [ApiExplorerSettings(GroupName = ApiGroups.Blog)]
 public class BlogController : ControllerBase {
+    private readonly ILogger<BlogController> _logger;
     private readonly BlogService _blogService;
 
 
-    public BlogController(BlogService blogService) {
+    public BlogController(BlogService blogService, ILogger<BlogController> logger) {
         _blogService = blogService;
+        _logger = logger;
     }
 
     /// <summary>
@@ -78,13 +80,14 @@ public class BlogController : ControllerBase {
             return ApiResponse.BadRequest("只能上传zip格式的文件哦~");
         }
 
-        var category = categoryService.GetById(dto.CategoryId);
+        var category = await categoryService.GetById(dto.CategoryId);
         if (category == null) return ApiResponse.BadRequest($"分类 {dto.CategoryId} 不存在！");
 
         try {
             return new ApiResponse<Post>(await _blogService.Upload(dto, file));
         }
         catch (Exception ex) {
+            _logger.LogError(ex, "解压文件出错：{message}", ex.Message);
             return ApiResponse.Error($"解压文件出错：{ex.Message}");
         }
     }
