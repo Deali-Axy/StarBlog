@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using CodeLab.Share.Contrib.StopWords;
 using CodeLab.Share.ViewModels.Response;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StarBlog.Data.Models;
 using StarBlog.Web.Extensions;
@@ -87,6 +88,7 @@ public class CommentController : ControllerBase {
 
         string msg;
         if (_filter.CheckBadWord(dto.Content)) {
+            comment.IsNeedAudit = true;
             comment.Visible = false;
             msg = "小管家发现您可能使用了不良用语，该评论将在审核通过后展示~";
         }
@@ -100,5 +102,37 @@ public class CommentController : ControllerBase {
         return new ApiResponse<Comment>(comment) {
             Message = msg
         };
+    }
+
+    /// <summary>
+    /// 获取需要审核的评论列表
+    /// </summary>
+    [Authorize]
+    [HttpGet("[action]")]
+    public async Task<ApiResponsePaged<Comment>> GetNeedAuditList([FromQuery] CommentQueryParameters @params) {
+        var (data, meta) = await _commentService.GetPagedList(@params, false, true);
+        return new ApiResponsePaged<Comment>(data, meta);
+    }
+
+    /// <summary>
+    /// 审核通过
+    /// </summary>
+    [Authorize]
+    [HttpPost("{id}/[action]")]
+    public async Task<ApiResponse<Comment>> Accept([FromRoute] string id, [FromBody] CommentAcceptDto dto) {
+        var item = await _commentService.GetById(id);
+        if (item == null) return ApiResponse.NotFound();
+        return new ApiResponse<Comment>(await _commentService.Accept(item, dto.Reason));
+    }
+
+    /// <summary>
+    /// 审核拒绝
+    /// </summary>
+    [Authorize]
+    [HttpPost("{id}/[action]")]
+    public async Task<ApiResponse<Comment>> Reject([FromRoute] string id, [FromBody] CommentRejectDto dto) {
+        var item = await _commentService.GetById(id);
+        if (item == null) return ApiResponse.NotFound();
+        return new ApiResponse<Comment>(await _commentService.Reject(item, dto.Reason));
     }
 }

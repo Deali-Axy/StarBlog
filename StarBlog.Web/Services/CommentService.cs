@@ -45,11 +45,15 @@ public class CommentService {
     }
 
     public async Task<(List<Comment>, PaginationMetadata)> GetPagedList(CommentQueryParameters param,
-        bool onlyVisible = true) {
+        bool onlyVisible = true, bool? isNeedAudit = null) {
         var querySet = _commentRepo.Select;
 
         if (onlyVisible) {
             querySet = querySet.Where(a => a.Visible);
+        }
+
+        if (isNeedAudit != null) {
+            querySet = querySet.Where(a => a.IsNeedAudit == isNeedAudit);
         }
 
         if (param.PostId != null) {
@@ -80,6 +84,26 @@ public class CommentService {
             TotalItemCount = await querySet.CountAsync(),
         };
         return (data, pagination);
+    }
+
+    public async Task<Comment?> GetById(string id) {
+        return await _commentRepo.Where(a => a.Id == id).FirstAsync();
+    }
+
+    public async Task<Comment> Accept(Comment comment, string? reason = null) {
+        comment.Visible = true;
+        comment.IsNeedAudit = false;
+        comment.Reason = reason;
+        await _commentRepo.UpdateAsync(comment);
+        return comment;
+    }
+
+    public async Task<Comment> Reject(Comment comment, string reason) {
+        comment.Visible = false;
+        comment.IsNeedAudit = false;
+        comment.Reason = reason;
+        await _commentRepo.UpdateAsync(comment);
+        return comment;
     }
 
     public async Task<AnonymousUser?> GetAnonymousUser(string email) {
