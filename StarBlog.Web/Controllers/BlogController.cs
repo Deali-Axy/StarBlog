@@ -32,9 +32,10 @@ public class BlogController : Controller {
         _configService = configService;
     }
 
-    public async Task<IActionResult> List(int categoryId = 0, int page = 1, int pageSize = 6) {
+    public async Task<IActionResult> List(int categoryId = 0, int page = 1, int pageSize = 6,
+        string sortType = "asc", string sortBy = "-CreationTime") {
         var currentCategory = categoryId == 0
-            ? new Category {Id = 0, Name = "All"}
+            ? new Category { Id = 0, Name = "All" }
             : await _categoryRepo.Where(a => a.Id == categoryId).FirstAsync();
 
         if (currentCategory == null) {
@@ -51,11 +52,14 @@ public class BlogController : Controller {
             CurrentCategory = currentCategory,
             CurrentCategoryId = categoryId,
             CategoryNodes = await _categoryService.GetNodes(),
+            SortType = sortType,
+            SortBy = sortBy,
             Posts = await _postService.GetPagedList(new PostQueryParameters {
                 CategoryId = categoryId,
                 Page = page,
                 PageSize = pageSize,
-                OnlyPublished = true
+                OnlyPublished = true,
+                SortBy = sortType == "desc" ? $"-{sortBy}" : sortBy
             })
         });
     }
@@ -97,7 +101,7 @@ public class BlogController : Controller {
         var rndPost = posts[Random.Shared.Next(posts.Count)];
         _messages.Info($"随机推荐了文章 <b>{rndPost.Title}</b> 给你~" +
                        $"<span class='ps-3'><a href=\"{Url.Action(nameof(RandomPost))}\">再来一次</a></span>");
-        return RedirectToAction(nameof(Post), new {id = rndPost.Id});
+        return RedirectToAction(nameof(Post), new { id = rndPost.Id });
     }
 
     public IActionResult Temp() {

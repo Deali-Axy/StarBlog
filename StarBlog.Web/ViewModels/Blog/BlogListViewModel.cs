@@ -8,6 +8,8 @@ using X.PagedList;
 namespace StarBlog.Web.ViewModels.Blog;
 
 public class BlogListViewModel {
+    public string SortType { get; set; }
+    public string SortBy { get; set; }
     public Category CurrentCategory { get; set; }
     public int CurrentCategoryId { get; set; }
     public IPagedList<Post> Posts { get; set; }
@@ -16,6 +18,6 @@ public class BlogListViewModel {
 
     public string CategoryNodesJson => JsonSerializer.Serialize(
         CategoryNodes,
-        new JsonSerializerOptions {Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping}
+        new JsonSerializerOptions { Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping }
     );
 }

@@ -12,12 +12,12 @@ namespace StarBlog.Web.Services;
 public class LinkExchangeService {
     private readonly IBaseRepository<LinkExchange> _repo;
     private readonly LinkService _linkService;
-    private readonly EmailAccountConfig _emailAccountConfig;
+    private readonly EmailService _emailService;
 
-    public LinkExchangeService(IBaseRepository<LinkExchange> repo, LinkService linkService, IOptions<EmailAccountConfig> options) {
+    public LinkExchangeService(IBaseRepository<LinkExchange> repo, LinkService linkService, EmailService emailService) {
         _repo = repo;
         _linkService = linkService;
-        _emailAccountConfig = options.Value;
+        _emailService = emailService;
     }
 
     /// <summary>
@@ -79,74 +79,35 @@ public class LinkExchangeService {
         return await _repo.DeleteAsync(a => a.Id == id);
     }
 
-    public async Task SendEmailOnAdd(LinkExchange item) {
-        const string starblogLink = "<a href=\"https://deali.cn\">StarBlog</a>";
+    public async Task SendEmail(LinkExchange item, string subject, string message) {
         var sb = new StringBuilder();
-        sb.AppendLine($"<p>友链申请已提交，正在处理中，请及时关注邮件通知~</p>");
+        sb.AppendLine($"<p>{message}</p>");
         sb.AppendLine($"<br>");
         sb.AppendLine($"<p>以下是您申请的友链信息：</p>");
         sb.AppendLine($"<p>网站名称：{item.Name}</p>");
         sb.AppendLine($"<p>介绍：{item.Description}</p>");
         sb.AppendLine($"<p>网址：{item.Url}</p>");
         sb.AppendLine($"<p>站长：{item.WebMaster}</p>");
+        if (item.Reason != null) sb.AppendLine($"<p>补充信息：{item.Reason}</p>");
         sb.AppendLine($"<br>");
         sb.AppendLine($"<br>");
-        sb.AppendLine($"<br>");
-        sb.AppendLine($"<p>本消息由 {starblogLink} 自动发送，无需回复。</p>");
-        await EmailUtils.SendEmailAsync(
-            _emailAccountConfig,
-            "[StarBlog]友链申请已提交",
+        await _emailService.SendEmailAsync(
+            $"[StarBlog]{subject}",
             sb.ToString(),
             item.WebMaster,
             item.Email
         );
+    }
+
+    public async Task SendEmailOnAdd(LinkExchange item) {
+        await SendEmail(item, "友链申请已提交", "友链申请已提交，正在处理中，请及时关注邮件通知~");
     }
 
     public async Task SendEmailOnAccept(LinkExchange item) {
-        const string starblogLink = "<a href=\"https://deali.cn\">StarBlog</a>";
-        var sb = new StringBuilder();
-        sb.AppendLine($"<p>您好，友链申请已通过！感谢支持，欢迎互访哦~</p>");
-        sb.AppendLine($"<br>");
-        sb.AppendLine($"<p>以下是您申请的友链信息：</p>");
-        sb.AppendLine($"<p>网站名称：{item.Name}</p>");
-        sb.AppendLine($"<p>介绍：{item.Description}</p>");
-        sb.AppendLine($"<p>网址：{item.Url}</p>");
-        sb.AppendLine($"<p>站长：{item.WebMaster}</p>");
-        sb.AppendLine($"<p>补充信息：{item.Reason}</p>");
-        sb.AppendLine($"<br>");
-        sb.AppendLine($"<br>");
-        sb.AppendLine($"<br>");
-        sb.AppendLine($"<p>本消息由 {starblogLink} 自动发送，无需回复。</p>");
-        await EmailUtils.SendEmailAsync(
-            _emailAccountConfig,
-            "[StarBlog]友链申请结果反馈",
-            sb.ToString(),
-            item.WebMaster,
-            item.Email
-        );
+        await SendEmail(item, "友链申请结果反馈", "您好，友链申请已通过！感谢支持，欢迎互访哦~");
     }
 
     public async Task SendEmailOnReject(LinkExchange item) {
-        const string starblogLink = "<a href=\"https://deali.cn\">StarBlog</a>";
-        var sb = new StringBuilder();
-        sb.AppendLine($"<p>很抱歉，友链申请未通过！建议您查看补充信息，调整后再次进行申请，感谢您的理解与支持~</p>");
-        sb.AppendLine($"<br>");
-        sb.AppendLine($"<p>以下是您申请的友链信息：</p>");
-        sb.AppendLine($"<p>网站名称：{item.Name}</p>");
-        sb.AppendLine($"<p>介绍：{item.Description}</p>");
-        sb.AppendLine($"<p>网址：{item.Url}</p>");
-        sb.AppendLine($"<p>站长：{item.WebMaster}</p>");
-        sb.AppendLine($"<p>补充信息：{item.Reason}</p>");
-        sb.AppendLine($"<br>");
-        sb.AppendLine($"<br>");
-        sb.AppendLine($"<br>");
-        sb.AppendLine($"<p>本消息由 {starblogLink} 自动发送，无需回复。</p>");
-        await EmailUtils.SendEmailAsync(
-            _emailAccountConfig,
-            "[StarBlog]友链申请结果反馈",
-            sb.ToString(),
-            item.WebMaster,
-            item.Email
-        );
+        await SendEmail(item, "友链申请结果反馈", "很抱歉，友链申请未通过！建议您查看补充信息，调整后再次进行申请，感谢您的理解与支持~");
     }
 }

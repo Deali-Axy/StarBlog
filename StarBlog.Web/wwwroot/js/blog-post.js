@@ -33,7 +33,7 @@ $(function () {
  */
 function procImages(postId) {
     $.get(`/Api/BlogPost/${postId}/`, function (res) {
-        console.log(res)
+        console.log('procImages', res)
         for (const imgElem of document.querySelectorAll('.post-content img')) {
             let originSrc = imgElem.getAttribute('src')
             // let newSrc = `/assets/blog/${res.data.path}/${originSrc}`

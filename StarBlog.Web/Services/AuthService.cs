@@ -14,6 +14,9 @@ public class AuthService {
     private readonly Auth _auth;
     private readonly IBaseRepository<User> _userRepo;
 
+    private const string ClaimUserId = "user_id";
+    private const string ClaimUserName = "user_name";
+
     public AuthService(IOptions<Auth> options, IBaseRepository<User> userRepo) {
         _auth = options.Value;
         _userRepo = userRepo;
@@ -21,19 +24,22 @@ public class AuthService {
 
     public LoginToken GenerateLoginToken(User user) {
         var claims = new List<Claim> {
-            new(JwtRegisteredClaimNames.Sub, user.Id), // User.Identity.Name
-            new(JwtRegisteredClaimNames.GivenName, user.Name),
+            new(ClaimUserId, user.Id), // User.Identity.Name
+            new(ClaimUserName, user.Name),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()), // JWT ID
         };
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_auth.Jwt.Key));
+        // todo 使用非对称加密 jwt (RSA)
         var signCredential = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
         var jwtToken = new JwtSecurityToken(
             issuer: _auth.Jwt.Issuer,
             audience: _auth.Jwt.Audience,
             claims: claims,
             expires: DateTime.Now.AddDays(7),
-            signingCredentials: signCredential);
+            signingCredentials: signCredential
+        );
 
+        // todo 尝试使用 jose-jwt 生成 jwt
         return new LoginToken {
             Token = new JwtSecurityTokenHandler().WriteToken(jwtToken),
             Expiration = TimeZoneInfo.ConvertTimeFromUtc(jwtToken.ValidTo, TimeZoneInfo.Local)
@@ -49,9 +55,8 @@ public class AuthService {
     }
 
     public User? GetUser(ClaimsPrincipal userClaim) {
-        var userId = userClaim.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Sub)?.Value;
-        var userName = userClaim.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.GivenName)?.Value;
-        var temp = userClaim.FindFirst(JwtRegisteredClaimNames.Name)?.Value;
+        var userId = userClaim.FindFirstValue(ClaimUserId);
+        var userName = userClaim.FindFirstValue(ClaimUserName);
         if (userId == null || userName == null) return null;
         return new User { Id = userId, Name = userName };
     }

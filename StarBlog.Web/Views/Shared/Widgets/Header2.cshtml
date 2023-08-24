@@ -1,0 +1,58 @@
+﻿@using StarBlog.Web.Utils
+<nav class="navbar navbar-expand-md navbar-dark bg-dark" id="vue-header">
+    <div class="container-fluid">
+        <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+            <img src="~/images/codelab.jpg" class="rounded-circle" alt="" style="height: 40px;width: 40px;">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample04" aria-controls="navbarsExample04" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarsExample04">
+            <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                <li class="nav-item">
+                    <a class="nav-link @ViewContext.NavItemActive("Home", "Index")"
+                       asp-controller="Home" asp-action="Index">
+                        Home
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @ViewContext.NavItemActive("Blog", "List")"
+                       asp-controller="Blog" asp-action="List">
+                        Blog
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @ViewContext.NavItemActive("Photography", "Index")" 
+                       asp-controller="Photography" asp-action="Index">
+                        Photography
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @ViewContext.NavItemActive("Rss", "Index")"
+                       asp-controller="Rss" asp-action="Index">
+                        Rss
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @ViewContext.NavItemActive("About", "Index")"
+                       asp-controller="About" asp-action="Index">
+                        About
+                    </a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="dropdown04" data-bs-toggle="dropdown" aria-expanded="false">Themes</a>
+                    <ul class="dropdown-menu" aria-labelledby="dropdown04">
+                        <li v-for="theme in themes">
+                            <a v-if="theme.name===currentTheme" class="dropdown-item active">{{theme.name}}</a>
+                            <a v-else class="dropdown-item" v-on:click="setTheme(theme.name)">{{theme.name}}</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+            <form asp-controller="Search" asp-action="Blog" method="get">
+                <input type="search" class="form-control" placeholder="Search..." aria-label="Search" name="keyword">
+            </form>
+        </div>
+    </div>
+</nav>

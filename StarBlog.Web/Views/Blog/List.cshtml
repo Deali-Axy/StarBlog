@@ -2,18 +2,74 @@
 @using X.PagedList.Mvc.Core
 @using StarBlog.Web.Utils
 @using Microsoft.AspNetCore.Mvc.TagHelpers
+@using StarBlog.Web.ViewModels.Blog
 @model StarBlog.Web.ViewModels.Blog.BlogListViewModel
 @{
     ViewData["Title"] = "博客列表";
+
+    string ConditionActive(Func<bool> condition) {
+        return condition() ? "active" : "";
+    }
 }
 
-@await Html.PartialAsync("Widgets/BackToTop", new BackToTopViewModel {IsShowText = false})
+@await Html.PartialAsync("Widgets/BackToTop", new BackToTopViewModel { IsShowText = false })
 
 <div class="container px-4 py-3">
-    <h2 class="d-flex w-100 justify-content-between pb-2 mb-3 border-bottom">
-        <div>Blog / @Model.CurrentCategory.Name</div>
-        <div>@Model.Posts.TotalItemCount.ToString() Posts</div>
-    </h2>
+    <div class="d-flex w-100 justify-content-between pb-2 mb-3 border-bottom">
+        <div>
+            <h2>Blog / @Model.CurrentCategory.Name</h2>
+            <span class="small">@Model.Posts.TotalItemCount.ToString() Posts</span>
+        </div>
+        <div>
+            <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+                <a class="btn btn-outline-primary @ConditionActive(() => Model.SortType == "desc")" asp-controller="Blog" asp-action="List"
+                   asp-route-categoryId="@Model.CurrentCategoryId"
+                   asp-route-sortBy="@Model.SortBy"
+                   asp-route-sortType="desc">
+                    <i class="fa-solid fa-down-long"></i>
+                </a>
+
+                <a class="btn btn-outline-primary @ConditionActive(() => Model.SortType == "asc")" asp-controller="Blog" asp-action="List"
+                   asp-route-categoryId="@Model.CurrentCategoryId"
+                   asp-route-sortBy="@Model.SortBy"
+                   asp-route-sortType="asc">
+                    <i class="fa-solid fa-up-long"></i>
+                </a>
+
+                <div class="btn-group" role="group">
+                    <button id="btnGroupDrop1" type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        排序
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+                        <li>
+                            <a class="dropdown-item" asp-controller="Blog" asp-action="List"
+                               asp-route-categoryId="@Model.CurrentCategoryId"
+                               asp-route-sortType="@Model.SortType"
+                               asp-route-sortBy="Title">
+                                文章标题
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" asp-controller="Blog" asp-action="List"
+                               asp-route-categoryId="@Model.CurrentCategoryId"
+                               asp-route-sortType="@Model.SortType"
+                               asp-route-sortBy="CreationTime">
+                                发表时间
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" asp-controller="Blog" asp-action="List"
+                               asp-route-categoryId="@Model.CurrentCategoryId"
+                               asp-route-sortType="@Model.SortType"
+                               asp-route-sortBy="LastUpdateTime">
+                                更新时间
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="row">
         <div class="col-lg-3 mb-3" id="categories"></div>
@@ -30,11 +86,17 @@
 
     <nav aria-label="Page navigation example">
         @Html.PagedListPager(Model.Posts, page => Url.Action(
-            RazorHelper.GetCurrentActionName(ViewContext), new {page, categoryId = Model.CurrentCategoryId}),
+            RazorHelper.GetCurrentActionName(ViewContext), new {
+                page,
+                categoryId = Model.CurrentCategoryId,
+                sortType = Model.SortType,
+                sortBy = Model.SortBy
+            }),
             new PagedListRenderOptions {
-                LiElementClasses = new[] {"page-item"},
-                PageClasses = new[] {"page-link"},
-                UlElementClasses = new[] {"pagination justify-content-center"}
+                LiElementClasses = new[] { "page-item" },
+                PageClasses = new[] { "page-link" },
+                UlElementClasses = new[] { "pagination justify-content-center" },
+                MaximumPageNumbersToDisplay = 6
             })
     </nav>
 </div>

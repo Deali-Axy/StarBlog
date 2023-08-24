@@ -17,11 +17,13 @@ namespace StarBlog.Web.Apis.Blog;
 [Route("Api/[controller]")]
 [ApiExplorerSettings(GroupName = ApiGroups.Blog)]
 public class BlogController : ControllerBase {
+    private readonly ILogger<BlogController> _logger;
     private readonly BlogService _blogService;
 
 
-    public BlogController(BlogService blogService) {
+    public BlogController(BlogService blogService, ILogger<BlogController> logger) {
         _blogService = blogService;
+        _logger = logger;
     }
 
     /// <summary>
@@ -29,6 +31,7 @@ public class BlogController : ControllerBase {
     /// </summary>
     /// <returns></returns>
     [HttpGet("Top")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<Post?>))]
     public async Task<Post?> GetTopOnePost() {
         return await _blogService.GetTopOnePost();
     }
@@ -38,6 +41,7 @@ public class BlogController : ControllerBase {
     /// </summary>
     /// <returns></returns>
     [HttpGet("Featured")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<List<Post>>))]
     public async Task<List<Post>> GetFeaturedPosts() {
         return await _blogService.GetFeaturedPosts();
     }
@@ -48,6 +52,7 @@ public class BlogController : ControllerBase {
     /// <returns></returns>
     // [Authorize]
     [HttpGet("[action]")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<BlogOverview>))]
     public async Task<BlogOverview> Overview() {
         return await _blogService.Overview();
     }
@@ -57,6 +62,7 @@ public class BlogController : ControllerBase {
     /// </summary>
     /// <returns></returns>
     [HttpGet("[action]")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<string?>))]
     public async Task<List<string?>> GetStatusList() {
         return await _blogService.GetStatusList();
     }
@@ -74,13 +80,14 @@ public class BlogController : ControllerBase {
             return ApiResponse.BadRequest("只能上传zip格式的文件哦~");
         }
 
-        var category = categoryService.GetById(dto.CategoryId);
+        var category = await categoryService.GetById(dto.CategoryId);
         if (category == null) return ApiResponse.BadRequest($"分类 {dto.CategoryId} 不存在！");
 
         try {
             return new ApiResponse<Post>(await _blogService.Upload(dto, file));
         }
         catch (Exception ex) {
+            _logger.LogError(ex, "解压文件出错：{message}", ex.Message);
             return ApiResponse.Error($"解压文件出错：{ex.Message}");
         }
     }

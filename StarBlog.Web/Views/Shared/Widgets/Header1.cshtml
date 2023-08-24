@@ -1,0 +1,96 @@
+﻿<header id="vue-header">
+    <div class="px-3 py-2 bg-dark text-white">
+        <div class="container">
+            <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+                <a class="d-flex align-items-center my-2 my-lg-0 me-lg-auto text-white text-decoration-none"
+                   asp-controller="Home" asp-action="Index">
+                    <img src="~/images/codelab.jpg" class="rounded-circle" alt="" style="height: 64px;width: 64px;">
+                </a>
+
+                <ul class="nav col-12 col-lg-auto pt-1 my-2 justify-content-center my-md-0 text-small">
+                    <li>
+                        <a class="nav-link text-white" asp-controller="Home" asp-action="Index">
+                            <div class="bi d-block mx-auto mb-1 text-center">
+                                <i class="fa-solid fa-house fa-2xl"></i>
+                            </div>
+                            Home
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link text-white" asp-controller="Blog" asp-action="List">
+                            <div class="bi d-block mx-auto mb-1 text-center">
+                                <i class="fa-solid fa-table-list fa-2xl"></i>
+                            </div>
+                            Blog
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link text-white" asp-controller="Photography" asp-action="Index">
+                            <div class="bi d-block mx-auto mb-1 text-center">
+                                <i class="fa-solid fa-images fa-2xl"></i>
+                            </div>
+                            Photos
+                        </a>
+                    </li>
+                    @* <li> *@
+                    @*     <a class="nav-link text-white" asp-controller="Product" asp-action="Index"> *@
+                    @*         <div class="bi d-block mx-auto mb-1 text-center"> *@
+                    @*             <i class="fa-solid fa-cubes fa-2xl"></i> *@
+                    @*         </div> *@
+                    @*         Products *@
+                    @*     </a> *@
+                    @* </li> *@
+                    @* <li> *@
+                    @*     <a href="#" class="nav-link text-white"> *@
+                    @*         <div class="bi d-block mx-auto mb-1 text-center"> *@
+                    @*             <i class="fa-solid fa-terminal fa-2xl"></i> *@
+                    @*         </div> *@
+                    @*         Console *@
+                    @*     </a> *@
+                    @* </li> *@
+                    <li>
+                        <a class="nav-link text-white" asp-controller="Rss" asp-action="Index">
+                            <div class="bi d-block mx-auto mb-1 text-center">
+                                <i class="fa-solid fa-rss fa-2xl"></i>
+                            </div>
+                            RSS
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link text-white" asp-controller="About" asp-action="Index">
+                            <div class="bi d-block mx-auto mb-1 text-center">
+                                <i class="fa-solid fa-circle-info fa-2xl"></i>
+                            </div>
+                            About
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="px-3 py-2 border-bottom mb-3">
+        <div class="container d-flex flex-wrap justify-content-center">
+            <form class="col-12 col-lg-auto mb-2 mb-lg-0 me-lg-auto"
+                  asp-controller="Search" asp-action="Blog" method="get">
+                <input type="search" class="form-control" placeholder="Search..." aria-label="Search" name="keyword">
+            </form>
+
+            <div class="text-end">
+                <span class="dropdown me-2">
+                    <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                        Themes
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                        <li v-for="theme in themes">
+                            <a v-if="theme.name===currentTheme" class="dropdown-item active">{{theme.name}}</a>
+                            <a v-else class="dropdown-item" v-on:click="setTheme(theme.name)">{{theme.name}}</a>
+                        </li>
+                    </ul>
+                </span>
+                @* todo 登录注册功能后续再来 *@
+                @* <button type="button" class="btn btn-light text-dark me-2">Login</button> *@
+                @* <button type="button" class="btn btn-primary">Sign-up</button> *@
+            </div>
+        </div>
+    </div>
+</header>

@@ -1,0 +1,127 @@
+﻿@model PostViewModel
+
+<div class="mt-5" id="vue-comment">
+    <div class="d-flex justify-content-between border-bottom pb-1">
+        <h5><i class="el-icon-chat-dot-round me-1"></i>讨论区</h5>
+        <span>共 {{comments.length}} 条讨论</span>
+    </div>
+
+    <el-form :model="form" status-icon :rules="formRules" ref="form" class="my-3">
+        <div class="row">
+            <div class="col-3">
+                <el-form-item prop="email">
+                    <el-input type="email" v-model="form.email" placeholder="邮箱地址" :disabled="emailDisabled"></el-input>
+                </el-form-item>
+            </div>
+            <div class="col-2">
+                <el-form-item prop="emailOtp">
+                    <el-input type="text" v-model="form.emailOtp" placeholder="验证码" autocomplete="off" maxlength="4" @@change="handleEmailOtpChange" :disabled="emailOtpDisabled">
+                        <el-button type="text" class="pe-2" :loading="getEmailOtpLoading" slot="suffix" @@click="handleGetEmailOtp" :disabled="getEmailOtpDisabled">{{getEmailOtpText}}</el-button>
+                    </el-input>
+                </el-form-item>
+            </div>
+            <div class="col-3">
+                <el-form-item prop="userName">
+                    <el-input type="text" v-model="form.userName" placeholder="昵称" :disabled="userNameDisabled" v-loading="userNameLoading"></el-input>
+                </el-form-item>
+            </div>
+            <div class="col-4">
+                <el-form-item prop="url">
+                    <el-input type="text" v-model="form.url" placeholder="网址" :disabled="urlDisabled" v-loading="urlLoading" @@blur="handleUrlBlur">
+                        <template slot="prepend">
+                            <i class="el-icon-ship"></i>
+                        </template>
+                    </el-input>
+                </el-form-item>
+            </div>
+        </div>
+        <el-form-item prop="content">
+            <el-input ref="content" type="textarea" :rows="4" v-model="form.content" maxlength="300" show-word-limit placeholder="友善的评论是交流的起点" :disabled="contentDisabled">
+            </el-input>
+            <div class="form-text mt-0" style="line-height:1.5rem">良言一句三冬暖，恶语伤人六月寒。</div>
+            <div class="d-flex align-items-center" v-if="replyComment">
+                <span class="me-1">回复</span>
+                <el-tag closable
+                        :disable-transitions="false"
+                        @@close="handleReplyTagClose">
+                    @@{{replyComment.anonymousUser.name}}
+                </el-tag>
+            </div>
+        </el-form-item>
+        <el-form-item>
+            <div class="d-flex justify-content-between">
+                <el-button round type="primary" plain :loading="refreshLoading" icon="el-icon-refresh" @@click="handleRefresh">刷新</el-button>
+                <div>
+                    <el-button round type="info" plain icon="el-icon-close" @@click="handleReset">重置</el-button>
+                    <el-button round type="success" plain :loading="submitLoading" icon="el-icon-edit" @@click="handleSubmit" :disabled="submitDisabled">发表</el-button>
+                </div>
+            </div>
+        </el-form-item>
+    </el-form>
+
+    <el-divider content-position="left">
+        <i class="el-icon-cold-drink"></i>
+    </el-divider>
+
+    <div class="mt-3" v-loading="refreshLoading">
+        <el-empty description="暂无讨论" v-if="comments.length===0"></el-empty>
+        <div class="list-group list-group-flush">
+            <div class="list-group-item" v-for="comment in comments">
+                <div class="row">
+                    <div class="col-auto">
+                        <el-popover placement="top-start" trigger="hover">
+                            <div class="row">
+                                <div class="col-auto">
+                                    <el-avatar class="ms-3" :src="comment.avatar" :size="100"></el-avatar>
+                                </div>
+                                <div class="col-auto">
+                                    <h5 class="ms-3">{{comment.anonymousUser.name}}</h5>
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item">首次发言：{{comment.anonymousUser.createdTime}}</li>
+                                        <li class="list-group-item">网站地址：{{comment.anonymousUser.url}}</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <el-avatar slot="reference" :src="comment.avatar" :size="50"></el-avatar>
+                        </el-popover>
+                    </div>
+                    <div class="col">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">{{comment.anonymousUser.name}}</h5>
+                            <small class="text-muted">{{comment.createdTime}}</small>
+                        </div>
+                        <div class="mb-1">
+                            <el-link v-if="comment.replyUser">@@{{comment.replyUser}}</el-link>
+                            {{comment.content}}
+                        </div>
+                        <div class="d-flex w-100 justify-content-between">
+                            <a class="text-muted small" :href="`//${comment.anonymousUser.url}`" target="_blank">{{comment.anonymousUser.url}}</a>
+                            <el-link type="primary" :disabled="replyDisabled" @@click="handleReply(comment)">回复</el-link>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <el-divider content-position="right">
+        <i class="el-icon-mobile-phone"></i>
+    </el-divider>
+
+    <nav aria-label="评论分页" class="my-3">
+        <div class="d-flex justify-content-center">
+            <el-pagination
+                background
+                layout="prev, pager, next, sizes, total"
+                :total="total"
+                :current-page="page"
+                :page-sizes="[5, 10, 20, 50]"
+                :page-size="pageSize"
+                @@current-change="handleCurrentChange"
+                @@size-change="handleSizeChange">
+            </el-pagination>
+        </div>
+    </nav>
+</div>
+
+<script>const POST_ID = '@Model.Id'</script>

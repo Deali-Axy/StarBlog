@@ -1,4 +1,5 @@
 ﻿using System.Text.RegularExpressions;
+using System.Web;
 using Markdig;
 using Markdig.Renderers.Normalize;
 using Markdig.Syntax;
@@ -36,19 +37,21 @@ public class PostProcessor {
             foreach (var inline in paragraphBlock.Inline) {
                 if (inline is not LinkInline { IsImage: true } linkInline) continue;
 
-                if (linkInline.Url == null) continue;
-                if (linkInline.Url.StartsWith("http")) continue;
+                var imgUrl = HttpUtility.UrlDecode(linkInline.Url);
+                if (imgUrl == null) continue;
+                if (imgUrl.StartsWith("http")) continue;
 
                 // 路径处理
-                var imgPath = Path.Combine(_importPath, _post.Path, linkInline.Url);
-                var imgFilename = Path.GetFileName(linkInline.Url);
+                var imgPath = Path.Combine(_importPath, _post.Path ?? "", imgUrl);
+                var imgFilename = Path.GetFileName(imgUrl);
                 var destDir = Path.Combine(_assetsPath, _post.Id);
                 if (!Directory.Exists(destDir)) Directory.CreateDirectory(destDir);
                 var destPath = Path.Combine(destDir, imgFilename);
                 if (File.Exists(destPath)) {
                     // 图片重名处理
                     var imgId = GuidUtils.GuidTo16String();
-                    imgFilename = $"{Path.GetFileNameWithoutExtension(imgFilename)}-{imgId}.{Path.GetExtension(imgFilename)}";
+                    imgFilename =
+                        $"{Path.GetFileNameWithoutExtension(imgFilename)}-{imgId}.{Path.GetExtension(imgFilename)}";
                     destPath = Path.Combine(destDir, imgFilename);
                 }
 

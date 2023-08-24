@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using StarBlog.Data.Models;
 using StarBlog.Share.Extensions;
 using StarBlog.Web.Contrib.SiteMessage;
+using StarBlog.Web.Extensions;
 using StarBlog.Web.Services;
 using StarBlog.Web.ViewModels;
 
@@ -14,14 +15,17 @@ public class HomeController : Controller {
     private readonly CategoryService _categoryService;
     private readonly LinkService _linkService;
     private readonly MessageService _messages;
+    private readonly ConfigService _conf;
 
-    public HomeController(BlogService blogService, PhotoService photoService, CategoryService categoryService, LinkService linkService,
-        MessageService messages) {
+    public HomeController(BlogService blogService, PhotoService photoService, CategoryService categoryService,
+        LinkService linkService,
+        MessageService messages, ConfigService conf) {
         _blogService = blogService;
         _photoService = photoService;
         _categoryService = categoryService;
         _linkService = linkService;
         _messages = messages;
+        _conf = conf;
     }
 
     public async Task<IActionResult> Index() {
@@ -29,14 +33,23 @@ public class HomeController : Controller {
             return BadRequest();
         }
 
-        return View(new HomeViewModel {
+        var vm = new HomeViewModel {
+            ChartVisible = _conf["home_chart_visible"] == "true",
+            RandomPhotoVisible = _conf["home_random_photo_visible"] == "true",
             RandomPhoto = await _photoService.GetRandomPhoto(),
             TopPost = await _blogService.GetTopOnePost(),
             FeaturedPosts = await _blogService.GetFeaturedPosts(),
             FeaturedPhotos = await _photoService.GetFeaturedPhotos(),
             FeaturedCategories = await _categoryService.GetFeaturedCategories(),
             Links = await _linkService.GetAll()
-        });
+        };
+
+        if (HttpContext.Request.IsMobileBrowser()) {
+            vm.ChartVisible = false;
+            vm.RandomPhotoVisible = false;
+        }
+
+        return View(vm);
     }
 
     [HttpGet]
@@ -53,21 +66,22 @@ public class HomeController : Controller {
     }
 
     [HttpPost]
-    public IActionResult Init([FromServices] ConfigService conf, [FromServices] IBaseRepository<User> userRepo, InitViewModel vm) {
-        if (conf["is_init"] == "true") {
+    public IActionResult Init([FromServices] IBaseRepository<User> userRepo, InitViewModel vm) {
+        if (_conf["is_init"] == "true") {
             _messages.Error("已经完成初始化！");
             return RedirectToAction(nameof(Index));
         }
-        
+
         if (!ModelState.IsValid) return View();
 
         // 保存配置
-        conf["host"] = vm.Host;
-        conf["default_render"] = vm.DefaultRender;
-        conf["is_init"] = "true";
+        _conf["host"] = vm.Host;
+        _conf["default_render"] = vm.DefaultRender;
+        _conf["is_init"] = "true";
 
         // 创建用户
         // to do 这里暂时存储明文密码，后期要换成MD5加密存储。2023-5-7 搞定
+        // todo 使用加盐的hash密码 https://www.ais.com/how-to-generate-a-jwt-token-using-net-6/
         userRepo.Insert(new User {
             Id = Guid.NewGuid().ToString(),
             Name = vm.Username,

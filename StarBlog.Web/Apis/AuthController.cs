@@ -28,6 +28,8 @@ public class AuthController : ControllerBase {
     /// <param name="loginUser"></param>
     /// <returns></returns>
     [HttpPost]
+    [Route("")]
+    [Route("[action]")]
     [ProducesResponseType(typeof(ApiResponse<LoginToken>), StatusCodes.Status200OK)]
     public async Task<ApiResponse> Login(LoginUser loginUser) {
         var user = await _authService.GetUserByName(loginUser.Username);
@@ -42,6 +44,8 @@ public class AuthController : ControllerBase {
     /// <returns></returns>
     [Authorize]
     [HttpGet]
+    [Route("")]
+    [Route("[action]")]
     public ApiResponse<User> GetUser() {
         var user = _authService.GetUser(User);
         if (user == null) return ApiResponse.NotFound("找不到用户资料");

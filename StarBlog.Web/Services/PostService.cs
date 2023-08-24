@@ -76,21 +76,13 @@ public class PostService {
     /// <summary>
     /// 指定文章上传图片
     /// </summary>
-    /// <param name="post"></param>
-    /// <param name="file"></param>
-    /// <returns></returns>
     public async Task<string> UploadImage(Post post, IFormFile file) {
         InitPostMediaDir(post);
 
-        var filename = WebUtility.UrlEncode(file.FileName);
+        // 直接生成唯一文件名，不保留原始文件名了。——2023-6-5 21:21:46
+        var filename = GuidUtils.GuidTo16String() + Path.GetExtension(file.FileName);
         var fileRelativePath = Path.Combine("media", "blog", post.Id, filename);
         var savePath = Path.Combine(_environment.WebRootPath, fileRelativePath);
-        if (File.Exists(savePath)) {
-            // 上传文件重名处理
-            var newFilename = $"{Path.GetFileNameWithoutExtension(filename)}-{GuidUtils.GuidTo16String()}.{Path.GetExtension(filename)}";
-            fileRelativePath = Path.Combine("media", "blog", post.Id, newFilename);
-            savePath = Path.Combine(_environment.WebRootPath, fileRelativePath);
-        }
 
         await using (var fs = new FileStream(savePath, FileMode.Create)) {
             await file.CopyToAsync(fs);
@@ -102,8 +94,6 @@ public class PostService {
     /// <summary>
     /// 获取指定文章的图片资源
     /// </summary>
-    /// <param name="post"></param>
-    /// <returns></returns>
     public List<string> GetImages(Post post) {
         var data = new List<string>();
         var postDir = InitPostMediaDir(post);
@@ -123,7 +113,7 @@ public class PostService {
         }
 
         // 状态过滤
-        if (!string.IsNullOrEmpty(param.Status)) {
+        if (!string.IsNullOrWhiteSpace(param.Status)) {
             querySet = querySet.Where(a => a.Status == param.Status);
         }
 
@@ -133,12 +123,12 @@ public class PostService {
         }
 
         // 关键词过滤
-        if (!string.IsNullOrEmpty(param.Search)) {
+        if (!string.IsNullOrWhiteSpace(param.Search)) {
             querySet = querySet.Where(a => a.Title.Contains(param.Search));
         }
 
         // 排序
-        if (!string.IsNullOrEmpty(param.SortBy)) {
+        if (!string.IsNullOrWhiteSpace(param.SortBy)) {
             // 是否升序
             var isAscending = !param.SortBy.StartsWith("-");
             var orderByProperty = param.SortBy.Trim('-');
@@ -172,7 +162,7 @@ public class PostService {
             TocNodes = post.ExtractToc()
         };
 
-        if (post.Slug != null) {
+        if (!string.IsNullOrWhiteSpace(post.Slug)) {
             model.Url = Host + _generator.GetPathByAction(
                 _accessor.HttpContext!,
                 "PostBySlug", "Blog",
@@ -181,14 +171,7 @@ public class PostService {
         }
 
         if (md2Html) {
-            // todo 研究一下后端渲染Markdown (PS: 虽然前端渲染轮子更多、效果更好，但后端渲染不会有割裂感）
-            // 这部分一些参考资料：
-            // - 关于前端渲染 MarkDown 样式：https://blog.csdn.net/sprintline/article/details/122849907
-            // - https://github.com/showdownjs/showdown
-            var pipeline = new MarkdownPipelineBuilder()
-                .UseAdvancedExtensions()
-                .Build();
-            model.ContentHtml = Markdown.ToHtml(model.Content, pipeline);
+            model.ContentHtml = GetContentHtml(post);
         }
 
         if (post.Categories != null) {
@@ -199,6 +182,18 @@ public class PostService {
         }
 
         return model;
+    }
+
+    public static string GetContentHtml(Post post) {
+        // todo 研究一下后端渲染Markdown (PS: 虽然前端渲染轮子更多、效果更好，但后端渲染不会有割裂感）
+        // 这部分一些参考资料：
+        // - 关于前端渲染 MarkDown 样式：https://blog.csdn.net/sprintline/article/details/122849907
+        // - https://github.com/showdownjs/showdown
+        var pipeline = new MarkdownPipelineBuilder()
+            .UseAdvancedExtensions()
+            .UseBootstrap5()
+            .Build();
+        return Markdown.ToHtml(post.Content ?? "", pipeline);
     }
 
     /// <summary>
