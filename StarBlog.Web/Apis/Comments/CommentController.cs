@@ -110,7 +110,9 @@ public class CommentController : ControllerBase {
     [Authorize]
     [HttpGet("[action]")]
     public async Task<ApiResponsePaged<Comment>> GetNeedAuditList([FromQuery] CommentQueryParameters @params) {
-        var (data, meta) = await _commentService.GetPagedList(@params, false, true);
+        var (data, meta) = await _commentService.GetPagedList(
+            @params, false, true, true
+        );
         return new ApiResponsePaged<Comment>(data, meta);
     }
 
