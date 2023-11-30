@@ -37,6 +37,8 @@
 - [基于.NetCore开发博客项目 StarBlog - (25) 图片接口与文件上传](https://www.cnblogs.com/deali/p/16999818.html)
 - [基于.NetCore开发博客项目 StarBlog - (26) 集成Swagger接口文档](https://www.cnblogs.com/deali/p/17093390.html)
 - [基于.NetCore开发博客项目 StarBlog - (27) 使用JWT保护接口](https://blog.sblt.deali.cn:9000/Blog/Post/541b8beae183d29e)
+- [基于.NetCore开发博客项目 StarBlog - (28) 开发友情链接相关接口](https://www.cnblogs.com/deali/p/starblog-28.html)
+- [基于.NetCore开发博客项目 StarBlog - (29) 开发RSS订阅功能](https://www.cnblogs.com/deali/p/17501704.html)
 - ...
 
 
