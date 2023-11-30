@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.EntityFrameworkCore;
 using RobotsTxt;
 using SixLabors.ImageSharp.Web.DependencyInjection;
+using StarBlog.Data;
 using StarBlog.Data.Extensions;
 using StarBlog.Web.Contrib.SiteMessage;
 using StarBlog.Web.Extensions;
@@ -26,6 +28,9 @@ builder.Services.AddSession(options => {
     options.Cookie.IsEssential = true;
 });
 builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddDbContext<AppDbContext>(options => {
+    options.UseSqlite(builder.Configuration.GetConnectionString("SQLite-Log"));
+});
 builder.Services.AddFreeSql(builder.Configuration);
 builder.Services.AddHttpClient();
 builder.Services.AddCors(options => {
@@ -89,7 +94,7 @@ app.UseStaticFiles(new StaticFileOptions {
     ServeUnknownFileTypes = true
 });
 
-// app.UseMiddleware<VisitRecordMiddleware>();
+app.UseMiddleware<VisitRecordMiddleware>();
 app.UseRobotsTxt();
 app.UseRouting();
 app.UseCors();
@@ -100,8 +105,6 @@ app.UseSession();
 
 app.UseSwaggerPkg();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

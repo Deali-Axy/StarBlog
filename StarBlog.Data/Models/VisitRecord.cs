@@ -8,7 +8,7 @@ namespace StarBlog.Data.Models;
 [Table(Name = "visit_record")]
 public class VisitRecord {
     [Column(IsIdentity = true, IsPrimary = true)]
-    public int Id { get; set; }
+    public long Id { get; set; }
 
     /// <summary>
     /// IP地址
