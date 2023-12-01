@@ -137,8 +137,8 @@ public class PostService {
         }
 
         IPagedList<Post> pagedList = new StaticPagedList<Post>(
-            await querySet.Include(a => a.Category).ToListAsync(),
-            param.Page, param.PageSize, Convert.ToInt32(await _postRepo.Select.CountAsync())
+            await querySet.Page(param.Page, param.PageSize).Include(a => a.Category).ToListAsync(),
+            param.Page, param.PageSize, Convert.ToInt32(await querySet.CountAsync())
         );
         return pagedList;
     }

@@ -60,7 +60,8 @@ public class CategoryService {
 
     public async Task<IPagedList<Category>> GetPagedList(int page = 1, int pageSize = 10) {
         IPagedList<Category> pagedList = new StaticPagedList<Category>(
-            await _cRepo.Select.ToListAsync(), page, pageSize, Convert.ToInt32(await _cRepo.Select.CountAsync())
+            await _cRepo.Select.Page(page, pageSize).ToListAsync(), page, pageSize,
+            Convert.ToInt32(await _cRepo.Select.CountAsync())
         );
         return pagedList;
     }

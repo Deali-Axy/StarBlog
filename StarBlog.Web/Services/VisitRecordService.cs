@@ -43,7 +43,7 @@ public class VisitRecordService {
         IPagedList<VisitRecord> pagedList = new StaticPagedList<VisitRecord>(
             await querySet.Page(param.Page, param.PageSize).ToListAsync(),
             param.Page, param.PageSize,
-            Convert.ToInt32(await _repo.Select.CountAsync())
+            Convert.ToInt32(await querySet.CountAsync())
         );
         return pagedList;
     }

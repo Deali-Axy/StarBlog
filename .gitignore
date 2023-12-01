@@ -6,10 +6,7 @@ StarBlog.Web/package-lock.json
 StarBlog.Web/yarn.lock
 StarBlog.Web/appsettings-email.json
 StarBlog.Web/words.json
-app.db
-app.db-shm
-app.db-wal
-app.db.*
+app*.db*
 *.min.css
 *.min.js
 

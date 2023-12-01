@@ -27,9 +27,11 @@ public class CommentService {
     }
 
     private List<Comment>? GetCommentsTree(List<Comment> commentsList, string? parentId = null) {
-        var comments = commentsList
-            .Where(a => a.ParentId == parentId && a.Visible)
-            .ToList();
+        var comments = commentsList.Where(e => e.Visible).ToList();
+        
+        if (parentId!=null) {
+            comments = comments.Where(e => e.ParentId == parentId).ToList();
+        }
 
         if (comments.Count == 0) return null;
 
@@ -39,8 +41,8 @@ public class CommentService {
         }).ToList();
     }
 
-    public async Task<List<Comment>?> GetAll(Post post) {
-        var comments = await _commentRepo.Where(a => a.PostId == post.Id).ToListAsync();
+    public async Task<List<Comment>?> GetAll(string postId) {
+        var comments = await _commentRepo.Where(a => a.PostId == postId).ToListAsync();
         return GetCommentsTree(comments);
     }
 

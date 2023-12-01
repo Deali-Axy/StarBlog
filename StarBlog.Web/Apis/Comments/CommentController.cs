@@ -104,6 +104,11 @@ public class CommentController : ControllerBase {
         };
     }
 
+    [HttpGet("[action]")]
+    public async Task<List<Comment>?> GetAll(string postId) {
+        return await _commentService.GetAll(postId);
+    }
+
     /// <summary>
     /// 获取需要审核的评论列表
     /// </summary>
