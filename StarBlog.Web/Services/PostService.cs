@@ -136,8 +136,11 @@ public class PostService {
             querySet = querySet.OrderByPropertyName(orderByProperty, isAscending);
         }
 
-        return (await querySet.Include(a => a.Category).ToListAsync())
-            .ToPagedList(param.Page, param.PageSize);
+        IPagedList<Post> pagedList = new StaticPagedList<Post>(
+            await querySet.Include(a => a.Category).ToListAsync(),
+            param.Page, param.PageSize, Convert.ToInt32(await _postRepo.Select.CountAsync())
+        );
+        return pagedList;
     }
 
     /// <summary>
@@ -153,7 +156,7 @@ public class PostService {
             Url = _generator.GetUriByAction(
                 _accessor.HttpContext!,
                 "Post", "Blog",
-                new {post.Id}
+                new { post.Id }
             ),
             CreationTime = post.CreationTime,
             LastUpdateTime = post.LastUpdateTime,
@@ -166,7 +169,7 @@ public class PostService {
             model.Url = Host + _generator.GetPathByAction(
                 _accessor.HttpContext!,
                 "PostBySlug", "Blog",
-                new {post.Slug}
+                new { post.Slug }
             );
         }
 
@@ -222,9 +225,9 @@ public class PostService {
         var document = Markdown.Parse(post.Content);
 
         foreach (var node in document.AsEnumerable()) {
-            if (node is not ParagraphBlock {Inline: { }} paragraphBlock) continue;
+            if (node is not ParagraphBlock { Inline: { } } paragraphBlock) continue;
             foreach (var inline in paragraphBlock.Inline) {
-                if (inline is not LinkInline {IsImage: true} linkInline) continue;
+                if (inline is not LinkInline { IsImage: true } linkInline) continue;
 
                 var imgUrl = linkInline.Url;
                 if (imgUrl == null) continue;
@@ -264,9 +267,9 @@ public class PostService {
 
         var document = Markdown.Parse(post.Content);
         foreach (var node in document.AsEnumerable()) {
-            if (node is not ParagraphBlock {Inline: { }} paragraphBlock) continue;
+            if (node is not ParagraphBlock { Inline: { } } paragraphBlock) continue;
             foreach (var inline in paragraphBlock.Inline) {
-                if (inline is not LinkInline {IsImage: true} linkInline) continue;
+                if (inline is not LinkInline { IsImage: true } linkInline) continue;
 
                 var imgUrl = linkInline.Url;
                 // 跳过空链接

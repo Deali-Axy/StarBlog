@@ -29,8 +29,11 @@ public class PhotoService {
     }
 
     public async Task<IPagedList<Photo>> GetPagedList(int page = 1, int pageSize = 10) {
-        return (await _photoRepo.Select.OrderByDescending(a => a.CreateTime)
-            .ToListAsync()).ToPagedList(page, pageSize);
+        IPagedList<Photo> pagedList = new StaticPagedList<Photo>(
+            await _photoRepo.Select.OrderByDescending(a => a.CreateTime).ToListAsync(),
+            page, pageSize, Convert.ToInt32(await _photoRepo.Select.CountAsync())
+        );
+        return pagedList;
     }
 
     public async Task<List<Photo>> GetFeaturedPhotos() {

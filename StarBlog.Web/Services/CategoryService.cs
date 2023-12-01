@@ -25,7 +25,7 @@ public class CategoryService {
 
     public async Task<List<CategoryNode>?> GetNodes() {
         var categoryList = await _cRepo.Select
-            .IncludeMany(a => a.Posts.Select(p => new Post {Id = p.Id}))
+            .IncludeMany(a => a.Posts.Select(p => new Post { Id = p.Id }))
             .ToListAsync();
         return GetNodes(categoryList, 0);
     }
@@ -47,9 +47,9 @@ public class CategoryService {
                 _accessor.HttpContext!,
                 nameof(BlogController.List),
                 "Blog",
-                new {categoryId = category.Id}
+                new { categoryId = category.Id }
             ),
-            tags = new List<string> {category.Posts.Count.ToString()},
+            tags = new List<string> { category.Posts.Count.ToString() },
             nodes = GetNodes(categoryList, category.Id)
         }).ToList();
     }
@@ -59,7 +59,10 @@ public class CategoryService {
     }
 
     public async Task<IPagedList<Category>> GetPagedList(int page = 1, int pageSize = 10) {
-        return (await _cRepo.Select.ToListAsync()).ToPagedList(page, pageSize);
+        IPagedList<Category> pagedList = new StaticPagedList<Category>(
+            await _cRepo.Select.ToListAsync(), page, pageSize, Convert.ToInt32(await _cRepo.Select.CountAsync())
+        );
+        return pagedList;
     }
 
     public async Task<Category?> GetById(int id) {
@@ -84,7 +87,7 @@ public class CategoryService {
             .Where(a => a.Visible && a.ParentId == 0)
             .IncludeMany(a => a.Posts).ToListAsync();
 
-        var data = list.Select(item => new {name = item.Name, value = item.Posts.Count}).ToList<object>();
+        var data = list.Select(item => new { name = item.Name, value = item.Posts.Count }).ToList<object>();
 
         return data;
     }
@@ -98,7 +101,8 @@ public class CategoryService {
             .Include(a => a.Category).FirstAsync();
     }
 
-    public async Task<FeaturedCategory> AddOrUpdateFeaturedCategory(Category category, FeaturedCategoryCreationDto dto) {
+    public async Task<FeaturedCategory>
+        AddOrUpdateFeaturedCategory(Category category, FeaturedCategoryCreationDto dto) {
         var item = await _fcRepo.Where(a => a.CategoryId == category.Id).FirstAsync();
         if (item == null) {
             item = new FeaturedCategory {
@@ -136,7 +140,7 @@ public class CategoryService {
     /// <para>形式：1,3,5,7,9</para>
     /// </summary>
     public string GetCategoryBreadcrumb(Category item) {
-        var categories = new List<Category> {item};
+        var categories = new List<Category> { item };
         var parent = item.Parent;
         while (parent != null) {
             categories.Add(parent);

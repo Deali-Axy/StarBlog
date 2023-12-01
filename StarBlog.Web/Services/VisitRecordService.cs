@@ -37,8 +37,15 @@ public class VisitRecordService {
             querySet = querySet.OrderByPropertyName(orderByProperty, isAscending);
         }
 
-        // todo 不能这样分页，得用数据库分页，不然性能很差
-        return (await querySet.ToListAsync()).ToPagedList(param.Page, param.PageSize);
+        // to do 不能这样分页，得用数据库分页，不然性能很差 - 2023-12-1 09:53:50 搞定
+        // return (await querySet.ToListAsync()).ToPagedList(param.Page, param.PageSize);
+
+        IPagedList<VisitRecord> pagedList = new StaticPagedList<VisitRecord>(
+            await querySet.Page(param.Page, param.PageSize).ToListAsync(),
+            param.Page, param.PageSize,
+            Convert.ToInt32(await _repo.Select.CountAsync())
+        );
+        return pagedList;
     }
 
     /// <summary>
