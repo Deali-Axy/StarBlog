@@ -13,6 +13,16 @@ public class PostUpdateDto {
     /// <para> http://starblog.com/p/post-slug1 </para>
     /// </summary>
     public string? Slug { get; set; }
+    
+    /// <summary>
+    /// 文章标记
+    /// </summary>
+    public string? Status { get; set; }
+    
+    /// <summary>
+    /// 是否发表（不发表的话就是草稿状态）
+    /// </summary>
+    public bool IsPublish { get; set; }
 
     /// <summary>
     /// 梗概
