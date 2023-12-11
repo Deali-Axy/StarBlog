@@ -5,9 +5,9 @@
 /// </summary>
 public class PostQueryParameters : QueryParameters {
     /// <summary>
-    /// 仅请求已发布文章
+    /// 是否已发布（仅管理员可以查询和管理未发布文章）
     /// </summary>
-    public bool OnlyPublished { get; set; } = false;
+    public bool? IsPublish { get; set; } = null;
 
     /// <summary>
     /// 文章状态

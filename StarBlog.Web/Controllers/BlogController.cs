@@ -58,7 +58,6 @@ public class BlogController : Controller {
                 CategoryId = categoryId,
                 Page = page,
                 PageSize = pageSize,
-                OnlyPublished = true,
                 SortBy = sortType == "desc" ? $"-{sortBy}" : sortBy
             })
         });

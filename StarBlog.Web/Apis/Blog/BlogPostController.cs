@@ -35,7 +35,10 @@ public class BlogPostController : ControllerBase {
     [AllowAnonymous]
     [HttpGet]
     public async Task<ApiResponsePaged<Post>> GetList([FromQuery] PostQueryParameters param) {
-        var pagedList = await _postService.GetPagedList(param);
+        // 已登录则设置为管理员模式
+        // todo 后续改成根据角色确定管理员
+        var adminMode = User.Identity?.IsAuthenticated ?? false;
+        var pagedList = await _postService.GetPagedList(param, adminMode);
         return new ApiResponsePaged<Post> {
             Message = "Get posts list",
             Data = pagedList.ToList(),
@@ -154,6 +157,6 @@ public class BlogPostController : ControllerBase {
         var post = await _postService.GetById(id);
         if (post == null) return ApiResponse.NotFound($"博客 {id} 不存在");
         var (data, rows) = await _blogService.SetTopPost(post);
-        return new ApiResponse<TopPost> {Data = data, Message = $"ok. deleted {rows} old topPosts."};
+        return new ApiResponse<TopPost> { Data = data, Message = $"ok. deleted {rows} old topPosts." };
     }
 }

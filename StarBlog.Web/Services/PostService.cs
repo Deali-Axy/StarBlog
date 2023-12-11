@@ -104,11 +104,15 @@ public class PostService {
         return data;
     }
 
-    public async Task<IPagedList<Post>> GetPagedList(PostQueryParameters param) {
+    public async Task<IPagedList<Post>> GetPagedList(PostQueryParameters param, bool adminMode = false) {
         var querySet = _postRepo.Select;
 
-        // 是否发布
-        if (param.OnlyPublished) {
+        // 筛选发布状态
+        // 仅管理员能筛选发布状态
+        if (param.IsPublish != null && adminMode) {
+            querySet = _postRepo.Select.Where(a => a.IsPublish == param.IsPublish);
+        }
+        if (!adminMode) {
             querySet = _postRepo.Select.Where(a => a.IsPublish);
         }
 
