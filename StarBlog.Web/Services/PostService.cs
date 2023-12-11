@@ -43,6 +43,13 @@ public class PostService {
         _logger = logger;
     }
 
+    /// <summary>
+    /// 检查 slug 是否可用
+    /// </summary>
+    public async Task<bool> CheckSlugAvailable(string slug) {
+        return !await _postRepo.Select.AnyAsync(a => a.Slug == slug);
+    }
+
     public async Task<Post?> GetById(string id) {
         // 获取文章的时候对markdown中的图片地址解析，加上完整地址返回给前端
         var post = await _postRepo.Where(a => a.Id == id).Include(a => a.Category).FirstAsync();
@@ -112,6 +119,7 @@ public class PostService {
         if (param.IsPublish != null && adminMode) {
             querySet = _postRepo.Select.Where(a => a.IsPublish == param.IsPublish);
         }
+
         if (!adminMode) {
             querySet = _postRepo.Select.Where(a => a.IsPublish);
         }

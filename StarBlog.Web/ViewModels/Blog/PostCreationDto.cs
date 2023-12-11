@@ -11,6 +11,11 @@ public class PostCreationDto {
     /// <para> http://starblog.com/p/post-slug1 </para>
     /// </summary>
     public string? Slug { get; set; }
+    
+    /// <summary>
+    /// 文章标记
+    /// </summary>
+    public string? Status { get; set; }
 
     /// <summary>
     /// 梗概

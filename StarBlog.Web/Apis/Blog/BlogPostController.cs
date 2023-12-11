@@ -69,6 +69,10 @@ public class BlogPostController : ControllerBase {
         var category = await categoryService.GetById(dto.CategoryId);
         if (category == null) return ApiResponse.BadRequest($"分类 {dto.CategoryId} 不存在！");
 
+        if (!string.IsNullOrWhiteSpace(dto.Slug) && !await _postService.CheckSlugAvailable(dto.Slug)) {
+            return ApiResponse.BadRequest("指定的 slug 已经被其他文章使用！");
+        }
+
         post.Id = GuidUtils.GuidTo16String();
         post.CreationTime = DateTime.Now;
         post.LastUpdateTime = DateTime.Now;
@@ -84,6 +88,12 @@ public class BlogPostController : ControllerBase {
     public async Task<ApiResponse<Post>> Update(string id, PostUpdateDto dto) {
         var post = await _postService.GetById(id);
         if (post == null) return ApiResponse.NotFound($"博客 {id} 不存在");
+
+        if (!string.IsNullOrWhiteSpace(dto.Slug)) {
+            if (dto.Slug!= post.Slug && !await _postService.CheckSlugAvailable(dto.Slug)) {
+                return ApiResponse.BadRequest("指定的 slug 已经被其他文章使用！");
+            }
+        }
 
         // mapper.Map(source) 得到一个全新的对象
         // mapper.Map(source, dest) 在 dest 对象的基础上修改
