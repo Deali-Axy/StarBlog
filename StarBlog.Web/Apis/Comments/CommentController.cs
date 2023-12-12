@@ -28,7 +28,8 @@ public class CommentController : ControllerBase {
     /// </summary>
     [HttpGet]
     public async Task<ApiResponsePaged<Comment>> GetPagedList([FromQuery] CommentQueryParameters @params) {
-        var (data, meta) = await _commentService.GetPagedList(@params);
+        var adminMode = User.Identity?.IsAuthenticated ?? false;
+        var (data, meta) = await _commentService.GetPagedList(@params, adminMode, adminMode);
         return new ApiResponsePaged<Comment>(data, meta);
     }
 
@@ -107,18 +108,6 @@ public class CommentController : ControllerBase {
     [HttpGet("[action]")]
     public async Task<List<Comment>?> GetAll(string postId) {
         return await _commentService.GetAll(postId);
-    }
-
-    /// <summary>
-    /// 获取需要审核的评论列表
-    /// </summary>
-    [Authorize]
-    [HttpGet("[action]")]
-    public async Task<ApiResponsePaged<Comment>> GetNeedAuditList([FromQuery] CommentQueryParameters @params) {
-        var (data, meta) = await _commentService.GetPagedList(
-            @params, false, true, true
-        );
-        return new ApiResponsePaged<Comment>(data, meta);
     }
 
     /// <summary>

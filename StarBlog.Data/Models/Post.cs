@@ -23,11 +23,13 @@ public class Post {
     public string? Slug { get; set; }
     
     /// <summary>
-    /// 文章状态，提取原markdown文件的文件名前缀，用于区分文章状态，例子如下
+    /// 文章标记，提取原markdown文件的文件名前缀，用于区分文章状态，例子如下
     /// <para>《（未完成）StarBlog博客开发笔记(3)：模型设计》</para>
     /// <para>《（未发布）StarBlog博客开发笔记(3)：模型设计》</para>
     /// </summary>
     public string? Status { get; set; }
+    
+    // todo 新增 tag 功能
 
     /// <summary>
     /// 是否发表（不发表的话就是草稿状态）
