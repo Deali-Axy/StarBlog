@@ -57,7 +57,7 @@ public class BlogPostController : ControllerBase {
     public async Task<ApiResponse> Delete(string id) {
         var post = await _postService.GetById(id);
         if (post == null) return ApiResponse.NotFound($"博客 {id} 不存在");
-        var rows = _postService.Delete(id);
+        var rows = await _postService.Delete(id);
         return ApiResponse.Ok($"删除了 {rows} 篇博客");
     }
 
