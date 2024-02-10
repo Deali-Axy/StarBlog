@@ -93,6 +93,15 @@ if (app.Environment.IsDevelopment()) {
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+else {
+    app.UseExceptionHandler(applicationBuilder => {
+        applicationBuilder.Run(async context => {
+            // todo 记录错误日志
+            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            await context.Response.WriteAsJsonAsync(new { message = "Unexpected error!" });
+        });
+    });
+}
 
 app.UseForwardedHeaders(new ForwardedHeadersOptions {
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
