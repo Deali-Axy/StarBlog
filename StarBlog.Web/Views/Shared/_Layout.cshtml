@@ -1,5 +1,6 @@
 ﻿@using StarBlog.Web.Utils
 @inject StarBlog.Web.Contrib.SiteMessage.MessageService Messages
+@inject Rin.Mvc.View.RinHelperService RinHelper
 
 <!DOCTYPE html>
 <html lang="en">
@@ -22,6 +23,10 @@
     <link rel="stylesheet" href="~/css/metro.css">
     <link rel="stylesheet" href="~/css/footer.css">
     <script src="~/js/site.preload.js"></script>
+    <environment include="Development">
+        @* Add: Enable In-View Inspector for ASP.NET Core MVC *@
+        @RinHelper.RenderInViewInspector()
+    </environment>
 
     @await RenderSectionAsync("head", false)
 </head>
