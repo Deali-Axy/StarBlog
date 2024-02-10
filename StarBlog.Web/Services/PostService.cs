@@ -59,6 +59,7 @@ public class PostService {
     }
 
     public async Task<int> Delete(string id) {
+        // todo 删除文章的时候顺便删除对应的图片资源
         return await _postRepo.DeleteAsync(a => a.Id == id);
     }
 
@@ -74,6 +75,8 @@ public class PostService {
         post.Content = await MdExternalUrlDownloadAsync(post);
         // 修改文章时，将markdown中的图片地址替换成相对路径再保存
         post.Content = MdImageLinkConvert(post, false);
+        // todo 修改文章时，要同时重新生成分类层级
+        
 
         // 处理完内容再更新一次
         await _postRepo.UpdateAsync(post);
