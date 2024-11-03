@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Text.Json;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StarBlog.Web.Extensions;
 using StarBlog.Web.Services;
@@ -26,5 +27,12 @@ public class DataAcqController : ControllerBase {
     [HttpGet]
     public async Task<string> Hitokoto() {
         return await _crawlService.GetHitokoto();
+    }
+
+    [HttpGet]
+    public async Task<ActionResult<object>> WeiboTop() {
+        var raw = await _crawlService.GetWeiboTop();
+        var json = JsonSerializer.Deserialize<dynamic>(raw);
+        return json ?? new { };
     }
 }

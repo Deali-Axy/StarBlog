@@ -81,9 +81,6 @@ public class PicLibService {
     /// <summary>
     /// 求最大公约数
     /// </summary>
-    /// <param name="m"></param>
-    /// <param name="n"></param>
-    /// <returns>最大公约数</returns>
     private static int GetGreatestCommonDivisor(int m, int n) {
         if (m < n) (n, m) = (m, n);
 
@@ -98,8 +95,6 @@ public class PicLibService {
     /// <summary>
     /// 获取图片比例
     /// </summary>
-    /// <param name="width"></param>
-    /// <param name="height"></param>
     /// <returns>宽度 x 高度</returns>
     private static (double, double) GetPhotoScale(int width, int height) {
         if (width == height) return (1, 1);
@@ -110,10 +105,6 @@ public class PicLibService {
     /// <summary>
     /// 生成指定尺寸图片
     /// </summary>
-    /// <param name="imagePath"></param>
-    /// <param name="width"></param>
-    /// <param name="height"></param>
-    /// <returns></returns>
     async Task<(Image, IImageFormat)> GenerateSizedImageAsync(string imagePath, int width, int height) {
         await using var fileStream = new FileStream(imagePath, FileMode.Open);
         var (image, format) = await Image.LoadWithFormatAsync(fileStream);
