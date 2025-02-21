@@ -8,14 +8,12 @@ namespace StarBlog.Web.Middlewares;
 
 public class VisitRecordMiddleware {
     private readonly RequestDelegate _next;
-    private readonly VisitRecordQueueService _logQueue;
 
-    public VisitRecordMiddleware(RequestDelegate requestDelegate, VisitRecordQueueService logQueue) {
+    public VisitRecordMiddleware(RequestDelegate requestDelegate) {
         _next = requestDelegate;
-        _logQueue = logQueue;
     }
 
-    public Task Invoke(HttpContext context) {
+    public Task Invoke(HttpContext context, VisitRecordQueueService logQueue) {
         var request = context.Request;
 
         var item = new VisitRecord {
@@ -26,7 +24,7 @@ public class VisitRecordMiddleware {
             UserAgent = request.Headers.UserAgent,
             Time = DateTime.Now
         };
-        _logQueue.EnqueueLog(item);
+        logQueue.EnqueueLog(item);
 
         return _next(context);
     }

@@ -26,26 +26,21 @@ public class VisitRecordQueueService {
 
     // 定期批量写入数据库的方法
     public async Task WriteLogsToDatabaseAsync(CancellationToken cancellationToken) {
-        while (!cancellationToken.IsCancellationRequested) {
-            if (!_logQueue.IsEmpty) {
-                var batch = new List<VisitRecord>();
-                // 从队列中取出一批日志
-                while (_logQueue.TryDequeue(out var log) && batch.Count < BatchSize) {
-                    batch.Add(log);
-                }
+        if (_logQueue.IsEmpty) return;
 
-                try {
-                    _context.VisitRecords.AddRange(batch);
-                    await _context.SaveChangesAsync(cancellationToken);
-                    _logger.LogInformation($"Successfully wrote {batch.Count} logs to the database.");
-                }
-                catch (Exception ex) {
-                    _logger.LogError($"Error writing logs to the database: {ex.Message}");
-                }
-            }
+        var batch = new List<VisitRecord>();
+        // 从队列中取出一批日志
+        while (_logQueue.TryDequeue(out var log) && batch.Count < BatchSize) {
+            batch.Add(log);
+        }
 
-            // 暂停一会再继续检查
-            await Task.Delay(5000, cancellationToken); // 每5秒写一次日志
+        try {
+            _context.VisitRecords.AddRange(batch);
+            await _context.SaveChangesAsync(cancellationToken);
+            _logger.LogInformation($"访问日志 Successfully wrote {batch.Count} logs to the database.");
+        }
+        catch (Exception ex) {
+            _logger.LogError($"访问日志 Error writing logs to the database: {ex.Message}");
         }
     }
 }
