@@ -2,7 +2,7 @@
 using Microsoft.Extensions.FileProviders;
 using StarBlog.Web.Extensions;
 
-namespace StarBlog.Web.Apis;
+namespace StarBlog.Web.Apis.Test;
 
 /// <summary>
 /// 用于测试 DataWrapper 的功能
