@@ -2,19 +2,21 @@
 using StarBlog.Data;
 using StarBlog.Data.Models;
 using StarBlog.Web.Extensions;
+using StarBlog.Web.Services;
 
 namespace StarBlog.Web.Middlewares;
 
 public class VisitRecordMiddleware {
     private readonly RequestDelegate _next;
+    private readonly VisitRecordQueueService _logQueue;
 
-    public VisitRecordMiddleware(RequestDelegate requestDelegate) {
+    public VisitRecordMiddleware(RequestDelegate requestDelegate, VisitRecordQueueService logQueue) {
         _next = requestDelegate;
+        _logQueue = logQueue;
     }
 
-    public Task Invoke(HttpContext context, AppDbContext db) {
+    public Task Invoke(HttpContext context) {
         var request = context.Request;
-        var response = context.Response;
 
         var item = new VisitRecord {
             Ip = context.GetRemoteIPAddress()?.ToString().Split(":")?.Last(),
@@ -24,8 +26,7 @@ public class VisitRecordMiddleware {
             UserAgent = request.Headers.UserAgent,
             Time = DateTime.Now
         };
-        db.VisitRecords.Add(item);
-        db.SaveChanges();
+        _logQueue.EnqueueLog(item);
 
         return _next(context);
     }

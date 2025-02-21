@@ -39,6 +39,7 @@ builder.Services.AddDbContext<AppDbContext>(options => {
     options.UseSqlite(builder.Configuration.GetConnectionString("SQLite-Log"));
 });
 builder.Services.AddFreeSql(builder.Configuration);
+builder.Services.AddVisitRecord();
 builder.Services.AddHttpClient();
 builder.Services.AddCors(options => {
     options.AddDefaultPolicy(policyBuilder => {
@@ -80,7 +81,7 @@ builder.Services.AddScoped<LinkExchangeService>();
 builder.Services.AddScoped<LinkService>();
 builder.Services.AddScoped<PhotoService>();
 builder.Services.AddScoped<PostService>();
-builder.Services.AddScoped<VisitRecordService>();
+
 // 设置请求最大大小
 builder.WebHost.ConfigureKestrel(options => {
     options.Limits.MaxRequestBodySize = long.MaxValue;
