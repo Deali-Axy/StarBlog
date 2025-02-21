@@ -76,7 +76,10 @@ builder.Services.AddScoped<LinkService>();
 builder.Services.AddScoped<PhotoService>();
 builder.Services.AddScoped<PostService>();
 builder.Services.AddScoped<VisitRecordService>();
-
+// 设置请求最大大小
+builder.WebHost.ConfigureKestrel(options => {
+    options.Limits.MaxRequestBodySize = long.MaxValue;
+});
 
 var app = builder.Build();
 

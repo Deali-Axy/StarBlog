@@ -11,11 +11,10 @@ public class VisitRecordMiddleware {
         _next = requestDelegate;
     }
 
-    public Task Invoke(HttpContext context, IBaseRepository<VisitRecord> visitRecordRepo) {
+    public async Task Invoke(HttpContext context, IBaseRepository<VisitRecord> visitRecordRepo) {
         var request = context.Request;
-        var response = context.Response;
 
-        visitRecordRepo.InsertAsync(new VisitRecord {
+        await visitRecordRepo.InsertAsync(new VisitRecord {
             Ip = context.GetRemoteIPAddress()?.ToString().Split(":")?.Last(),
             RequestPath = request.Path,
             RequestQueryString = request.QueryString.Value,
@@ -24,6 +23,6 @@ public class VisitRecordMiddleware {
             Time = DateTime.Now
         });
         
-        return _next(context);
+        await _next(context);
     }
 }
