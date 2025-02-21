@@ -37,8 +37,9 @@ public class PostProcessor {
             foreach (var inline in paragraphBlock.Inline) {
                 if (inline is not LinkInline { IsImage: true } linkInline) continue;
 
-                var imgUrl = HttpUtility.UrlDecode(linkInline.Url);
-                if (imgUrl == null) continue;
+
+                if (string.IsNullOrWhiteSpace(linkInline.Url)) continue;
+                var imgUrl = Uri.UnescapeDataString(linkInline.Url);
                 if (imgUrl.StartsWith("http")) continue;
 
                 // 路径处理
