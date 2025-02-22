@@ -16,8 +16,11 @@ public class VisitRecordMiddleware {
     public Task Invoke(HttpContext context, VisitRecordQueueService logQueue) {
         var request = context.Request;
 
+        // var ip = context.Connection.RemoteIpAddress;
+        var ip = context.GetRemoteIpAddress()?.ToString();
+        
         var item = new VisitRecord {
-            Ip = context.GetRemoteIPAddress()?.ToString().Split(":")?.Last(),
+            Ip = ip?.ToString(),
             RequestPath = request.Path,
             RequestQueryString = request.QueryString.Value,
             RequestMethod = request.Method,

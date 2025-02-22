@@ -7,16 +7,16 @@ namespace StarBlog.Web.Services;
 public class VisitRecordQueueService {
     private readonly ConcurrentQueue<VisitRecord> _logQueue = new ConcurrentQueue<VisitRecord>();
     private readonly ILogger<VisitRecordQueueService> _logger;
-    private readonly AppDbContext _context;
+    private readonly IServiceScopeFactory _scopeFactory;
 
     /// <summary>
-    /// 批量大小可调整
+    /// 批量大小
     /// </summary>
-    private const int BatchSize = 100;
+    private const int BatchSize = 10;
 
-    public VisitRecordQueueService(ILogger<VisitRecordQueueService> logger, AppDbContext context) {
+    public VisitRecordQueueService(ILogger<VisitRecordQueueService> logger, IServiceScopeFactory scopeFactory) {
         _logger = logger;
-        _context = context;
+        _scopeFactory = scopeFactory;
     }
 
     // 将日志加入队列
@@ -26,7 +26,11 @@ public class VisitRecordQueueService {
 
     // 定期批量写入数据库的方法
     public async Task WriteLogsToDatabaseAsync(CancellationToken cancellationToken) {
-        if (_logQueue.IsEmpty) return;
+        if (_logQueue.IsEmpty) {
+            // 暂时等待，避免高频次无意义的检查
+            await Task.Delay(1000, cancellationToken);
+            return;
+        }
 
         var batch = new List<VisitRecord>();
         // 从队列中取出一批日志
@@ -35,12 +39,23 @@ public class VisitRecordQueueService {
         }
 
         try {
-            _context.VisitRecords.AddRange(batch);
-            await _context.SaveChangesAsync(cancellationToken);
-            _logger.LogInformation($"访问日志 Successfully wrote {batch.Count} logs to the database.");
+            using var scope = _scopeFactory.CreateScope();
+            var dbCtx = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            await using var transaction = await dbCtx.Database.BeginTransactionAsync(cancellationToken);
+            try {
+                dbCtx.VisitRecords.AddRange(batch);
+                await dbCtx.SaveChangesAsync(cancellationToken);
+                await transaction.CommitAsync(cancellationToken);
+                _logger.LogInformation("访问日志 Successfully wrote {BatchCount} logs to the database", batch.Count);
+            }
+            catch (Exception) {
+                await transaction.RollbackAsync(cancellationToken);
+                // 重新抛出异常，确保外部捕获
+                throw;
+            }
         }
         catch (Exception ex) {
-            _logger.LogError($"访问日志 Error writing logs to the database: {ex.Message}");
+            _logger.LogError(ex, "访问日志 Error writing logs to the database: {ExMessage}", ex.Message);
         }
     }
 }

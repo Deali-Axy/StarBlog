@@ -10,7 +10,7 @@ public static class HttpContextExtensions {
     /// <param name="context"></param>
     /// <param name="allowForwarded"></param>
     /// <returns></returns>
-    public static IPAddress? GetRemoteIPAddress(this HttpContext context, bool allowForwarded = true) {
+    public static IPAddress? GetRemoteIpAddress(this HttpContext context, bool allowForwarded = true) {
         if (allowForwarded) {
             var header = context.Request.Headers["CF-Connecting-IP"].FirstOrDefault()
                          ?? context.Request.Headers["X-Forwarded-For"].FirstOrDefault();

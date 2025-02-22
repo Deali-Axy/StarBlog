@@ -3,22 +3,19 @@
 public class VisitRecordWorker : BackgroundService {
     private readonly ILogger<VisitRecordWorker> _logger;
     private readonly IServiceScopeFactory _scopeFactory;
+    private readonly VisitRecordQueueService _logQueue;
+    private readonly TimeSpan _executeInterval = TimeSpan.FromSeconds(30);
 
-    public VisitRecordWorker(ILogger<VisitRecordWorker> logger, IServiceScopeFactory scopeFactory) {
+    public VisitRecordWorker(ILogger<VisitRecordWorker> logger, IServiceScopeFactory scopeFactory, VisitRecordQueueService logQueue) {
         _logger = logger;
         _scopeFactory = scopeFactory;
+        _logQueue = logQueue;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken) {
         while (!stoppingToken.IsCancellationRequested) {
-            using (var scope = _scopeFactory.CreateScope()) {
-                var logQueue = scope.ServiceProvider.GetRequiredService<VisitRecordQueueService>();
-                await logQueue.WriteLogsToDatabaseAsync(stoppingToken);
-            }
-
-            // 暂停一会再继续检查
-            await Task.Delay(5000, stoppingToken); // 每5秒写一次日志
-            
+            await _logQueue.WriteLogsToDatabaseAsync(stoppingToken);
+            await Task.Delay(_executeInterval, stoppingToken);
             _logger.LogDebug("后台任务 VisitRecordWorker ExecuteAsync");
         }
     }
