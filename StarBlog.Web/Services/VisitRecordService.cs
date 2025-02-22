@@ -1,4 +1,6 @@
-﻿using FreeSql;
+﻿using System.Linq.Dynamic.Core;
+using Microsoft.EntityFrameworkCore;
+using StarBlog.Data;
 using StarBlog.Data.Models;
 using StarBlog.Web.ViewModels.QueryFilters;
 using X.PagedList;
@@ -6,23 +8,25 @@ using X.PagedList;
 namespace StarBlog.Web.Services;
 
 public class VisitRecordService {
-    private readonly IBaseRepository<VisitRecord> _repo;
+    private readonly ILogger<VisitRecordService> _logger;
+    private readonly AppDbContext _dbContext;
 
-    public VisitRecordService(IBaseRepository<VisitRecord> repo) {
-        _repo = repo;
+    public VisitRecordService(ILogger<VisitRecordService> logger, AppDbContext dbContext) {
+        _logger = logger;
+        _dbContext = dbContext;
     }
 
     public async Task<VisitRecord?> GetById(int id) {
-        var item = await _repo.Where(a => a.Id == id).FirstAsync();
+        var item = await _dbContext.VisitRecords.FirstOrDefaultAsync(e => e.Id == id);
         return item;
     }
 
     public async Task<List<VisitRecord>> GetAll() {
-        return await _repo.Select.OrderByDescending(a => a.Time).ToListAsync();
+        return await _dbContext.VisitRecords.OrderByDescending(e => e.Time).ToListAsync();
     }
 
     public async Task<IPagedList<VisitRecord>> GetPagedList(VisitRecordQueryParameters param) {
-        var querySet = _repo.Select;
+        var querySet = _dbContext.VisitRecords.AsQueryable();
 
         // 搜索
         if (!string.IsNullOrEmpty(param.Search)) {
@@ -31,10 +35,13 @@ public class VisitRecordService {
 
         // 排序
         if (!string.IsNullOrEmpty(param.SortBy)) {
-            // 是否升序
-            var isAscending = !param.SortBy.StartsWith("-");
+            var isDesc = param.SortBy.StartsWith("-");
             var orderByProperty = param.SortBy.Trim('-');
-            querySet = querySet.OrderByPropertyName(orderByProperty, isAscending);
+            if (isDesc) {
+                orderByProperty = $"{orderByProperty} desc";
+            }
+
+            querySet = querySet.OrderBy(orderByProperty);
         }
 
         // to do 不能这样分页，得用数据库分页，不然性能很差 - 2023-12-1 09:53:50 搞定
@@ -53,12 +60,16 @@ public class VisitRecordService {
     /// </summary>
     /// <returns></returns>
     public async Task<object> Overview() {
-        return await _repo.Where(a => !a.RequestPath.StartsWith("/Api"))
-            .ToAggregateAsync(g => new {
-                TotalVisit = g.Count(),
-                TodayVisit = g.Sum(g.Key.Time.Date == DateTime.Today ? 1 : 0),
-                YesterdayVisit = g.Sum(g.Key.Time.Date == DateTime.Today.AddDays(-1).Date ? 1 : 0)
-            });
+        var querySet = _dbContext.VisitRecords
+            .Where(e => !e.RequestPath.StartsWith("/Api"));
+
+        return new {
+            TotalVisit = await querySet.CountAsync(),
+            TodayVisit = await querySet.Where(e => e.Time.Date == DateTime.Today).CountAsync(),
+            YesterdayVisit = await querySet
+                .Where(e => e.Time.Date == DateTime.Today.AddDays(-1).Date)
+                .CountAsync()
+        };
     }
 
     /// <summary>
@@ -67,14 +78,18 @@ public class VisitRecordService {
     /// <param name="days">查看最近几天的数据，默认7天</param>
     /// <returns></returns>
     public async Task<object> Trend(int days = 7) {
-        return await _repo.Where(a => !a.RequestPath.StartsWith("/Api"))
-            .Where(a => a.Time.Date > DateTime.Today.AddDays(-days).Date)
-            .GroupBy(a => a.Time.Date)
-            .ToListAsync(a => new {
-                time = a.Key,
-                date = $"{a.Key.Month}-{a.Key.Day}",
-                count = a.Count()
-            });
+        var startDate = DateTime.Today.AddDays(-days).Date;
+        return await _dbContext.VisitRecords
+            .Where(e => !e.RequestPath.StartsWith("/Api"))
+            .Where(e => e.Time.Date >= startDate)
+            .GroupBy(e => e.Time.Date)
+            .Select(g => new {
+                time = g.Key,
+                date = $"{g.Key.Month}-{g.Key.Day}",
+                count = g.Count()
+            })
+            .OrderBy(e => e.time)
+            .ToListAsync();
     }
 
     /// <summary>
@@ -82,11 +97,11 @@ public class VisitRecordService {
     /// </summary>
     /// <returns></returns>
     public async Task<object> Stats(DateTime date) {
-        return await _repo.Where(
-            a => a.Time.Date == date.Date
-                 && !a.RequestPath.StartsWith("/Api")
-        ).ToAggregateAsync(g => new {
-            Count = g.Count()
-        });
+        return new {
+            Count = await _dbContext.VisitRecords
+                .Where(e => e.Time.Date == date)
+                .Where(e => !e.RequestPath.StartsWith("/Api"))
+                .CountAsync()
+        };
     }
 }
