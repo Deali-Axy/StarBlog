@@ -62,6 +62,7 @@ builder.Services.AddStaticRobotsTxt(builder => builder
 builder.Services.AddSwagger();
 builder.Services.AddSettings(builder.Configuration);
 builder.Services.AddAuth(builder.Configuration);
+builder.Services.AddIp2Region();
 // 注册 IHttpClientFactory，参考：https://docs.microsoft.com/zh-cn/dotnet/core/extensions/http-client
 builder.Services.AddHttpClient();
 builder.Services.AddImageSharp();
