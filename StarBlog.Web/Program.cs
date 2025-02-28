@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.EntityFrameworkCore;
 using RobotsTxt;
 using SixLabors.ImageSharp.Web.DependencyInjection;
+using StarBlog.Data;
 using StarBlog.Data.Extensions;
 using StarBlog.Web.Contrib.SiteMessage;
 using StarBlog.Web.Extensions;
@@ -33,7 +35,11 @@ builder.Services.AddSession(options => {
     options.Cookie.IsEssential = true;
 });
 builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddDbContext<AppDbContext>(options => {
+    options.UseSqlite(builder.Configuration.GetConnectionString("SQLite-Log"));
+});
 builder.Services.AddFreeSql(builder.Configuration);
+builder.Services.AddVisitRecord();
 builder.Services.AddHttpClient();
 builder.Services.AddCors(options => {
     options.AddDefaultPolicy(policyBuilder => {
@@ -75,7 +81,7 @@ builder.Services.AddScoped<LinkExchangeService>();
 builder.Services.AddScoped<LinkService>();
 builder.Services.AddScoped<PhotoService>();
 builder.Services.AddScoped<PostService>();
-builder.Services.AddScoped<VisitRecordService>();
+
 // 设置请求最大大小
 builder.WebHost.ConfigureKestrel(options => {
     options.Limits.MaxRequestBodySize = long.MaxValue;
@@ -96,6 +102,15 @@ if (app.Environment.IsDevelopment()) {
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+else {
+    app.UseExceptionHandler(applicationBuilder => {
+        applicationBuilder.Run(async context => {
+            // todo 记录错误日志
+            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            await context.Response.WriteAsJsonAsync(new { message = "Unexpected error!" });
+        });
+    });
+}
 
 app.UseForwardedHeaders(new ForwardedHeadersOptions {
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
@@ -107,7 +122,7 @@ app.UseStaticFiles(new StaticFileOptions {
     ServeUnknownFileTypes = true
 });
 
-// app.UseMiddleware<VisitRecordMiddleware>();
+app.UseMiddleware<VisitRecordMiddleware>();
 app.UseRobotsTxt();
 app.UseRouting();
 app.UseCors();
@@ -118,8 +133,6 @@ app.UseSession();
 
 app.UseSwaggerPkg();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+app.MapControllerRoute(name: "default", pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

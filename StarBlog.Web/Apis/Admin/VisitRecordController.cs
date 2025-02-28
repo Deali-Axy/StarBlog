@@ -5,6 +5,7 @@ using StarBlog.Data.Models;
 using StarBlog.Web.Extensions;
 using StarBlog.Web.Services;
 using StarBlog.Web.ViewModels.QueryFilters;
+using StarBlog.Web.ViewModels.VisitRecord;
 
 namespace StarBlog.Web.Apis.Admin;
 
@@ -67,8 +68,8 @@ public class VisitRecordController : ControllerBase {
     /// </summary>
     /// <returns></returns>
     [HttpGet("[action]")]
-    public async Task<ApiResponse> Stats(int year, int month, int day) {
-        var date = new DateTime(year, month, day);
+    public async Task<ApiResponse> Stats([FromQuery] StatsDto dto) {
+        var date = new DateTime(dto.Year, dto.Month, dto.Day);
         return ApiResponse.Ok(await _service.Stats(date));
     }
 }

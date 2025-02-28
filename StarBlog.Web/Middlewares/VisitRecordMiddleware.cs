@@ -1,6 +1,8 @@
 ﻿using FreeSql;
+using StarBlog.Data;
 using StarBlog.Data.Models;
 using StarBlog.Web.Extensions;
+using StarBlog.Web.Services;
 
 namespace StarBlog.Web.Middlewares;
 
@@ -11,18 +13,22 @@ public class VisitRecordMiddleware {
         _next = requestDelegate;
     }
 
-    public async Task Invoke(HttpContext context, IBaseRepository<VisitRecord> visitRecordRepo) {
+    public Task Invoke(HttpContext context, VisitRecordQueueService logQueue) {
         var request = context.Request;
 
-        await visitRecordRepo.InsertAsync(new VisitRecord {
-            Ip = context.GetRemoteIPAddress()?.ToString().Split(":")?.Last(),
+        // var ip = context.Connection.RemoteIpAddress;
+        var ip = context.GetRemoteIpAddress()?.ToString();
+        
+        var item = new VisitRecord {
+            Ip = ip?.ToString(),
             RequestPath = request.Path,
             RequestQueryString = request.QueryString.Value,
             RequestMethod = request.Method,
             UserAgent = request.Headers.UserAgent,
             Time = DateTime.Now
-        });
-        
-        await _next(context);
+        };
+        logQueue.EnqueueLog(item);
+
+        return _next(context);
     }
 }

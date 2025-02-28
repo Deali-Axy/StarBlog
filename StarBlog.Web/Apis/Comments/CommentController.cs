@@ -76,7 +76,7 @@ public class CommentController : ControllerBase {
 
         var anonymousUser = await _commentService.GetOrCreateAnonymousUser(
             dto.UserName, dto.Email, dto.Url,
-            HttpContext.GetRemoteIPAddress()?.ToString().Split(":")?.Last()
+            HttpContext.GetRemoteIpAddress()?.ToString().Split(":")?.Last()
         );
 
         var comment = new Comment {

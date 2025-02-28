@@ -21,4 +21,10 @@ public class CrawlService {
         var obj = await http.GetFromJsonAsync<DataAcqResp<List<Hitokoto>>>(url);
         return obj?.Data[0].Content ?? "(未能获取一言)";
     }
+
+    public async Task<string> GetWeiboTop() {
+        const string url = "http://www.sblt.deali.cn:15902/hotspot/weibo_top";
+        var http = _httpClientFactory.CreateClient();
+        return await http.GetStringAsync(url);
+    }
 }
