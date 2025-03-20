@@ -1,5 +1,7 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Text;
+using System.Text.RegularExpressions;
 using Markdig.Syntax;
+using Markdig.Syntax.Inlines;
 using StarBlog.Data.Models;
 
 namespace StarBlog.Share.Extensions.Markdown;
@@ -24,8 +26,24 @@ public static class ToC {
         var headings = new List<Heading>();
 
         foreach (var heading in document.Descendants<HeadingBlock>()) {
-            var item = new Heading {Level = heading.Level, Text = heading.Inline?.FirstChild?.ToString()};
-            headings.Add(item);
+            Heading item;  
+            // 处理标题中包含代码块 `标题`
+            if (heading.Inline != null && heading.Inline.Count() > 1) {  
+                var textBuilder = new StringBuilder();  
+                foreach (var inline in heading.Inline) {  
+                    if (inline is CodeInline codeInline)  
+                        textBuilder.Append(codeInline.Content);  
+                    else
+                        textBuilder.Append(inline);  
+                }  
+                // 去除代码块中的空格和换行符
+                string cleanedText = Regex.Replace(textBuilder.ToString().Trim(), @"[\t\n\r]", "");  
+                item = new Heading { Level = heading.Level, Text = cleanedText };  
+            } else {  
+                item = new Heading { Level = heading.Level, Text = heading.Inline?.FirstChild?.ToString() };  
+            }  
+    
+            headings.Add(item);  
         }
 
         var chineseTitleCount = 0;
