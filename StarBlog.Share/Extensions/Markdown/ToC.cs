@@ -27,25 +27,39 @@ public static class ToC {
 
         foreach (var heading in document.Descendants<HeadingBlock>()) {
             Heading item;  
-            // 处理标题中包含代码块 `标题`
-            if (heading.Inline != null && heading.Inline.Count() > 1) {  
-                var textBuilder = new StringBuilder();  
-                foreach (var inline in heading.Inline) {  
-                    if (inline is CodeInline codeInline)  
-                        textBuilder.Append(codeInline.Content);  
-                    else
-                        textBuilder.Append(inline);  
-                }  
-                // 去除代码块中的空格和换行符
-                string cleanedText = Regex.Replace(textBuilder.ToString().Trim(), @"[\t\n\r]", "");  
-                item = new Heading { Level = heading.Level, Text = cleanedText };  
-            } else {  
-                item = new Heading { Level = heading.Level, Text = heading.Inline?.FirstChild?.ToString() };  
-            }  
+            // 处理标题中包含特殊语法（如代码块、加粗等）
+            if (heading.Inline != null) {
+                var textBuilder = new StringBuilder();
+                foreach (var inline in heading.Inline) {
+                    switch (inline) {
+                        case CodeInline codeInline:
+                            textBuilder.Append(codeInline.Content);
+                            break;
+                        case EmphasisInline emphasisInline:
+                            foreach (var emphasisContent in emphasisInline) {
+                                textBuilder.Append(emphasisContent);
+                            }
+                            break;
+                        case LiteralInline literalInline:
+                            textBuilder.Append(literalInline.Content);
+                            break;
+                        default:
+                            textBuilder.Append(inline);
+                            break;
+                    }
+                }
+                // 去除空格和换行符
+                string cleanedText = Regex.Replace(textBuilder.ToString().Trim(), @"[\t\n\r]", "");
+                item = new Heading { Level = heading.Level, Text = cleanedText };
+            } else {
+                item = new Heading { Level = heading.Level, Text = null };
+            }
+
     
             headings.Add(item);  
         }
 
+        // todo 生成slug和href这部分还是有bug
         var chineseTitleCount = 0;
         var slugMap = new Dictionary<string, int>();
         for (var i = 0; i < headings.Count; i++) {
@@ -58,10 +72,9 @@ public static class ToC {
                 item.Slug = chineseTitleCount == 0 ? "section" : $"section-{chineseTitleCount}";
                 chineseTitleCount++;
             }
-            // 其他情况处理为只包含英文数字格式
+            // 其他情况处理为只替换空格为连字符
             else {
-                item.Slug = Regex.Replace(text, @"[^a-zA-Z0-9\s]+", "")
-                    .Trim().Replace(" ", "-").ToLower();
+                item.Slug = text.Trim().Replace(" ", "-").ToLower();
                 if (slugMap.ContainsKey(item.Slug)) {
                     item.Slug = $"{item.Slug}-{slugMap[item.Slug]++}";
                 }
