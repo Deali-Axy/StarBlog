@@ -18,6 +18,8 @@ StarBlog 是一个基于 .NET 6 和 ASP.NET Core 开发的现代博客系统，�
 
 **管理后台项目**：[https://github.com/Deali-Axy/StarBlog-Admin](https://github.com/Deali-Axy/StarBlog-Admin)
 
+**AI文章发布工具**：[https://github.com/star-blog/starblog-publisher](https://github.com/star-blog/starblog-publisher)
+
 ## 📫 项目动机
 
 在线博客平台那么多，**为什么要自己开发博客？**
@@ -43,6 +45,27 @@ StarBlog 是一个基于 .NET 6 和 ASP.NET Core 开发的现代博客系统，�
 - **随机图片 API**：提供一套随机图片 API，文章封面默认使用随机图片
 - **评论系统**：内置用户/游客评论功能，以及评论自动过滤、审核功能
 - **RSS 订阅**：支持 RSS 订阅
+
+## 🌟 StarBlog 生态
+
+StarBlog 不仅仅是一个博客系统，它正在发展成为一个完整的博客生态系统，包含多个配套工具和项目：
+
+### StarBlog Publisher
+
+[StarBlog Publisher](https://github.com/star-blog/starblog-publisher) 是一款专为 StarBlog 博客系统设计的专业文章发布工具，提供比传统打包上传更便捷的文章发布方式。
+
+- **Markdown 支持**：支持 Markdown 格式文章的预览和发布
+- **直观界面**：提供用户友好的界面，轻松管理和发布博客内容
+- **AI 辅助**：集成多种领先的 AI 大模型（包括 OpenAI 的 ChatGPT、Anthropic 的 Claude 和 DeepSeek 等）
+- **跨平台**：基于 C# 和 .NET 8.0 构建，可在 Windows、macOS 和 Linux 上运行
+
+### StarBlog Admin
+
+[StarBlog Admin](https://github.com/Deali-Axy/StarBlog-Admin) 是 StarBlog 的管理后台项目，基于 Vue + ElementUI 开发，提供完整的博客内容管理功能。
+
+### StarBlogHub
+
+实现一个去中心化的博客聚合平台，不同的个人博客都可以接入，共享流量。
 
 ## 🏗️ 架构
 
