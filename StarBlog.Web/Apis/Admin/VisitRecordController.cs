@@ -72,4 +72,12 @@ public class VisitRecordController : ControllerBase {
         var date = new DateTime(dto.Year, dto.Month, dto.Day);
         return ApiResponse.Ok(await _service.Stats(date));
     }
+
+    /// <summary>
+    /// 地理位置分布统计
+    /// </summary>
+    [HttpGet("GeoDistribution")]
+    public async Task<ApiResponse> GeoDistribution() {
+        return ApiResponse.Ok(await _service.GetGeoDistribution());
+    }
 }
