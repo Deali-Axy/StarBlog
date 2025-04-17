@@ -30,6 +30,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ParallelTest", "demo\Parall
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GenerateRandomCoordinates", "demo\GenerateRandomCoordinates\GenerateRandomCoordinates.csproj", "{CCA99BCE-D5A9-4A2E-8578-CCCE67F0C743}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ip2RegionDataProc", "demo\Ip2RegionDataProc\Ip2RegionDataProc.csproj", "{61E8C361-3C29-47D3-86C6-E03FB123F825}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,6 +44,7 @@ Global
 		{FB98CEDA-3AB4-4E26-815A-B52BAAB9A1B1} = {68E4117F-1EC3-4B1D-B413-888607595781}
 		{EB688698-734F-4169-99C5-8031B277FEB1} = {68E4117F-1EC3-4B1D-B413-888607595781}
 		{CCA99BCE-D5A9-4A2E-8578-CCCE67F0C743} = {68E4117F-1EC3-4B1D-B413-888607595781}
+		{61E8C361-3C29-47D3-86C6-E03FB123F825} = {68E4117F-1EC3-4B1D-B413-888607595781}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{0512E31F-954B-4E53-B3AF-F2EF206FAE33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -88,5 +91,9 @@ Global
 		{CCA99BCE-D5A9-4A2E-8578-CCCE67F0C743}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CCA99BCE-D5A9-4A2E-8578-CCCE67F0C743}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CCA99BCE-D5A9-4A2E-8578-CCCE67F0C743}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61E8C361-3C29-47D3-86C6-E03FB123F825}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61E8C361-3C29-47D3-86C6-E03FB123F825}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61E8C361-3C29-47D3-86C6-E03FB123F825}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61E8C361-3C29-47D3-86C6-E03FB123F825}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
