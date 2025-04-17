@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using StarBlog.Data;
 using StarBlog.Data.Models;
 using StarBlog.Web.ViewModels.QueryFilters;
+using StarBlog.Web.ViewModels.VisitRecord;
 using X.PagedList;
 
 namespace StarBlog.Web.Services;
@@ -21,11 +22,6 @@ public class VisitRecordService {
 
     public async Task<VisitRecord?> GetById(int id) {
         var item = await _dbContext.VisitRecords.FirstOrDefaultAsync(e => e.Id == id);
-        if (!string.IsNullOrWhiteSpace(item?.Ip)) {
-            var result =_searcher.Search(item.Ip);
-            Console.WriteLine($"ip2region result: {result}");
-        }
-
         return item;
     }
 
@@ -52,9 +48,6 @@ public class VisitRecordService {
             querySet = querySet.OrderBy(orderByProperty);
         }
 
-        // to do 不能这样分页，得用数据库分页，不然性能很差 - 2023-12-1 09:53:50 搞定
-        // return (await querySet.ToListAsync()).ToPagedList(param.Page, param.PageSize);
-
         IPagedList<VisitRecord> pagedList = new StaticPagedList<VisitRecord>(
             await querySet.Page(param.Page, param.PageSize).ToListAsync(),
             param.Page, param.PageSize,
@@ -79,6 +72,75 @@ public class VisitRecordService {
                 .CountAsync()
         };
     }
+
+    /// <summary>
+    /// PV / UV 统计
+    /// <para>PV（Page Views）：总访问数</para>
+    /// <para>UV（Unique Visitors）：去重的 IP 数或去重的用户数</para>
+    /// </summary>
+    public async Task<PvUv> GetPvUv(DateTime date) {
+        var q = _dbContext.VisitRecords.Where(e => e.Time.Date == date.Date);
+        var pv = await q.CountAsync();
+        var uv = await q.Select(e => e.Ip).Distinct().CountAsync();
+        return new PvUv { Date = date.Date, PV = pv, UV = uv };
+    }
+
+    /// <summary>
+    /// Top N 访问路径
+    /// <para>找出某天或某段时间最热的页面／接口</para>
+    /// </summary>
+    public async Task<List<TopPath>> GetTopPaths(DateTime from, DateTime to, int top = 10) {
+        return await _dbContext.VisitRecords
+            .Where(e => e.Time >= from && e.Time < to)
+            .GroupBy(e => e.RequestPath)
+            .Select(g => new TopPath { Path = g.Key, Count = g.Count() })
+            .OrderByDescending(x => x.Count)
+            .Take(top)
+            .ToListAsync();
+    }
+
+    /// <summary>
+    /// 响应时间分布
+    /// <para>计算平均、最大、95 百分位等</para>
+    /// </summary>
+    public async Task<object> GetResponseTimeStats(DateTime date) {
+        var q = _dbContext.VisitRecords.Where(e => e.Time.Date == date.Date);
+        var avg = await q.AverageAsync(e => e.ResponseTimeMs);
+        var max = await q.MaxAsync(e => e.ResponseTimeMs);
+        var p95 = await q
+            .OrderBy(e => e.ResponseTimeMs)
+            .Skip((int)(await q.CountAsync() * 0.95))
+            .Select(e => e.ResponseTimeMs)
+            .FirstOrDefaultAsync();
+        return new { Date = date.Date, Avg = avg, Max = max, P95 = p95 };
+    }
+
+    /// <summary>
+    /// 状态码分布
+    /// <para>统计各状态码的调用量</para>
+    /// </summary>
+    public async Task<List<StatusCodeDistribution>> GetStatusCodeDistribution(DateTime date) {
+        return await _dbContext.VisitRecords
+            .Where(e => e.Time.Date == date.Date)
+            .GroupBy(e => e.StatusCode)
+            .Select(g => new StatusCodeDistribution { Code = g.Key, Count = g.Count() })
+            .OrderByDescending(x => x.Count)
+            .ToListAsync();
+    }
+
+    /// <summary>
+    /// 小时／分钟级趋势
+    /// <para>按小时查看访问量变化</para>
+    /// </summary>
+    public async Task<List<HourlyTrend>> GetHourlyTrend(DateTime date) {
+        return await _dbContext.VisitRecords
+            .Where(e => e.Time.Date == date.Date)
+            .GroupBy(e => e.Time.Hour)
+            .Select(g => new HourlyTrend { Hour = g.Key, Count = g.Count() })
+            .OrderBy(x => x.Hour)
+            .ToListAsync();
+    }
+
 
     /// <summary>
     /// 趋势数据

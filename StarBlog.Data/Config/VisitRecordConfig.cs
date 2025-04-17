@@ -50,7 +50,6 @@ public class VisitRecordConfig : IEntityTypeConfiguration<VisitRecord> {
             .HasMaxLength(128);
 
         // 索引
-        builder.HasIndex(e => e.RequestPath).HasDatabaseName("idx_visit_url");
         builder.HasIndex(e => e.Time).HasDatabaseName("idx_visit_time");
         builder.HasIndex(e => e.RequestPath).HasDatabaseName("idx_visit_path");
         builder.HasIndex(e => e.StatusCode).HasDatabaseName("idx_visit_status");
