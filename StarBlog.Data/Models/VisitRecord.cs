@@ -39,4 +39,20 @@ public class VisitRecord {
     /// 时间
     /// </summary>
     public DateTime Time { get; set; }
+
+    /// <summary>HTTP 状态码</summary>
+    public int StatusCode { get; set; }
+
+    /// <summary>响应耗时（ms）</summary>
+    public int ResponseTimeMs { get; set; }
+
+    /// <summary>来源页面</summary>
+    public string? Referrer { get; set; }
+
+    // 区域
+    public string? RegionCode { get; set; }
+    public string? Country { get; set; }
+    public string? Province { get; set; }
+    public string? City { get; set; }
+    public string? Isp { get; set; }
 }

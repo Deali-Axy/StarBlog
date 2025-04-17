@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using IP2Region.Net.Abstractions;
 using StarBlog.Data;
 using StarBlog.Data.Models;
 
@@ -8,15 +9,18 @@ public class VisitRecordQueueService {
     private readonly ConcurrentQueue<VisitRecord> _logQueue = new ConcurrentQueue<VisitRecord>();
     private readonly ILogger<VisitRecordQueueService> _logger;
     private readonly IServiceScopeFactory _scopeFactory;
+    private readonly ISearcher _searcher;
 
     /// <summary>
     /// 批量大小
     /// </summary>
     private const int BatchSize = 10;
 
-    public VisitRecordQueueService(ILogger<VisitRecordQueueService> logger, IServiceScopeFactory scopeFactory) {
+    public VisitRecordQueueService(ILogger<VisitRecordQueueService> logger, IServiceScopeFactory scopeFactory,
+        ISearcher searcher) {
         _logger = logger;
         _scopeFactory = scopeFactory;
+        _searcher = searcher;
     }
 
     // 将日志加入队列
@@ -35,6 +39,7 @@ public class VisitRecordQueueService {
         var batch = new List<VisitRecord>();
         // 从队列中取出一批日志
         while (_logQueue.TryDequeue(out var log) && batch.Count < BatchSize) {
+            log = InflateIpRegion(log);
             batch.Add(log);
         }
 
@@ -57,5 +62,21 @@ public class VisitRecordQueueService {
         catch (Exception ex) {
             _logger.LogError(ex, "访问日志 Error writing logs to the database: {ExMessage}", ex.Message);
         }
+    }
+
+    private VisitRecord InflateIpRegion(VisitRecord log) {
+        if (string.IsNullOrWhiteSpace(log.Ip)) return log;
+        
+        var result = _searcher.Search(log.Ip);
+        if (string.IsNullOrWhiteSpace(result)) return log;
+        
+        var parts = result.Split('|');
+        log.Country = parts[0];
+        log.RegionCode = parts[1];
+        log.Province = parts[2];
+        log.City = parts[3];
+        log.Isp = parts[4];
+
+        return log;
     }
 }

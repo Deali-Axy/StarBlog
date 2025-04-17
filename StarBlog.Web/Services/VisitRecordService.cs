@@ -1,4 +1,5 @@
 ﻿using System.Linq.Dynamic.Core;
+using IP2Region.Net.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using StarBlog.Data;
 using StarBlog.Data.Models;
@@ -10,14 +11,21 @@ namespace StarBlog.Web.Services;
 public class VisitRecordService {
     private readonly ILogger<VisitRecordService> _logger;
     private readonly AppDbContext _dbContext;
+    private readonly ISearcher _searcher;
 
-    public VisitRecordService(ILogger<VisitRecordService> logger, AppDbContext dbContext) {
+    public VisitRecordService(ILogger<VisitRecordService> logger, AppDbContext dbContext, ISearcher searcher) {
         _logger = logger;
         _dbContext = dbContext;
+        _searcher = searcher;
     }
 
     public async Task<VisitRecord?> GetById(int id) {
         var item = await _dbContext.VisitRecords.FirstOrDefaultAsync(e => e.Id == id);
+        if (!string.IsNullOrWhiteSpace(item?.Ip)) {
+            var result =_searcher.Search(item.Ip);
+            Console.WriteLine($"ip2region result: {result}");
+        }
+
         return item;
     }
 
