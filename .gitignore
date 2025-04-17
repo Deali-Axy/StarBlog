@@ -7,6 +7,7 @@ StarBlog.Web/yarn.lock
 StarBlog.Web/appsettings-email.json
 StarBlog.Web/words.json
 app*.db*
+*.xdb
 *.min.css
 *.min.js
 
