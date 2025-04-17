@@ -50,6 +50,7 @@ builder.Services.AddCors(options => {
         policyBuilder.WithOrigins("http://localhost:8080");
         policyBuilder.WithOrigins("http://localhost:8081");
         policyBuilder.WithOrigins("https://deali.cn");
+        policyBuilder.WithOrigins("https://blog.deali.cn");
     });
 });
 builder.Services.AddStaticRobotsTxt(builder => builder

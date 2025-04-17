@@ -33,7 +33,7 @@ public class VisitRecord {
     /// <summary>
     /// 用户设备
     /// </summary>
-    public string UserAgent { get; set; }
+    public string? UserAgent { get; set; }
 
     /// <summary>
     /// 时间
