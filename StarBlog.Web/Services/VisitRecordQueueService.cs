@@ -1,7 +1,9 @@
 ﻿using System.Collections.Concurrent;
+using AutoMapper;
 using IP2Region.Net.Abstractions;
 using StarBlog.Data;
 using StarBlog.Data.Models;
+using UAParser;
 
 namespace StarBlog.Web.Services;
 
@@ -10,6 +12,8 @@ public class VisitRecordQueueService {
     private readonly ILogger<VisitRecordQueueService> _logger;
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly ISearcher _searcher;
+    private readonly IMapper _mapper;
+    private readonly Parser _uaParser = Parser.GetDefault();
 
     /// <summary>
     /// 批量大小
@@ -17,10 +21,11 @@ public class VisitRecordQueueService {
     private const int BatchSize = 10;
 
     public VisitRecordQueueService(ILogger<VisitRecordQueueService> logger, IServiceScopeFactory scopeFactory,
-        ISearcher searcher) {
+        ISearcher searcher, IMapper mapper) {
         _logger = logger;
         _scopeFactory = scopeFactory;
         _searcher = searcher;
+        _mapper = mapper;
     }
 
     // 将日志加入队列
@@ -40,6 +45,7 @@ public class VisitRecordQueueService {
         // 从队列中取出一批日志
         while (_logQueue.TryDequeue(out var log) && batch.Count < BatchSize) {
             log = InflateIpRegion(log);
+            log = InflateUA(log);
             batch.Add(log);
         }
 
@@ -66,10 +72,10 @@ public class VisitRecordQueueService {
 
     private VisitRecord InflateIpRegion(VisitRecord log) {
         if (string.IsNullOrWhiteSpace(log.Ip)) return log;
-        
+
         var result = _searcher.Search(log.Ip);
         if (string.IsNullOrWhiteSpace(result)) return log;
-        
+
         var parts = result.Split('|');
         log.Country = parts[0];
         log.RegionCode = parts[1];
@@ -77,6 +83,12 @@ public class VisitRecordQueueService {
         log.City = parts[3];
         log.Isp = parts[4];
 
+        return log;
+    }
+
+    private VisitRecord InflateUA(VisitRecord log) {
+        var c = _uaParser.Parse(log.UserAgent);
+        log.UserAgentInfo = _mapper.Map<UserAgentInfo>(c);
         return log;
     }
 }

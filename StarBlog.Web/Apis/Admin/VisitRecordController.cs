@@ -12,7 +12,7 @@ namespace StarBlog.Web.Apis.Admin;
 /// <summary>
 /// 访问记录
 /// </summary>
-// [Authorize]
+[Authorize]
 [ApiController]
 [Route("Api/[controller]")]
 [ApiExplorerSettings(GroupName = ApiGroups.Admin)]
