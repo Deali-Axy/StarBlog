@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Ip2RegionDataProc.Entities;
+namespace VisitRecordDataProc.Entities;
 
 public class AppSettings {
     public string Name { get; set; }

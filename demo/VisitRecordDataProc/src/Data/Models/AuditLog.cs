@@ -1,4 +1,4 @@
-﻿namespace Ip2RegionDataProc.Data.Models;
+﻿namespace VisitRecordDataProc.Data.Models;
 
 public class AuditLog {
     public long Id { get; set; }

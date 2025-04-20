@@ -1,13 +1,13 @@
 using System.Reflection;
 using dotenv.net;
-using Ip2RegionDataProc.Framework.Extensions;
-using Ip2RegionDataProc.Services;
-using Ip2RegionDataProc.Utilities;
+using VisitRecordDataProc.Framework.Extensions;
 using FluentResults;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using VisitRecordDataProc.Services;
+using VisitRecordDataProc.Utilities;
 
-namespace Ip2RegionDataProc.Framework;
+namespace VisitRecordDataProc.Framework;
 
 public sealed class FluentConsoleApp {
     public static FluentConsoleBuilder CreateBuilder(string[] args) {
@@ -16,7 +16,7 @@ public sealed class FluentConsoleApp {
         var version = Assembly.GetExecutingAssembly().GetName().Version;
 
         ConsoleTool.PrintLogo();
-        ConsoleTool.PrintTitle($"Ip2RegionDataProc - {version}");
+        ConsoleTool.PrintTitle($"VisitRecordDataProc - {version}");
 
         var builder = new FluentConsoleBuilder {
             Services = new ServiceCollection()

@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
-namespace Ip2RegionDataProc.Data;
+namespace VisitRecordDataProc.Data;
 
 public class AppDesignTimeDbContextFactory : IDesignTimeDbContextFactory<AppDbContext> {
     public AppDbContext CreateDbContext(string[] args) {

@@ -1,7 +1,7 @@
 using System;
 using System.Text;
 
-namespace Ip2RegionDataProc.Utilities;
+namespace VisitRecordDataProc.Utilities;
 
 public static class ConsoleTool {
     public static void PrintLogo() {

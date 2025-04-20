@@ -2,9 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Ip2RegionDataProc.Data;
+using VisitRecordDataProc.Data;
 
-namespace Ip2RegionDataProc.Framework.Extensions;
+namespace VisitRecordDataProc.Framework.Extensions;
 
 public static class EFCoreItegration {
     public static void AddDefaultEFCoreItegration(this FluentConsoleApp app) {

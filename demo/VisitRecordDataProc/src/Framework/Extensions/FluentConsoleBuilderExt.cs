@@ -1,11 +1,11 @@
-using Ip2RegionDataProc.Entities;
-using Ip2RegionDataProc.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using VisitRecordDataProc.Entities;
+using VisitRecordDataProc.Services;
 
-namespace Ip2RegionDataProc.Framework.Extensions;
+namespace VisitRecordDataProc.Framework.Extensions;
 
 public static class FluentConsoleBuilderExt {
     public static FluentConsoleBuilder InitializeConfiguration(this FluentConsoleBuilder builder) {

@@ -2,8 +2,8 @@
 
 using IP2Region.Net.Abstractions;
 using IP2Region.Net.XDB;
-using Ip2RegionDataProc.Services;
-using Ip2RegionDataProc.Framework;
+using VisitRecordDataProc.Services;
+using VisitRecordDataProc.Framework;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,6 +23,7 @@ app.Services.AddSingleton<ISearcher>(new Searcher(
     CachePolicy.Content,
     app.Configuration.GetConnectionString("Ip2Region")!
 ));
+app.Services.AddAutoMapper(typeof(Program));
 
 await app.Run<MainService>();
 

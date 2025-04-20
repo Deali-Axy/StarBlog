@@ -1,9 +1,9 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
-using Ip2RegionDataProc.Entities;
+using VisitRecordDataProc.Entities;
 
-namespace Ip2RegionDataProc.Utilities;
+namespace VisitRecordDataProc.Utilities;
 
 [JsonSourceGenerationOptions(WriteIndented = true)]
 [JsonSerializable(typeof(OutputResult))]

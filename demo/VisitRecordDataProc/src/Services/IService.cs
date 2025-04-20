@@ -1,6 +1,6 @@
 using FluentResults;
 
-namespace Ip2RegionDataProc.Services;
+namespace VisitRecordDataProc.Services;
 
 public interface IService {
     Task<Result> Run();

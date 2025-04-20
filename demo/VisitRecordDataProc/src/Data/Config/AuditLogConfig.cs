@@ -1,8 +1,8 @@
-﻿using Ip2RegionDataProc.Data.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using VisitRecordDataProc.Data.Models;
 
-namespace Ip2RegionDataProc.Data.Config;
+namespace VisitRecordDataProc.Data.Config;
 
 public class AuditLogConfig : IEntityTypeConfiguration<AuditLog> {
     public void Configure(EntityTypeBuilder<AuditLog> builder) {

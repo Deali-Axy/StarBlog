@@ -1,7 +1,7 @@
-﻿using Ip2RegionDataProc.Data.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using VisitRecordDataProc.Data.Models;
 
-namespace Ip2RegionDataProc.Data;
+namespace VisitRecordDataProc.Data;
 
 public class AppDbContext : DbContext {
     public DbSet<AuditLog> AuditLogs { get; set; }

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Ip2RegionDataProc.src.Data.Migrations {
+namespace VisitRecordDataProc.src.Data.Migrations {
     /// <inheritdoc />
     public partial class InitialCreate : Migration {
         /// <inheritdoc />

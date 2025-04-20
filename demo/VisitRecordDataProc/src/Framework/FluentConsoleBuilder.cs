@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Ip2RegionDataProc.Framework;
+namespace VisitRecordDataProc.Framework;
 
 public class FluentConsoleBuilder {
     public IConfiguration Configuration { get; set; }
