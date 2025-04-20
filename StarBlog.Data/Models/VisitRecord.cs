@@ -14,6 +14,11 @@ public class VisitRecord {
     /// IP地址
     /// </summary>
     public string? Ip { get; set; }
+    
+    /// <summary>
+    /// IP信息
+    /// </summary>
+    public IpInfo IpInfo { get; set; }
 
     /// <summary>
     /// 请求路径
@@ -53,7 +58,9 @@ public class VisitRecord {
 
     /// <summary>来源页面</summary>
     public string? Referrer { get; set; }
+}
 
+public class IpInfo {
     // 区域
     public string? RegionCode { get; set; }
     public string? Country { get; set; }

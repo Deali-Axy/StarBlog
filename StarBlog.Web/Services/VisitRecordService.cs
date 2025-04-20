@@ -1,5 +1,4 @@
 ﻿using System.Linq.Dynamic.Core;
-using IP2Region.Net.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using StarBlog.Data;
 using StarBlog.Data.Models;
@@ -12,12 +11,10 @@ namespace StarBlog.Web.Services;
 public class VisitRecordService {
     private readonly ILogger<VisitRecordService> _logger;
     private readonly AppDbContext _dbContext;
-    private readonly ISearcher _searcher;
 
-    public VisitRecordService(ILogger<VisitRecordService> logger, AppDbContext dbContext, ISearcher searcher) {
+    public VisitRecordService(ILogger<VisitRecordService> logger, AppDbContext dbContext) {
         _logger = logger;
         _dbContext = dbContext;
-        _searcher = searcher;
     }
 
     private IQueryable<VisitRecord> GetQuerySet(VisitRecordFilter? filter = null) {
@@ -75,19 +72,19 @@ public class VisitRecordService {
 
         // 筛选
         if (!string.IsNullOrWhiteSpace(param.Country)) {
-            qs = qs.Where(e => e.Country != null && e.Country.Contains(param.Country));
+            qs = qs.Where(e => e.IpInfo.Country != null && e.IpInfo.Country.Contains(param.Country));
         }
 
         if (!string.IsNullOrWhiteSpace(param.Province)) {
-            qs = qs.Where(e => e.Province != null && e.Province.Contains(param.Province));
+            qs = qs.Where(e => e.IpInfo.Province != null && e.IpInfo.Province.Contains(param.Province));
         }
 
         if (!string.IsNullOrWhiteSpace(param.City)) {
-            qs = qs.Where(e => e.City != null && e.City.Contains(param.City));
+            qs = qs.Where(e => e.IpInfo.City != null && e.IpInfo.City.Contains(param.City));
         }
 
         if (!string.IsNullOrWhiteSpace(param.Isp)) {
-            qs = qs.Where(e => e.Isp != null && e.Isp.Contains(param.Isp));
+            qs = qs.Where(e => e.IpInfo.Isp != null && e.IpInfo.Isp.Contains(param.Isp));
         }
 
         IPagedList<VisitRecord> pagedList = new StaticPagedList<VisitRecord>(
@@ -125,7 +122,7 @@ public class VisitRecordService {
         filter ??= new VisitRecordFilter { ExcludeApi = true };
         var qs = GetQuerySet(filter);
         var startDate = DateTime.Today.AddDays(-days).Date;
-        return qs.Where(e => e.Time.Date >= startDate)
+        return await qs.Where(e => e.Time.Date >= startDate)
             .GroupBy(e => e.Time.Date)
             .Select(g => new {
                 time = g.Key,
@@ -143,40 +140,39 @@ public class VisitRecordService {
         filter ??= new VisitRecordFilter { ExcludeApi = true };
         var qs = GetQuerySet(filter);
         return new {
-            Count = qs.Where(e => e.Time.Date == date).CountAsync()
+            Count = await qs.Where(e => e.Time.Date == date).CountAsync()
         };
     }
 
     /// <summary>
     /// 获取地理信息筛选参数
     /// </summary>
-    public async Task<List<string?>> GetGeoFilterParams(string param = "country", 
+    public async Task<List<string?>> GetGeoFilterParams(string param = "country",
         string? country = null, string? province = null, string? city = null) {
         var qs = GetQuerySet();
         // 筛选
         if (!string.IsNullOrWhiteSpace(country)) {
-            qs = qs.Where(e => e.Country != null && e.Country.Contains(country));
+            qs = qs.Where(e => e.IpInfo.Country != null && e.IpInfo.Country.Contains(country));
         }
 
         if (!string.IsNullOrWhiteSpace(province)) {
-            qs = qs.Where(e => e.Province != null && e.Province.Contains(province));
+            qs = qs.Where(e => e.IpInfo.Province != null && e.IpInfo.Province.Contains(province));
         }
 
         if (!string.IsNullOrWhiteSpace(city)) {
-            qs = qs.Where(e => e.City != null && e.City.Contains(city));
+            qs = qs.Where(e => e.IpInfo.City != null && e.IpInfo.City.Contains(city));
         }
 
         switch (param) {
             case "country":
-                return await qs.Select(e => e.Country).Distinct().ToListAsync();
+                return await qs.Select(e => e.IpInfo.Country).Distinct().ToListAsync();
             case "province":
-                return await qs.Select(e => e.Province).Distinct().ToListAsync();
+                return await qs.Select(e => e.IpInfo.Province).Distinct().ToListAsync();
             case "city":
-                return await qs.Select(e => e.City).Distinct().ToListAsync();
+                return await qs.Select(e => e.IpInfo.City).Distinct().ToListAsync();
             default:
                 return new List<string?>();
         }
-    
     }
 
     /// <summary>
@@ -225,7 +221,7 @@ public class VisitRecordService {
             .Skip((int)(await q.CountAsync() * 0.95))
             .Select(e => e.ResponseTimeMs)
             .FirstOrDefaultAsync();
-        return new { Date = date.Date, Avg = avg, Max = max, P95 = p95 };
+        return new { date.Date, Avg = avg, Max = max, P95 = p95 };
     }
 
     /// <summary>
@@ -262,19 +258,19 @@ public class VisitRecordService {
         filter ??= new VisitRecordFilter { ExcludeApi = true };
         var query = GetQuerySet(filter);
 
-        var countryStats = await query.GroupBy(e => e.Country)
+        var countryStats = await query.GroupBy(e => e.IpInfo.Country)
             .Select(g => new { Country = g.Key, Count = g.Count() })
             .OrderByDescending(x => x.Count)
             .ToListAsync();
-        var provinceStats = await query.GroupBy(e => e.Province)
+        var provinceStats = await query.GroupBy(e => e.IpInfo.Province)
             .Select(g => new { Province = g.Key, Count = g.Count() })
             .OrderByDescending(x => x.Count)
             .ToListAsync();
-        var cityStats = await query.GroupBy(e => e.City)
+        var cityStats = await query.GroupBy(e => e.IpInfo.City)
             .Select(g => new { City = g.Key, Count = g.Count() })
             .OrderByDescending(x => x.Count)
             .ToListAsync();
-        var ispStats = await query.GroupBy(e => e.Isp)
+        var ispStats = await query.GroupBy(e => e.IpInfo.Isp)
             .Select(g => new { Isp = g.Key, Count = g.Count() })
             .OrderByDescending(x => x.Count)
             .ToListAsync();

@@ -54,11 +54,13 @@ public class MainService(
         if (string.IsNullOrWhiteSpace(result)) return log;
 
         var parts = result.Split('|');
-        log.Country = parts[0];
-        log.RegionCode = parts[1];
-        log.Province = parts[2];
-        log.City = parts[3];
-        log.Isp = parts[4];
+        log.IpInfo = new IpInfo {
+            Country = parts[0],
+            RegionCode = parts[1],
+            Province = parts[2],
+            City = parts[3],
+            Isp = parts[4]
+        };
 
         return log;
     }
