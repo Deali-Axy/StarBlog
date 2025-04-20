@@ -91,6 +91,10 @@ public class VisitRecordQueueService {
     private VisitRecord InflateUA(VisitRecord log) {
         var c = _uaParser.Parse(log.UserAgent);
         log.UserAgentInfo = _mapper.Map<UserAgentInfo>(c);
+        if (!string.IsNullOrWhiteSpace(log.UserAgentInfo.UserAgent.Family)
+            && log.UserAgentInfo.UserAgent.Family.ToLower().Contains("bytespider")) {
+            log.UserAgentInfo.Device.IsSpider = true;
+        }
         return log;
     }
 }

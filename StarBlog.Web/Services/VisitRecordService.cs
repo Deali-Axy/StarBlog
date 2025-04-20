@@ -52,7 +52,7 @@ public class VisitRecordService {
     }
 
     public async Task<IPagedList<VisitRecord>> GetPagedList(VisitRecordQueryParameters param) {
-        var qs = GetQuerySet();
+        var qs = GetQuerySet(new VisitRecordFilter { ExcludeApi = param.ExcludeApi });
 
         // 搜索
         if (!string.IsNullOrEmpty(param.Search)) {
@@ -85,6 +85,24 @@ public class VisitRecordService {
 
         if (!string.IsNullOrWhiteSpace(param.Isp)) {
             qs = qs.Where(e => e.IpInfo.Isp != null && e.IpInfo.Isp.Contains(param.Isp));
+        }
+
+        if (!string.IsNullOrWhiteSpace(param.OS)) {
+            qs = qs.Where(e => e.UserAgentInfo.OS.Family != null && e.UserAgentInfo.OS.Family.Contains(param.OS));
+        }
+
+        if (!string.IsNullOrWhiteSpace(param.Device)) {
+            qs = qs.Where(e =>
+                e.UserAgentInfo.Device.Family != null && e.UserAgentInfo.Device.Family.Contains(param.Device));
+        }
+
+        if (!string.IsNullOrWhiteSpace(param.UserAgent)) {
+            qs = qs.Where(e =>
+                e.UserAgentInfo.UserAgent.Family != null && e.UserAgentInfo.UserAgent.Family.Contains(param.UserAgent));
+        }
+
+        if (param.IsSpider != null) {
+            qs = qs.Where(e => e.UserAgentInfo.Device.IsSpider == param.IsSpider);
         }
 
         IPagedList<VisitRecord> pagedList = new StaticPagedList<VisitRecord>(
@@ -173,6 +191,15 @@ public class VisitRecordService {
             default:
                 return new List<string?>();
         }
+    }
+
+    public async Task<object> GetUserAgentFilterParams() {
+        var qs = GetQuerySet();
+        return new {
+            OS = await qs.Select(e => e.UserAgentInfo.OS.Family).Distinct().ToListAsync(),
+            Device = await qs.Select(e => e.UserAgentInfo.Device.Family).Distinct().ToListAsync(),
+            UserAgent = await qs.Select(e => e.UserAgentInfo.UserAgent.Family).Distinct().ToListAsync(),
+        };
     }
 
     /// <summary>

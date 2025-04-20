@@ -41,7 +41,7 @@ public class MainService(
         db.UpdateRange(recordsToUpdate);
         var updateRows = await db.SaveChangesAsync();
         logger.LogInformation("更新完成，已更新 {rows} 条数据", updateRows);
-        
+
         InflateUA(records.First());
 
         return Result.Ok();
@@ -68,6 +68,11 @@ public class MainService(
     private VisitRecord InflateUA(VisitRecord log) {
         var c = uaParser.Parse(log.UserAgent);
         log.UserAgentInfo = mapper.Map<UserAgentInfo>(c);
+        if (!string.IsNullOrWhiteSpace(log.UserAgentInfo.UserAgent.Family)
+            && log.UserAgentInfo.UserAgent.Family.ToLower().Contains("bytespider")) {
+            log.UserAgentInfo.Device.IsSpider = true;
+        }
+
         return log;
     }
 }

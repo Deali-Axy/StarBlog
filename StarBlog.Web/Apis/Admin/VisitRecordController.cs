@@ -87,6 +87,15 @@ public class VisitRecordController : ControllerBase {
     }
 
     /// <summary>
+    /// 获取 UserAgent 筛选参数
+    /// </summary>
+    [HttpGet("[action]")]
+    public async Task<ApiResponse> GetUserAgentFilterParams() {
+        var r = await _service.GetUserAgentFilterParams();
+        return ApiResponse.Ok(r);
+    }
+
+    /// <summary>
     /// 地理位置分布统计
     /// </summary>
     [HttpGet("GeoDistribution")]
