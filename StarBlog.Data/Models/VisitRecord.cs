@@ -36,6 +36,11 @@ public class VisitRecord {
     public string? UserAgent { get; set; }
 
     /// <summary>
+    /// UA信息
+    /// </summary>
+    public UserAgentInfo UserAgentInfo { get; set; }
+
+    /// <summary>
     /// 时间
     /// </summary>
     public DateTime Time { get; set; }
@@ -55,4 +60,32 @@ public class VisitRecord {
     public string? Province { get; set; }
     public string? City { get; set; }
     public string? Isp { get; set; }
+}
+
+public class UserAgentInfo {
+    public OS OS { get; set; }
+    public Device Device { get; set; }
+    public UserAgent UserAgent { get; set; }
+}
+
+public class OS {
+    public string? Family { get; set; }
+    public string? Major { get; set; }
+    public string? Minor { get; set; }
+    public string? Patch { get; set; }
+    public string? PatchMinor { get; set; }
+}
+
+public class Device {
+    public string? Brand { get; set; }
+    public string? Family { get; set; }
+    public string? Model { get; set; }
+    public bool IsSpider { get; set; }
+}
+
+public class UserAgent {
+    public string? Family { get; set; }
+    public string? Major { get; set; }
+    public string? Minor { get; set; }
+    public string? Patch { get; set; }
 }

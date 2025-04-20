@@ -28,6 +28,27 @@ public class VisitRecordConfig : IEntityTypeConfiguration<VisitRecord> {
         builder.Property(e => e.UserAgent)
             .HasMaxLength(1024);
 
+        builder.OwnsOne(c => c.UserAgentInfo, info => {
+            info.OwnsOne(e => e.OS, nb => {
+                nb.Property(os => os.Family).HasMaxLength(50);
+                nb.Property(os => os.Major).HasMaxLength(20);
+                nb.Property(os => os.Minor).HasMaxLength(20);
+                nb.Property(os => os.Patch).HasMaxLength(20);
+                nb.Property(os => os.PatchMinor).HasMaxLength(20);
+            });
+            info.OwnsOne(e => e.Device, nb => {
+                nb.Property(d => d.Family).HasMaxLength(50);
+                nb.Property(d => d.Brand).HasMaxLength(50);
+                nb.Property(d => d.Model).HasMaxLength(50);
+            });
+            info.OwnsOne(e => e.UserAgent, nb => {
+                nb.Property(u => u.Family).HasMaxLength(50);
+                nb.Property(u => u.Major).HasMaxLength(20);
+                nb.Property(u => u.Minor).HasMaxLength(20);
+                nb.Property(u => u.Patch).HasMaxLength(20);
+            });
+        });
+
         builder.Property(e => e.Time)
             .IsRequired();
 

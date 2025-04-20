@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StarBlog.Data;
 
@@ -10,9 +11,10 @@ using StarBlog.Data;
 namespace StarBlog.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250420132509_AddUserAgentInfo")]
+    partial class AddUserAgentInfo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.18");
@@ -149,11 +151,13 @@ namespace StarBlog.Data.Migrations
                                         .HasColumnName("id");
 
                                     b2.Property<string>("Brand")
+                                        .IsRequired()
                                         .HasMaxLength(50)
                                         .HasColumnType("TEXT")
                                         .HasColumnName("user_agent_info_device_brand");
 
                                     b2.Property<string>("Family")
+                                        .IsRequired()
                                         .HasMaxLength(50)
                                         .HasColumnType("TEXT")
                                         .HasColumnName("user_agent_info_device_family");
@@ -163,6 +167,7 @@ namespace StarBlog.Data.Migrations
                                         .HasColumnName("user_agent_info_device_is_spider");
 
                                     b2.Property<string>("Model")
+                                        .IsRequired()
                                         .HasMaxLength(50)
                                         .HasColumnType("TEXT")
                                         .HasColumnName("user_agent_info_device_model");
@@ -183,26 +188,31 @@ namespace StarBlog.Data.Migrations
                                         .HasColumnName("id");
 
                                     b2.Property<string>("Family")
+                                        .IsRequired()
                                         .HasMaxLength(50)
                                         .HasColumnType("TEXT")
                                         .HasColumnName("user_agent_info_os_family");
 
                                     b2.Property<string>("Major")
+                                        .IsRequired()
                                         .HasMaxLength(20)
                                         .HasColumnType("TEXT")
                                         .HasColumnName("user_agent_info_os_major");
 
                                     b2.Property<string>("Minor")
+                                        .IsRequired()
                                         .HasMaxLength(20)
                                         .HasColumnType("TEXT")
                                         .HasColumnName("user_agent_info_os_minor");
 
                                     b2.Property<string>("Patch")
+                                        .IsRequired()
                                         .HasMaxLength(20)
                                         .HasColumnType("TEXT")
                                         .HasColumnName("user_agent_info_os_patch");
 
                                     b2.Property<string>("PatchMinor")
+                                        .IsRequired()
                                         .HasMaxLength(20)
                                         .HasColumnType("TEXT")
                                         .HasColumnName("user_agent_info_os_patch_minor");
@@ -223,21 +233,25 @@ namespace StarBlog.Data.Migrations
                                         .HasColumnName("id");
 
                                     b2.Property<string>("Family")
+                                        .IsRequired()
                                         .HasMaxLength(50)
                                         .HasColumnType("TEXT")
                                         .HasColumnName("user_agent_info_user_agent_family");
 
                                     b2.Property<string>("Major")
+                                        .IsRequired()
                                         .HasMaxLength(20)
                                         .HasColumnType("TEXT")
                                         .HasColumnName("user_agent_info_user_agent_major");
 
                                     b2.Property<string>("Minor")
+                                        .IsRequired()
                                         .HasMaxLength(20)
                                         .HasColumnType("TEXT")
                                         .HasColumnName("user_agent_info_user_agent_minor");
 
                                     b2.Property<string>("Patch")
+                                        .IsRequired()
                                         .HasMaxLength(20)
                                         .HasColumnType("TEXT")
                                         .HasColumnName("user_agent_info_user_agent_patch");
