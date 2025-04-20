@@ -73,6 +73,23 @@ public class VisitRecordService {
             qs = qs.OrderBy(orderByProperty);
         }
 
+        // 筛选
+        if (!string.IsNullOrWhiteSpace(param.Country)) {
+            qs = qs.Where(e => e.Country != null && e.Country.Contains(param.Country));
+        }
+
+        if (!string.IsNullOrWhiteSpace(param.Province)) {
+            qs = qs.Where(e => e.Province != null && e.Province.Contains(param.Province));
+        }
+
+        if (!string.IsNullOrWhiteSpace(param.City)) {
+            qs = qs.Where(e => e.City != null && e.City.Contains(param.City));
+        }
+
+        if (!string.IsNullOrWhiteSpace(param.Isp)) {
+            qs = qs.Where(e => e.Isp != null && e.Isp.Contains(param.Isp));
+        }
+
         IPagedList<VisitRecord> pagedList = new StaticPagedList<VisitRecord>(
             await qs.Page(param.Page, param.PageSize).ToListAsync(),
             param.Page, param.PageSize,
@@ -128,6 +145,38 @@ public class VisitRecordService {
         return new {
             Count = qs.Where(e => e.Time.Date == date).CountAsync()
         };
+    }
+
+    /// <summary>
+    /// 获取地理信息筛选参数
+    /// </summary>
+    public async Task<List<string?>> GetGeoFilterParams(string param = "country", 
+        string? country = null, string? province = null, string? city = null) {
+        var qs = GetQuerySet();
+        // 筛选
+        if (!string.IsNullOrWhiteSpace(country)) {
+            qs = qs.Where(e => e.Country != null && e.Country.Contains(country));
+        }
+
+        if (!string.IsNullOrWhiteSpace(province)) {
+            qs = qs.Where(e => e.Province != null && e.Province.Contains(province));
+        }
+
+        if (!string.IsNullOrWhiteSpace(city)) {
+            qs = qs.Where(e => e.City != null && e.City.Contains(city));
+        }
+
+        switch (param) {
+            case "country":
+                return await qs.Select(e => e.Country).Distinct().ToListAsync();
+            case "province":
+                return await qs.Select(e => e.Province).Distinct().ToListAsync();
+            case "city":
+                return await qs.Select(e => e.City).Distinct().ToListAsync();
+            default:
+                return new List<string?>();
+        }
+    
     }
 
     /// <summary>
@@ -212,7 +261,7 @@ public class VisitRecordService {
     public async Task<object> GetGeoDistribution(VisitRecordFilter? filter = null) {
         filter ??= new VisitRecordFilter { ExcludeApi = true };
         var query = GetQuerySet(filter);
-        
+
         var countryStats = await query.GroupBy(e => e.Country)
             .Select(g => new { Country = g.Key, Count = g.Count() })
             .OrderByDescending(x => x.Count)
@@ -229,7 +278,7 @@ public class VisitRecordService {
             .Select(g => new { Isp = g.Key, Count = g.Count() })
             .OrderByDescending(x => x.Count)
             .ToListAsync();
-        
+
         return new {
             Country = countryStats,
             Province = provinceStats,

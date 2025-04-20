@@ -12,7 +12,7 @@ namespace StarBlog.Web.Apis.Admin;
 /// <summary>
 /// 访问记录
 /// </summary>
-[Authorize]
+// [Authorize]
 [ApiController]
 [Route("Api/[controller]")]
 [ApiExplorerSettings(GroupName = ApiGroups.Admin)]
@@ -71,6 +71,19 @@ public class VisitRecordController : ControllerBase {
     public async Task<ApiResponse> Stats([FromQuery] StatsDto dto) {
         var date = new DateTime(dto.Year, dto.Month, dto.Day);
         return ApiResponse.Ok(await _service.Stats(date));
+    }
+
+    /// <summary>
+    /// 获取地理信息筛选参数
+    /// </summary>
+    /// <param name="param">可选 country, province, city</param>
+    /// <param name="country"></param>
+    /// <param name="province"></param>
+    /// <param name="city"></param>
+    [HttpGet("[action]")]
+    public async Task<ApiResponse> GetGeoFilterParams(string param = "country", string? country = null, string? province = null, string? city = null) {
+        var r = await _service.GetGeoFilterParams(param, country, province, city);
+        return ApiResponse.Ok(r);
     }
 
     /// <summary>
