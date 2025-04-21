@@ -23,8 +23,12 @@ public class VisitRecordService {
             return qs;
         }
 
-        if (filter.ExcludeApi) {
+        if (filter.ExcludeApi != null && filter.ExcludeApi.Value) {
             qs = qs.Where(e => !e.RequestPath.ToLower().StartsWith("/api"));
+        }
+
+        if (filter.ExcludeIntranetIp != null && filter.ExcludeIntranetIp.Value) {
+            qs = qs.Where(e => e.IpInfo.Isp != null && !e.IpInfo.Isp.Contains("内网"));
         }
 
         if (filter.Date.HasValue) {
@@ -52,7 +56,10 @@ public class VisitRecordService {
     }
 
     public async Task<IPagedList<VisitRecord>> GetPagedList(VisitRecordQueryParameters param) {
-        var qs = GetQuerySet(new VisitRecordFilter { ExcludeApi = param.ExcludeApi });
+        var qs = GetQuerySet(new VisitRecordFilter {
+            ExcludeApi = param.ExcludeApi,
+            ExcludeIntranetIp = param.ExcludeIntranetIp,
+        });
 
         // 搜索
         if (!string.IsNullOrEmpty(param.Search)) {
