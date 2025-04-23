@@ -1,9 +1,9 @@
 ﻿using System.Text.Json.Serialization;
 using Newtonsoft.Json;
 
-namespace StarBlog.Web.QueryFilters;
+namespace StarBlog.Web.Criteria;
 
-public class VisitRecordQueryParameters : QueryParameters {
+public class VisitRecordQuery : QueryParameters {
     /// <summary>
     /// 排序字段
     /// </summary>
@@ -18,6 +18,10 @@ public class VisitRecordQueryParameters : QueryParameters {
     /// 排除内网IP
     /// </summary>
     public bool? ExcludeIntranetIp { get; set; }
+
+    public DateTime? Date { get; set; }
+    public DateTime? From { get; set; }
+    public DateTime? To { get; set; }
 
     /// <summary>
     /// 国家

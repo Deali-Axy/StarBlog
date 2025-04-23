@@ -1,4 +1,4 @@
-﻿namespace StarBlog.Web.QueryFilters;
+﻿namespace StarBlog.Web.Criteria;
 
 /// <summary>
 /// 请求参数
@@ -10,6 +10,11 @@ public class QueryParameters {
     public const int MaxPageSize = 50;
 
     private int _pageSize = 10;
+
+    /// <summary>
+    /// 是否启用分页（默认 true）
+    /// </summary>
+    public bool EnablePaging { get; set; } = true;
 
     /// <summary>
     /// 页面大小
