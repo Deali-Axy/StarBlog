@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using Newtonsoft.Json;
 
-namespace StarBlog.Web.ViewModels.QueryFilters;
+namespace StarBlog.Web.QueryFilters;
 
 public class VisitRecordQueryParameters : QueryParameters {
     /// <summary>

@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using StarBlog.Data;
 using StarBlog.Data.Models;
-using StarBlog.Web.ViewModels.QueryFilters;
+using StarBlog.Web.QueryFilters;
 using StarBlog.Web.ViewModels.VisitRecord;
 using X.PagedList;
 

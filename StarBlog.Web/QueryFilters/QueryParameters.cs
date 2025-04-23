@@ -1,4 +1,4 @@
-﻿namespace StarBlog.Web.ViewModels.QueryFilters;
+﻿namespace StarBlog.Web.QueryFilters;
 
 /// <summary>
 /// 请求参数

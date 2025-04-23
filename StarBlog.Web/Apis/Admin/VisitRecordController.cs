@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using StarBlog.Data.Models;
 using StarBlog.Web.Extensions;
 using StarBlog.Web.Services;
-using StarBlog.Web.ViewModels.QueryFilters;
+using StarBlog.Web.QueryFilters;
 using StarBlog.Web.ViewModels.VisitRecord;
 
 namespace StarBlog.Web.Apis.Admin;

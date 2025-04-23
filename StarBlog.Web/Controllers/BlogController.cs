@@ -4,7 +4,7 @@ using StarBlog.Data.Models;
 using StarBlog.Web.Contrib.SiteMessage;
 using StarBlog.Web.Services;
 using StarBlog.Web.ViewModels.Blog;
-using StarBlog.Web.ViewModels.QueryFilters;
+using StarBlog.Web.QueryFilters;
 using X.PagedList;
 
 namespace StarBlog.Web.Controllers;

@@ -7,7 +7,7 @@ using StarBlog.Data.Models;
 using StarBlog.Web.Extensions;
 using StarBlog.Web.Services;
 using StarBlog.Web.ViewModels.Comments;
-using StarBlog.Web.ViewModels.QueryFilters;
+using StarBlog.Web.QueryFilters;
 
 namespace StarBlog.Web.Apis.Comments;
 
