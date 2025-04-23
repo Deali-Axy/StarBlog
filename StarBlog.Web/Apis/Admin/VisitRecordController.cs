@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StarBlog.Data.Models;
 using StarBlog.Web.Extensions;
-using StarBlog.Web.Services;
-using StarBlog.Web.QueryFilters;
+using StarBlog.Web.Services.VisitRecordServices;
+using StarBlog.Web.Criteria;
 using StarBlog.Web.ViewModels.VisitRecord;
 
 namespace StarBlog.Web.Apis.Admin;
@@ -24,7 +24,7 @@ public class VisitRecordController : ControllerBase {
     }
 
     [HttpGet]
-    public async Task<ApiResponsePaged<VisitRecord>> GetList([FromQuery] VisitRecordQueryParameters param) {
+    public async Task<ApiResponsePaged<VisitRecord>> GetList([FromQuery] VisitRecordParameters param) {
         var pagedList = await _service.GetPagedList(param);
         return new ApiResponsePaged<VisitRecord>(pagedList);
     }
@@ -40,8 +40,8 @@ public class VisitRecordController : ControllerBase {
     /// </summary>
     /// <returns></returns>
     [HttpGet("All")]
-    public async Task<List<VisitRecord>> GetAll() {
-        return await _service.GetAll();
+    public async Task<List<VisitRecord>> GetAll([FromQuery] VisitRecordParameters p) {
+        return await _service.GetAll(p);
     }
 
     /// <summary>
@@ -49,8 +49,8 @@ public class VisitRecordController : ControllerBase {
     /// </summary>
     /// <returns></returns>
     [HttpGet("[action]")]
-    public async Task<ApiResponse> Overview() {
-        return ApiResponse.Ok(await _service.Overview());
+    public async Task<ApiResponse> Overview([FromQuery] VisitRecordParameters p) {
+        return ApiResponse.Ok(await _service.Overview(p));
     }
 
     /// <summary>
@@ -59,30 +59,17 @@ public class VisitRecordController : ControllerBase {
     /// <param name="days">查看最近几天的数据，默认7天</param>
     /// <returns></returns>
     [HttpGet("[action]")]
-    public async Task<ApiResponse> Trend(int days = 7) {
-        return ApiResponse.Ok(await _service.Trend(days));
-    }
-
-    /// <summary>
-    /// 统计接口
-    /// </summary>
-    /// <returns></returns>
-    [HttpGet("[action]")]
-    public async Task<ApiResponse> Stats([FromQuery] StatsDto dto) {
-        var date = new DateTime(dto.Year, dto.Month, dto.Day);
-        return ApiResponse.Ok(await _service.Stats(date));
+    public async Task<ApiResponse> Trend([FromQuery] VisitRecordParameters p, int days = 7) {
+        return ApiResponse.Ok(await _service.Trend(p, days));
     }
 
     /// <summary>
     /// 获取地理信息筛选参数
     /// </summary>
     /// <param name="param">可选 country, province, city</param>
-    /// <param name="country"></param>
-    /// <param name="province"></param>
-    /// <param name="city"></param>
     [HttpGet("[action]")]
-    public async Task<ApiResponse> GetGeoFilterParams(string param = "country", string? country = null, string? province = null, string? city = null) {
-        var r = await _service.GetGeoFilterParams(param, country, province, city);
+    public async Task<ApiResponse> GetGeoFilterParams([FromQuery] VisitRecordParameters p, string param = "country") {
+        var r = await _service.GetGeoFilterParams(p, param);
         return ApiResponse.Ok(r);
     }
 
@@ -90,8 +77,8 @@ public class VisitRecordController : ControllerBase {
     /// 获取 UserAgent 筛选参数
     /// </summary>
     [HttpGet("[action]")]
-    public async Task<ApiResponse> GetUserAgentFilterParams() {
-        var r = await _service.GetUserAgentFilterParams();
+    public async Task<ApiResponse> GetUserAgentFilterParams([FromQuery] VisitRecordParameters p) {
+        var r = await _service.GetUserAgentFilterParams(p);
         return ApiResponse.Ok(r);
     }
 
@@ -99,7 +86,7 @@ public class VisitRecordController : ControllerBase {
     /// 地理位置分布统计
     /// </summary>
     [HttpGet("GeoDistribution")]
-    public async Task<ApiResponse> GeoDistribution() {
-        return ApiResponse.Ok(await _service.GetGeoDistribution());
+    public async Task<ApiResponse> GeoDistribution([FromQuery] VisitRecordParameters p) {
+        return ApiResponse.Ok(await _service.GetGeoDistribution(p));
     }
 }

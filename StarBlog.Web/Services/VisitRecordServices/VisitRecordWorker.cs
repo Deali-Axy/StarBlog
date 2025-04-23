@@ -1,4 +1,4 @@
-﻿namespace StarBlog.Web.Services;
+﻿namespace StarBlog.Web.Services.VisitRecordServices;
 
 public class VisitRecordWorker : BackgroundService {
     private readonly ILogger<VisitRecordWorker> _logger;

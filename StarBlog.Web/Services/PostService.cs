@@ -8,7 +8,7 @@ using StarBlog.Share.Utils;
 using StarBlog.Data.Models;
 using StarBlog.Share.Extensions.Markdown;
 using StarBlog.Web.ViewModels;
-using StarBlog.Web.QueryFilters;
+using StarBlog.Web.Criteria;
 using X.PagedList;
 
 namespace StarBlog.Web.Services;

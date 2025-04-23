@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace StarBlog.Web.Criteria;
 
-public class VisitRecordQuery : QueryParameters {
+public class VisitRecordParameters : QueryParameters {
     /// <summary>
     /// 排序字段
     /// </summary>

@@ -9,7 +9,7 @@ using StarBlog.Web.Extensions;
 using StarBlog.Web.Services;
 using StarBlog.Web.ViewModels;
 using StarBlog.Web.ViewModels.Blog;
-using StarBlog.Web.QueryFilters;
+using StarBlog.Web.Criteria;
 using X.PagedList;
 
 namespace StarBlog.Web.Apis.Blog;

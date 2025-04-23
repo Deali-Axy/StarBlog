@@ -5,7 +5,7 @@ using StarBlog.Data;
 using StarBlog.Data.Models;
 using UAParser;
 
-namespace StarBlog.Web.Services;
+namespace StarBlog.Web.Services.VisitRecordServices;
 
 public class VisitRecordQueueService {
     private readonly ConcurrentQueue<VisitRecord> _logQueue = new ConcurrentQueue<VisitRecord>();

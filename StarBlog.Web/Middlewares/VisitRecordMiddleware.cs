@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using StarBlog.Data.Models;
 using StarBlog.Web.Extensions;
-using StarBlog.Web.Services;
+using StarBlog.Web.Services.VisitRecordServices;
 
 namespace StarBlog.Web.Middlewares;
 
