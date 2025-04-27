@@ -53,7 +53,7 @@ builder.Services.AddCors(options => {
         policyBuilder.WithOrigins("https://blog.deali.cn");
     });
 });
-builder.Services.AddStaticRobotsTxt(builder => builder
+builder.Services.AddStaticRobotsTxt(opt => opt
     .AddSection(section => section.AddUserAgent("Googlebot").Allow("/"))
     .AddSection(section => section.AddUserAgent("bingbot").Allow("/"))
     .AddSection(section => section.AddUserAgent("Bytespider").Allow("/"))
