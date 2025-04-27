@@ -115,8 +115,8 @@ StarBlog/
 
 ### 环境要求
 
-- .NET 6 SDK
-- Node.js 和 npm/yarn（用于前端资源管理）
+- **.NET 6 SDK**
+- **Node.js v18** 以上版本 和 **npm/yarn**（用于前端资源管理）
 
 ### 构建步骤
 
@@ -129,26 +129,113 @@ cd StarBlog
 
 2. **前端资源准备**
 
-本项目使用 NPM + Gulp 管理前端静态文件，详情可查看[这篇博客](https://www.cnblogs.com/deali/p/15905760.html)。
+本项目使用 NPM + Gulp 管理前端静态文件，需要使用 Nodejs 18 以上版本，详情可查看: [AspNetCore开发笔记：使用NPM和gulp管理前端静态文件](https://www.cnblogs.com/deali/p/15905760.html)。
 
 ```bash
 cd StarBlog.Web
+npm i -g bower
 npm install  # 或 yarn
 npm install --global gulp-cli
 gulp move
 ```
 
-**注意**：本项目依赖 [bootstrap5-treeview](https://www.npmjs.com/package/bootstrap5-treeview) 组件。如果在执行 `npm install` 过程中出错，请先安装 [bower](https://bower.io/)：`npm i -g bower`
+**注意**：本项目依赖 [bootstrap5-treeview](https://www.npmjs.com/package/bootstrap5-treeview) 组件。而这个组件又使用 bower 进行构建，请先安装 [bower](https://bower.io/)：`npm i -g bower`，不然在执行 `npm install` 过程中会出错。
 
 3. **运行项目**
 
 使用 Visual Studio 或 Rider 打开解决方案，设置 `StarBlog.Web` 为启动项目并运行。
 
+为了快速启动，本项目默认使用 SQLite 数据库，大部分功能都是使用 FreeSQL 作为 ORM，直接运行项目，无需额外配置 FreeSQL 会自动生成表结构。
+
+4. **访问日志数据库同步**
+
+StarBlog 的访问日志模块为了优化性能，是独立的数据库，使用 EFCore 进行管理，详见: [StarBlog 番外篇 (1) 全新的访问统计功能，异步队列，分库存储](https://blog.deali.cn/Blog/Post/a97ecc01df52707a)
+
+EFCore 不能像 FreeSQL 一样自动生成表结构，需要手动同步数据库，默认也是使用 SQLite 数据库，如有需要可以自行切换 MySQL 或者 PostgreSQL。
+
+首先安装 EFCore 的 cli 工具:
+
+```bash
+dotnet tool install --global dotnet-ef
+```
+
+同步数据库 (Windows10+)
+
+```powershell
+cd StarBlog.Data
+$env:CONNECTION_STRING = "Data Source=..\StarBlog.Web\app.log.db"
+dotnet ef database update
+```
+
+同步数据库 (Linux/MacOS)
+
+```bash
+cd StarBlog.Data
+set CONNECTION_STRING = "Data Source=../StarBlog.Web/app.log.db"
+dotnet ef database update
+```
+
 ### 初始化
 
-首次启动项目后，访问 `/Home/Init` 进行管理员账户创建等初始化操作。
+首次启动 StarBlog 项目后，访问 `/Home/Init` 进行管理员账户创建等初始化操作，之后才可以使用这个管理员账号登录管理后台。
 
-**注意**：初始化操作只能执行一次。详情请参考[这篇文章](https://www.cnblogs.com/deali/p/16523157.html)。
+**注意**：初始化操作只能执行一次。详情请参考 [StarBlog - (16) 一些新功能 (监控/统计/配置/初始化)](https://www.cnblogs.com/deali/p/16523157.html)。
+
+### 配置
+
+#### 邮件配置
+
+StarBlog 的友情链接、评论系统都用到了发邮件功能，详情见: [StarBlog - (28) 开发友情链接相关接口](https://blog.deali.cn/Blog/Post/f55c8c7610706503)
+
+请在项目根目录中添加 `appsettings.email.json` 文件，以 Outlook 邮箱为例，配置如下
+
+```json
+"EmailAccountConfig": {
+  "Host": "smtp-mail.outlook.com",
+  "Port": 587,
+  "FromUsername": "邮箱地址@outlook.com",
+  "FromPassword": "邮箱密码",
+  "FromAddress": "邮箱地址@outlook.com"
+}
+```
+
+#### 敏感词检测
+
+StarBlog 使用 DFA 技术实现评论敏感词检测，使用时需要在 StarBlog.Web 项目下放置一个敏感词库文件 `words.json`
+
+为了网络环境的文明和谐，本项目的开源代码里不能提供，需要的同学可以自行搜集。
+
+格式是这样的
+
+```json
+[
+  {
+    "Id": 1,
+    "Value": "小可爱",
+    "Tag": "暴力"
+  },
+  {
+    "Id": 2,
+    "Value": "河蟹",
+    "Tag": "广告"
+  }
+]
+```
+
+>如果是学习、测试用途实在需要的话，可以在公众号「程序设计实验室」后台私信 badwords 获取。
+
+## 部署
+
+StarBlog 支持多种部署方式，门槛最低的是使用 self-container 模式发布，然后在服务器上直接运行即可。
+
+```bash
+dotnet publish -r linux-x64 -c Release -p:PublishSingleFile=true -p:PublishTrimmed=true  --self-contained true
+```
+
+发布之后将 `publish` 目录下的文件上传到服务器，运行 **StarBlog.Web** 文件即可。
+
+关于部署的更多方式可以参考: [StarBlog - (31) 发布和部署](https://blog.deali.cn/p/starblog-31)
+
 
 ## 📚 开发笔记
 
