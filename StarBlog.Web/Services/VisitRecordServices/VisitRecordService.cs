@@ -49,22 +49,68 @@ public class VisitRecordService {
     }
 
     /// <summary>
-    /// 趋势数据
+    /// 获取按天趋势数据
     /// </summary>
+    /// <param name="p"></param>
     /// <param name="days">查看最近几天的数据，默认7天</param>
-    /// <param name="filter"></param>
     /// <returns></returns>
-    public async Task<object> Trend(VisitRecordParameters p, int days) {
+    public async Task<object> GetDailyTrend(VisitRecordParameters p, int days) {
         var qs = _dbContext.VisitRecords.ApplyFilters(p);
         var startDate = DateTime.Today.AddDays(-days).Date;
-        return await qs.Where(e => e.Time.Date >= startDate)
+
+        var dailyStats = await qs.Where(e => e.Time.Date >= startDate)
             .GroupBy(e => e.Time.Date)
             .Select(g => new {
                 time = g.Key,
                 date = $"{g.Key.Month}-{g.Key.Day}",
-                count = g.Count()
+                // 总访问量
+                total = g.Count(),
+                // page view (exclude api and spiders)
+                pv = g.Count(e =>
+                    !e.RequestPath.ToLower().StartsWith("/api") &&
+                    !e.UserAgentInfo.Device.IsSpider
+                ),
+                // unique visitors
+                uv = g.Where(e =>
+                        !e.RequestPath.ToLower().StartsWith("/api") &&
+                        !e.UserAgentInfo.Device.IsSpider)
+                    .Select(e => e.Ip).Distinct().Count(),
+                // api visit count
+                api = g.Count(e => e.RequestPath.ToLower().StartsWith("/api")),
+                spider = g.Count(e => e.UserAgentInfo.Device.IsSpider),
             })
             .OrderBy(e => e.time)
+            .ToListAsync();
+
+        return dailyStats;
+    }
+
+    /// <summary>
+    /// 小时／分钟级趋势
+    /// <para>按小时查看访问量变化</para>
+    /// </summary>
+    public async Task<List<HourlyTrend>> GetHourlyTrend(VisitRecordParameters p) {
+        var qs = _dbContext.VisitRecords.ApplyFilters(p);
+        return await qs.GroupBy(e => e.Time.Hour)
+            .Select(g => new HourlyTrend {
+                Hour = g.Key,
+                // 总访问量
+                Total = g.Count(),
+                // page view (exclude api and spiders)
+                Pv = g.Count(e =>
+                    !e.RequestPath.ToLower().StartsWith("/api") &&
+                    !e.UserAgentInfo.Device.IsSpider
+                ),
+                // unique visitors
+                Uv = g.Where(e =>
+                        !e.RequestPath.ToLower().StartsWith("/api") &&
+                        !e.UserAgentInfo.Device.IsSpider)
+                    .Select(e => e.Ip).Distinct().Count(),
+                // api visit count
+                Api = g.Count(e => e.RequestPath.ToLower().StartsWith("/api")),
+                Spider = g.Count(e => e.UserAgentInfo.Device.IsSpider),
+            })
+            .OrderBy(e => e.Hour)
             .ToListAsync();
     }
 
@@ -141,18 +187,6 @@ public class VisitRecordService {
             .GroupBy(e => e.StatusCode)
             .Select(g => new StatusCodeDistribution { Code = g.Key, Count = g.Count() })
             .OrderByDescending(x => x.Count)
-            .ToListAsync();
-    }
-
-    /// <summary>
-    /// 小时／分钟级趋势
-    /// <para>按小时查看访问量变化</para>
-    /// </summary>
-    public async Task<List<HourlyTrend>> GetHourlyTrend(VisitRecordParameters p) {
-        var qs = _dbContext.VisitRecords.ApplyFilters(p);
-        return await qs.GroupBy(e => e.Time.Hour)
-            .Select(g => new HourlyTrend { Hour = g.Key, Count = g.Count() })
-            .OrderBy(x => x.Hour)
             .ToListAsync();
     }
 
