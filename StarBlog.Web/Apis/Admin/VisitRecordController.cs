@@ -60,7 +60,7 @@ public class VisitRecordController : ControllerBase {
     /// <returns></returns>
     [HttpGet("[action]")]
     public async Task<ApiResponse> Trend([FromQuery] VisitRecordParameters p, int days = 7) {
-        return ApiResponse.Ok(await _service.Trend(p, days));
+        return ApiResponse.Ok(await _service.GetDailyTrend(p, days));
     }
 
     /// <summary>
