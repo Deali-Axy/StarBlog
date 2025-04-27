@@ -241,7 +241,6 @@ dotnet publish -r linux-x64 -c Release -p:PublishSingleFile=true -p:PublishTrimm
 
 本项目配套了一系列开发笔记，记录了从零开始构建这个博客系统的全过程，同时可以作为 .NetCore 开发的入门学习教程。
 
-
 - [基于.NetCore开发博客项目 StarBlog - (1) 为什么需要自己写一个博客？](https://www.cnblogs.com/deali/p/16104454.html)
 - [基于.NetCore开发博客项目 StarBlog - (2) 环境准备和创建项目](https://www.cnblogs.com/deali/p/16172342.html)
 - [基于.NetCore开发博客项目 StarBlog - (3) 模型设计](https://www.cnblogs.com/deali/p/16180920.html)
@@ -276,8 +275,14 @@ dotnet publish -r linux-x64 -c Release -p:PublishSingleFile=true -p:PublishTrimm
 - [基于.NetCore开发博客项目 StarBlog - (32) 第一期完结](https://www.cnblogs.com/deali/p/18582026)
 - ...
 
-## 📷 截图展示
+番外篇：
 
+- [StarBlog 番外篇 (1) 全新的访问统计功能，异步队列，分库存储](https://blog.deali.cn/Blog/Post/a97ecc01df52707a)
+- [StarBlog 番外篇 (2) 深入解析Markdig源码，优化ToC标题提取和文章目录树生成逻辑](https://blog.deali.cn/Blog/Post/d47403a6c7399c44)
+- [StarBlog 番外篇 (3) StarBlog Publisher，跨平台一键发布，DeepSeek加持的文章创作神器](https://blog.deali.cn/Blog/Post/211884ccc25b02e2)
+
+
+## 📷 截图展示
 
 ### 博客主页
 
@@ -333,8 +338,8 @@ dotnet publish -r linux-x64 -c Release -p:PublishSingleFile=true -p:PublishTrimm
 
 ### 博客前台重构
 
-- 使用 Next.js 重构
-- 使用 nodejs 技术栈的 markdown 解析
+- 使用 Next.js/Remix/Astro 重构 (具体技术栈待定)
+- 使用 nodejs 技术栈的 markdown 解析功能
 
 ### 管理后台重构
 
@@ -354,7 +359,7 @@ dotnet publish -r linux-x64 -c Release -p:PublishSingleFile=true -p:PublishTrimm
 
 ### 文章阅读体验优化
 
-- 使用新的 markdown 渲染工具（目前使用的是我 fork 魔改的 editor.md，用起来还可以，但这个工具很老了，而且也停更了，我希望找一个维护良好更现代的渲染工具来替代）
+- 使用新的 markdown 渲染工具（目前使用的是我 fork 魔改的 [editor.md](https://github.com/Deali-Axy/editor.md-ext) , 用起来还可以，但这个工具很老了，而且也停更了，我希望找一个维护良好更现代的渲染工具来替代）
 
 ### 文章加密
 
