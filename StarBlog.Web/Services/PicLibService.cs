@@ -8,15 +8,22 @@ namespace StarBlog.Web.Services;
 /// 图片库服务
 /// </summary>
 public class PicLibService {
+    private readonly ILogger<PicLibService> _logger;
     private readonly IWebHostEnvironment _environment;
     private readonly Random _random;
     public List<string> ImageList { get; set; } = new();
 
-    public PicLibService(IWebHostEnvironment environment) {
+    public PicLibService(IWebHostEnvironment environment, ILogger<PicLibService> logger) {
         _environment = environment;
+        _logger = logger;
         _random = Random.Shared;
 
         var importPath = Path.Combine(_environment.WebRootPath, "media", "picture_library");
+        if (!Directory.Exists(importPath)) {
+            _logger.LogInformation("Creating picture library directory");
+            Directory.CreateDirectory(importPath);
+        }
+
         var root = new DirectoryInfo(importPath);
         foreach (var file in root.GetFiles()) {
             ImageList.Add(file.FullName);
@@ -24,7 +31,8 @@ public class PicLibService {
     }
 
     [Obsolete("有些图片会破坏比例、或者裁剪失败")]
-    public static async Task<(Image, IImageFormat)> GenerateSizedImageAsyncOld(string imagePath, int width, int height) {
+    public static async Task<(Image, IImageFormat)>
+        GenerateSizedImageAsyncOld(string imagePath, int width, int height) {
         await using var fileStream = new FileStream(imagePath, FileMode.Open);
         var (image, format) = await Image.LoadWithFormatAsync(fileStream);
 
@@ -89,6 +97,7 @@ public class PicLibService {
             m = n;
             n = r;
         }
+
         return m;
     }
 
@@ -130,7 +139,8 @@ public class PicLibService {
             cropWidth = (int)(image.Height / scaleHeight * scaleWidth);
         }
 
-        var cropRect = new Rectangle((image.Width - cropWidth) / 2, (image.Height - cropHeight) / 2, cropWidth, cropHeight);
+        var cropRect = new Rectangle((image.Width - cropWidth) / 2, (image.Height - cropHeight) / 2, cropWidth,
+            cropHeight);
         image.Mutate(a => a.Crop(cropRect));
         image.Mutate(a => a.Resize(width, height));
 
