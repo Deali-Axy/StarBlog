@@ -54,39 +54,37 @@ public class VisitRecordService {
     /// <param name="p"></param>
     /// <param name="days">查看最近几天的数据，默认7天</param>
     /// <returns></returns>
-    public async Task<object> GetDailyTrend(VisitRecordParameters p, int days) {
+    public async Task<List<DailyTrend>> GetDailyTrend(VisitRecordParameters p, int days) {
         var qs = _dbContext.VisitRecords.ApplyFilters(p);
         var startDate = DateTime.Today.AddDays(-days).Date;
 
-        var dailyStats = await qs.Where(e => e.Time.Date >= startDate)
+        return await qs.Where(e => e.Time.Date >= startDate)
             .GroupBy(e => e.Time.Date)
-            .Select(g => new {
-                time = g.Key,
-                date = $"{g.Key.Month}-{g.Key.Day}",
+            .Select(g => new DailyTrend {
+                Time = g.Key,
+                Date = $"{g.Key.Month}-{g.Key.Day}",
                 // 总访问量
-                total = g.Count(),
+                Total = g.Count(),
                 // page view (exclude api and spiders)
-                pv = g.Count(e =>
+                Pv = g.Count(e =>
                     !e.RequestPath.ToLower().StartsWith("/api") &&
                     !e.UserAgentInfo.Device.IsSpider
                 ),
                 // unique visitors
-                uv = g.Where(e =>
+                Uv = g.Where(e =>
                         !e.RequestPath.ToLower().StartsWith("/api") &&
                         !e.UserAgentInfo.Device.IsSpider)
                     .Select(e => e.Ip).Distinct().Count(),
                 // api visit count
-                api = g.Count(e => e.RequestPath.ToLower().StartsWith("/api")),
-                spider = g.Count(e => e.UserAgentInfo.Device.IsSpider),
+                Api = g.Count(e => e.RequestPath.ToLower().StartsWith("/api")),
+                Spider = g.Count(e => e.UserAgentInfo.Device.IsSpider),
             })
-            .OrderBy(e => e.time)
+            .OrderBy(e => e.Time)
             .ToListAsync();
-
-        return dailyStats;
     }
 
     /// <summary>
-    /// 小时／分钟级趋势
+    /// 小时级趋势
     /// <para>按小时查看访问量变化</para>
     /// </summary>
     public async Task<List<HourlyTrend>> GetHourlyTrend(VisitRecordParameters p) {
@@ -218,6 +216,225 @@ public class VisitRecordService {
             Province = provinceStats,
             City = cityStats,
             Isp = ispStats
+        };
+    }
+
+    /// <summary>
+    /// 来源域名分析
+    /// <para>统计访问来源的域名分布</para>
+    /// </summary>
+    public async Task<List<ReferrerDomain>> GetReferrerDomains(VisitRecordParameters p, int top = 10) {
+        var qs = _dbContext.VisitRecords.ApplyFilters(p);
+        // 先获取有效的引用记录
+        var records = await qs.Where(e => !string.IsNullOrEmpty(e.Referrer))
+            .Select(e => e.Referrer)
+            .ToListAsync();
+
+        // 在内存中进行 Uri 解析和分组
+        return records
+            .Select(r => {
+                try {
+                    return new Uri(r!).Host;
+                }
+                catch {
+                    return r;
+                } // 处理无效的 URL
+            })
+            .GroupBy(host => host)
+            .Select(g => new ReferrerDomain { Domain = g.Key, Count = g.Count() })
+            .OrderByDescending(x => x.Count)
+            .Take(top)
+            .ToList();
+    }
+
+    /// <summary>
+    /// 环比增长分析
+    /// <para>计算当前周期与上一周期的访问量对比</para>
+    /// </summary>
+    public async Task<GrowthRate> GetGrowthRate(VisitRecordParameters p, int days = 7) {
+        var qs = _dbContext.VisitRecords.ApplyFilters(p);
+        var endDate = DateTime.Today;
+        var startDate = endDate.AddDays(-days);
+        var prevStartDate = startDate.AddDays(-days);
+
+        var currentPeriodCount = await qs
+            .Where(e => e.Time.Date >= startDate && e.Time.Date <= endDate)
+            .CountAsync();
+
+        var prevPeriodCount = await qs
+            .Where(e => e.Time.Date >= prevStartDate && e.Time.Date < startDate)
+            .CountAsync();
+
+        var growthRate = prevPeriodCount == 0 ? 0 : (currentPeriodCount - prevPeriodCount) * 100.0 / prevPeriodCount;
+
+        return new GrowthRate {
+            CurrentPeriodCount = currentPeriodCount,
+            PrevPeriodCount = prevPeriodCount,
+            GrowthPercentage = growthRate,
+            Days = days
+        };
+    }
+
+    /// <summary>
+    /// 跳出率分析
+    /// <para>计算只访问一个页面就离开的会话比例</para>
+    /// </summary>
+    public async Task<BounceRateStats> GetBounceRate(VisitRecordParameters p) {
+        var qs = _dbContext.VisitRecords.ApplyFilters(p);
+
+        // 按IP和会话时间分组，计算每个会话的页面访问数
+        var sessions = await qs
+            .GroupBy(e => new { e.Ip, SessionTime = e.Time.Date.AddHours(e.Time.Hour) })
+            .Select(g => new { g.Key.Ip, g.Key.SessionTime, PageViews = g.Count() })
+            .ToListAsync();
+
+        var totalSessions = sessions.Count;
+        var bounceSessions = sessions.Count(s => s.PageViews == 1);
+        var bounceRate = totalSessions == 0 ? 0 : (double)bounceSessions / totalSessions * 100;
+
+        return new BounceRateStats {
+            TotalSessions = totalSessions,
+            BounceSessions = bounceSessions,
+            BounceRate = bounceRate
+        };
+    }
+
+    /// <summary>
+    /// 首次访问分析
+    /// <para>统计新访客与回访者的比例</para>
+    /// </summary>
+    public async Task<FirstVisitStats> GetFirstVisitStats(VisitRecordParameters p, int days) {
+        var qs = _dbContext.VisitRecords.ApplyFilters(p);
+
+        // 获取所有IP的首次访问时间
+        var firstVisits = await qs
+            .GroupBy(e => e.Ip)
+            .Select(g => new { Ip = g.Key, FirstVisit = g.Min(e => e.Time) })
+            .ToListAsync();
+
+        // 当前时间范围内的访问记录
+        var periodStart = DateTime.Today.AddDays(-days);
+        var currentPeriodVisits = await qs
+            .Where(e => e.Time >= periodStart)
+            .Select(e => new { e.Ip, e.Time })
+            .ToListAsync();
+
+        // 计算新访客数量
+        var newVisitors = currentPeriodVisits
+            .GroupBy(e => e.Ip)
+            .Count(g => firstVisits.First(f => f.Ip == g.Key).FirstVisit >= periodStart);
+
+        // 计算回访者数量
+        var returningVisitors = currentPeriodVisits
+            .Select(e => e.Ip)
+            .Distinct()
+            .Count() - newVisitors;
+
+        return new FirstVisitStats {
+            NewVisitors = newVisitors,
+            ReturningVisitors = returningVisitors,
+            TotalVisitors = newVisitors + returningVisitors,
+            NewVisitorsPercentage = (double)newVisitors / (newVisitors + returningVisitors) * 100
+        };
+    }
+
+    /// <summary>
+    /// 技术分布统计
+    /// <para>统计浏览器、设备、操作系统的分布情况</para>
+    /// </summary>
+    public async Task<TechDistribution> GetTechDistribution(VisitRecordParameters p) {
+        var qs = _dbContext.VisitRecords.ApplyFilters(p);
+
+        var browserStats = await qs
+            .GroupBy(e => e.UserAgentInfo.UserAgent.Family)
+            .Select(g => new { Browser = g.Key, Count = g.Count() })
+            .OrderByDescending(x => x.Count)
+            .Take(10)
+            .ToListAsync();
+
+        var osStats = await qs
+            .GroupBy(e => e.UserAgentInfo.OS.Family)
+            .Select(g => new { OS = g.Key, Count = g.Count() })
+            .OrderByDescending(x => x.Count)
+            .Take(10)
+            .ToListAsync();
+
+        var deviceStats = await qs
+            .GroupBy(e => e.UserAgentInfo.Device.Family)
+            .Select(g => new { Device = g.Key, Count = g.Count() })
+            .OrderByDescending(x => x.Count)
+            .Take(10)
+            .ToListAsync();
+
+        return new TechDistribution {
+            Browsers = browserStats.Select(b => new NameCountPair { Name = b.Browser, Count = b.Count }).ToList(),
+            OperatingSystems = osStats.Select(o => new NameCountPair { Name = o.OS, Count = o.Count }).ToList(),
+            Devices = deviceStats.Select(d => new NameCountPair { Name = d.Device, Count = d.Count }).ToList()
+        };
+    }
+
+    /// <summary>
+    /// 慢请求排行
+    /// <para>获取响应时间最长的请求列表</para>
+    /// </summary>
+    public async Task<List<SlowRequest>> GetSlowRequests(VisitRecordParameters p, int top = 10) {
+        var qs = _dbContext.VisitRecords.ApplyFilters(p);
+
+        return await qs
+            .OrderByDescending(e => e.ResponseTimeMs)
+            .Take(top)
+            .Select(e => new SlowRequest {
+                Path = e.RequestPath,
+                Method = e.RequestMethod,
+                ResponseTimeMs = e.ResponseTimeMs,
+                Time = e.Time,
+                StatusCode = e.StatusCode
+            })
+            .ToListAsync();
+    }
+
+    /// <summary>
+    /// 转化行为分析
+    /// <para>分析用户从入口页到目标页面的转化路径</para>
+    /// </summary>
+    public async Task<ConversionStats> GetConversionStats(VisitRecordParameters p, string targetPath) {
+        var qs = _dbContext.VisitRecords.ApplyFilters(p);
+
+        // 先获取基础数据到内存
+        var records = await qs
+            .Select(e => new { e.Ip, e.RequestPath, e.Time })
+            .ToListAsync();
+
+        // 在内存中进行复杂处理
+        // 按IP和会话分组
+        var sessions = records
+            .GroupBy(e => e.Ip)
+            .Select(g => new {
+                Ip = g.Key,
+                Paths = g.OrderBy(e => e.Time).Select(e => e.RequestPath).ToList()
+            })
+            .ToList();
+
+        // 计算转化率
+        var totalSessions = sessions.Count;
+        var convertedSessions = sessions.Count(s => s.Paths.Contains(targetPath));
+        var conversionRate = totalSessions == 0 ? 0 : (double)convertedSessions / totalSessions * 100;
+
+        // 计算顶部入口页面
+        var topEntryPages = sessions
+            .Where(s => s.Paths.Count > 0)
+            .GroupBy(s => s.Paths.First())
+            .Select(g => new NameCountPair { Name = g.Key, Count = g.Count() })
+            .OrderByDescending(x => x.Count)
+            .Take(10)
+            .ToList();
+
+        return new ConversionStats {
+            TargetPath = targetPath,
+            TotalSessions = totalSessions,
+            ConvertedSessions = convertedSessions,
+            ConversionRate = conversionRate,
+            TopEntryPages = topEntryPages
         };
     }
 }

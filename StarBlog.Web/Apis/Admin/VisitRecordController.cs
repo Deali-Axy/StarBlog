@@ -89,4 +89,92 @@ public class VisitRecordController : ControllerBase {
     public async Task<ApiResponse> GeoDistribution([FromQuery] VisitRecordParameters p) {
         return ApiResponse.Ok(await _service.GetGeoDistribution(p));
     }
+
+    /// <summary>
+    /// 获取来源域名分析
+    /// </summary>
+    [HttpGet("[action]")]
+    public async Task<ApiResponse> ReferrerDomains([FromQuery] VisitRecordParameters p, int top = 10) {
+        return ApiResponse.Ok(await _service.GetReferrerDomains(p, top));
+    }
+
+    /// <summary>
+    /// 获取环比增长数据
+    /// </summary>
+    [HttpGet("[action]")]
+    public async Task<ApiResponse> GrowthRate([FromQuery] VisitRecordParameters p, int days = 7) {
+        return ApiResponse.Ok(await _service.GetGrowthRate(p, days));
+    }
+
+    /// <summary>
+    /// 获取跳出率统计
+    /// </summary>
+    [HttpGet("[action]")]
+    public async Task<ApiResponse> BounceRate([FromQuery] VisitRecordParameters p) {
+        return ApiResponse.Ok(await _service.GetBounceRate(p));
+    }
+
+    /// <summary>
+    /// 获取首次访问统计
+    /// </summary>
+    [HttpGet("[action]")]
+    public async Task<ApiResponse> FirstVisit([FromQuery] VisitRecordParameters p, [FromQuery] int days = 7) {
+        return ApiResponse.Ok(await _service.GetFirstVisitStats(p, days));
+    }
+
+    /// <summary>
+    /// 获取技术分布统计
+    /// </summary>
+    [HttpGet("[action]")]
+    public async Task<ApiResponse> TechDistribution([FromQuery] VisitRecordParameters p) {
+        return ApiResponse.Ok(await _service.GetTechDistribution(p));
+    }
+
+    /// <summary>
+    /// 获取慢请求排行
+    /// </summary>
+    [HttpGet("[action]")]
+    public async Task<ApiResponse> SlowRequests([FromQuery] VisitRecordParameters p, int top = 10) {
+        return ApiResponse.Ok(await _service.GetSlowRequests(p, top));
+    }
+
+    /// <summary>
+    /// 获取转化行为分析
+    /// </summary>
+    [HttpGet("[action]")]
+    public async Task<ApiResponse> Conversion([FromQuery] VisitRecordParameters p, string targetPath) {
+        return ApiResponse.Ok(await _service.GetConversionStats(p, targetPath));
+    }
+
+    /// <summary>
+    /// 获取小时级趋势
+    /// </summary>
+    [HttpGet("[action]")]
+    public async Task<ApiResponse> HourlyTrend([FromQuery] VisitRecordParameters p) {
+        return ApiResponse.Ok(await _service.GetHourlyTrend(p));
+    }
+
+    /// <summary>
+    /// 获取PV/UV统计
+    /// </summary>
+    [HttpGet("[action]")]
+    public async Task<ApiResponse> PvUv([FromQuery] VisitRecordParameters p) {
+        return ApiResponse.Ok(await _service.GetPvUv(p));
+    }
+
+    /// <summary>
+    /// 获取响应时间统计
+    /// </summary>
+    [HttpGet("[action]")]
+    public async Task<ApiResponse> ResponseTimeStats([FromQuery] VisitRecordParameters p) {
+        return ApiResponse.Ok(await _service.GetResponseTimeStats(p));
+    }
+
+    /// <summary>
+    /// 获取Top N访问路径
+    /// </summary>
+    [HttpGet("[action]")]
+    public async Task<ApiResponse> TopPaths([FromQuery] VisitRecordParameters p, int top = 10) {
+        return ApiResponse.Ok(await _service.GetTopPaths(p, top));
+    }
 }
