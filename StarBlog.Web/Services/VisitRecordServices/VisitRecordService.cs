@@ -36,16 +36,24 @@ public class VisitRecordService {
     /// 总览数据
     /// </summary>
     /// <returns></returns>
-    public async Task<object> Overview(VisitRecordParameters p) {
+    public async Task<VisitOverview> Overview(VisitRecordParameters p) {
         var qs = _dbContext.VisitRecords.ApplyFilters(p);
 
-        return new {
-            TotalVisit = await qs.CountAsync(),
-            TodayVisit = await qs.Where(e => e.Time.Date == DateTime.Today).CountAsync(),
-            YesterdayVisit = await qs
-                .Where(e => e.Time.Date == DateTime.Today.AddDays(-1).Date)
-                .CountAsync()
+        var data = new VisitOverview {
+            Total = await qs.CountAsync(),
+            Pv = qs.Count(e =>
+                !e.RequestPath.ToLower().StartsWith("/api") &&
+                !e.UserAgentInfo.Device.IsSpider
+            ),
+            Uv = qs.Where(e =>
+                    !e.RequestPath.ToLower().StartsWith("/api") &&
+                    !e.UserAgentInfo.Device.IsSpider)
+                .Select(e => e.Ip).Distinct().Count(),
+            Api = qs.Count(e => e.RequestPath.ToLower().StartsWith("/api")),
+            Spider = qs.Count(e => e.UserAgentInfo.Device.IsSpider),
         };
+
+        return data;
     }
 
     /// <summary>
@@ -125,9 +133,9 @@ public class VisitRecordService {
         };
     }
 
-    public async Task<object> GetUserAgentFilterParams(VisitRecordParameters p) {
+    public async Task<UserAgentFilterParams> GetUserAgentFilterParams(VisitRecordParameters p) {
         var qs = _dbContext.VisitRecords.ApplyFilters(p);
-        return new {
+        return new UserAgentFilterParams {
             OS = await qs.Select(e => e.UserAgentInfo.OS.Family).Distinct().ToListAsync(),
             Device = await qs.Select(e => e.UserAgentInfo.Device.Family).Distinct().ToListAsync(),
             UserAgent = await qs.Select(e => e.UserAgentInfo.UserAgent.Family).Distinct().ToListAsync(),
