@@ -95,7 +95,7 @@ public class VisitRecordQueueService {
     /// <returns>填充了用户代理信息的访问记录</returns>
     private VisitRecord InflateUA(VisitRecord log) {
         // 检查UserAgent是否为null或空字符串，避免UAParser抛出ArgumentNullException
-        if (string.IsNullOrEmpty(log.UserAgent)) {
+        if (string.IsNullOrWhiteSpace(log.UserAgent)) {
             // 如果UserAgent为空，设置UserAgentInfo为默认值
             log.UserAgentInfo = new UserAgentInfo();
             return log;
