@@ -14,7 +14,7 @@ public class VisitRecord {
     /// IP地址
     /// </summary>
     public string? Ip { get; set; }
-    
+
     /// <summary>
     /// IP信息
     /// </summary>
@@ -43,7 +43,7 @@ public class VisitRecord {
     /// <summary>
     /// UA信息
     /// </summary>
-    public UserAgentInfo UserAgentInfo { get; set; }
+    public UserAgentInfo UserAgentInfo { get; set; } = new();
 
     /// <summary>
     /// 时间
@@ -70,9 +70,9 @@ public class IpInfo {
 }
 
 public class UserAgentInfo {
-    public OS OS { get; set; }
-    public Device Device { get; set; }
-    public UserAgent UserAgent { get; set; }
+    public OS OS { get; set; } = new();
+    public Device Device { get; set; } = new();
+    public UserAgent UserAgent { get; set; } = new();
 }
 
 public class OS {
