@@ -8,7 +8,7 @@ using StarBlog.Share.Utils;
 using StarBlog.Data.Models;
 using StarBlog.Share.Extensions.Markdown;
 using StarBlog.Web.ViewModels;
-using StarBlog.Web.ViewModels.QueryFilters;
+using StarBlog.Web.Criteria;
 using X.PagedList;
 
 namespace StarBlog.Web.Services;
@@ -76,7 +76,7 @@ public class PostService {
         // 修改文章时，将markdown中的图片地址替换成相对路径再保存
         post.Content = MdImageLinkConvert(post, false);
         // todo 修改文章时，要同时重新生成分类层级
-        
+
 
         // 处理完内容再更新一次
         await _postRepo.UpdateAsync(post);
@@ -291,6 +291,10 @@ public class PostService {
                 if (imgUrl == null) continue;
                 // 跳过本站地址的图片
                 if (imgUrl.StartsWith(Host)) continue;
+                // 跳过相对路径和本地路径
+                if (imgUrl.StartsWith("./") || imgUrl.StartsWith("../") || imgUrl.StartsWith("/")) continue;
+                // 跳过非HTTP协议的链接（如file://等）
+                if (!imgUrl.StartsWith("http://") && !imgUrl.StartsWith("https://")) continue;
 
                 // 下载图片
                 _logger.LogDebug("文章：{Title}，下载图片：{Url}", post.Title, imgUrl);

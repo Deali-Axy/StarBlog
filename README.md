@@ -254,6 +254,14 @@ dotnet publish -r linux-x64 -c Release -p:PublishSingleFile=true -p:PublishTrimm
 
 本项目配套了一系列开发笔记，记录了从零开始构建这个博客系统的全过程，同时可以作为 .NetCore 开发的入门学习教程。
 
+> PS: 项目代码更新较快，学习开发笔记系列文章请使用 [v1.0.0 版本代码](https://github.com/Deali-Axy/StarBlog/tree/v1.0.0)
+>
+> clone 命令
+>
+> ```bash
+> git clone --branch v1.0.0 --single-branch https://github.com/Deali-Axy/StarBlog.git
+> ```
+
 - [基于.NetCore开发博客项目 StarBlog - (1) 为什么需要自己写一个博客？](https://www.cnblogs.com/deali/p/16104454.html)
 - [基于.NetCore开发博客项目 StarBlog - (2) 环境准备和创建项目](https://www.cnblogs.com/deali/p/16172342.html)
 - [基于.NetCore开发博客项目 StarBlog - (3) 模型设计](https://www.cnblogs.com/deali/p/16180920.html)

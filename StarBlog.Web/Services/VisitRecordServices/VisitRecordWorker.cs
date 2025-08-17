@@ -1,4 +1,4 @@
-﻿namespace StarBlog.Web.Services;
+﻿namespace StarBlog.Web.Services.VisitRecordServices;
 
 public class VisitRecordWorker : BackgroundService {
     private readonly ILogger<VisitRecordWorker> _logger;
@@ -16,7 +16,6 @@ public class VisitRecordWorker : BackgroundService {
         while (!stoppingToken.IsCancellationRequested) {
             await _logQueue.WriteLogsToDatabaseAsync(stoppingToken);
             await Task.Delay(_executeInterval, stoppingToken);
-            _logger.LogDebug("后台任务 VisitRecordWorker ExecuteAsync");
         }
     }
 }

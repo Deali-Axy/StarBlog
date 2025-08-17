@@ -47,13 +47,14 @@ builder.Services.AddCors(options => {
         policyBuilder.AllowAnyHeader();
         policyBuilder.AllowAnyMethod();
         // policyBuilder.AllowAnyOrigin();
+        policyBuilder.WithOrigins("http://localhost:3000");
         policyBuilder.WithOrigins("http://localhost:8080");
         policyBuilder.WithOrigins("http://localhost:8081");
         policyBuilder.WithOrigins("https://deali.cn");
         policyBuilder.WithOrigins("https://blog.deali.cn");
     });
 });
-builder.Services.AddStaticRobotsTxt(builder => builder
+builder.Services.AddStaticRobotsTxt(opt => opt
     .AddSection(section => section.AddUserAgent("Googlebot").Allow("/"))
     .AddSection(section => section.AddUserAgent("bingbot").Allow("/"))
     .AddSection(section => section.AddUserAgent("Bytespider").Allow("/"))
@@ -74,6 +75,7 @@ builder.Services.AddSingleton<MessageService>();
 builder.Services.AddSingleton<ThemeService>();
 builder.Services.AddSingleton<PicLibService>();
 builder.Services.AddSingleton<TempFilterService>();
+builder.Services.AddSingleton<MonitoringService>();
 builder.Services.AddScoped<BlogService>();
 builder.Services.AddScoped<CategoryService>();
 builder.Services.AddScoped<CommentService>();

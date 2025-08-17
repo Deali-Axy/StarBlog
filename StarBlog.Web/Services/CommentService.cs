@@ -7,7 +7,7 @@ using FreeSql;
 using Microsoft.Extensions.Caching.Memory;
 using StarBlog.Data.Models;
 using StarBlog.Share.Utils;
-using StarBlog.Web.ViewModels.QueryFilters;
+using StarBlog.Web.Criteria;
 using X.PagedList;
 
 namespace StarBlog.Web.Services;
