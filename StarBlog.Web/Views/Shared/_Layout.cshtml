@@ -1,6 +1,7 @@
 ﻿@using StarBlog.Web.Utils
 @inject StarBlog.Web.Contrib.SiteMessage.MessageService Messages
 @inject Rin.Mvc.View.RinHelperService RinHelper
+@inject StarBlog.Web.Services.MonitoringService MonitoringService
 
 <!DOCTYPE html>
 <html lang="en">
@@ -26,6 +27,29 @@
     <environment include="Development">
         @* Add: Enable In-View Inspector for ASP.NET Core MVC *@
         @RinHelper.RenderInViewInspector()
+    </environment>
+
+    <environment exclude="Development">
+        @if (MonitoringService.IsUmamiEnabled)
+        {
+            <script defer src="@MonitoringService.UmamiConfig.ScriptUrl"
+                    data-website-id="@MonitoringService.UmamiConfig.WebsiteId"></script>
+        }
+        @if (MonitoringService.IsClarityEnabled)
+        {
+            <script type="text/javascript">
+                (function (c, l, a, r, i, t, y) {
+                    c[a] = c[a] || function () {
+                        (c[a].q = c[a].q || []).push(arguments)
+                    };
+                    t = l.createElement(r);
+                    t.async = 1;
+                    t.src = "https://www.clarity.ms/tag/" + i;
+                    y = l.getElementsByTagName(r)[0];
+                    y.parentNode.insertBefore(t, y);
+                })(window, document, "clarity", "script", "@MonitoringService.ClarityConfig.ProjectId");
+            </script>
+        }
     </environment>
 
     @await RenderSectionAsync("head", false)
@@ -73,12 +97,14 @@
                     </p>
                     <p>
                         All content is released under
-                        <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/deed.en" rel="external nofollow" target="_blank">
+                        <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/deed.en" rel="external nofollow"
+                           target="_blank">
                             Creative Commons
                             BY-NC-SA 3.0
                         </a>.
                         <br>
-                        If articles including programming codes (e.g. Java, Python, C#, Go) are exceptions, which are released under
+                        If articles including programming codes (e.g. Java, Python, C#, Go) are exceptions, which are
+                        released under
                         <a href="http://www.gnu.org/licenses/gpl.html"
                            rel="external nofollow" target="_blank">
                             GPL
@@ -86,8 +112,12 @@
                         </a>.
                     </p>
                     <p>
-                        所有內容皆以<a href="http://creativecommons.org/licenses/by-nc-sa/3.0/deed.en" rel="external nofollow" target="_blank"> 知识共享署名-相同方式共享 4.0 国际许可协议 </a>进行发布。<br>
-                        含有程序代码內容的文章 (如 Java, Python, C#, Go) 除外，包含的程序代码皆以 <a href="http://www.gnu.org/licenses/gpl.html" rel="external nofollow" target="_blank">GPL v3</a> 发布。
+                        所有內容皆以<a href="http://creativecommons.org/licenses/by-nc-sa/3.0/deed.en"
+                                       rel="external nofollow" target="_blank"> 知识共享署名-相同方式共享 4.0
+                            国际许可协议 </a>进行发布。<br>
+                        含有程序代码內容的文章 (如 Java, Python, C#, Go) 除外，包含的程序代码皆以 <a
+                            href="http://www.gnu.org/licenses/gpl.html" rel="external nofollow" target="_blank">GPL
+                            v3</a> 发布。
                     </p>
                     <p>
                         本站使用 <a href="https://github.com/Deali-Axy/StarBlog">StarBlog</a> 开源博客系统，

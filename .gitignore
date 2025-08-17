@@ -5,6 +5,7 @@ StarBlog.Web/wwwroot/is-cache
 StarBlog.Web/package-lock.json
 StarBlog.Web/yarn.lock
 StarBlog.Web/appsettings-email.json
+StarBlog.Web/appsettings-monitoring.json
 StarBlog.Web/words.json
 app*.db*
 *.xdb
