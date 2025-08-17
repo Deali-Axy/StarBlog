@@ -17,9 +17,14 @@ public class PicLibService {
         _random = Random.Shared;
 
         var importPath = Path.Combine(_environment.WebRootPath, "media", "picture_library");
-        var root = new DirectoryInfo(importPath);
-        foreach (var file in root.GetFiles()) {
-            ImageList.Add(file.FullName);
+        if (Directory.Exists(importPath)) {
+            var root = new DirectoryInfo(importPath);
+            foreach (var file in root.GetFiles()) {
+                // 只添加存在且可访问的图片文件
+                if (file.Exists && IsImageFile(file.Extension)) {
+                    ImageList.Add(file.FullName);
+                }
+            }
         }
     }
 
@@ -103,38 +108,58 @@ public class PicLibService {
     }
 
     /// <summary>
+    /// 检查是否为支持的图片文件格式
+    /// </summary>
+    /// <param name="extension">文件扩展名</param>
+    /// <returns>是否为支持的图片格式</returns>
+    private static bool IsImageFile(string extension) {
+        var supportedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp" };
+        return supportedExtensions.Contains(extension.ToLowerInvariant());
+    }
+
+    /// <summary>
     /// 生成指定尺寸图片
     /// </summary>
     async Task<(Image, IImageFormat)> GenerateSizedImageAsync(string imagePath, int width, int height) {
-        await using var fileStream = new FileStream(imagePath, FileMode.Open);
-        var (image, format) = await Image.LoadWithFormatAsync(fileStream);
+        // 检查文件是否存在
+        if (!File.Exists(imagePath)) {
+            throw new FileNotFoundException($"图片文件不存在: {imagePath}");
+        }
 
-        // 输出尺寸超出原图片尺寸，放大
-        if (width > image.Width && height > image.Height) {
+        try {
+            await using var fileStream = new FileStream(imagePath, FileMode.Open, FileAccess.Read);
+            var (image, format) = await Image.LoadWithFormatAsync(fileStream);
+
+            // 输出尺寸超出原图片尺寸，放大
+            if (width > image.Width && height > image.Height) {
+                image.Mutate(a => a.Resize(width, height));
+            }
+            else if (width > image.Width || height > image.Height) {
+                // 改变比例大的边
+                if (width / image.Width < height / image.Height)
+                    image.Mutate(a => a.Resize(0, height));
+                else
+                    image.Mutate(a => a.Resize(width, 0));
+            }
+
+            // 将输入的尺寸作为裁剪比例
+            var (scaleWidth, scaleHeight) = GetPhotoScale(width, height);
+            var cropWidth = image.Width;
+            var cropHeight = (int)(image.Width / scaleWidth * scaleHeight);
+            if (cropHeight > image.Height) {
+                cropHeight = image.Height;
+                cropWidth = (int)(image.Height / scaleHeight * scaleWidth);
+            }
+
+            var cropRect = new Rectangle((image.Width - cropWidth) / 2, (image.Height - cropHeight) / 2, cropWidth, cropHeight);
+            image.Mutate(a => a.Crop(cropRect));
             image.Mutate(a => a.Resize(width, height));
-        }
-        else if (width > image.Width || height > image.Height) {
-            // 改变比例大的边
-            if (width / image.Width < height / image.Height)
-                image.Mutate(a => a.Resize(0, height));
-            else
-                image.Mutate(a => a.Resize(width, 0));
-        }
 
-        // 将输入的尺寸作为裁剪比例
-        var (scaleWidth, scaleHeight) = GetPhotoScale(width, height);
-        var cropWidth = image.Width;
-        var cropHeight = (int)(image.Width / scaleWidth * scaleHeight);
-        if (cropHeight > image.Height) {
-            cropHeight = image.Height;
-            cropWidth = (int)(image.Height / scaleHeight * scaleWidth);
+            return (image, format);
         }
-
-        var cropRect = new Rectangle((image.Width - cropWidth) / 2, (image.Height - cropHeight) / 2, cropWidth, cropHeight);
-        image.Mutate(a => a.Crop(cropRect));
-        image.Mutate(a => a.Resize(width, height));
-
-        return (image, format);
+        catch (Exception ex) {
+            throw new InvalidOperationException($"处理图片时发生错误: {imagePath}, 错误信息: {ex.Message}", ex);
+        }
     }
 
     /// <summary>
@@ -145,6 +170,10 @@ public class PicLibService {
     /// <param name="seed"></param>
     /// <returns></returns>
     public async Task<(Image, IImageFormat)> GetRandomImageAsync(int width, int height, string? seed = null) {
+        if (ImageList.Count == 0) {
+            throw new InvalidOperationException("图片库为空，请检查图片目录是否存在或包含有效的图片文件");
+        }
+
         var rnd = seed == null ? _random : new Random(seed.GetHashCode());
         var imagePath = ImageList[rnd.Next(0, ImageList.Count)];
         return await GenerateSizedImageAsync(imagePath, width, height);
@@ -156,9 +185,24 @@ public class PicLibService {
     /// <param name="seed"></param>
     /// <returns></returns>
     public async Task<(Image, IImageFormat)> GetRandomImageAsync(string? seed = null) {
+        if (ImageList.Count == 0) {
+            throw new InvalidOperationException("图片库为空，请检查图片目录是否存在或包含有效的图片文件");
+        }
+
         var rnd = seed == null ? _random : new Random(seed.GetHashCode());
         var imagePath = ImageList[rnd.Next(0, ImageList.Count)];
-        await using var fileStream = new FileStream(imagePath, FileMode.Open);
-        return await Image.LoadWithFormatAsync(fileStream);
+        
+        // 检查文件是否存在
+        if (!File.Exists(imagePath)) {
+            throw new FileNotFoundException($"图片文件不存在: {imagePath}");
+        }
+
+        try {
+            await using var fileStream = new FileStream(imagePath, FileMode.Open, FileAccess.Read);
+            return await Image.LoadWithFormatAsync(fileStream);
+        }
+        catch (Exception ex) {
+            throw new InvalidOperationException($"加载图片时发生错误: {imagePath}, 错误信息: {ex.Message}", ex);
+        }
     }
 }
