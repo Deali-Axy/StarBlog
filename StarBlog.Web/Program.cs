@@ -108,6 +108,7 @@ builder.Services.AddScoped<PostService>();
 builder.Services.AddScoped<SeoService>();
 builder.Services.AddScoped<StructuredDataService>();
 builder.Services.AddScoped<ImageSeoService>();
+builder.Services.AddScoped<SitemapService>();
 
 // 设置请求最大大小
 builder.WebHost.ConfigureKestrel(options => {

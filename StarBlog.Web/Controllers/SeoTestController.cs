@@ -10,16 +10,19 @@ public class SeoTestController : Controller {
     private readonly SeoService _seoService;
     private readonly StructuredDataService _structuredDataService;
     private readonly ImageSeoService _imageSeoService;
+    private readonly SitemapService _sitemapService;
     private readonly IBaseRepository<Post> _postRepo;
 
     public SeoTestController(
         SeoService seoService,
         StructuredDataService structuredDataService,
         ImageSeoService imageSeoService,
+        SitemapService sitemapService,
         IBaseRepository<Post> postRepo) {
         _seoService = seoService;
         _structuredDataService = structuredDataService;
         _imageSeoService = imageSeoService;
+        _sitemapService = sitemapService;
         _postRepo = postRepo;
     }
 
@@ -58,6 +61,16 @@ public class SeoTestController : Controller {
                 var imageUrls = _imageSeoService.ExtractImageUrls(firstPost);
                 testResults.Add($"✅ 图片URL提取成功: 找到 {imageUrls.Count} 张图片");
             }
+
+            // 测试Sitemap服务
+            var mainSitemap = await _sitemapService.GenerateMainSitemapAsync();
+            testResults.Add($"✅ 主sitemap生成成功: {mainSitemap.Length} 字符");
+
+            var imageSitemap = await _sitemapService.GenerateImageSitemapAsync();
+            testResults.Add($"✅ 图片sitemap生成成功: {imageSitemap.Length} 字符");
+
+            var sitemapIndex = _sitemapService.GenerateSitemapIndex();
+            testResults.Add($"✅ Sitemap索引生成成功: {sitemapIndex.Length} 字符");
 
             testResults.Add("🎉 所有SEO功能测试通过！");
         }

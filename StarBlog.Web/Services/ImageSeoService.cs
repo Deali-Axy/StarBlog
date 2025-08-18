@@ -131,42 +131,7 @@ public class ImageSeoService {
         return imageUrls;
     }
 
-    /// <summary>
-    /// 生成图片sitemap XML
-    /// </summary>
-    public async Task<string> GenerateImageSitemap(IEnumerable<Post> posts) {
-        var baseUrl = GetBaseUrl();
-        var xml = new System.Text.StringBuilder();
-        
-        xml.AppendLine("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-        xml.AppendLine("<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\"");
-        xml.AppendLine("        xmlns:image=\"http://www.google.com/schemas/sitemap-image/1.1\">");
 
-        foreach (var post in posts) {
-            var imageUrls = ExtractImageUrls(post);
-            if (!imageUrls.Any()) continue;
-
-            var postUrl = string.IsNullOrWhiteSpace(post.Slug) 
-                ? $"{baseUrl}/Blog/Post/{post.Id}"
-                : $"{baseUrl}/p/{post.Slug}";
-
-            xml.AppendLine("  <url>");
-            xml.AppendLine($"    <loc>{postUrl}</loc>");
-
-            foreach (var imageUrl in imageUrls) {
-                xml.AppendLine("    <image:image>");
-                xml.AppendLine($"      <image:loc>{imageUrl}</image:loc>");
-                xml.AppendLine($"      <image:caption>{post.Title} 相关图片</image:caption>");
-                xml.AppendLine($"      <image:title>{post.Title}</image:title>");
-                xml.AppendLine("    </image:image>");
-            }
-
-            xml.AppendLine("  </url>");
-        }
-
-        xml.AppendLine("</urlset>");
-        return xml.ToString();
-    }
 
     private string GetBaseUrl() {
         var host = _configService["host"];
