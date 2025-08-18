@@ -1,6 +1,6 @@
 ﻿@using StarBlog.Web.Utils
 <nav class="navbar navbar-expand-md navbar-dark bg-dark" id="vue-header">
-    <div class="container-fluid">
+    <div class="container">
         <a class="navbar-brand" asp-controller="Home" asp-action="Index">
             <img src="~/images/codelab.jpg" class="rounded-circle" alt="" style="height: 40px;width: 40px;">
         </a>
@@ -13,35 +13,35 @@
                 <li class="nav-item">
                     <a class="nav-link @ViewContext.NavItemActive("Home", "Index")"
                        asp-controller="Home" asp-action="Index">
-                        Home
+                        主页
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link @ViewContext.NavItemActive("Blog", "List")"
                        asp-controller="Blog" asp-action="List">
-                        Blog
+                        文章
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link @ViewContext.NavItemActive("Photography", "Index")" 
                        asp-controller="Photography" asp-action="Index">
-                        Photography
+                        照片
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link @ViewContext.NavItemActive("Rss", "Index")"
                        asp-controller="Rss" asp-action="Index">
-                        Rss
+                        订阅
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link @ViewContext.NavItemActive("About", "Index")"
                        asp-controller="About" asp-action="Index">
-                        About
+                        关于
                     </a>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="dropdown04" data-bs-toggle="dropdown" aria-expanded="false">Themes</a>
+                    <a class="nav-link dropdown-toggle" href="#" id="dropdown04" data-bs-toggle="dropdown" aria-expanded="false">界面主题</a>
                     <ul class="dropdown-menu" aria-labelledby="dropdown04">
                         <li v-for="theme in themes">
                             <a v-if="theme.name===currentTheme" class="dropdown-item active">{{theme.name}}</a>
@@ -51,7 +51,7 @@
                 </li>
             </ul>
             <form asp-controller="Search" asp-action="Blog" method="get">
-                <input type="search" class="form-control" placeholder="Search..." aria-label="Search" name="keyword">
+                <input type="search" class="form-control" placeholder="输入搜索..." aria-label="Search" name="keyword">
             </form>
         </div>
     </div>
