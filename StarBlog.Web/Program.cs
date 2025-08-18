@@ -12,15 +12,10 @@ using StarBlog.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Enable Rin Logger
-builder.Logging.AddRinLogger();
 
 var mvcBuilder = builder.Services.AddControllersWithViews(
     options => { options.Filters.Add<ResponseWrapperFilter>(); }
-).AddRinMvcSupport();
-
-// Register Rin services
-builder.Services.AddRin();
+);
 
 // 开发模式启用Razor页面动态编译
 if (builder.Environment.IsDevelopment()) {
@@ -92,14 +87,7 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) {
-    // Add: Enable request/response recording and serve a inspector frontend.
-    // Important: `UseRin` (Middlewares) must be top of the HTTP pipeline.
-    app.UseRin();
-    // Add(option): Enable ASP.NET Core MVC support if the project built with ASP.NET Core MVC
-    app.UseRinMvcSupport();
     app.UseDeveloperExceptionPage();
-    // Add: Enable Exception recorder. this handler must be after `UseDeveloperExceptionPage`.
-    app.UseRinDiagnosticsHandler();
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }

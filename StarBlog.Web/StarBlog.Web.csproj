@@ -37,8 +37,6 @@
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.DynamicLinq" Version="9.6.7" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.8" />
-        <PackageReference Include="Rin" Version="2.6.0" />
-        <PackageReference Include="Rin.Mvc" Version="2.6.0" />
         <PackageReference Include="RobotsTxtCore" Version="3.0.0" />
         <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
         <PackageReference Include="SixLabors.ImageSharp.Web" Version="3.2.0" />
