@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore.DynamicLinq;
 using StarBlog.Web.Criteria;
 using X.PagedList;
+using X.PagedList.EF;
+using X.PagedList.Extensions;
 
 namespace StarBlog.Web.Extensions;
 
