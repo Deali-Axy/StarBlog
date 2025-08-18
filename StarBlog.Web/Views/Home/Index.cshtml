@@ -125,35 +125,20 @@
     </div>
 </div>
 
-<div class="container px-4 py-3" id="custom-cards">
+<div class="container px-4 py-4" id="custom-cards">
     <h2 class="pb-2 border-bottom">照片</h2>
 
     @if (Model.FeaturedPhotos.Any()) {
         <div class="row row-cols-1 row-cols-lg-3 align-items-stretch g-4 py-5">
             @foreach (var photo in Model.FeaturedPhotos) {
-                <div class="col">
+                <a role="button" class="col hero-placeholder-image" asp-controller="Photography" asp-action="Photo" asp-route-id="@photo.Id">
                     <partial name="Widgets/PhotoCardSmall" model="photo"/>
-                </div>
+                </a>
             }
         </div>
     }
     else {
         @await Html.PartialAsync("Widgets/PlaceholderCard", "推荐图片")
-    }
-
-</div>
-
-<div class="container px-4 py-3" id="featured-3">
-    <h2 class="pb-2 border-bottom">推荐分类</h2>
-    @if (Model.FeaturedCategories.Any()) {
-        <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
-            @foreach (var fc in Model.FeaturedCategories) {
-                @await Html.PartialAsync("Widgets/FeaturedCategoryCard", fc)
-            }
-        </div>
-    }
-    else {
-        @await Html.PartialAsync("Widgets/PlaceholderCard", "推荐分类")
     }
 
 </div>
@@ -181,6 +166,21 @@
     else {
         @await Html.PartialAsync("Widgets/PlaceholderCard", "推荐博客")
     }
+</div>
+
+<div class="container px-4 py-3" id="featured-3">
+    <h2 class="pb-2 border-bottom">推荐分类</h2>
+    @if (Model.FeaturedCategories.Any()) {
+        <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
+            @foreach (var fc in Model.FeaturedCategories) {
+                @await Html.PartialAsync("Widgets/FeaturedCategoryCard", fc)
+            }
+        </div>
+    }
+    else {
+        @await Html.PartialAsync("Widgets/PlaceholderCard", "推荐分类")
+    }
+
 </div>
 
 <div class="container px-4 py-3">
