@@ -78,6 +78,7 @@ builder.Services.AddStaticRobotsTxt(opt => {
            .Disallow("/bin/")
            .Disallow("/obj/")
            .Disallow("/node_modules/")
+           .Disallow("/seo-test")
            .Allow("/"))
        .AddSitemap($"{baseUrl}/sitemap.xml")
        .AddSitemap($"{baseUrl}/sitemap-images.xml");
