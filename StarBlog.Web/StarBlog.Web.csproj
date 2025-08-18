@@ -1,10 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFramework>net9.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <LangVersion>default</LangVersion>
     </PropertyGroup>
 
     <!--  输出XML  -->
@@ -25,38 +26,30 @@
         <Content Update="wwwroot/media/**/*" CopyToPublishDirectory="Never" CopyToOutputDirectory="Never" />
     </ItemGroup>
 
-    <!--  复制 Magick 库  -->
-    <PropertyGroup>
-        <MagickCopyNativeWindows>true</MagickCopyNativeWindows>
-        <MagickCopyNativeLinux>true</MagickCopyNativeLinux>
-<!--        <MagickCopyNativeLinuxMusl>true</MagickCopyNativeLinuxMusl>-->
-        <MagickCopyNativeMacOS>true</MagickCopyNativeMacOS>
-    </PropertyGroup>
-
     <ItemGroup>
-        <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
+        <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
         <PackageReference Include="CodeLab.Share" Version="1.4.2" />
         <PackageReference Include="IP2Region.Net" Version="2.0.2" />
-        <PackageReference Include="Magick.NET-Q8-x64" Version="13.2.0" />
-        <PackageReference Include="Markdig" Version="0.30.2" />
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.8" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.8" />
-        <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.0.0" />
-        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.0.0" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.DynamicLinq" Version="6.6.1" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.18" />
+        <PackageReference Include="Markdig" Version="0.41.3" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.8" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="9.0.8" />
+        <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.14.0" />
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.DynamicLinq" Version="9.6.7" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.8" />
         <PackageReference Include="Rin" Version="2.6.0" />
         <PackageReference Include="Rin.Mvc" Version="2.6.0" />
-        <PackageReference Include="RobotsTxtCore" Version="2.1.1" />
-        <PackageReference Include="SixLabors.ImageSharp" Version="2.1.10" />
-        <PackageReference Include="SixLabors.ImageSharp.Web" Version="2.0.2" />
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
-        <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="7.0.4" />
-        <PackageReference Include="Swashbuckle.AspNetCore.ReDoc" Version="6.4.0" />
-        <PackageReference Include="System.ServiceModel.Syndication" Version="6.0.0" />
+        <PackageReference Include="RobotsTxtCore" Version="3.0.0" />
+        <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
+        <PackageReference Include="SixLabors.ImageSharp.Web" Version="3.2.0" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.3" />
+        <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="9.0.0" />
+        <PackageReference Include="Swashbuckle.AspNetCore.ReDoc" Version="9.0.3" />
+        <PackageReference Include="System.ServiceModel.Syndication" Version="9.0.8" />
         <PackageReference Include="UAParser" Version="3.1.47" />
-        <PackageReference Include="X.PagedList" Version="8.4.3" />
-        <PackageReference Include="X.PagedList.Mvc.Core" Version="8.4.3" />
+        <PackageReference Include="X.PagedList" Version="10.5.7" />
+        <PackageReference Include="X.PagedList.EF" Version="10.5.7" />
+        <PackageReference Include="X.PagedList.Mvc.Core" Version="10.5.7" />
     </ItemGroup>
 
 </Project>
