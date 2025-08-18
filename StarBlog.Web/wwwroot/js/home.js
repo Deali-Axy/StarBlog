@@ -16,21 +16,11 @@ let homeApp = new Vue({
         }
     },
     created() {
-        this.loadPoem()
-        this.loadHitokoto()
     },
     mounted() {
         if (CHART_VISIBLE === true) this.loadChart()
     },
     methods: {
-        loadPoem() {
-            fetch('/Api/DataAcq/Poem')
-                .then(res => res.json()).then(res => this.poemSimple = res.data)
-        },
-        loadHitokoto() {
-            fetch('/Api/DataAcq/Hitokoto')
-                .then(res => res.json()).then(res => this.hitokoto = res.data)
-        },
         /**
          * 生成随机RGB颜色字符串，例如：rgb(123,123,123)
          * @returns {string}

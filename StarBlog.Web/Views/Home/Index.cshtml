@@ -22,10 +22,7 @@
         </div>
         <div class="col-lg-6">
             <h1 class="display-5 fw-bold lh-1 mb-3">DealiAxy's Blog</h1>
-            <div class="lead">
-                <p>一句诗：{{poemSimple}}</p>
-                <p>一言：{{hitokoto}}</p>
-            </div>
+            <h5>StarBlog v2 正在开发中，不久之后就可以上线了</h5>
             <div class="d-grid gap-2 d-md-flex justify-content-md-start">
                 <a class="btn btn-primary btn-lg px-4" asp-controller="Blog" asp-action="RandomPost">看文</a>
                 <a class="btn btn-outline-secondary btn-lg px-4" asp-controller="Photography" asp-action="RandomPhoto">看图</a>
@@ -38,7 +35,7 @@
 </div>
 
 <div class="container px-4 py-3" id="custom-cards">
-    <h2 class="pb-2 border-bottom">Photography</h2>
+    <h2 class="pb-2 border-bottom">照片</h2>
 
     @if (Model.FeaturedPhotos.Any()) {
         <div class="row row-cols-1 row-cols-lg-3 align-items-stretch g-4 py-5">
@@ -56,7 +53,7 @@
 </div>
 
 <div class="container px-4 py-3" id="featured-3">
-    <h2 class="pb-2 border-bottom">Blog Categories</h2>
+    <h2 class="pb-2 border-bottom">推荐分类</h2>
     @if (Model.FeaturedCategories.Any()) {
         <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
             @foreach (var fc in Model.FeaturedCategories) {
@@ -71,7 +68,7 @@
 </div>
 
 <div class="container px-4 py-3">
-    <h2 class="pb-2 border-bottom">Blog Posts</h2>
+    <h2 class="pb-2 border-bottom">置顶文章</h2>
 
     @if (Model.TopPost != null) {
         <partial name="Widgets/TopPostCard" model="Model.TopPost"/>
@@ -80,7 +77,9 @@
         @await Html.PartialAsync("Widgets/PlaceholderCard", "置顶博客")
     }
 
-
+    
+    <h2 class="pb-2 border-bottom">推荐文章</h2>
+    
     @if (Model.FeaturedPosts.Any()) {
         <div class="row mb-2">
             @foreach (var post in @Model.FeaturedPosts) {

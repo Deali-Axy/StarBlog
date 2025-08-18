@@ -73,7 +73,6 @@ builder.Services.AddSingleton<CrawlService>();
 builder.Services.AddSingleton<EmailService>();
 builder.Services.AddSingleton<MessageService>();
 builder.Services.AddSingleton<ThemeService>();
-builder.Services.AddSingleton<PicLibService>();
 builder.Services.AddSingleton<TempFilterService>();
 builder.Services.AddSingleton<MonitoringService>();
 builder.Services.AddScoped<BlogService>();
