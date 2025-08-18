@@ -97,20 +97,9 @@ public class ImageOptimizer(
         var originalInfo = new FileInfo(imagePath);
         var originalSize = originalInfo.Length;
 
-        // 生成输出文件名
         var directory = Path.GetDirectoryName(imagePath)!;
         var fileNameWithoutExt = Path.GetFileNameWithoutExtension(imagePath);
         var extension = Path.GetExtension(imagePath).ToLower();
-
-        // 根据原始格式决定输出格式和文件名
-        string outputPath;
-        if (extension == ".gif") {
-            // GIF保持原格式，只优化
-            outputPath = Path.Combine(directory, $"{fileNameWithoutExt}_optimized.gif");
-        } else {
-            // 其他格式转换为WebP
-            outputPath = Path.Combine(directory, $"{fileNameWithoutExt}.webp");
-        }
 
         using var image = await Image.LoadAsync(imagePath);
 
@@ -127,18 +116,8 @@ public class ImageOptimizer(
             image.Mutate(x => x.Resize(newWidth, newHeight));
         }
 
-        // 根据格式保存
-        if (extension == ".gif") {
-            // GIF格式保持原样，只调整尺寸
-            await image.SaveAsGifAsync(outputPath);
-        } else {
-            // 其他格式转换为WebP
-            var webpEncoder = new WebpEncoder {
-                Quality = 85,
-                Method = WebpEncodingMethod.BestQuality
-            };
-            await image.SaveAsync(outputPath, webpEncoder);
-        }
+        // 智能选择输出格式
+        var (outputFormat, outputPath) = await SelectOptimalFormat(image, imagePath, directory, fileNameWithoutExt, extension);
 
         var compressedInfo = new FileInfo(outputPath);
         var compressedSize = compressedInfo.Length;
@@ -168,6 +147,8 @@ public class ImageOptimizer(
 
         File.Move(outputPath, finalPath);
 
+        logger.LogDebug("选择的输出格式: {OutputFormat}", outputFormat);
+
         return new CompressionResult {
             Success = true,
             OriginalFilePath = imagePath,
@@ -176,6 +157,124 @@ public class ImageOptimizer(
             CompressedSize = compressedSize,
             CompressionRatio = compressionRatio
         };
+    }
+
+    /// <summary>
+    /// 智能选择最优的输出格式
+    /// </summary>
+    /// <param name="image">图片对象</param>
+    /// <param name="originalPath">原始文件路径</param>
+    /// <param name="directory">输出目录</param>
+    /// <param name="fileNameWithoutExt">不含扩展名的文件名</param>
+    /// <param name="originalExtension">原始扩展名</param>
+    /// <returns>输出格式和路径</returns>
+    private async Task<(string format, string outputPath)> SelectOptimalFormat(
+        Image image, string originalPath, string directory, string fileNameWithoutExt, string originalExtension) {
+
+        // GIF格式特殊处理，保持原格式
+        if (originalExtension == ".gif") {
+            var gifPath = Path.Combine(directory, $"{fileNameWithoutExt}_optimized.gif");
+            await image.SaveAsGifAsync(gifPath);
+            return ("GIF", gifPath);
+        }
+
+        // 分析图片特征
+        bool hasTransparency = HasTransparency(image);
+        bool isSimpleGraphic = IsSimpleGraphic(image);
+
+        logger.LogDebug("图片分析 - 透明度: {HasTransparency}, 图片类型: {ImageType}",
+            hasTransparency, isSimpleGraphic ? "图形/图标" : "照片/复杂图像");
+
+        // 智能选择格式
+        if (hasTransparency) {
+            // 有透明度，使用 WebP
+            var webpPath = Path.Combine(directory, $"{fileNameWithoutExt}.webp");
+            var webpEncoder = new WebpEncoder {
+                Quality = 85,
+                Method = WebpEncodingMethod.BestQuality
+            };
+            await image.SaveAsync(webpPath, webpEncoder);
+            return ("WebP (保持透明度)", webpPath);
+        }
+        else if (isSimpleGraphic) {
+            // 简单图形，使用 WebP
+            var webpPath = Path.Combine(directory, $"{fileNameWithoutExt}.webp");
+            var webpEncoder = new WebpEncoder {
+                Quality = 85,
+                Method = WebpEncodingMethod.BestQuality
+            };
+            await image.SaveAsync(webpPath, webpEncoder);
+            return ("WebP (图形优化)", webpPath);
+        }
+        else {
+            // 复杂图像/照片，比较 WebP 和 JPEG
+            return await CompareWebpAndJpeg(image, directory, fileNameWithoutExt);
+        }
+    }
+
+    /// <summary>
+    /// 比较WebP和JPEG格式，选择文件更小的格式
+    /// </summary>
+    private async Task<(string format, string outputPath)> CompareWebpAndJpeg(
+        Image image, string directory, string fileNameWithoutExt) {
+
+        // 创建临时文件测试压缩效果
+        string tempWebp = Path.GetTempFileName() + ".webp";
+        string tempJpeg = Path.GetTempFileName() + ".jpg";
+
+        try {
+            // 测试 WebP
+            var webpEncoder = new WebpEncoder {
+                Quality = 85,
+                Method = WebpEncodingMethod.BestQuality
+            };
+            await image.SaveAsync(tempWebp, webpEncoder);
+
+            // 测试 JPEG
+            var jpegEncoder = new JpegEncoder {
+                Quality = 85
+            };
+            await image.SaveAsync(tempJpeg, jpegEncoder);
+
+            // 比较文件大小
+            var webpSize = new FileInfo(tempWebp).Length;
+            var jpegSize = new FileInfo(tempJpeg).Length;
+
+            logger.LogDebug("格式比较 - WebP: {WebpSize} bytes, JPEG: {JpegSize} bytes", webpSize, jpegSize);
+
+            // 选择更小的格式
+            if (webpSize <= jpegSize) {
+                var webpPath = Path.Combine(directory, $"{fileNameWithoutExt}.webp");
+                File.Copy(tempWebp, webpPath, true);
+                return ("WebP (更小)", webpPath);
+            } else {
+                var jpegPath = Path.Combine(directory, $"{fileNameWithoutExt}.jpg");
+                File.Copy(tempJpeg, jpegPath, true);
+                return ("JPEG (更小)", jpegPath);
+            }
+
+        } finally {
+            // 清理临时文件
+            if (File.Exists(tempWebp)) File.Delete(tempWebp);
+            if (File.Exists(tempJpeg)) File.Delete(tempJpeg);
+        }
+    }
+
+    /// <summary>
+    /// 检测图片是否有透明度
+    /// </summary>
+    private static bool HasTransparency(Image image) {
+        // 检查像素格式是否支持透明度
+        return image.PixelType.BitsPerPixel == 32 ||
+               image.PixelType.ToString().Contains("Rgba");
+    }
+
+    /// <summary>
+    /// 检测是否为简单图形
+    /// </summary>
+    private static bool IsSimpleGraphic(Image image) {
+        // 简单启发式：小尺寸可能是图标/图形
+        return image.Width <= 512 && image.Height <= 512;
     }
 
     /// <summary>
