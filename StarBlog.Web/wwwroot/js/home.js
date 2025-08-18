@@ -3,9 +3,6 @@
 let homeApp = new Vue({
     el: '#vue-app',
     data: {
-        poem: {},
-        hitokoto: {},
-        poemSimple: '',
         chartTypes: ['bubble', 'bar'],
         currentChartTypeIndex: 0,
         currentChart: null

@@ -42,14 +42,4 @@ public class HomeViewModel {
     /// 友情链接
     /// </summary>
     public List<Link> Links { get; set; } = new();
-
-    /// <summary>
-    /// 一句诗
-    /// </summary>
-    public string OnePoem { get; set; }
-
-    /// <summary>
-    /// 一言
-    /// </summary>
-    public string Hitokoto { get; set; }
 }

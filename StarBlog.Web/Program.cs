@@ -69,7 +69,6 @@ builder.Services.AddHttpClient();
 builder.Services.AddImageSharp();
 // 注册自定义服务
 builder.Services.AddSingleton<CommonService>();
-builder.Services.AddSingleton<CrawlService>();
 builder.Services.AddSingleton<EmailService>();
 builder.Services.AddSingleton<MessageService>();
 builder.Services.AddSingleton<ThemeService>();
