@@ -26,13 +26,36 @@ public class ImageOptimizer(
             throw new Exception("wwwroot 配置错误");
         }
 
+        // 获取输出目录配置
+        var outputBaseDir = conf.GetValue<string>("ImageOptimizer:OutputDir");
+        if (string.IsNullOrWhiteSpace(outputBaseDir)) {
+            throw new Exception("未配置输出目录");
+        }
+
+        logger.LogInformation("压缩后图片将保存到: {OutputBaseDir}", outputBaseDir);
+
+        // 确保输出基础目录存在
+        Directory.CreateDirectory(outputBaseDir);
+
+        logger.LogInformation("开始处理 {TotalPosts} 篇文章的图片", posts.Count);
+        var processedCount = 0;
+
         foreach (var post in posts) {
+            processedCount++;
+            logger.LogInformation("处理进度: {Current}/{Total} - 文章 {PostId}",
+                processedCount, posts.Count, post.Id);
+
             var blogImageDir = Path.Combine(wwwroot, "media", "blog", post.Id);
             if (!Directory.Exists(blogImageDir)) {
                 continue;
             }
 
-            logger.LogInformation("处理文章 {PostId} 的图片, {blogImageDir}", post.Id, blogImageDir);
+            // 创建对应的输出目录
+            var outputDir = Path.Combine(outputBaseDir, post.Id);
+            Directory.CreateDirectory(outputDir);
+
+            logger.LogInformation("处理文章 {PostId} 的图片, 源目录: {SourceDir}, 输出目录: {OutputDir}",
+                post.Id, blogImageDir, outputDir);
 
             var files = Directory.GetFiles(blogImageDir);
             var hasChanges = false;
@@ -46,7 +69,7 @@ public class ImageOptimizer(
                 logger.LogInformation("处理图片 {FileName}", file);
 
                 try {
-                    var result = await CompressImage(file);
+                    var result = await CompressImage(file, outputDir);
                     if (result.Success) {
                         hasChanges = true;
                         var originalFileName = Path.GetFileName(file);
@@ -59,21 +82,34 @@ public class ImageOptimizer(
                         logger.LogInformation("图片压缩成功: {OriginalFile} -> {NewFile}, 压缩率: {CompressionRatio:P2}",
                             originalFileName, newFileName, result.CompressionRatio);
                     }
-                } catch (Exception ex) {
+                }
+                catch (Exception ex) {
                     logger.LogError(ex, "压缩图片失败: {FileName}", file);
                 }
             }
 
             // 如果有文件名变化，需要更新博客内容
             if (hasChanges && fileNameMappings.Count > 0) {
-                var updatedContent = UpdateMarkdownImageLinks(post, fileNameMappings);
-                if (updatedContent != post.Content) {
-                    post.Content = updatedContent;
-                    await postRepo.UpdateAsync(post);
-                    logger.LogInformation("已更新文章 {PostId} 的图片链接", post.Id);
+                try {
+                    var updatedContent = UpdateMarkdownImageLinks(post, fileNameMappings);
+                    if (updatedContent != post.Content) {
+                        post.Content = updatedContent;
+                        await postRepo.UpdateAsync(post);
+                        logger.LogInformation("已更新文章 {PostId} 的图片链接", post.Id);
+                    }
+                }
+                catch (Exception ex) {
+                    logger.LogError(ex, "更新文章 {PostId} 的图片链接失败", post.Id);
+                    // 数据库更新失败不影响继续处理其他文章
                 }
             }
         }
+
+        logger.LogInformation("图片压缩完成！");
+        logger.LogInformation("压缩后的图片已保存到: {OutputBaseDir}", outputBaseDir);
+        logger.LogInformation("您可以检查压缩效果后，手动替换原目录中的图片文件");
+        logger.LogInformation("原目录: {OriginalDir}", Path.Combine(wwwroot, "media", "blog"));
+        logger.LogInformation("新目录: {NewDir}", outputBaseDir);
 
         return Result.Ok();
     }
@@ -91,13 +127,13 @@ public class ImageOptimizer(
     /// <summary>
     /// 压缩单个图片
     /// </summary>
-    /// <param name="imagePath">图片路径</param>
+    /// <param name="imagePath">原图片路径</param>
+    /// <param name="outputDirectory">输出目录</param>
     /// <returns>压缩结果</returns>
-    private async Task<CompressionResult> CompressImage(string imagePath) {
+    private async Task<CompressionResult> CompressImage(string imagePath, string outputDirectory) {
         var originalInfo = new FileInfo(imagePath);
         var originalSize = originalInfo.Length;
 
-        var directory = Path.GetDirectoryName(imagePath)!;
         var fileNameWithoutExt = Path.GetFileNameWithoutExtension(imagePath);
         var extension = Path.GetExtension(imagePath).ToLower();
 
@@ -117,42 +153,38 @@ public class ImageOptimizer(
         }
 
         // 智能选择输出格式
-        var (outputFormat, outputPath) = await SelectOptimalFormat(image, imagePath, directory, fileNameWithoutExt, extension);
+        var (outputFormat, outputPath) =
+            await SelectOptimalFormat(image, imagePath, outputDirectory, fileNameWithoutExt, extension);
 
         var compressedInfo = new FileInfo(outputPath);
         var compressedSize = compressedInfo.Length;
         var compressionRatio = 1.0 - (double)compressedSize / originalSize;
 
-        // 如果压缩后文件更大，保留原文件
+        // 如果压缩后文件更大，删除压缩文件，复制原文件到输出目录
         if (compressedSize >= originalSize) {
             File.Delete(outputPath);
+
+            // 复制原文件到输出目录
+            var originalFileName = Path.GetFileName(imagePath);
+            var finalPath = Path.Combine(outputDirectory, originalFileName);
+            File.Copy(imagePath, finalPath, true);
+
             return new CompressionResult {
                 Success = false,
                 OriginalFilePath = imagePath,
-                NewFilePath = imagePath,
+                NewFilePath = finalPath,
                 OriginalSize = originalSize,
                 CompressedSize = originalSize,
                 CompressionRatio = 0
             };
         }
 
-        // 删除原文件，重命名压缩后的文件
-        File.Delete(imagePath);
-        var finalPath = imagePath;
-
-        // 如果格式发生变化，需要更新文件扩展名
-        if (Path.GetExtension(outputPath) != Path.GetExtension(imagePath)) {
-            finalPath = Path.ChangeExtension(imagePath, Path.GetExtension(outputPath));
-        }
-
-        File.Move(outputPath, finalPath);
-
         logger.LogDebug("选择的输出格式: {OutputFormat}", outputFormat);
 
         return new CompressionResult {
             Success = true,
             OriginalFilePath = imagePath,
-            NewFilePath = finalPath,
+            NewFilePath = outputPath,
             OriginalSize = originalSize,
             CompressedSize = compressedSize,
             CompressionRatio = compressionRatio
@@ -164,16 +196,15 @@ public class ImageOptimizer(
     /// </summary>
     /// <param name="image">图片对象</param>
     /// <param name="originalPath">原始文件路径</param>
-    /// <param name="directory">输出目录</param>
+    /// <param name="outputDirectory">输出目录</param>
     /// <param name="fileNameWithoutExt">不含扩展名的文件名</param>
     /// <param name="originalExtension">原始扩展名</param>
     /// <returns>输出格式和路径</returns>
     private async Task<(string format, string outputPath)> SelectOptimalFormat(
-        Image image, string originalPath, string directory, string fileNameWithoutExt, string originalExtension) {
-
+        Image image, string originalPath, string outputDirectory, string fileNameWithoutExt, string originalExtension) {
         // GIF格式特殊处理，保持原格式
         if (originalExtension == ".gif") {
-            var gifPath = Path.Combine(directory, $"{fileNameWithoutExt}_optimized.gif");
+            var gifPath = Path.Combine(outputDirectory, $"{fileNameWithoutExt}.gif");
             await image.SaveAsGifAsync(gifPath);
             return ("GIF", gifPath);
         }
@@ -188,7 +219,7 @@ public class ImageOptimizer(
         // 智能选择格式
         if (hasTransparency) {
             // 有透明度，使用 WebP
-            var webpPath = Path.Combine(directory, $"{fileNameWithoutExt}.webp");
+            var webpPath = Path.Combine(outputDirectory, $"{fileNameWithoutExt}.webp");
             var webpEncoder = new WebpEncoder {
                 Quality = 85,
                 Method = WebpEncodingMethod.BestQuality
@@ -198,7 +229,7 @@ public class ImageOptimizer(
         }
         else if (isSimpleGraphic) {
             // 简单图形，使用 WebP
-            var webpPath = Path.Combine(directory, $"{fileNameWithoutExt}.webp");
+            var webpPath = Path.Combine(outputDirectory, $"{fileNameWithoutExt}.webp");
             var webpEncoder = new WebpEncoder {
                 Quality = 85,
                 Method = WebpEncodingMethod.BestQuality
@@ -208,7 +239,7 @@ public class ImageOptimizer(
         }
         else {
             // 复杂图像/照片，比较 WebP 和 JPEG
-            return await CompareWebpAndJpeg(image, directory, fileNameWithoutExt);
+            return await CompareWebpAndJpeg(image, outputDirectory, fileNameWithoutExt);
         }
     }
 
@@ -216,8 +247,7 @@ public class ImageOptimizer(
     /// 比较WebP和JPEG格式，选择文件更小的格式
     /// </summary>
     private async Task<(string format, string outputPath)> CompareWebpAndJpeg(
-        Image image, string directory, string fileNameWithoutExt) {
-
+        Image image, string outputDirectory, string fileNameWithoutExt) {
         // 创建临时文件测试压缩效果
         string tempWebp = Path.GetTempFileName() + ".webp";
         string tempJpeg = Path.GetTempFileName() + ".jpg";
@@ -244,16 +274,17 @@ public class ImageOptimizer(
 
             // 选择更小的格式
             if (webpSize <= jpegSize) {
-                var webpPath = Path.Combine(directory, $"{fileNameWithoutExt}.webp");
+                var webpPath = Path.Combine(outputDirectory, $"{fileNameWithoutExt}.webp");
                 File.Copy(tempWebp, webpPath, true);
                 return ("WebP (更小)", webpPath);
-            } else {
-                var jpegPath = Path.Combine(directory, $"{fileNameWithoutExt}.jpg");
+            }
+            else {
+                var jpegPath = Path.Combine(outputDirectory, $"{fileNameWithoutExt}.jpg");
                 File.Copy(tempJpeg, jpegPath, true);
                 return ("JPEG (更小)", jpegPath);
             }
-
-        } finally {
+        }
+        finally {
             // 清理临时文件
             if (File.Exists(tempWebp)) File.Delete(tempWebp);
             if (File.Exists(tempJpeg)) File.Delete(tempJpeg);
@@ -308,7 +339,8 @@ public class ImageOptimizer(
                     var directory = Path.GetDirectoryName(imgUrl);
                     if (string.IsNullOrEmpty(directory)) {
                         linkInline.Url = newFileName;
-                    } else {
+                    }
+                    else {
                         linkInline.Url = Path.Combine(directory, newFileName).Replace('\\', '/');
                     }
 
