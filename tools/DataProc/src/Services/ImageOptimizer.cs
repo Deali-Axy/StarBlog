@@ -14,11 +14,33 @@ using Markdig.Syntax.Inlines;
 
 namespace DataProc.Services;
 
+public class ProcessingStats {
+    public string PostId { get; set; } = "";
+    public int TotalImages { get; set; }
+    public int ProcessedImages { get; set; }
+    public int SuccessfulCompressions { get; set; }
+    public int FailedCompressions { get; set; }
+    public long OriginalSize { get; set; }
+    public long CompressedSize { get; set; }
+    public double CompressionRatio => OriginalSize > 0 ? 1.0 - (double)CompressedSize / OriginalSize : 0;
+    public long SavedBytes => OriginalSize - CompressedSize;
+}
+
 public class ImageOptimizer(
     ILogger<ImageOptimizer> logger,
     IConfiguration conf,
     IBaseRepository<Post> postRepo
 ) : IService {
+
+    // 统计信息
+    private readonly List<ProcessingStats> _processingStats = new();
+    private int _totalImages = 0;
+    private int _processedImages = 0;
+    private int _successfulCompressions = 0;
+    private int _failedCompressions = 0;
+    private long _totalOriginalSize = 0;
+    private long _totalCompressedSize = 0;
+    private readonly Dictionary<string, int> _formatStats = new();
     public async Task<Result> Run() {
         var posts = await postRepo.Select.ToListAsync();
         var wwwroot = conf.GetValue<string>("StarBlog:wwwroot");
@@ -61,17 +83,31 @@ public class ImageOptimizer(
             var hasChanges = false;
             var fileNameMappings = new Dictionary<string, string>();
 
-            foreach (var file in files) {
-                if (!IsImage(file)) {
-                    continue;
-                }
+            // 初始化当前文章的统计信息
+            var postStats = new ProcessingStats { PostId = post.Id };
+            var imageFiles = files.Where(IsImage).ToArray();
+            postStats.TotalImages = imageFiles.Length;
+            _totalImages += imageFiles.Length;
 
+            foreach (var file in imageFiles) {
                 logger.LogInformation("处理图片 {FileName}", file);
+                _processedImages++;
+                postStats.ProcessedImages++;
 
                 try {
                     var result = await CompressImage(file, outputDir);
+
+                    // 更新统计信息
+                    postStats.OriginalSize += result.OriginalSize;
+                    postStats.CompressedSize += result.CompressedSize;
+                    _totalOriginalSize += result.OriginalSize;
+                    _totalCompressedSize += result.CompressedSize;
+
                     if (result.Success) {
                         hasChanges = true;
+                        postStats.SuccessfulCompressions++;
+                        _successfulCompressions++;
+
                         var originalFileName = Path.GetFileName(file);
                         var newFileName = Path.GetFileName(result.NewFilePath);
 
@@ -79,13 +115,27 @@ public class ImageOptimizer(
                             fileNameMappings[originalFileName] = newFileName;
                         }
 
+                        // 统计格式信息
+                        var outputFormat = Path.GetExtension(result.NewFilePath).ToLower();
+                        _formatStats[outputFormat] = _formatStats.GetValueOrDefault(outputFormat, 0) + 1;
+
                         logger.LogInformation("图片压缩成功: {OriginalFile} -> {NewFile}, 压缩率: {CompressionRatio:P2}",
                             originalFileName, newFileName, result.CompressionRatio);
+                    } else {
+                        postStats.FailedCompressions++;
+                        _failedCompressions++;
                     }
                 }
                 catch (Exception ex) {
                     logger.LogError(ex, "压缩图片失败: {FileName}", file);
+                    postStats.FailedCompressions++;
+                    _failedCompressions++;
                 }
+            }
+
+            // 保存文章统计信息
+            if (postStats.TotalImages > 0) {
+                _processingStats.Add(postStats);
             }
 
             // 如果有文件名变化，需要更新博客内容
@@ -105,13 +155,105 @@ public class ImageOptimizer(
             }
         }
 
-        logger.LogInformation("图片压缩完成！");
-        logger.LogInformation("压缩后的图片已保存到: {OutputBaseDir}", outputBaseDir);
-        logger.LogInformation("您可以检查压缩效果后，手动替换原目录中的图片文件");
-        logger.LogInformation("原目录: {OriginalDir}", Path.Combine(wwwroot, "media", "blog"));
-        logger.LogInformation("新目录: {NewDir}", outputBaseDir);
+        // 生成汇总报告
+        GenerateSummaryReport(outputBaseDir, wwwroot);
 
         return Result.Ok();
+    }
+
+    /// <summary>
+    /// 生成汇总报告
+    /// </summary>
+    private void GenerateSummaryReport(string outputBaseDir, string wwwroot) {
+        logger.LogInformation("");
+        logger.LogInformation("🎉 ================ 图片压缩汇总报告 ================");
+        logger.LogInformation("");
+
+        // 基本统计
+        logger.LogInformation("📊 基本统计:");
+        logger.LogInformation("   • 处理的文章数量: {ProcessedPosts}", _processingStats.Count);
+        logger.LogInformation("   • 发现的图片总数: {TotalImages}", _totalImages);
+        logger.LogInformation("   • 处理的图片数量: {ProcessedImages}", _processedImages);
+        logger.LogInformation("   • 成功压缩数量: {SuccessfulCompressions}", _successfulCompressions);
+        logger.LogInformation("   • 压缩失败数量: {FailedCompressions}", _failedCompressions);
+        logger.LogInformation("");
+
+        // 文件大小统计
+        var totalSavedBytes = _totalOriginalSize - _totalCompressedSize;
+        var overallCompressionRatio = _totalOriginalSize > 0 ? 1.0 - (double)_totalCompressedSize / _totalOriginalSize : 0;
+
+        logger.LogInformation("💾 文件大小统计:");
+        logger.LogInformation("   • 原始总大小: {OriginalSize}", FormatFileSize(_totalOriginalSize));
+        logger.LogInformation("   • 压缩后总大小: {CompressedSize}", FormatFileSize(_totalCompressedSize));
+        logger.LogInformation("   • 节省空间: {SavedSize}", FormatFileSize(totalSavedBytes));
+        logger.LogInformation("   • 总体压缩率: {CompressionRatio:P2}", overallCompressionRatio);
+        logger.LogInformation("");
+
+        // 格式统计
+        if (_formatStats.Count > 0) {
+            logger.LogInformation("📁 输出格式统计:");
+            foreach (var format in _formatStats.OrderByDescending(x => x.Value)) {
+                logger.LogInformation("   • {Format}: {Count} 个文件", format.Key.ToUpper(), format.Value);
+            }
+            logger.LogInformation("");
+        }
+
+        // 前10个压缩效果最好的文章
+        var topCompressionPosts = _processingStats
+            .Where(p => p.SuccessfulCompressions > 0)
+            .OrderByDescending(p => p.SavedBytes)
+            .Take(10)
+            .ToList();
+
+        if (topCompressionPosts.Count > 0) {
+            logger.LogInformation("🏆 压缩效果最佳的文章 (前10名):");
+            for (int i = 0; i < topCompressionPosts.Count; i++) {
+                var post = topCompressionPosts[i];
+                logger.LogInformation("   {Rank}. 文章 {PostId}: 节省 {SavedSize}, 压缩率 {CompressionRatio:P2} ({SuccessfulCount}/{TotalCount} 张图片)",
+                    i + 1, post.PostId, FormatFileSize(post.SavedBytes), post.CompressionRatio,
+                    post.SuccessfulCompressions, post.TotalImages);
+            }
+            logger.LogInformation("");
+        }
+
+        // 失败统计
+        var failedPosts = _processingStats.Where(p => p.FailedCompressions > 0).ToList();
+        if (failedPosts.Count > 0) {
+            logger.LogInformation("⚠️  压缩失败统计:");
+            foreach (var post in failedPosts.OrderByDescending(p => p.FailedCompressions)) {
+                logger.LogInformation("   • 文章 {PostId}: {FailedCount} 张图片压缩失败",
+                    post.PostId, post.FailedCompressions);
+            }
+            logger.LogInformation("");
+        }
+
+        // 目录信息
+        logger.LogInformation("📂 目录信息:");
+        logger.LogInformation("   • 原始图片目录: {OriginalDir}", Path.Combine(wwwroot, "media", "blog"));
+        logger.LogInformation("   • 压缩后图片目录: {OutputDir}", outputBaseDir);
+        logger.LogInformation("");
+
+        // 操作建议
+        logger.LogInformation("💡 下一步操作建议:");
+        logger.LogInformation("   1. 检查压缩后的图片质量和效果");
+        logger.LogInformation("   2. 确认无误后，可以手动替换原目录中的图片文件");
+        logger.LogInformation("   3. 建议先备份原始图片目录");
+        if (failedPosts.Count > 0) {
+            logger.LogInformation("   4. 检查压缩失败的图片，可能需要手动处理");
+        }
+        logger.LogInformation("");
+        logger.LogInformation("🎉 ================ 报告结束 ================");
+        logger.LogInformation("");
+    }
+
+    /// <summary>
+    /// 格式化文件大小显示
+    /// </summary>
+    private static string FormatFileSize(long bytes) {
+        if (bytes < 1024) return $"{bytes} B";
+        if (bytes < 1024 * 1024) return $"{bytes / 1024.0:F1} KB";
+        if (bytes < 1024 * 1024 * 1024) return $"{bytes / (1024.0 * 1024):F1} MB";
+        return $"{bytes / (1024.0 * 1024 * 1024):F1} GB";
     }
 
     bool IsImage(string fileName) {
