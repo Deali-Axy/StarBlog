@@ -96,7 +96,7 @@ public class SeoTestController : Controller {
 
     [HttpGet("seo-test/meta")]
     public async Task<IActionResult> TestMeta() {
-        var posts = _postRepo.Where(a => a.IsPublish).ToList();
+        var posts = await _postRepo.Where(a => a.IsPublish).ToListAsync();
         if (posts.Count == 0) {
             ViewBag.Error = "没有找到已发布的文章";
             return View();
