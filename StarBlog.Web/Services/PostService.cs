@@ -316,30 +316,41 @@ public class PostService {
     }
 
     /// <summary>
-    /// 获取相关文章推荐
+    /// 获取相关文章推荐（随机顺序）
     /// </summary>
     public async Task<List<Post>> GetRelatedPosts(Post currentPost, int count = 5) {
         var relatedPosts = new List<Post>();
 
-        // 1. 优先推荐同分类的文章
+        // 1. 优先推荐同分类的文章（随机顺序）
         if (currentPost.CategoryId > 0) {
             var sameCategoryPosts = await _postRepo
                 .Where(p => p.IsPublish && p.Id != currentPost.Id && p.CategoryId == currentPost.CategoryId)
-                .OrderByDescending(p => p.LastUpdateTime)
-                .Take(count)
                 .ToListAsync();
-            relatedPosts.AddRange(sameCategoryPosts);
+
+            // 随机打乱同分类文章
+            var randomSameCategoryPosts = sameCategoryPosts
+                .OrderBy(x => Random.Shared.Next())
+                .Take(count)
+                .ToList();
+            relatedPosts.AddRange(randomSameCategoryPosts);
         }
 
-        // 2. 如果同分类文章不够，从其他分类补充
+        // 2. 如果同分类文章不够，从其他分类补充（随机顺序）
         if (relatedPosts.Count < count) {
             var remainingCount = count - relatedPosts.Count;
+            var excludeIds = relatedPosts.Select(r => r.Id).ToList();
+            excludeIds.Add(currentPost.Id); // 排除当前文章
+
             var otherPosts = await _postRepo
-                .Where(p => p.IsPublish && p.Id != currentPost.Id && !relatedPosts.Select(r => r.Id).Contains(p.Id))
-                .OrderByDescending(p => p.LastUpdateTime)
-                .Take(remainingCount)
+                .Where(p => p.IsPublish && !excludeIds.Contains(p.Id))
                 .ToListAsync();
-            relatedPosts.AddRange(otherPosts);
+
+            // 随机打乱其他文章
+            var randomOtherPosts = otherPosts
+                .OrderBy(x => Random.Shared.Next())
+                .Take(remainingCount)
+                .ToList();
+            relatedPosts.AddRange(randomOtherPosts);
         }
 
         return relatedPosts.Take(count).ToList();
