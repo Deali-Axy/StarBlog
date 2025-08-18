@@ -32,7 +32,7 @@ public class BlogController : Controller {
         _configService = configService;
     }
 
-    public async Task<IActionResult> List(int categoryId = 0, int page = 1, int pageSize = 6,
+    public async Task<IActionResult> List(int categoryId = 0, int page = 1, int pageSize = 8,
         string sortType = "asc", string sortBy = "-CreationTime") {
         var currentCategory = categoryId == 0
             ? new Category { Id = 0, Name = "All" }
