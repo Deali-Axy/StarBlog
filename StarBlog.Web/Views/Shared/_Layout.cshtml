@@ -30,13 +30,11 @@
     </environment>
 
     <environment exclude="Development">
-        @if (MonitoringService.IsUmamiEnabled)
-        {
+        @if (MonitoringService.IsUmamiEnabled) {
             <script defer src="@MonitoringService.UmamiConfig.ScriptUrl"
                     data-website-id="@MonitoringService.UmamiConfig.WebsiteId"></script>
         }
-        @if (MonitoringService.IsClarityEnabled)
-        {
+        @if (MonitoringService.IsClarityEnabled) {
             <script type="text/javascript">
                 (function (c, l, a, r, i, t, y) {
                     c[a] = c[a] || function () {
@@ -59,12 +57,14 @@
 <partial name="Widgets/Header2"/>
 
 <main id="vue-app">
-    <div class="container mt-3">
-        @while (!Messages.IsEmpty) {
-            var message = Messages.Dequeue();
-            <partial name="Widgets/Alert" model="message"/>
-        }
-    </div>
+    @if (!Messages.IsEmpty) {
+        <div class="container py-3">
+            @while (!Messages.IsEmpty) {
+                var message = Messages.Dequeue();
+                <partial name="Widgets/Alert" model="message"/>
+            }
+        </div>
+    }
     @RenderBody()
 </main>
 
