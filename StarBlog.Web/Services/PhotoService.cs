@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using FreeSql;
-using ImageMagick;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
+using SixLabors.ImageSharp.Formats.Jpeg;
 using StarBlog.Share.Utils;
 using StarBlog.Data.Models;
 using StarBlog.Web.ViewModels.Photography;
@@ -66,20 +66,25 @@ public class PhotoService {
     }
 
     /// <summary>
-    /// 生成Progressive JPEG缩略图 （使用 MagickImage）
+    /// 生成JPEG缩略图 （使用 ImageSharp）
     /// </summary>
     /// <param name="id"></param>
     /// <param name="width">设置为0则不调整大小</param>
-    public async Task<byte[]> GetThumb(string id, int width = 0) {
+    /// <param name="quality">质量，默认85</param>
+    public async Task<byte[]> GetThumb(string id, int width = 0, int quality = 85) {
         var photo = await _photoRepo.Where(a => a.Id == id).FirstAsync();
-        using (var image = new MagickImage(GetPhotoFilePath(photo))) {
-            image.Format = MagickFormat.Pjpeg;
-            if (width != 0) {
-                image.Resize(width, 0);
-            }
+        using var image = await Image.LoadAsync(GetPhotoFilePath(photo));
 
-            return image.ToByteArray();
+        if (width != 0) {
+            image.Mutate(x => x.Resize(width, 0));
         }
+
+        using var memoryStream = new MemoryStream();
+        var encoder = new JpegEncoder {
+            Quality = quality
+        };
+        await image.SaveAsync(memoryStream, encoder);
+        return memoryStream.ToArray();
     }
 
     public async Task<Photo> Update(PhotoUpdateDto dto) {

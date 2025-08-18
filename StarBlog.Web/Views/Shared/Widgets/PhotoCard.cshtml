@@ -1,7 +1,6 @@
 ﻿@using StarBlog.Share.Extensions
 @model Photo
 @{
-    // var imageSrc = @Url.Action("GetThumb", "Photo", new {id = Model.Id, width = 300});
     var imageSrc = "media/photography/" + Model.FilePath.Replace("\\", "/") + "?width=300";
 }
 

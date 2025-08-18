@@ -1,12 +1,7 @@
 ﻿@model Photo
 @{
     ViewBag.Title = "查看图片详情";
-    var pjpeg = false;
-
     var imageUrl = "/media/photography/" + Model?.FilePath.Replace("\\", "/");
-    if (pjpeg) {
-        imageUrl = Url.Action("GetThumb", "Photo", new {id = Model.Id, width = 1000});
-    }
 }
 
 <div class="container px-4 py-3">

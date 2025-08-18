@@ -47,8 +47,8 @@ public class PhotoController : ControllerBase {
     /// </summary>
     [AllowAnonymous]
     [HttpGet("{id}/Thumb")]
-    public async Task<IActionResult> GetThumb(string id, [FromQuery] int width = 300) {
-        var data = await _photoService.GetThumb(id, width);
+    public async Task<IActionResult> GetThumb(string id, [FromQuery] int width = 300, [FromQuery] int quality = 85) {
+        var data = await _photoService.GetThumb(id, width, quality);
         return new FileContentResult(data, "image/jpeg");
     }
 
