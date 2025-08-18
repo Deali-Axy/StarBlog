@@ -10,8 +10,18 @@
     var altText = !string.IsNullOrEmpty(Model?.Title) ? Model.Title : "照片";
 }
 
-<div class="card card-cover overflow-hidden shadow-lg rounded-4 position-relative"
-     style="background-image: url('@imageSrc'); height: 20em; background-size: cover; background-position: center;">
+<div class="card-cover overflow-hidden shadow-lg rounded-4 position-relative"
+     style="background-image: url('@imageSrc'); 
+            height: 20em; 
+            background-size: cover; 
+            background-position: center; 
+            background-repeat: no-repeat;
+            border: none; 
+            padding: 0; 
+            margin: 0;
+            box-sizing: border-box;
+            display: block;
+            width: 100%;">
     
     @* 添加渐变遮罩以提高可读性 *@
     <div class="position-absolute top-0 start-0 w-100 h-100" 
