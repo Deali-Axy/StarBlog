@@ -11,6 +11,7 @@ using Markdig;
 using Markdig.Renderers.Normalize;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
+using System.Collections.Concurrent;
 
 namespace DataProc.Services;
 
@@ -26,21 +27,39 @@ public class ProcessingStats {
     public long SavedBytes => OriginalSize - CompressedSize;
 }
 
-public class ImageOptimizer(
-    ILogger<ImageOptimizer> logger,
-    IConfiguration conf,
-    IBaseRepository<Post> postRepo
-) : IService {
+public class ImageOptimizer : IService {
+    private readonly ILogger<ImageOptimizer> logger;
+    private readonly IConfiguration conf;
+    private readonly IBaseRepository<Post> postRepo;
 
-    // 统计信息
-    private readonly List<ProcessingStats> _processingStats = new();
+    // 统计信息 - 使用线程安全的集合
+    private readonly ConcurrentBag<ProcessingStats> _processingStats = new();
     private int _totalImages = 0;
     private int _processedImages = 0;
     private int _successfulCompressions = 0;
     private int _failedCompressions = 0;
     private long _totalOriginalSize = 0;
     private long _totalCompressedSize = 0;
-    private readonly Dictionary<string, int> _formatStats = new();
+    private readonly ConcurrentDictionary<string, int> _formatStats = new();
+
+    // 并发控制
+    private readonly SemaphoreSlim _concurrencyLimiter;
+    private readonly int _maxConcurrency;
+
+    public ImageOptimizer(
+        ILogger<ImageOptimizer> logger,
+        IConfiguration conf,
+        IBaseRepository<Post> postRepo) {
+        this.logger = logger;
+        this.conf = conf;
+        this.postRepo = postRepo;
+
+        // 设置最大并发数，默认为CPU核心数
+        _maxConcurrency = conf.GetValue<int>("ImageOptimizer:MaxConcurrency", Environment.ProcessorCount);
+        _concurrencyLimiter = new SemaphoreSlim(_maxConcurrency, _maxConcurrency);
+
+        logger.LogInformation("图片压缩器初始化 - 最大并发数: {MaxConcurrency}", _maxConcurrency);
+    }
     public async Task<Result> Run() {
         var posts = await postRepo.Select.ToListAsync();
         var wwwroot = conf.GetValue<string>("StarBlog:wwwroot");
@@ -89,47 +108,67 @@ public class ImageOptimizer(
             postStats.TotalImages = imageFiles.Length;
             _totalImages += imageFiles.Length;
 
-            foreach (var file in imageFiles) {
-                logger.LogInformation("处理图片 {FileName}", file);
-                _processedImages++;
-                postStats.ProcessedImages++;
-
+            // 并行处理图片
+            var compressionTasks = imageFiles.Select(async file => {
+                await _concurrencyLimiter.WaitAsync();
                 try {
+                    logger.LogInformation("处理图片 {FileName}", file);
+                    Interlocked.Increment(ref _processedImages);
+
                     var result = await CompressImage(file, outputDir);
 
-                    // 更新统计信息
-                    postStats.OriginalSize += result.OriginalSize;
-                    postStats.CompressedSize += result.CompressedSize;
-                    _totalOriginalSize += result.OriginalSize;
-                    _totalCompressedSize += result.CompressedSize;
+                    // 线程安全地更新统计信息
+                    Interlocked.Add(ref _totalOriginalSize, result.OriginalSize);
+                    Interlocked.Add(ref _totalCompressedSize, result.CompressedSize);
 
                     if (result.Success) {
                         hasChanges = true;
-                        postStats.SuccessfulCompressions++;
-                        _successfulCompressions++;
+                        Interlocked.Increment(ref _successfulCompressions);
 
                         var originalFileName = Path.GetFileName(file);
                         var newFileName = Path.GetFileName(result.NewFilePath);
 
                         if (originalFileName != newFileName) {
-                            fileNameMappings[originalFileName] = newFileName;
+                            lock (fileNameMappings) {
+                                fileNameMappings[originalFileName] = newFileName;
+                            }
                         }
 
-                        // 统计格式信息
+                        // 线程安全地统计格式信息
                         var outputFormat = Path.GetExtension(result.NewFilePath).ToLower();
-                        _formatStats[outputFormat] = _formatStats.GetValueOrDefault(outputFormat, 0) + 1;
+                        _formatStats.AddOrUpdate(outputFormat, 1, (key, value) => value + 1);
 
                         logger.LogInformation("图片压缩成功: {OriginalFile} -> {NewFile}, 压缩率: {CompressionRatio:P2}",
                             originalFileName, newFileName, result.CompressionRatio);
                     } else {
-                        postStats.FailedCompressions++;
-                        _failedCompressions++;
+                        Interlocked.Increment(ref _failedCompressions);
                     }
+
+                    return result;
                 }
                 catch (Exception ex) {
                     logger.LogError(ex, "压缩图片失败: {FileName}", file);
+                    Interlocked.Increment(ref _failedCompressions);
+                    return null;
+                }
+                finally {
+                    _concurrencyLimiter.Release();
+                }
+            });
+
+            // 等待所有图片处理完成
+            var results = await Task.WhenAll(compressionTasks);
+
+            // 收集文章级别的统计信息
+            foreach (var result in results.Where(r => r != null)) {
+                postStats.OriginalSize += result.OriginalSize;
+                postStats.CompressedSize += result.CompressedSize;
+                postStats.ProcessedImages++;
+
+                if (result.Success) {
+                    postStats.SuccessfulCompressions++;
+                } else {
                     postStats.FailedCompressions++;
-                    _failedCompressions++;
                 }
             }
 
