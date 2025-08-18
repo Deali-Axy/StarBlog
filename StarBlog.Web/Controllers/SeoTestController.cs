@@ -96,11 +96,13 @@ public class SeoTestController : Controller {
 
     [HttpGet("seo-test/meta")]
     public async Task<IActionResult> TestMeta() {
-        var post = await _postRepo.Where(p => p.IsPublish).FirstAsync();
-        if (post == null) {
+        var posts = _postRepo.Where(a => a.IsPublish).ToList();
+        if (posts.Count == 0) {
             ViewBag.Error = "没有找到已发布的文章";
             return View();
         }
+        
+        var post = posts[Random.Shared.Next(posts.Count)];
 
         // 生成测试用的PostViewModel
         var postViewModel = new StarBlog.Web.ViewModels.PostViewModel {
@@ -110,7 +112,7 @@ public class SeoTestController : Controller {
             Content = post.Content ?? "测试内容",
             CreationTime = post.CreationTime,
             LastUpdateTime = post.LastUpdateTime,
-            Category = post.Category,
+            Category = post.Category ?? new Category(),
             Categories = new List<Category>()
         };
 
