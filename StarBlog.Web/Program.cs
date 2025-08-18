@@ -24,6 +24,23 @@ if (builder.Environment.IsDevelopment()) {
 
 builder.Services.AddMemoryCache();
 builder.Services.AddHttpContextAccessor();
+
+// 添加响应压缩
+builder.Services.AddResponseCompression(options => {
+    options.EnableForHttps = true;
+    options.Providers.Add<Microsoft.AspNetCore.ResponseCompression.BrotliCompressionProvider>();
+    options.Providers.Add<Microsoft.AspNetCore.ResponseCompression.GzipCompressionProvider>();
+    options.MimeTypes = Microsoft.AspNetCore.ResponseCompression.ResponseCompressionDefaults.MimeTypes.Concat(new[] {
+        "application/javascript",
+        "application/json",
+        "application/xml",
+        "text/css",
+        "text/html",
+        "text/json",
+        "text/plain",
+        "text/xml"
+    });
+});
 builder.Services.AddSession(options => {
     options.IdleTimeout = TimeSpan.FromHours(1);
     options.Cookie.HttpOnly = true;
@@ -49,13 +66,24 @@ builder.Services.AddCors(options => {
         policyBuilder.WithOrigins("https://blog.deali.cn");
     });
 });
-builder.Services.AddStaticRobotsTxt(opt => opt
-    .AddSection(section => section.AddUserAgent("Googlebot").Allow("/"))
-    .AddSection(section => section.AddUserAgent("bingbot").Allow("/"))
-    .AddSection(section => section.AddUserAgent("Bytespider").Allow("/"))
-    .AddSection(section => section.AddUserAgent("Sogou web spider").Allow("/"))
-    .AddSection(section => section.AddUserAgent("*").Disallow("/"))
-);
+builder.Services.AddStaticRobotsTxt(opt => {
+    var baseUrl = builder.Configuration["host"] ?? "https://blog.deali.cn";
+    opt.AddSection(section => section.AddUserAgent("Googlebot").Allow("/"))
+       .AddSection(section => section.AddUserAgent("bingbot").Allow("/"))
+       .AddSection(section => section.AddUserAgent("Bytespider").Disallow("/"))
+       .AddSection(section => section.AddUserAgent("Sogou web spider").Allow("/"))
+       .AddSection(section => section.AddUserAgent("*")
+           .Disallow("/Admin/")
+           .Disallow("/Api/")
+           .Disallow("/bin/")
+           .Disallow("/obj/")
+           .Disallow("/node_modules/")
+           .Allow("/"))
+       .AddSitemap($"{baseUrl}/sitemap.xml")
+       .AddSitemap($"{baseUrl}/sitemap-images.xml");
+
+    return opt;
+});
 builder.Services.AddSwagger();
 builder.Services.AddSettings(builder.Configuration);
 builder.Services.AddAuth(builder.Configuration);
@@ -77,6 +105,9 @@ builder.Services.AddScoped<LinkExchangeService>();
 builder.Services.AddScoped<LinkService>();
 builder.Services.AddScoped<PhotoService>();
 builder.Services.AddScoped<PostService>();
+builder.Services.AddScoped<SeoService>();
+builder.Services.AddScoped<StructuredDataService>();
+builder.Services.AddScoped<ImageSeoService>();
 
 // 设置请求最大大小
 builder.WebHost.ConfigureKestrel(options => {
@@ -107,8 +138,18 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions {
 
 app.UseImageSharp();
 // app.UseHttpsRedirection();
+
+// 启用响应压缩
+app.UseResponseCompression();
+
+// 配置静态文件缓存
 app.UseStaticFiles(new StaticFileOptions {
-    ServeUnknownFileTypes = true
+    ServeUnknownFileTypes = true,
+    OnPrepareResponse = ctx => {
+        const int durationInSeconds = 60 * 60 * 24 * 30; // 30天
+        ctx.Context.Response.Headers.CacheControl = $"public,max-age={durationInSeconds}";
+        ctx.Context.Response.Headers.Expires = DateTime.UtcNow.AddDays(30).ToString("R");
+    }
 });
 
 app.UseMiddleware<VisitRecordMiddleware>();

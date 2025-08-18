@@ -39,6 +39,11 @@
             </div>
 
             <partial name="Widgets/PostBottom"/>
+
+            @* 相关文章推荐 *@
+            @if (ViewData["RelatedPosts"] != null) {
+                <partial name="Widgets/RelatedPosts" model='ViewData["RelatedPosts"]'/>
+            }
         </div>
     </div>
 </div>

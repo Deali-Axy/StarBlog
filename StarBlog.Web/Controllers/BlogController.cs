@@ -17,19 +17,25 @@ public class BlogController : Controller {
     private readonly PostService _postService;
     private readonly CategoryService _categoryService;
     private readonly ConfigService _configService;
+    private readonly SeoService _seoService;
+    private readonly StructuredDataService _structuredDataService;
 
     public BlogController(IBaseRepository<Post> postRepo,
         IBaseRepository<Category> categoryRepo,
         PostService postService,
         MessageService messages,
         CategoryService categoryService,
-        ConfigService configService) {
+        ConfigService configService,
+        SeoService seoService,
+        StructuredDataService structuredDataService) {
         _postRepo = postRepo;
         _categoryRepo = categoryRepo;
         _postService = postService;
         _messages = messages;
         _categoryService = categoryService;
         _configService = configService;
+        _seoService = seoService;
+        _structuredDataService = structuredDataService;
     }
 
     public async Task<IActionResult> List(int categoryId = 0, int page = 1, int pageSize = 8,
@@ -48,18 +54,27 @@ public class BlogController : Controller {
             return RedirectToAction(nameof(List));
         }
 
+        var posts = await _postService.GetPagedList(new PostQueryParameters {
+            CategoryId = categoryId,
+            Page = page,
+            PageSize = pageSize,
+            SortBy = sortType == "desc" ? $"-{sortBy}" : sortBy
+        });
+
+        // 设置SEO元数据
+        if (categoryId > 0) {
+            ViewData["SeoMetadata"] = _seoService.GetCategorySeoMetadata(currentCategory, posts.TotalItemCount);
+        } else {
+            ViewData["SeoMetadata"] = _seoService.GetBlogListSeoMetadata(page);
+        }
+
         return View(new BlogListViewModel {
             CurrentCategory = currentCategory,
             CurrentCategoryId = categoryId,
             CategoryNodes = await _categoryService.GetNodes(),
             SortType = sortType,
             SortBy = sortBy,
-            Posts = await _postService.GetPagedList(new PostQueryParameters {
-                CategoryId = categoryId,
-                Page = page,
-                PageSize = pageSize,
-                SortBy = sortType == "desc" ? $"-{sortBy}" : sortBy
-            })
+            Posts = posts
         });
     }
 
@@ -82,12 +97,28 @@ public class BlogController : Controller {
             return RedirectToAction(nameof(List));
         }
 
+        var postViewModel = await _postService.GetPostViewModel(post);
+
+        // 设置SEO元数据
+        ViewData["SeoMetadata"] = _seoService.GetPostSeoMetadata(postViewModel);
+
+        // 设置结构化数据
+        var structuredData = new Dictionary<string, string> {
+            ["BlogPosting"] = _structuredDataService.GetBlogPostingStructuredData(postViewModel),
+            ["BreadcrumbList"] = _structuredDataService.GetBreadcrumbStructuredData(postViewModel),
+            ["Person"] = _structuredDataService.GetPersonStructuredData()
+        };
+        ViewData["StructuredData"] = structuredData;
+
+        // 获取相关文章
+        ViewData["RelatedPosts"] = await _postService.GetRelatedPosts(post, 4);
+
         var viewName = "Post.FrontendRender";
         if (_configService["default_render"] == "backend") {
             viewName = "Post.BackendRender";
         }
 
-        return View(viewName, await _postService.GetPostViewModel(post));
+        return View(viewName, postViewModel);
     }
 
     public IActionResult RandomPost() {

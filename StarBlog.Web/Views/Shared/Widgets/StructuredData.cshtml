@@ -1,0 +1,10 @@
+@model Dictionary<string, string>
+
+@* 渲染所有结构化数据 *@
+@if (Model != null && Model.Any()) {
+    @foreach (var item in Model) {
+        <script type="application/ld+json">
+            @Html.Raw(item.Value)
+        </script>
+    }
+}

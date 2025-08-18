@@ -1,0 +1,67 @@
+@model StarBlog.Web.Services.SeoMetadata
+
+@* 基础Meta标签 *@
+<title>@Model.Title</title>
+<meta name="description" content="@Model.Description">
+<meta name="keywords" content="@Model.Keywords">
+<meta name="author" content="DealiAxy">
+<meta name="generator" content="StarBlog">
+
+@* Canonical URL *@
+@if (!string.IsNullOrEmpty(Model.CanonicalUrl)) {
+    <link rel="canonical" href="@Model.CanonicalUrl">
+}
+
+@* Open Graph标签 *@
+<meta property="og:title" content="@Model.OgTitle">
+<meta property="og:description" content="@Model.OgDescription">
+<meta property="og:type" content="@Model.OgType">
+<meta property="og:url" content="@Model.OgUrl">
+<meta property="og:site_name" content="StarBlog">
+<meta property="og:locale" content="zh_CN">
+
+@if (!string.IsNullOrEmpty(Model.OgImage)) {
+    <meta property="og:image" content="@Model.OgImage">
+    <meta property="og:image:alt" content="@Model.OgTitle">
+}
+
+@* 文章特定的Open Graph标签 *@
+@if (Model.OgType == "article") {
+    @if (!string.IsNullOrEmpty(Model.OgArticleAuthor)) {
+        <meta property="article:author" content="@Model.OgArticleAuthor">
+    }
+    @if (Model.OgArticlePublishedTime.HasValue) {
+        <meta property="article:published_time" content="@Model.OgArticlePublishedTime.Value.ToString("yyyy-MM-ddTHH:mm:sszzz")">
+    }
+    @if (Model.OgArticleModifiedTime.HasValue) {
+        <meta property="article:modified_time" content="@Model.OgArticleModifiedTime.Value.ToString("yyyy-MM-ddTHH:mm:sszzz")">
+    }
+    @if (!string.IsNullOrEmpty(Model.OgArticleSection)) {
+        <meta property="article:section" content="@Model.OgArticleSection">
+    }
+}
+
+@* Twitter Card标签 *@
+<meta name="twitter:card" content="@Model.TwitterCard">
+<meta name="twitter:title" content="@Model.TwitterTitle">
+<meta name="twitter:description" content="@Model.TwitterDescription">
+<meta name="twitter:site" content="@@DealiAxy">
+<meta name="twitter:creator" content="@@DealiAxy">
+
+@if (!string.IsNullOrEmpty(Model.TwitterImage)) {
+    <meta name="twitter:image" content="@Model.TwitterImage">
+    <meta name="twitter:image:alt" content="@Model.TwitterTitle">
+}
+
+@* 移动端优化 *@
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="format-detection" content="telephone=no">
+<meta name="theme-color" content="#007bff">
+
+@* 搜索引擎指令 *@
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+
+@* 其他SEO相关标签 *@
+<meta name="referrer" content="no-referrer-when-downgrade">
+<link rel="dns-prefetch" href="//fonts.googleapis.com">
+<link rel="dns-prefetch" href="//cdnjs.cloudflare.com">

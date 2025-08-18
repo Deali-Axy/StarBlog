@@ -3,25 +3,35 @@
 @inject StarBlog.Web.Services.MonitoringService MonitoringService
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="画星星高手博客；程序设计实验室博客；">
-    <meta name="author" content="DealiAxy">
-    <meta name="generator" content="StarBlog">
-    @if (ViewData["Title"] != null) {
-        <title>@ViewData["Title"] - StarBlog</title>
+
+    @* SEO Meta标签 *@
+    @if (ViewData["SeoMetadata"] != null) {
+        <partial name="Widgets/SeoMeta" model='ViewData["SeoMetadata"]'/>
     }
     else {
         <title>StarBlog · 画星星高手</title>
+        <meta name="description" content="画星星高手博客；程序设计实验室博客；">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="author" content="DealiAxy">
+        <meta name="generator" content="StarBlog">
     }
 
+    @* 预加载关键资源 *@
+    <link rel="preload" href="~/lib/bootstrap/dist/css/bootstrap.css" as="style">
+    <link rel="preload" href="~/lib/font-awesome/css/all.css" as="style">
+    <link rel="preload" href="~/js/site.preload.js" as="script">
+
+    @* CSS资源 *@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css">
     <link rel="stylesheet" href="~/lib/font-awesome/css/all.css">
     <link rel="stylesheet" href="~/css/features.css">
     <link rel="stylesheet" href="~/css/metro.css">
     <link rel="stylesheet" href="~/css/footer.css">
+
+    @* 预加载脚本 *@
     <script src="~/js/site.preload.js"></script>
     <environment exclude="Development">
         @if (MonitoringService.IsUmamiEnabled) {
@@ -45,6 +55,11 @@
     </environment>
 
     @await RenderSectionAsync("head", false)
+
+    @* 结构化数据 *@
+    @if (ViewData["StructuredData"] != null) {
+        <partial name="Widgets/StructuredData" model='ViewData["StructuredData"]'/>
+    }
 </head>
 <body>
 

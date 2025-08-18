@@ -16,16 +16,20 @@ public class HomeController : Controller {
     private readonly LinkService _linkService;
     private readonly MessageService _messages;
     private readonly ConfigService _conf;
+    private readonly SeoService _seoService;
+    private readonly StructuredDataService _structuredDataService;
 
     public HomeController(BlogService blogService, PhotoService photoService, CategoryService categoryService,
         LinkService linkService,
-        MessageService messages, ConfigService conf) {
+        MessageService messages, ConfigService conf, SeoService seoService, StructuredDataService structuredDataService) {
         _blogService = blogService;
         _photoService = photoService;
         _categoryService = categoryService;
         _linkService = linkService;
         _messages = messages;
         _conf = conf;
+        _seoService = seoService;
+        _structuredDataService = structuredDataService;
     }
 
     public async Task<IActionResult> Index() {
@@ -48,6 +52,17 @@ public class HomeController : Controller {
             vm.ChartVisible = false;
             vm.RandomPhotoVisible = false;
         }
+
+        // 设置SEO元数据
+        ViewData["SeoMetadata"] = _seoService.GetHomeSeoMetadata();
+
+        // 设置结构化数据
+        var structuredData = new Dictionary<string, string> {
+            ["WebSite"] = _structuredDataService.GetWebsiteStructuredData(),
+            ["Organization"] = _structuredDataService.GetOrganizationStructuredData(),
+            ["Person"] = _structuredDataService.GetPersonStructuredData()
+        };
+        ViewData["StructuredData"] = structuredData;
 
         return View(vm);
     }

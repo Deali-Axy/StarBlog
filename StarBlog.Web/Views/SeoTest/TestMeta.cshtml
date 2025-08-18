@@ -1,0 +1,83 @@
+@model StarBlog.Web.ViewModels.PostViewModel
+@{
+    ViewData["Title"] = "Meta标签测试";
+}
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <h1 class="mb-4">Meta标签测试</h1>
+            
+            <div class="alert alert-info">
+                <h5>Meta标签说明</h5>
+                <p>此页面展示了为文章页面生成的SEO meta标签和结构化数据。</p>
+            </div>
+
+            @if (ViewBag.Error != null) {
+                <div class="alert alert-danger">
+                    @ViewBag.Error
+                </div>
+            } else if (Model != null) {
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>测试文章信息</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6>@Model.Title</h6>
+                        <p class="text-muted">@Model.Summary</p>
+                        <small>
+                            发布时间: @Model.CreationTime.ToString("yyyy-MM-dd HH:mm")
+                            @if (Model.Category != null) {
+                                <span class="ms-3">分类: @Model.Category.Name</span>
+                            }
+                        </small>
+                    </div>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>生成的Meta标签</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted">以下是为此页面生成的meta标签（查看页面源代码可以看到实际效果）：</p>
+                        <div class="bg-light p-3 rounded">
+                            <small>
+                                @if (ViewData["SeoMetadata"] is StarBlog.Web.Services.SeoMetadata seoMeta) {
+                                    <div>&lt;title&gt;@seoMeta.Title&lt;/title&gt;</div>
+                                    <div>&lt;meta name="description" content="@seoMeta.Description"&gt;</div>
+                                    <div>&lt;meta name="keywords" content="@seoMeta.Keywords"&gt;</div>
+                                    <div>&lt;meta property="og:title" content="@seoMeta.OgTitle"&gt;</div>
+                                    <div>&lt;meta property="og:description" content="@seoMeta.OgDescription"&gt;</div>
+                                    <div>&lt;meta property="og:type" content="@seoMeta.OgType"&gt;</div>
+                                    <div>&lt;meta name="twitter:card" content="@seoMeta.TwitterCard"&gt;</div>
+                                    <div>&lt;meta name="twitter:title" content="@seoMeta.TwitterTitle"&gt;</div>
+                                }
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h5>结构化数据预览</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted">以下是为此页面生成的JSON-LD结构化数据：</p>
+                        @if (ViewData["StructuredData"] is Dictionary<string, string> structuredData) {
+                            @foreach (var item in structuredData) {
+                                <div class="mb-3">
+                                    <h6>@item.Key</h6>
+                                    <pre class="bg-light p-2 rounded small" style="max-height: 200px; overflow-y: auto;">@item.Value</pre>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            }
+
+            <div class="mt-4">
+                <a href="/seo-test" class="btn btn-primary">返回SEO测试首页</a>
+            </div>
+        </div>
+    </div>
+</div>

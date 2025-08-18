@@ -1,0 +1,104 @@
+@{
+    ViewData["Title"] = "页面未找到 - 404错误";
+    ViewData["SeoMetadata"] = new StarBlog.Web.Services.SeoMetadata {
+        Title = "页面未找到 - 404错误 - StarBlog",
+        Description = "抱歉，您访问的页面不存在。请检查URL是否正确，或返回首页浏览其他内容。",
+        Keywords = "404,页面未找到,错误,StarBlog",
+        OgTitle = "页面未找到 - StarBlog",
+        OgDescription = "抱歉，您访问的页面不存在。",
+        OgType = "website",
+        TwitterCard = "summary",
+        TwitterTitle = "页面未找到 - StarBlog",
+        TwitterDescription = "抱歉，您访问的页面不存在。"
+    };
+}
+
+
+@section head {
+    <style>
+        .error-page {
+            padding: 2rem 0;
+        }
+
+        .display-1 {
+            font-size: 8rem;
+            line-height: 1;
+        }
+
+        @@media (max-width: 768px) {
+            .display-1 {
+                font-size: 6rem;
+            }
+        }
+    </style>
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 text-center">
+            <div class="error-page">
+                <h1 class="display-1 fw-bold text-primary">404</h1>
+                <h2 class="mb-4">页面未找到</h2>
+                <p class="lead mb-4">
+                    抱歉，您访问的页面不存在或已被移动。
+                </p>
+                <p class="mb-4">
+                    可能的原因：
+                </p>
+                <ul class="list-unstyled mb-4">
+                    <li>• URL地址输入错误</li>
+                    <li>• 页面已被删除或移动</li>
+                    <li>• 链接已过期</li>
+                </ul>
+
+                <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
+                    <a href="/" class="btn btn-primary btn-lg">
+                        <i class="fas fa-home me-2"></i>返回首页
+                    </a>
+                    <a href="/Blog/List" class="btn btn-outline-primary btn-lg">
+                        <i class="fas fa-blog me-2"></i>浏览博客
+                    </a>
+                    <a href="/Search" class="btn btn-outline-secondary btn-lg">
+                        <i class="fas fa-search me-2"></i>搜索内容
+                    </a>
+                </div>
+
+                <hr class="my-5">
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <h5>热门文章</h5>
+                        <div class="list-group list-group-flush">
+                            <a href="/Blog/List" class="list-group-item list-group-item-action">
+                                浏览所有文章
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <h5>分类导航</h5>
+                        <div class="list-group list-group-flush">
+                            <a href="/Blog/List" class="list-group-item list-group-item-action">
+                                技术分类
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <h5>其他页面</h5>
+                        <div class="list-group list-group-flush">
+                            <a href="/About" class="list-group-item list-group-item-action">
+                                关于我们
+                            </a>
+                            <a href="/Photography" class="list-group-item list-group-item-action">
+                                摄影作品
+                            </a>
+                            <a href="/LinkExchange" class="list-group-item list-group-item-action">
+                                友情链接
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

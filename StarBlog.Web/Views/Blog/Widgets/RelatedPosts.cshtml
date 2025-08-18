@@ -1,0 +1,39 @@
+@model List<StarBlog.Data.Models.Post>
+
+@if (Model != null && Model.Any()) {
+    <div class="related-posts mt-5">
+        <h4 class="mb-4">
+            <i class="fas fa-link me-2"></i>相关文章
+        </h4>
+        <div class="row">
+            @foreach (var post in Model) {
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                <a href="@(string.IsNullOrWhiteSpace(post.Slug) ? $"/Blog/Post/{post.Id}" : $"/p/{post.Slug}")" 
+                                   class="text-decoration-none">
+                                    @post.Title
+                                </a>
+                            </h6>
+                            @if (!string.IsNullOrEmpty(post.Summary) && post.Summary != "（没有介绍）") {
+                                <p class="card-text small text-muted">
+                                    @(post.Summary.Length > 80 ? post.Summary.Substring(0, 77) + "..." : post.Summary)
+                                </p>
+                            }
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    <i class="far fa-calendar-alt me-1"></i>
+                                    @post.CreationTime.ToString("yyyy-MM-dd")
+                                </small>
+                                @if (post.Category != null) {
+                                    <span class="badge bg-secondary">@post.Category.Name</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}

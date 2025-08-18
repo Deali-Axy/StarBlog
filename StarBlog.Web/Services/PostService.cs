@@ -22,6 +22,7 @@ public class PostService {
     private readonly LinkGenerator _generator;
     private readonly ConfigService _conf;
     private readonly CommonService _commonService;
+    private readonly ImageSeoService _imageSeoService;
 
     private string Host => _conf["host"];
 
@@ -32,7 +33,8 @@ public class PostService {
         LinkGenerator generator,
         ConfigService conf,
         CommonService commonService,
-        ILogger<PostService> logger) {
+        ILogger<PostService> logger,
+        ImageSeoService imageSeoService) {
         _postRepo = postRepo;
         _categoryRepo = categoryRepo;
         _environment = environment;
@@ -41,6 +43,7 @@ public class PostService {
         _conf = conf;
         _commonService = commonService;
         _logger = logger;
+        _imageSeoService = imageSeoService;
     }
 
     /// <summary>
@@ -190,6 +193,8 @@ public class PostService {
 
         if (md2Html) {
             model.ContentHtml = GetContentHtml(post);
+            // 优化HTML中的图片SEO
+            model.ContentHtml = _imageSeoService.OptimizeImagesInHtml(model.ContentHtml, post.Title);
         }
 
         if (post.Categories != null) {
@@ -308,5 +313,57 @@ public class PostService {
         var render = new NormalizeRenderer(writer);
         render.Render(document);
         return writer.ToString();
+    }
+
+    /// <summary>
+    /// 获取相关文章推荐
+    /// </summary>
+    public async Task<List<Post>> GetRelatedPosts(Post currentPost, int count = 5) {
+        var relatedPosts = new List<Post>();
+
+        // 1. 优先推荐同分类的文章
+        if (currentPost.CategoryId > 0) {
+            var sameCategoryPosts = await _postRepo
+                .Where(p => p.IsPublish && p.Id != currentPost.Id && p.CategoryId == currentPost.CategoryId)
+                .OrderByDescending(p => p.LastUpdateTime)
+                .Take(count)
+                .ToListAsync();
+            relatedPosts.AddRange(sameCategoryPosts);
+        }
+
+        // 2. 如果同分类文章不够，从其他分类补充
+        if (relatedPosts.Count < count) {
+            var remainingCount = count - relatedPosts.Count;
+            var otherPosts = await _postRepo
+                .Where(p => p.IsPublish && p.Id != currentPost.Id && !relatedPosts.Select(r => r.Id).Contains(p.Id))
+                .OrderByDescending(p => p.LastUpdateTime)
+                .Take(remainingCount)
+                .ToListAsync();
+            relatedPosts.AddRange(otherPosts);
+        }
+
+        return relatedPosts.Take(count).ToList();
+    }
+
+    /// <summary>
+    /// 获取热门文章
+    /// </summary>
+    public async Task<List<Post>> GetPopularPosts(int count = 10) {
+        return await _postRepo
+            .Where(p => p.IsPublish)
+            .OrderByDescending(p => p.LastUpdateTime)
+            .Take(count)
+            .ToListAsync();
+    }
+
+    /// <summary>
+    /// 获取最新文章
+    /// </summary>
+    public async Task<List<Post>> GetLatestPosts(int count = 10) {
+        return await _postRepo
+            .Where(p => p.IsPublish)
+            .OrderByDescending(p => p.CreationTime)
+            .Take(count)
+            .ToListAsync();
     }
 }

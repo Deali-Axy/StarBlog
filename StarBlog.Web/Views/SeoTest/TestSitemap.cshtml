@@ -1,0 +1,60 @@
+@{
+    ViewData["Title"] = "Sitemap测试";
+}
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <h1 class="mb-4">Sitemap测试</h1>
+            
+            <div class="alert alert-info">
+                <h5>Sitemap说明</h5>
+                <p>Sitemap帮助搜索引擎更好地发现和索引网站内容。</p>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5>可用的Sitemap</h5>
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.SitemapUrls != null) {
+                        <div class="list-group">
+                            @foreach (string url in ViewBag.SitemapUrls) {
+                                <a href="@url" class="list-group-item list-group-item-action" target="_blank">
+                                    <strong>@url</strong>
+                                    <small class="d-block text-muted">
+                                        @switch (url) {
+                                            case "/sitemap.xml":
+                                                @:主要的XML sitemap，包含所有页面
+                                                break;
+                                            case "/sitemap-images.xml":
+                                                @:图片sitemap，包含所有文章中的图片
+                                                break;
+                                            case "/sitemap-index.xml":
+                                                @:Sitemap索引文件，列出所有sitemap
+                                                break;
+                                        }
+                                    </small>
+                                </a>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <h5>Sitemap验证工具</h5>
+                <p>您可以使用以下工具验证sitemap的有效性：</p>
+                <ul>
+                    <li><a href="https://www.google.com/webmasters/tools/sitemap-list" target="_blank">Google Search Console</a></li>
+                    <li><a href="https://www.bing.com/webmaster" target="_blank">Bing Webmaster Tools</a></li>
+                    <li><a href="https://www.xml-sitemaps.com/validate-xml-sitemap.html" target="_blank">XML Sitemap Validator</a></li>
+                </ul>
+            </div>
+
+            <div class="mt-4">
+                <a href="/seo-test" class="btn btn-primary">返回SEO测试首页</a>
+            </div>
+        </div>
+    </div>
+</div>
