@@ -10,8 +10,8 @@ namespace DataProc.Services;
 public class LLM : IService {
     private IChatClient _chatClient;
 
-    public LLM(IOptions<AppSettings> settings) {
-        var llmConfig = settings.Value.LLM;
+    public LLM(IOptions<LLMSettings> llmOptions) {
+        var llmConfig = llmOptions.Value;
         _chatClient = new OpenAIClient(
             new ApiKeyCredential(llmConfig.Key),
             new OpenAIClientOptions {
