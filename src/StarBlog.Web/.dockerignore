@@ -23,3 +23,12 @@
 **/values.dev.yaml
 LICENSE
 README.md
+
+# 添加以下排除项
+**/wwwroot/media/**
+**/wwwroot/assets/**
+**/*.log
+**/*.db
+**/appsettings.Development.json
+**/gulpfile.js
+**/package*.json

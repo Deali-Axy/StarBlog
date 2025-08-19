@@ -29,6 +29,7 @@
     "editor.md-ext": "^1.5.4",
     "element-ui": "^2.15.13",
     "github-markdown-css": "^5.1.0",
+    "highlight.js": "^11.11.1",
     "imagesloaded": "^5.0.0",
     "jquery": "^3.6.0",
     "masonry-layout": "^4.2.2",
