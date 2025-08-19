@@ -15,6 +15,26 @@ using System.Collections.Concurrent;
 
 namespace DataProc.Services;
 
+/// <summary>
+/// 图片压缩模式配置
+/// </summary>
+public record CompressionMode(
+    string Name,
+    int MaxWidth,
+    int MaxHeight,
+    int Quality,
+    string Description
+);
+
+/// <summary>
+/// 图片压缩配置选项
+/// </summary>
+public class ImageCompressionOptions {
+    public bool EnableResize { get; set; } = true;
+    public string DefaultMode { get; set; } = "ArticleImage";
+    public Dictionary<string, CompressionMode> Modes { get; set; } = new();
+}
+
 public class ProcessingStats {
     public string PostId { get; set; } = "";
     public int TotalImages { get; set; }
@@ -46,6 +66,10 @@ public class ImageOptimizer : IService {
     private readonly SemaphoreSlim _concurrencyLimiter;
     private readonly int _maxConcurrency;
 
+    // 压缩模式配置
+    private readonly ImageCompressionOptions _compressionOptions;
+    private readonly Dictionary<string, CompressionMode> _compressionModes;
+
     public ImageOptimizer(
         ILogger<ImageOptimizer> logger,
         IConfiguration conf,
@@ -58,7 +82,124 @@ public class ImageOptimizer : IService {
         _maxConcurrency = conf.GetValue<int>("ImageOptimizer:MaxConcurrency", Environment.ProcessorCount);
         _concurrencyLimiter = new SemaphoreSlim(_maxConcurrency, _maxConcurrency);
 
+        // 初始化压缩模式配置
+        _compressionOptions = InitializeCompressionOptions(conf);
+        _compressionModes = _compressionOptions.Modes;
+
         logger.LogInformation("图片压缩器初始化 - 最大并发数: {MaxConcurrency}", _maxConcurrency);
+        logger.LogInformation("默认压缩模式: {DefaultMode}", _compressionOptions.DefaultMode);
+        logger.LogInformation("可用压缩模式: {ModeCount} 种", _compressionModes.Count);
+
+        // 显示压缩模式详情
+        LogCompressionModes();
+    }
+
+    /// <summary>
+    /// 初始化压缩模式配置
+    /// </summary>
+    private ImageCompressionOptions InitializeCompressionOptions(IConfiguration conf) {
+        var options = new ImageCompressionOptions();
+
+        // 从配置文件读取设置
+        var section = conf.GetSection("ImageOptimizer:CompressionModes");
+        if (section.Exists()) {
+            conf.GetSection("ImageOptimizer").Bind(options);
+        }
+
+        // 如果配置为空，使用默认模式
+        if (options.Modes.Count == 0) {
+            options.Modes = GetDefaultCompressionModes();
+        }
+
+        return options;
+    }
+
+    /// <summary>
+    /// 获取默认压缩模式配置
+    /// </summary>
+    private Dictionary<string, CompressionMode> GetDefaultCompressionModes() {
+        return new Dictionary<string, CompressionMode> {
+            ["ArticleImage"] = new("文章配图模式", 1200, 800, 85, "适合博客文章中的配图，平衡质量与文件大小"),
+            ["Thumbnail"] = new("缩略图模式", 400, 300, 80, "适合生成缩略图，小尺寸高压缩"),
+            ["HeaderImage"] = new("头图模式", 1920, 1080, 90, "适合文章头图或横幅，保持高质量"),
+            ["KeepOriginal"] = new("保持原尺寸", int.MaxValue, int.MaxValue, 80, "保持原始尺寸，仅压缩质量")
+        };
+    }
+
+    /// <summary>
+    /// 根据图片特征智能选择压缩模式
+    /// </summary>
+    private CompressionMode GetCompressionModeForImage(Image image, long fileSize) {
+        // 获取默认模式
+        var defaultModeName = _compressionOptions.DefaultMode;
+        if (_compressionModes.TryGetValue(defaultModeName, out var defaultMode)) {
+            return defaultMode;
+        }
+
+        // 如果默认模式不存在，使用智能选择
+        return SelectIntelligentMode(image, fileSize);
+    }
+
+    /// <summary>
+    /// 智能选择压缩模式
+    /// </summary>
+    private CompressionMode SelectIntelligentMode(Image image, long fileSize) {
+        // 根据图片尺寸和文件大小智能选择模式
+
+        // 大尺寸图片 (可能是头图)
+        if (image.Width >= 2000 || image.Height >= 2000) {
+            return _compressionModes.GetValueOrDefault("HeaderImage", _compressionModes.Values.First());
+        }
+
+        // 小尺寸图片 (可能是缩略图或图标)
+        if (image is { Width: <= 500, Height: <= 500 }) {
+            return _compressionModes.GetValueOrDefault("Thumbnail", _compressionModes.Values.First());
+        }
+
+        // 中等尺寸图片 (文章配图)
+        return _compressionModes.GetValueOrDefault("ArticleImage", _compressionModes.Values.First());
+    }
+
+    /// <summary>
+    /// 应用图片尺寸调整
+    /// </summary>
+    private void ApplyImageResize(Image image, CompressionMode mode) {
+        // 计算缩放比例，保持宽高比
+        double scaleX = (double)mode.MaxWidth / image.Width;
+        double scaleY = (double)mode.MaxHeight / image.Height;
+        double scale = Math.Min(scaleX, scaleY);
+
+        // 只缩小不放大
+        if (scale >= 1.0) {
+            return;
+        }
+
+        var newWidth = (int)(image.Width * scale);
+        var newHeight = (int)(image.Height * scale);
+
+        logger.LogDebug("调整图片尺寸: {OriginalWidth}×{OriginalHeight} -> {NewWidth}×{NewHeight} (模式: {ModeName})",
+            image.Width, image.Height, newWidth, newHeight, mode.Name);
+
+        image.Mutate(x => x.Resize(newWidth, newHeight));
+    }
+
+    /// <summary>
+    /// 记录压缩模式配置信息
+    /// </summary>
+    private void LogCompressionModes() {
+        logger.LogInformation("");
+        logger.LogInformation("🎨 压缩模式配置:");
+
+        foreach (var (key, mode) in _compressionModes) {
+            var isDefault = key == _compressionOptions.DefaultMode ? " [默认]" : "";
+            var sizeInfo = mode.MaxWidth == int.MaxValue ? "保持原尺寸" : $"{mode.MaxWidth}×{mode.MaxHeight}";
+
+            logger.LogInformation("   • {ModeName}{IsDefault}: {SizeInfo}, 质量{Quality}%",
+                mode.Name, isDefault, sizeInfo, mode.Quality);
+            logger.LogInformation("     {Description}", mode.Description);
+        }
+
+        logger.LogInformation("");
     }
     public async Task<Result> Run() {
         var posts = await postRepo.Select.ToListAsync();
@@ -320,22 +461,17 @@ public class ImageOptimizer : IService {
 
         using var image = await Image.LoadAsync(imagePath);
 
-        // 计算缩放比例，保持宽高比，最大宽度1200px
-        const int maxWidth = 1200;
-        double scale = 1.0;
-        if (image.Width > maxWidth) {
-            scale = (double)maxWidth / image.Width;
-        }
+        // 获取压缩模式配置
+        var compressionMode = GetCompressionModeForImage(image, originalSize);
 
-        if (scale < 1.0) {
-            var newWidth = (int)(image.Width * scale);
-            var newHeight = (int)(image.Height * scale);
-            image.Mutate(x => x.Resize(newWidth, newHeight));
+        // 应用尺寸调整（如果启用）
+        if (_compressionOptions.EnableResize && compressionMode is { MaxWidth: < int.MaxValue, MaxHeight: < int.MaxValue }) {
+            ApplyImageResize(image, compressionMode);
         }
 
         // 智能选择输出格式
         var (outputFormat, outputPath) =
-            await SelectOptimalFormat(image, imagePath, outputDirectory, fileNameWithoutExt, extension);
+            await SelectOptimalFormat(image, imagePath, outputDirectory, fileNameWithoutExt, extension, compressionMode.Quality);
 
         var compressedInfo = new FileInfo(outputPath);
         var compressedSize = compressedInfo.Length;
@@ -380,9 +516,10 @@ public class ImageOptimizer : IService {
     /// <param name="outputDirectory">输出目录</param>
     /// <param name="fileNameWithoutExt">不含扩展名的文件名</param>
     /// <param name="originalExtension">原始扩展名</param>
+    /// <param name="quality">压缩质量</param>
     /// <returns>输出格式和路径</returns>
     private async Task<(string format, string outputPath)> SelectOptimalFormat(
-        Image image, string originalPath, string outputDirectory, string fileNameWithoutExt, string originalExtension) {
+        Image image, string originalPath, string outputDirectory, string fileNameWithoutExt, string originalExtension, int quality) {
         // GIF格式特殊处理，保持原格式
         if (originalExtension == ".gif") {
             var gifPath = Path.Combine(outputDirectory, $"{fileNameWithoutExt}.gif");
@@ -402,7 +539,7 @@ public class ImageOptimizer : IService {
             // 有透明度，使用 WebP
             var webpPath = Path.Combine(outputDirectory, $"{fileNameWithoutExt}.webp");
             var webpEncoder = new WebpEncoder {
-                Quality = 85,
+                Quality = quality,
                 Method = WebpEncodingMethod.BestQuality
             };
             await image.SaveAsync(webpPath, webpEncoder);
@@ -412,7 +549,7 @@ public class ImageOptimizer : IService {
             // 简单图形，使用 WebP
             var webpPath = Path.Combine(outputDirectory, $"{fileNameWithoutExt}.webp");
             var webpEncoder = new WebpEncoder {
-                Quality = 85,
+                Quality = quality,
                 Method = WebpEncodingMethod.BestQuality
             };
             await image.SaveAsync(webpPath, webpEncoder);
@@ -420,7 +557,7 @@ public class ImageOptimizer : IService {
         }
         else {
             // 复杂图像/照片，比较 WebP 和 JPEG
-            return await CompareWebpAndJpeg(image, outputDirectory, fileNameWithoutExt);
+            return await CompareWebpAndJpeg(image, outputDirectory, fileNameWithoutExt, quality);
         }
     }
 
@@ -428,7 +565,7 @@ public class ImageOptimizer : IService {
     /// 比较WebP和JPEG格式，选择文件更小的格式
     /// </summary>
     private async Task<(string format, string outputPath)> CompareWebpAndJpeg(
-        Image image, string outputDirectory, string fileNameWithoutExt) {
+        Image image, string outputDirectory, string fileNameWithoutExt, int quality) {
         // 创建临时文件测试压缩效果
         string tempWebp = Path.GetTempFileName() + ".webp";
         string tempJpeg = Path.GetTempFileName() + ".jpg";
@@ -436,14 +573,14 @@ public class ImageOptimizer : IService {
         try {
             // 测试 WebP
             var webpEncoder = new WebpEncoder {
-                Quality = 85,
+                Quality = quality,
                 Method = WebpEncodingMethod.BestQuality
             };
             await image.SaveAsync(tempWebp, webpEncoder);
 
             // 测试 JPEG
             var jpegEncoder = new JpegEncoder {
-                Quality = 85
+                Quality = quality
             };
             await image.SaveAsync(tempJpeg, jpegEncoder);
 
