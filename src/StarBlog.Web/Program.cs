@@ -121,8 +121,6 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) {
     app.UseDeveloperExceptionPage();
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
 }
 else {
     app.UseExceptionHandler(applicationBuilder => {
@@ -132,6 +130,8 @@ else {
             await context.Response.WriteAsJsonAsync(new { message = "Unexpected error!" });
         });
     });
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseHsts();
 }
 
 app.UseForwardedHeaders(new ForwardedHeadersOptions {
@@ -144,13 +144,36 @@ app.UseImageSharp();
 // 启用响应压缩
 app.UseResponseCompression();
 
+// 添加静态文件调试中间件（仅在非生产环境）
+if (!app.Environment.IsProduction()) {
+    app.UseMiddleware<StaticFileDebugMiddleware>();
+}
+
 // 配置静态文件缓存
 app.UseStaticFiles(new StaticFileOptions {
     ServeUnknownFileTypes = true,
     OnPrepareResponse = ctx => {
-        const int durationInSeconds = 60 * 60 * 24 * 30; // 30天
-        ctx.Context.Response.Headers.CacheControl = $"public,max-age={durationInSeconds}";
-        ctx.Context.Response.Headers.Expires = DateTime.UtcNow.AddDays(30).ToString("R");
+        var path = ctx.Context.Request.Path.Value;
+
+        // 对于 JS 和 CSS 文件，设置较短的缓存时间以便调试
+        if (path != null && (path.EndsWith(".js") || path.EndsWith(".css"))) {
+            if (app.Environment.IsDevelopment()) {
+                // 开发环境不缓存 JS/CSS
+                ctx.Context.Response.Headers.CacheControl = "no-cache, no-store, must-revalidate";
+                ctx.Context.Response.Headers.Pragma = "no-cache";
+                ctx.Context.Response.Headers.Expires = "0";
+            } else {
+                // 生产环境短期缓存 JS/CSS
+                const int shortDuration = 60 * 60 * 24; // 1天
+                ctx.Context.Response.Headers.CacheControl = $"public,max-age={shortDuration}";
+                ctx.Context.Response.Headers.Expires = DateTime.UtcNow.AddDays(1).ToString("R");
+            }
+        } else {
+            // 其他静态文件长期缓存
+            const int durationInSeconds = 60 * 60 * 24 * 30; // 30天
+            ctx.Context.Response.Headers.CacheControl = $"public,max-age={durationInSeconds}";
+            ctx.Context.Response.Headers.Expires = DateTime.UtcNow.AddDays(30).ToString("R");
+        }
     }
 });
 
