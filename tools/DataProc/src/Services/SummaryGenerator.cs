@@ -19,8 +19,11 @@ public class SummaryGenerator(
 
 
     public async Task<Result> Run() {
-        var total = await postRepo.Select.CountAsync();
-        var posts = await postRepo.Where(e => string.IsNullOrWhiteSpace(e.Summary)).ToListAsync();
+            var total = await postRepo.Select.CountAsync();
+        var posts = await postRepo.Where(e =>
+            string.IsNullOrWhiteSpace(e.Summary) ||
+            e.Summary == e.Title
+        ).ToListAsync();
 
         logger.LogInformation("开始生成文章摘要 - 待处理: {Count}, 总数: {Total}", posts.Count, total);
 
@@ -41,7 +44,8 @@ public class SummaryGenerator(
                 }
                 else {
                     failureCount++;
-                    logger.LogError("文章 [{title}] 摘要生成失败: {Error}", post.Title, result.Errors.FirstOrDefault()?.Message);
+                    logger.LogError("文章 [{title}] 摘要生成失败: {Error}", post.Title,
+                        result.Errors.FirstOrDefault()?.Message);
                 }
 
                 // 添加延迟以避免速率限制
