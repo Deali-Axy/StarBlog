@@ -23,6 +23,7 @@ public static partial class PromptTemplates {
         ---
 
         文章标题：{{title}}
+        文章简介：{{summary}}
 
         > **请直接输出最终的 URL slug：**  
 
