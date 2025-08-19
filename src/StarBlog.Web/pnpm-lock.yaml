@@ -38,9 +38,6 @@ importers:
       github-markdown-css:
         specifier: ^5.1.0
         version: 5.8.1
-      highlight.js:
-        specifier: ^11.11.1
-        version: 11.11.1
       imagesloaded:
         specifier: ^5.0.0
         version: 5.0.0
@@ -1116,10 +1113,6 @@ packages:
     resolution: {integrity: sha512-X8xbmTc1cbPXcQV4WkLcRMALuyoxhfpFATmyuCxJPOAvrDS4DNnsTAOmKUxMTOWU6TzrTOkxPKwIx5ZOpJVSrg==}
     engines: {node: '>=0.10.32'}
     deprecated: This module moved to @hapi/hawk. Please make sure to switch over as this distribution is no longer supported and may contain bugs and critical security issues.
-
-  highlight.js@11.11.1:
-    resolution: {integrity: sha512-Xwwo44whKBVCYoliBQwaPvtd/2tYFkRQtXDWj1nackaV2JPXx3L0+Jvd8/qCJ2p+ML0/XVkJ2q+Mr+UVdpJK5w==}
-    engines: {node: '>=12.0.0'}
 
   hoek@2.16.3:
     resolution: {integrity: sha512-V6Yw1rIcYV/4JsnggjBU0l4Kr+EXhpwqXRusENU1Xx6ro00IHPHYNynCuBTOZAPlr3AAmLvchH9I7N/VUdvOwQ==}
@@ -3646,8 +3639,6 @@ snapshots:
       cryptiles: 2.0.5
       hoek: 2.16.3
       sntp: 1.0.9
-
-  highlight.js@11.11.1: {}
 
   hoek@2.16.3: {}
 
