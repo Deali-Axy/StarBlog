@@ -14,7 +14,7 @@
     </style>
 }
 
-@await Html.PartialAsync("Widgets/BackToTop", new BackToTopViewModel {IsShowText = false})
+@await Html.PartialAsync("Widgets/BackToTop", new BackToTopViewModel { IsShowText = false })
 
 <div class="container">
     <div class="row">
@@ -33,7 +33,7 @@
         </div>
         <div class="col-lg-9">
             <partial name="Widgets/PostHeader"/>
-            
+
             <div id="post-markdown-content" class="post-content">
                 <textarea id="append-test" style="display:none;">@Model.Content</textarea>
             </div>
@@ -60,8 +60,12 @@
     <script src="~/lib/editormd/lib/sequence-diagram.min.js"></script>
     <script src="~/lib/editormd/lib/flowchart.min.js"></script>
     <script src="~/lib/editormd/lib/jquery.flowchart.min.js"></script>
+    <script src="~/lib/editormd/editormd.min.js"></script>
 
-    <script src="~/lib/editormd/editormd.js"></script>
-    <script src="~/js/blog-post.js"></script>
-    <script src="~/js/comment.js"></script>
+    <environment include="Development">
+        <script src="~/js/blog-post.js"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="~/js/blog-post.min.js"></script>
+    </environment>
 }
