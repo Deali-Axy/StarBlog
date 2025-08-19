@@ -24,6 +24,9 @@
         <None Update=".env">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </None>
+        <None Update="appsettings.llm.json">
+          <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
     <ItemGroup>

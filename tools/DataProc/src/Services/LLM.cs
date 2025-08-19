@@ -8,11 +8,9 @@ using OpenAI;
 namespace DataProc.Services;
 
 public class LLM : IService {
-    private IChatClient _chatClient;
-
     public LLM(IOptions<LLMSettings> llmOptions) {
         var llmConfig = llmOptions.Value;
-        _chatClient = new OpenAIClient(
+        ChatClient = new OpenAIClient(
             new ApiKeyCredential(llmConfig.Key),
             new OpenAIClientOptions {
                 Endpoint = new Uri(llmConfig.Endpoint)
@@ -20,7 +18,7 @@ public class LLM : IService {
         ).GetChatClient(llmConfig.Model).AsIChatClient();
     }
 
-    public IChatClient ChatClient { get; set; }
+    public IChatClient ChatClient { get; }
 
     public Task<Result> Run() {
         throw new NotImplementedException();
