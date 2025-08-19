@@ -31,9 +31,11 @@ if (!string.IsNullOrEmpty(ip2RegionPath) && File.Exists(ip2RegionPath)) {
         CachePolicy.Content,
         ip2RegionPath
     ));
-} else {
+}
+else {
     app.Services.AddSingleton<ISearcher>(new FakeIpSearcher());
 }
+
 app.Services.AddAutoMapper(typeof(Program));
 
 // 可以选择运行不同的服务
@@ -44,11 +46,17 @@ Console.Write("请输入选择 (1-2): ");
 
 var choice = Console.ReadLine();
 switch (choice) {
+    case "1":
+        await app.Run<VisitRecordService>();
+        break;
     case "2":
         await app.Run<ImageOptimizer>();
         break;
-    default:
-        await app.Run<VisitRecordService>();
+    case "3":
+        await app.Run<SlugGenerator>();
+        break;
+    case "4":
+        await app.Run<SummaryGenerator>();
         break;
 }
 
