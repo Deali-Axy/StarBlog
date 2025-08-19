@@ -57,7 +57,7 @@ public class VisitRecordService {
     }
 
     /// <summary>
-    /// 获取按天趋势数据
+    /// 获取按天趋势数据 - 使用拆分查询避免复杂 LINQ 翻译问题
     /// </summary>
     /// <param name="p"></param>
     /// <param name="days">查看最近几天的数据，默认7天</param>
@@ -66,8 +66,19 @@ public class VisitRecordService {
         var qs = _dbContext.VisitRecords.ApplyFilters(p);
         var startDate = DateTime.Today.AddDays(-days).Date;
 
-        return await qs.Where(e => e.Time.Date >= startDate)
-            .GroupBy(e => e.Time.Date)
+        // 获取基础数据到内存中进行处理
+        var records = await qs.Where(e => e.Time.Date >= startDate)
+            .Select(e => new {
+                e.Time.Date,
+                e.RequestPath,
+                e.Ip,
+                IsSpider = e.UserAgentInfo.Device.IsSpider
+            })
+            .ToListAsync();
+
+        // 在内存中进行分组和统计
+        var data = records
+            .GroupBy(e => e.Date)
             .Select(g => new DailyTrend {
                 Time = g.Key,
                 Date = $"{g.Key.Month}-{g.Key.Day}",
@@ -76,28 +87,43 @@ public class VisitRecordService {
                 // page view (exclude api and spiders)
                 Pv = g.Count(e =>
                     !e.RequestPath.ToLower().StartsWith("/api") &&
-                    !e.UserAgentInfo.Device.IsSpider
+                    !e.IsSpider
                 ),
                 // unique visitors
                 Uv = g.Where(e =>
                         !e.RequestPath.ToLower().StartsWith("/api") &&
-                        !e.UserAgentInfo.Device.IsSpider)
+                        !e.IsSpider)
                     .Select(e => e.Ip).Distinct().Count(),
                 // api visit count
                 Api = g.Count(e => e.RequestPath.ToLower().StartsWith("/api")),
-                Spider = g.Count(e => e.UserAgentInfo.Device.IsSpider),
+                Spider = g.Count(e => e.IsSpider),
             })
             .OrderBy(e => e.Time)
-            .ToListAsync();
+            .ToList();
+
+        return data;
     }
 
     /// <summary>
-    /// 小时级趋势
+    /// 小时级趋势 - 使用拆分查询避免复杂 LINQ 翻译问题
     /// <para>按小时查看访问量变化</para>
     /// </summary>
     public async Task<List<HourlyTrend>> GetHourlyTrend(VisitRecordParameters p) {
         var qs = _dbContext.VisitRecords.ApplyFilters(p);
-        return await qs.GroupBy(e => e.Time.Hour)
+        
+        // 获取基础数据到内存中进行处理
+        var records = await qs
+            .Select(e => new {
+                e.Time.Hour,
+                e.RequestPath,
+                e.Ip,
+                IsSpider = e.UserAgentInfo.Device.IsSpider
+            })
+            .ToListAsync();
+
+        // 在内存中进行分组和统计
+        var data = records
+            .GroupBy(e => e.Hour)
             .Select(g => new HourlyTrend {
                 Hour = g.Key,
                 // 总访问量
@@ -105,19 +131,21 @@ public class VisitRecordService {
                 // page view (exclude api and spiders)
                 Pv = g.Count(e =>
                     !e.RequestPath.ToLower().StartsWith("/api") &&
-                    !e.UserAgentInfo.Device.IsSpider
+                    !e.IsSpider
                 ),
                 // unique visitors
                 Uv = g.Where(e =>
                         !e.RequestPath.ToLower().StartsWith("/api") &&
-                        !e.UserAgentInfo.Device.IsSpider)
+                        !e.IsSpider)
                     .Select(e => e.Ip).Distinct().Count(),
                 // api visit count
                 Api = g.Count(e => e.RequestPath.ToLower().StartsWith("/api")),
-                Spider = g.Count(e => e.UserAgentInfo.Device.IsSpider),
+                Spider = g.Count(e => e.IsSpider),
             })
             .OrderBy(e => e.Hour)
-            .ToListAsync();
+            .ToList();
+
+        return data;
     }
 
     /// <summary>
