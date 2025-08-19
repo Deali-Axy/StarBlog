@@ -30,18 +30,18 @@ public class SummaryGenerator(
         foreach (var post in posts) {
             try {
                 if (string.IsNullOrWhiteSpace(post.Content)) {
-                    logger.LogWarning("文章 [{PostId}] 内容为空，跳过", post.Id);
+                    logger.LogWarning("文章 [{title}] 内容为空，跳过", post.Title);
                     continue;
                 }
 
                 var result = await GenerateSummaryWithRetry(post);
                 if (result.IsSuccess) {
                     successCount++;
-                    logger.LogInformation("文章 [{PostId}] 摘要生成成功", post.Id);
+                    logger.LogInformation("文章 [{title}] 摘要生成成功", post.Title);
                 }
                 else {
                     failureCount++;
-                    logger.LogError("文章 [{PostId}] 摘要生成失败: {Error}", post.Id, result.Errors.FirstOrDefault()?.Message);
+                    logger.LogError("文章 [{title}] 摘要生成失败: {Error}", post.Title, result.Errors.FirstOrDefault()?.Message);
                 }
 
                 // 添加延迟以避免速率限制
@@ -49,7 +49,7 @@ public class SummaryGenerator(
             }
             catch (Exception ex) {
                 failureCount++;
-                logger.LogError(ex, "处理文章 [{PostId}] 时发生未预期错误", post.Id);
+                logger.LogError(ex, "处理文章 [{title}] 时发生未预期错误", post.Title);
             }
         }
 
@@ -82,8 +82,8 @@ public class SummaryGenerator(
                 return Result.Fail("生成的摘要为空");
             }
             catch (Exception ex) {
-                logger.LogWarning("文章 [{PostId}] 第 {Attempt} 次尝试失败: {Error}",
-                    post.Id, attempt, ex.Message);
+                logger.LogWarning("文章 [{title}] 第 {Attempt} 次尝试失败: {Error}",
+                    post.Title, attempt, ex.Message);
 
                 if (attempt == _settings.MaxRetries) {
                     return Result.Fail($"重试 {_settings.MaxRetries} 次后仍然失败: {ex.Message}");
