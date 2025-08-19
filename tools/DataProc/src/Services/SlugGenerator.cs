@@ -23,37 +23,113 @@ public class SlugGenerator(
 
         logger.LogInformation("开始生成文章 Slug - 待处理: {Count}, 总数: {Total}", posts.Count, total);
 
+        if (posts.Count == 0) {
+            Console.WriteLine("✅ 所有文章都已有 Slug，无需处理");
+            return Result.Ok();
+        }
+
         var successCount = 0;
         var failureCount = 0;
+        var skippedCount = 0;
+        var startTime = DateTime.Now;
 
-        foreach (var post in posts) {
+        Console.WriteLine($"\n🚀 开始处理 {posts.Count} 篇文章...\n");
+
+        for (int i = 0; i < posts.Count; i++) {
+            var post = posts[i];
+            var currentIndex = i + 1;
+
             try {
+                // 显示当前处理的文章信息
+                Console.Write($"[{currentIndex:D3}/{posts.Count:D3}] ");
+
                 if (string.IsNullOrWhiteSpace(post.Title)) {
+                    Console.WriteLine($"⚠️  跳过 - 标题为空");
                     logger.LogWarning("文章 [{id}] 标题为空，跳过", post.Id);
+                    skippedCount++;
                     continue;
                 }
+                
+                if (string.IsNullOrWhiteSpace(post.Summary)) {
+                    Console.WriteLine($"⚠️  跳过 - 简介为空");
+                    logger.LogWarning("文章 [{title}] 简介为空，跳过", post.Title);
+                    skippedCount++;
+                    continue;
+                }
+
+                // 显示正在处理的文章标题（截断长标题）
+                var displayTitle = post.Title.Length > 40 ? post.Title.Substring(0, 37) + "..." : post.Title;
+                Console.Write($"处理: {displayTitle}");
 
                 var result = await GenerateSlugWithRetry(post);
                 if (result.IsSuccess) {
                     successCount++;
+                    Console.WriteLine($" ✅ {post.Slug}");
                     logger.LogInformation("文章 [{title}] Slug 生成成功: {Slug}", post.Title, post.Slug);
                 }
                 else {
                     failureCount++;
+                    Console.WriteLine($" ❌ 失败");
                     logger.LogError("文章 [{title}] Slug 生成失败: {Error}", post.Title, result.Errors.FirstOrDefault()?.Message);
                 }
 
+                // 显示进度统计
+                DisplayProgress(currentIndex, posts.Count, successCount, failureCount, skippedCount, startTime);
+
                 // 添加延迟以避免速率限制
-                await Task.Delay(_settings.DelayBetweenRequests);
+                if (currentIndex < posts.Count) {
+                    await Task.Delay(_settings.DelayBetweenRequests);
+                }
             }
             catch (Exception ex) {
                 failureCount++;
+                Console.WriteLine($" ❌ 异常");
                 logger.LogError(ex, "处理文章 [{title}] 时发生未预期错误", post.Title);
+
+                // 显示进度统计
+                DisplayProgress(currentIndex, posts.Count, successCount, failureCount, skippedCount, startTime);
             }
         }
 
-        logger.LogInformation("Slug 生成完成 - 成功: {Success}, 失败: {Failure}", successCount, failureCount);
+        // 显示最终结果
+        var endTime = DateTime.Now;
+        var totalTime = endTime - startTime;
+
+        Console.WriteLine("\n" + new string('=', 60));
+        Console.WriteLine("📊 处理完成统计");
+        Console.WriteLine(new string('=', 60));
+        Console.WriteLine($"✅ 成功: {successCount} 篇");
+        Console.WriteLine($"❌ 失败: {failureCount} 篇");
+        Console.WriteLine($"⚠️  跳过: {skippedCount} 篇");
+        Console.WriteLine($"📝 总计: {posts.Count} 篇");
+        Console.WriteLine($"⏱️  耗时: {totalTime:hh\\:mm\\:ss}");
+        Console.WriteLine($"⚡ 平均: {(totalTime.TotalSeconds / posts.Count):F1} 秒/篇");
+        Console.WriteLine(new string('=', 60));
+
+        logger.LogInformation("Slug 生成完成 - 成功: {Success}, 失败: {Failure}, 跳过: {Skipped}, 耗时: {Duration}",
+            successCount, failureCount, skippedCount, totalTime);
+
         return Result.Ok();
+    }
+
+    private void DisplayProgress(int current, int total, int success, int failure, int skipped, DateTime startTime) {
+        var elapsed = DateTime.Now - startTime;
+        var percentage = (double)current / total * 100;
+        var remaining = total - current;
+
+        // 估算剩余时间
+        var avgTimePerItem = elapsed.TotalSeconds / current;
+        var estimatedRemaining = TimeSpan.FromSeconds(avgTimePerItem * remaining);
+
+        // 创建进度条
+        var progressBarWidth = 30;
+        var filledWidth = (int)(percentage / 100 * progressBarWidth);
+        var progressBar = new string('█', filledWidth) + new string('░', progressBarWidth - filledWidth);
+
+        Console.WriteLine($"    📈 进度: [{progressBar}] {percentage:F1}% | " +
+                         $"✅{success} ❌{failure} ⚠️{skipped} | " +
+                         $"剩余: ~{estimatedRemaining:mm\\:ss}");
+        Console.WriteLine();
     }
 
     private async Task<Result> GenerateSlugWithRetry(Post post) {
@@ -107,6 +183,8 @@ public class SlugGenerator(
         try {
             var textStreamAsync = llm.GenerateTextStreamAsync(prompt);
 
+            Console.Write(" 🤖 ");
+
             await foreach (var update in textStreamAsync) {
                 if (!string.IsNullOrEmpty(update.Text)) {
                     slugBuilder.Append(update.Text);
@@ -114,7 +192,6 @@ public class SlugGenerator(
                 }
             }
 
-            Console.WriteLine(); // 换行
             return slugBuilder.ToString();
         }
         catch (Exception ex) {
