@@ -42,7 +42,9 @@ app.Services.AddAutoMapper(typeof(Program));
 Console.WriteLine("请选择要运行的服务:");
 Console.WriteLine("1. VisitRecordService (访问记录处理)");
 Console.WriteLine("2. ImageOptimizer (图片优化)");
-Console.Write("请输入选择 (1-2): ");
+Console.WriteLine("3. SlugGenerator (URL Slug 生成)");
+Console.WriteLine("4. SummaryGenerator (文章摘要生成)");
+Console.Write("请输入选择 (1-4): ");
 
 var choice = Console.ReadLine();
 switch (choice) {
@@ -58,6 +60,9 @@ switch (choice) {
     case "4":
         await app.Run<SummaryGenerator>();
         break;
+    default:
+        Console.WriteLine("无效选择，程序退出。");
+        return;
 }
 
 Console.Read();
