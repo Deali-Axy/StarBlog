@@ -13,8 +13,7 @@ using StarBlog.Web.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 
-var mvcBuilder = builder.Services.AddControllersWithViews(
-    options => { options.Filters.Add<ResponseWrapperFilter>(); }
+var mvcBuilder = builder.Services.AddControllersWithViews(options => { options.Filters.Add<ResponseWrapperFilter>(); }
 );
 
 // 开发模式启用Razor页面动态编译
@@ -28,8 +27,12 @@ builder.Services.AddHttpContextAccessor();
 // 添加响应压缩
 builder.Services.AddResponseCompression(options => {
     options.EnableForHttps = true;
+
+    // 配置压缩提供程序（按优先级排序）
     options.Providers.Add<Microsoft.AspNetCore.ResponseCompression.BrotliCompressionProvider>();
     options.Providers.Add<Microsoft.AspNetCore.ResponseCompression.GzipCompressionProvider>();
+
+    // 配置要压缩的 MIME 类型
     options.MimeTypes = Microsoft.AspNetCore.ResponseCompression.ResponseCompressionDefaults.MimeTypes.Concat(new[] {
         "application/javascript",
         "application/json",
@@ -41,6 +44,17 @@ builder.Services.AddResponseCompression(options => {
         "text/xml"
     });
 });
+
+// 配置 Brotli 压缩级别
+builder.Services.Configure<Microsoft.AspNetCore.ResponseCompression.BrotliCompressionProviderOptions>(options => {
+    options.Level = System.IO.Compression.CompressionLevel.Optimal;
+});
+
+// 配置 Gzip 压缩级别
+builder.Services.Configure<Microsoft.AspNetCore.ResponseCompression.GzipCompressionProviderOptions>(options => {
+    options.Level = System.IO.Compression.CompressionLevel.Optimal;
+});
+
 builder.Services.AddSession(options => {
     options.IdleTimeout = TimeSpan.FromHours(1);
     options.Cookie.HttpOnly = true;
@@ -69,19 +83,19 @@ builder.Services.AddCors(options => {
 builder.Services.AddStaticRobotsTxt(opt => {
     var baseUrl = builder.Configuration["host"] ?? "https://blog.deali.cn";
     opt.AddSection(section => section.AddUserAgent("Googlebot").Allow("/"))
-       .AddSection(section => section.AddUserAgent("bingbot").Allow("/"))
-       .AddSection(section => section.AddUserAgent("Bytespider").Disallow("/"))
-       .AddSection(section => section.AddUserAgent("Sogou web spider").Allow("/"))
-       .AddSection(section => section.AddUserAgent("*")
-           .Disallow("/Admin/")
-           .Disallow("/Api/")
-           .Disallow("/bin/")
-           .Disallow("/obj/")
-           .Disallow("/node_modules/")
-           .Disallow("/seo-test")
-           .Allow("/"))
-       .AddSitemap($"{baseUrl}/sitemap.xml")
-       .AddSitemap($"{baseUrl}/sitemap-images.xml");
+        .AddSection(section => section.AddUserAgent("bingbot").Allow("/"))
+        .AddSection(section => section.AddUserAgent("Bytespider").Disallow("/"))
+        .AddSection(section => section.AddUserAgent("Sogou web spider").Allow("/"))
+        .AddSection(section => section.AddUserAgent("*")
+            .Disallow("/Admin/")
+            .Disallow("/Api/")
+            .Disallow("/bin/")
+            .Disallow("/obj/")
+            .Disallow("/node_modules/")
+            .Disallow("/seo-test")
+            .Allow("/"))
+        .AddSitemap($"{baseUrl}/sitemap.xml")
+        .AddSitemap($"{baseUrl}/sitemap-images.xml");
 
     return opt;
 });
@@ -112,9 +126,7 @@ builder.Services.AddScoped<ImageSeoService>();
 builder.Services.AddScoped<SitemapService>();
 
 // 设置请求最大大小
-builder.WebHost.ConfigureKestrel(options => {
-    options.Limits.MaxRequestBodySize = long.MaxValue;
-});
+builder.WebHost.ConfigureKestrel(options => { options.Limits.MaxRequestBodySize = long.MaxValue; });
 
 var app = builder.Build();
 
@@ -162,13 +174,15 @@ app.UseStaticFiles(new StaticFileOptions {
                 ctx.Context.Response.Headers.CacheControl = "no-cache, no-store, must-revalidate";
                 ctx.Context.Response.Headers.Pragma = "no-cache";
                 ctx.Context.Response.Headers.Expires = "0";
-            } else {
+            }
+            else {
                 // 生产环境短期缓存 JS/CSS
                 const int shortDuration = 60 * 60 * 24; // 1天
                 ctx.Context.Response.Headers.CacheControl = $"public,max-age={shortDuration}";
                 ctx.Context.Response.Headers.Expires = DateTime.UtcNow.AddDays(1).ToString("R");
             }
-        } else {
+        }
+        else {
             // 其他静态文件长期缓存
             const int durationInSeconds = 60 * 60 * 24 * 30; // 30天
             ctx.Context.Response.Headers.CacheControl = $"public,max-age={durationInSeconds}";
