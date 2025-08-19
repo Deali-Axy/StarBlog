@@ -14,6 +14,7 @@ public static class FluentConsoleBuilderExt {
         configBuilder.AddEnvironmentVariables();
         configBuilder.SetBasePath(Environment.CurrentDirectory);
         configBuilder.AddJsonFile("appsettings.json", optional: false, reloadOnChange: false);
+        configBuilder.AddJsonFile("appsettings.llm.json", optional: true, reloadOnChange: false);
         try {
             config = configBuilder.Build();
         }
@@ -25,6 +26,7 @@ public static class FluentConsoleBuilderExt {
         builder.Configuration = config;
         builder.Services.AddSingleton<IConfiguration>(config);
         builder.Services.AddOptions().Configure<AppSettings>(e => config.GetSection(nameof(AppSettings)).Bind(e));
+        builder.Services.AddOptions().Configure<LLMSettings>(e => config.GetSection("LLM").Bind(e));
 
         return builder;
     }
