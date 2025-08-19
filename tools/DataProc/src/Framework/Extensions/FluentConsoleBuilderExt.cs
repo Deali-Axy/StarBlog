@@ -28,6 +28,8 @@ public static class FluentConsoleBuilderExt {
         builder.Services.AddOptions().Configure<AppSettings>(e => config.GetSection(nameof(AppSettings)).Bind(e));
         builder.Services.AddOptions<LLMSettings>()
             .Bind(config.GetSection("LLM"));
+        builder.Services.AddOptions<SummaryGeneratorSettings>()
+            .Bind(config.GetSection("SummaryGenerator"));
 
         return builder;
     }

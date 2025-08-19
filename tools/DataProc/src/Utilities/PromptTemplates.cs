@@ -37,7 +37,7 @@ public static partial class PromptTemplates {
     /// </summary>
     public const string ArticleDescriptionCasual =
         """
-        下面有一篇文章的标题和正文，请根据它们写一段**高冷又带点吐槽**风格的简介，字数控制在2～3句，不要出现"作为AI"或"我能"之类的套话，要让人感觉像是真人在翻白眼、顺便冷嘲热讽。
+        下面有一篇文章的标题和正文，请根据它们写一段**高冷又带点吐槽**风格的简介，字数控制在3～5句，不要出现"作为AI"或"我能"之类的套话，要让人感觉像是真人在翻白眼、顺便冷嘲热讽。
 
         标题：{{title}}  
         正文：{{content}}
