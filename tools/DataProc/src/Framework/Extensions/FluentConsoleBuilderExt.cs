@@ -30,6 +30,8 @@ public static class FluentConsoleBuilderExt {
             .Bind(config.GetSection("LLM"));
         builder.Services.AddOptions<SummaryGeneratorSettings>()
             .Bind(config.GetSection("SummaryGenerator"));
+        builder.Services.AddOptions<SlugGeneratorSettings>()
+            .Bind(config.GetSection("SlugGenerator"));
 
         return builder;
     }
