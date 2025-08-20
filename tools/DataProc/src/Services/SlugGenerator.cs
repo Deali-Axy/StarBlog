@@ -65,14 +65,16 @@ public class SlugGenerator(
                         progressTask.Description = $"[green]处理:[/] [blue]{displayTitle.EscapeMarkup()}[/]";
 
                         var result = await GenerateSlugWithRetry(post);
+                        var progressInfo = $"({currentIndex:D3}/{posts.Count:D3})";
+                        
                         if (result.IsSuccess) {
                             successCount++;
-                            AnsiConsole.MarkupLine($"[green]✅ [{currentIndex:D3}/{posts.Count:D3}] {displayTitle.EscapeMarkup()} -> {post.Slug.EscapeMarkup()}[/]");
+                            AnsiConsole.MarkupLine($"[green]✅ {progressInfo} {displayTitle.EscapeMarkup()} -> {post.Slug.EscapeMarkup()}[/]");
                             logger.LogInformation("文章 [{title}] Slug 生成成功: {Slug}", post.Title, post.Slug);
                         }
                         else {
                             failureCount++;
-                            AnsiConsole.MarkupLine($"[red]❌ [{currentIndex:D3}/{posts.Count:D3}] {displayTitle.EscapeMarkup()} - 失败[/]");
+                            AnsiConsole.MarkupLine($"[red]❌ {progressInfo} {displayTitle.EscapeMarkup()} - 失败[/]");
                             logger.LogError("文章 [{title}] Slug 生成失败: {Error}", post.Title, result.Errors.FirstOrDefault()?.Message);
                         }
 
@@ -90,7 +92,8 @@ public class SlugGenerator(
                     }
                     catch (Exception ex) {
                         failureCount++;
-                        AnsiConsole.MarkupLine($"[red]❌ [{currentIndex:D3}/{posts.Count:D3}] {post.Title?.EscapeMarkup() ?? "未知"} - 异常[/]");
+                        var progressInfo = $"({currentIndex:D3}/{posts.Count:D3})";
+                        AnsiConsole.MarkupLine($"[red]❌ {progressInfo} {post.Title?.EscapeMarkup() ?? "未知"} - 异常[/]");
                         logger.LogError(ex, "处理文章 [{title}] 时发生未预期错误", post.Title);
                         progressTask.Increment(1);
                     }
