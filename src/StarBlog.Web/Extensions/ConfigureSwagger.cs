@@ -1,5 +1,6 @@
 ﻿using Microsoft.OpenApi.Models;
 using StarBlog.Web.Models;
+using StarBlog.Web.Middlewares;
 using Swashbuckle.AspNetCore.Filters;
 using Swashbuckle.AspNetCore.SwaggerUI;
 
@@ -51,7 +52,17 @@ public static class ConfigureSwagger {
         });
     }
 
-    public static void UseSwaggerPkg(this IApplicationBuilder app) {
+    /// <summary>
+    /// 配置Swagger中间件
+    /// </summary>
+    /// <param name="app">应用程序构建器</param>
+    /// <param name="requireAuth">是否需要授权访问，默认为true</param>
+    public static void UseSwaggerPkg(this IApplicationBuilder app, bool requireAuth = true) {
+        // 如果需要授权，则添加Swagger授权中间件
+        if (requireAuth) {
+            app.UseSwaggerAuth();
+        }
+        
         app.UseSwagger();
         app.UseSwaggerUI(opt => {
             opt.RoutePrefix = "api-docs/swagger";
