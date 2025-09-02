@@ -24,18 +24,10 @@ public class SearchController : Controller {
             )
             .Include(a => a.Category)
             .ToList()
-            .Select(p => {
-                var item = new SearchPost {
-                    Post = p,
-                    TitleScore = p.Title.Split(keyword).Length - 1,
-                    ContentScore = p.Content.Split(keyword).Length - 1,
-                };
-
-                // 标题每命中一次+100分
-                // 内容命中+1分
-                item.Score = item.TitleScore * 100 + item.ContentScore * 1;
-
-                return item;
+            .Select(p => new SearchPost {
+                Post = p,
+                TitleScore = p.Title.ToLower().Split(keyword).Length - 1,
+                ContentScore = p.Content?.ToLower().Split(keyword).Length - 1 ?? 0,
             })
             .OrderByDescending(x => x.Score)
             .ToList();
