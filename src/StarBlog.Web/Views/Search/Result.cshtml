@@ -6,135 +6,135 @@
 
 <style>
     .search-header {
-        background: #f8f9fa;
-        border-bottom: 1px solid #e9ecef;
-        padding: 1.5rem 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 2rem;
         margin-bottom: 2rem;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
     }
-
+    
     .search-stats {
-        background: #e9ecef;
-        border-radius: 4px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 10px;
         padding: 0.5rem 1rem;
         display: inline-block;
-        font-size: 0.9rem;
-        color: #6c757d;
+        backdrop-filter: blur(10px);
     }
-
+    
     .search-result-card {
-        border: 1px solid #e9ecef;
-        border-radius: 4px;
-        transition: border-color 0.2s ease;
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        transition: all 0.3s ease;
+        overflow: hidden;
         margin-bottom: 1.5rem;
     }
-
+    
     .search-result-card:hover {
-        border-color: #007bff;
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.15);
     }
-
+    
     .category-badge {
-        background: #6c757d;
+        background: linear-gradient(45deg, #1BA1E2, #00ABA9);
         color: white;
-        padding: 0.2rem 0.6rem;
-        border-radius: 3px;
-        font-size: 0.75rem;
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
         font-weight: 500;
         display: inline-block;
         margin-bottom: 0.5rem;
     }
-
+    
     .score-badge {
-        background: #28a745;
+        background: linear-gradient(45deg, #F09609, #E51400);
         color: white;
         padding: 0.2rem 0.6rem;
-        border-radius: 3px;
+        border-radius: 15px;
         font-size: 0.75rem;
         font-weight: 500;
         display: inline-block;
     }
-
+    
     .result-title {
-        color: #007bff;
-        font-weight: 500;
-        margin-bottom: 0.5rem;
+        color: #2c3e50;
+        font-weight: 600;
+        margin-bottom: 0.8rem;
         line-height: 1.4;
-        font-size: 1.1rem;
     }
-
+    
     .result-snippet {
-        color: #495057;
-        line-height: 1.5;
+        color: #6c757d;
+        line-height: 1.6;
         margin-bottom: 1rem;
-        font-size: 0.95rem;
     }
-
+    
     .read-more-btn {
-        background: #007bff;
+        background: linear-gradient(45deg, #667eea, #764ba2);
         border: none;
         color: white;
-        padding: 0.5rem 1rem;
-        border-radius: 3px;
-        font-size: 0.9rem;
-        transition: background-color 0.2s ease;
+        padding: 0.6rem 1.5rem;
+        border-radius: 25px;
+        font-weight: 500;
+        transition: all 0.3s ease;
         text-decoration: none;
         display: inline-block;
     }
-
+    
     .read-more-btn:hover {
-        background: #0056b3;
+        background: linear-gradient(45deg, #764ba2, #667eea);
         color: white;
-        text-decoration: none;
+        transform: scale(1.05);
     }
-
+    
     .no-results {
         text-align: center;
         padding: 3rem 2rem;
-        background: #f8f9fa;
-        border: 1px solid #e9ecef;
-        border-radius: 4px;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        border-radius: 20px;
         margin: 2rem 0;
     }
-
+    
     .no-results-icon {
-        font-size: 3rem;
-        color: #dee2e6;
+        font-size: 4rem;
+        color: #6c757d;
         margin-bottom: 1rem;
     }
-
+    
     .no-results h3 {
         color: #495057;
         margin-bottom: 1rem;
     }
-
+    
     .no-results p {
         color: #6c757d;
         margin-bottom: 2rem;
     }
-
+    
     .back-home-btn {
-        background: #007bff;
+        background: linear-gradient(45deg, #1BA1E2, #00ABA9);
         border: none;
         color: white;
-        padding: 0.6rem 1.5rem;
-        border-radius: 3px;
+        padding: 0.8rem 2rem;
+        border-radius: 30px;
         font-weight: 500;
-        transition: background-color 0.2s ease;
+        transition: all 0.3s ease;
         text-decoration: none;
         display: inline-block;
     }
-
+    
     .back-home-btn:hover {
-        background: #0056b3;
+        background: linear-gradient(45deg, #00ABA9, #1BA1E2);
         color: white;
-        text-decoration: none;
+        transform: scale(1.05);
     }
-
+    
     .search-keyword {
-        background: #e9ecef;
+        background: rgba(255,255,255,0.3);
         padding: 0.2rem 0.6rem;
-        border-radius: 3px;
+        border-radius: 10px;
         font-weight: 600;
-        color: #495057;
     }
 </style>
 
@@ -186,18 +186,18 @@
                             </span>
                             <span class="score-badge">
                                 <i class="fas fa-bullseye me-1"></i>
-                                匹配度：@(item.Score)
+                                匹配度：@item.Score
                             </span>
                         </div>
-
+                        
                         <h4 class="result-title">
                             @Html.Raw(item.HighlightedTitle)
                         </h4>
-
+                        
                         <div class="result-snippet">
                             @Html.Raw(item.HighlightedSnippet)
                         </div>
-
+                        
                         <div class="d-flex justify-content-between align-items-center">
                             @if (!string.IsNullOrWhiteSpace(item.Post.Slug)) {
                                 <a class="read-more-btn" href="/p/@item.Post.Slug">
@@ -205,12 +205,11 @@
                                 </a>
                             }
                             else {
-                                <a class="read-more-btn" asp-controller="Blog" asp-action="Post"
-                                   asp-route-id="@item.Post.Id">
+                                <a class="read-more-btn" asp-controller="Blog" asp-action="Post" asp-route-id="@item.Post.Id">
                                     <i class="fas fa-arrow-right me-2"></i>阅读全文
                                 </a>
                             }
-
+                            
                             <small class="text-muted">
                                 <i class="fas fa-clock me-1"></i>
                                 @item.Post.CreationTime.ToString("yyyy-MM-dd")
