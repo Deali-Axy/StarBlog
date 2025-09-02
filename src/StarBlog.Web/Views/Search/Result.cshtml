@@ -1,52 +1,224 @@
 ﻿@model StarBlog.Web.ViewModels.Search.SearchResultViewModel
 
-
 @{
     ViewData["Title"] = $"{Model.Keyword} - 搜索结果";
 }
 
-<div class="container px-4 py-3">
-    <h2 class="d-flex w-100 justify-content-between pb-2 mb-3 border-bottom">
-        <div>@Model.Keyword - 搜索结果</div>
-        <div>共 @Model.SearchPosts.Count.ToString() 篇文章</div>
-    </h2>
+<style>
+    .search-header {
+        background: #f8f9fa;
+        border-bottom: 1px solid #e9ecef;
+        padding: 1.5rem 0;
+        margin-bottom: 2rem;
+    }
 
-    <div>
-        @if (Model.SearchPosts.Count == 0) {
-            <div class="d-flex justify-content-center">
-                <div class="card" style="width: 18rem;">
-                    <img src="~/images/codelab.jpg" class="card-img-top" alt="...">
-                    <div class="card-body">
-                        <h5 class="card-title">没有结果</h5>
-                        <p class="card-text">No result.</p>
-                        <a class="btn btn-primary" asp-controller="Home" asp-action="Index">返回主页</a>
-                    </div>
+    .search-stats {
+        background: #e9ecef;
+        border-radius: 4px;
+        padding: 0.5rem 1rem;
+        display: inline-block;
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+
+    .search-result-card {
+        border: 1px solid #e9ecef;
+        border-radius: 4px;
+        transition: border-color 0.2s ease;
+        margin-bottom: 1.5rem;
+    }
+
+    .search-result-card:hover {
+        border-color: #007bff;
+    }
+
+    .category-badge {
+        background: #6c757d;
+        color: white;
+        padding: 0.2rem 0.6rem;
+        border-radius: 3px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        display: inline-block;
+        margin-bottom: 0.5rem;
+    }
+
+    .score-badge {
+        background: #28a745;
+        color: white;
+        padding: 0.2rem 0.6rem;
+        border-radius: 3px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        display: inline-block;
+    }
+
+    .result-title {
+        color: #007bff;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        line-height: 1.4;
+        font-size: 1.1rem;
+    }
+
+    .result-snippet {
+        color: #495057;
+        line-height: 1.5;
+        margin-bottom: 1rem;
+        font-size: 0.95rem;
+    }
+
+    .read-more-btn {
+        background: #007bff;
+        border: none;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 3px;
+        font-size: 0.9rem;
+        transition: background-color 0.2s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .read-more-btn:hover {
+        background: #0056b3;
+        color: white;
+        text-decoration: none;
+    }
+
+    .no-results {
+        text-align: center;
+        padding: 3rem 2rem;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 4px;
+        margin: 2rem 0;
+    }
+
+    .no-results-icon {
+        font-size: 3rem;
+        color: #dee2e6;
+        margin-bottom: 1rem;
+    }
+
+    .no-results h3 {
+        color: #495057;
+        margin-bottom: 1rem;
+    }
+
+    .no-results p {
+        color: #6c757d;
+        margin-bottom: 2rem;
+    }
+
+    .back-home-btn {
+        background: #007bff;
+        border: none;
+        color: white;
+        padding: 0.6rem 1.5rem;
+        border-radius: 3px;
+        font-weight: 500;
+        transition: background-color 0.2s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .back-home-btn:hover {
+        background: #0056b3;
+        color: white;
+        text-decoration: none;
+    }
+
+    .search-keyword {
+        background: #e9ecef;
+        padding: 0.2rem 0.6rem;
+        border-radius: 3px;
+        font-weight: 600;
+        color: #495057;
+    }
+</style>
+
+<div class="container px-4 py-3">
+    <!-- 搜索头部 -->
+    <div class="search-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-2">
+                    <i class="fas fa-search me-2"></i>
+                    搜索：<span class="search-keyword">@Model.Keyword</span>
+                </h1>
+                <p class="mb-0 opacity-75">
+                    <i class="fas fa-info-circle me-1"></i>
+                    为您找到相关内容
+                </p>
+            </div>
+            <div class="col-md-4 text-md-end">
+                <div class="search-stats">
+                    <i class="fas fa-file-alt me-1"></i>
+                    共 <strong>@Model.SearchPosts.Count</strong> 篇文章
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 搜索结果 -->
+    <div class="search-results">
+        @if (Model.SearchPosts.Count == 0) {
+            <div class="no-results">
+                <div class="no-results-icon">
+                    <i class="fas fa-search-minus"></i>
+                </div>
+                <h3>未找到相关结果</h3>
+                <p>很抱歉，没有找到与 "<strong>@Model.Keyword</strong>" 相关的文章。<br>请尝试使用其他关键词进行搜索。</p>
+                <a class="back-home-btn" asp-controller="Home" asp-action="Index">
+                    <i class="fas fa-home me-2"></i>返回主页
+                </a>
             </div>
         }
-        @foreach (var item in Model.SearchPosts) {
-            <div class="card mb-3">
-                <div class="card-header">
-                    @item.Post.Category.Name
+        else {
+            @foreach (var item in Model.SearchPosts) {
+                <div class="card search-result-card">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <span class="category-badge">
+                                <i class="fas fa-folder me-1"></i>
+                                @item.Post.Category.Name
+                            </span>
+                            <span class="score-badge">
+                                <i class="fas fa-bullseye me-1"></i>
+                                匹配度：@(item.Score)
+                            </span>
+                        </div>
+
+                        <h4 class="result-title">
+                            @Html.Raw(item.HighlightedTitle)
+                        </h4>
+
+                        <div class="result-snippet">
+                            @Html.Raw(item.HighlightedSnippet)
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center">
+                            @if (!string.IsNullOrWhiteSpace(item.Post.Slug)) {
+                                <a class="read-more-btn" href="/p/@item.Post.Slug">
+                                    <i class="fas fa-arrow-right me-2"></i>阅读全文
+                                </a>
+                            }
+                            else {
+                                <a class="read-more-btn" asp-controller="Blog" asp-action="Post"
+                                   asp-route-id="@item.Post.Id">
+                                    <i class="fas fa-arrow-right me-2"></i>阅读全文
+                                </a>
+                            }
+
+                            <small class="text-muted">
+                                <i class="fas fa-clock me-1"></i>
+                                @item.Post.CreationTime.ToString("yyyy-MM-dd")
+                            </small>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <h5 class="card-title">@Html.Raw(item.HighlightedTitle)</h5>
-                    <p class="card-text small">
-                        @Html.Raw(item.HighlightedSnippet)
-                    </p>
-                    @if (!string.IsNullOrWhiteSpace(item.Post.Slug)) {
-                        <a class="btn btn-outline-secondary stretched-link" href="/p/@item.Post.Slug">
-                            查看全文
-                        </a>
-                    }
-                    else {
-                        <a class="btn btn-outline-secondary stretched-link"
-                           asp-controller="Blog" asp-action="Post" asp-route-id="@item.Post.Id">
-                            查看全文
-                        </a>
-                    }
-                </div>
-            </div>
+            }
         }
     </div>
 </div>
