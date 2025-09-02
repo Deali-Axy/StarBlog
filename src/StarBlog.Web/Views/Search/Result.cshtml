@@ -1,4 +1,4 @@
-﻿@model SearchResultViewModel
+﻿@model StarBlog.Web.ViewModels.Search.SearchResultViewModel
 
 
 @{
@@ -7,12 +7,12 @@
 
 <div class="container px-4 py-3">
     <h2 class="d-flex w-100 justify-content-between pb-2 mb-3 border-bottom">
-        <div>Search Results "@Model.Keyword"</div>
-        <div>@Model.Posts.Count.ToString() Posts</div>
+        <div>@Model.Keyword - 搜索结果</div>
+        <div>共 @Model.SearchPosts.Count.ToString() 篇文章</div>
     </h2>
 
     <div>
-        @if (Model.Posts.Count == 0) {
+        @if (Model.SearchPosts.Count == 0) {
             <div class="d-flex justify-content-center">
                 <div class="card" style="width: 18rem;">
                     <img src="~/images/codelab.jpg" class="card-img-top" alt="...">
@@ -24,8 +24,29 @@
                 </div>
             </div>
         }
-        @foreach (var post in Model.Posts) {
-            <partial name="Widgets/PostCard" model="post"/>
+        @foreach (var item in Model.SearchPosts) {
+            <div class="card mb-3">
+                <div class="card-header">
+                    @item.Post.Category.Name
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">@Html.Raw(item.HighlightedTitle)</h5>
+                    <p class="card-text small">
+                        @Html.Raw(item.HighlightedSnippet)
+                    </p>
+                    @if (!string.IsNullOrWhiteSpace(item.Post.Slug)) {
+                        <a class="btn btn-outline-secondary stretched-link" href="/p/@item.Post.Slug">
+                            查看全文
+                        </a>
+                    }
+                    else {
+                        <a class="btn btn-outline-secondary stretched-link"
+                           asp-controller="Blog" asp-action="Post" asp-route-id="@item.Post.Id">
+                            查看全文
+                        </a>
+                    }
+                </div>
+            </div>
         }
     </div>
 </div>
