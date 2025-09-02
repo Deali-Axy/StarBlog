@@ -1,0 +1,240 @@
+﻿@using StarBlog.Share.Extensions
+@model HomeViewModel
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+@section head {
+    <link rel="stylesheet" href="~/css/hero.css"/>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+}
+
+<!-- Hero Section with Enhanced Design -->
+<div class="hero-section position-relative overflow-hidden">
+    <!-- Background Gradient -->
+    <div class="hero-bg position-absolute w-100 h-100"></div>
+
+    <div class="container col-xxl-10 py-5 position-relative">
+        <div class="row flex-lg-row-reverse align-items-center g-5 py-5 min-vh-75">
+            <!-- Right Column - Visual Content -->
+            <div class="col-12 col-lg-6">
+                <div class="hero-visual-content">
+                    @if (Model.RandomPhotoVisible) {
+                        @if (Model.RandomPhoto != null) {
+                            <div class="hero-photo-card">
+                                <partial name="Widgets/PhotoCardSmallPure" model="@Model.RandomPhoto"/>
+                            </div>
+                        }
+                        else {
+                            <div class="hero-placeholder-image">
+                                <img src="~/images/bootstrap/bootstrap-themes.png"
+                                     class="d-block mx-lg-auto img-fluid rounded-4 shadow-lg"
+                                     alt="Bootstrap Themes" width="700" height="500" loading="lazy">
+                            </div>
+                        }
+                    }
+                    @if (Model.ChartVisible) {
+                        <div class="hero-chart mt-4">
+                            <canvas class="w-100 rounded-3 shadow" id="myChart" height="400"></canvas>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Left Column - Content -->
+            <div class="col-lg-6">
+                <div class="hero-content">
+                    <!-- Main Title with Animation -->
+                    <div class="hero-title-section mb-4">
+                        <h1 class="display-4 fw-bold lh-1 mb-3 text-gradient">
+                            <span class="typewriter" data-text="DealiAxy's Blog">DealiAxy's Blog</span>
+                        </h1>
+                        <div class="hero-subtitle">
+                            <h3 class="h4 text-white-50 mb-3">曦远 (DealiAxy)</h3>
+                            <p class="lead mb-4">独立开发者 · Linux中度依赖者 · 业余摄影玩家 · 文学爱好者</p>
+                        </div>
+                    </div>
+
+                    <!-- Skills Tags -->
+                    <div class="hero-skills mb-4">
+                        <div class="skills-container">
+                            <a class="skill-tag" asp-controller="Search" asp-action="Blog" asp-route-keyword="C#">C#</a>
+                            <a class="skill-tag" asp-controller="Search" asp-action="Blog" asp-route-keyword="Python">Python</a>
+                            <a class="skill-tag" asp-controller="Search" asp-action="Blog" asp-route-keyword="React">React</a>
+                            <a class="skill-tag" asp-controller="Search" asp-action="Blog" asp-route-keyword="Flutter">Flutter</a>
+                            <a class="skill-tag" asp-controller="Search" asp-action="Blog" asp-route-keyword="Kotlin">Kotlin</a>
+                            <a class="skill-tag" asp-controller="Search" asp-action="Blog" asp-route-keyword="Go语言">Go</a>
+                            <a class="skill-tag" asp-controller="Search" asp-action="Blog" asp-route-keyword="LLM">LLM</a>
+                        </div>
+                    </div>
+
+                    <!-- Social Links -->
+                    <div class="hero-social mb-4">
+                        <div class="social-links">
+                            <a href="https://github.com/Deali-Axy" target="_blank" class="social-link" title="GitHub">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            <a href="https://www.zhihu.com/people/dealiaxy" target="_blank" class="social-link"
+                               title="知乎">
+                                <i class="fab fa-zhihu"></i>
+                            </a>
+                            <a href="https://www.cnblogs.com/deali/" target="_blank" class="social-link" title="博客园">
+                                <i class="fas fa-blog"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="hero-actions">
+                        <div class="d-grid gap-3 d-md-flex justify-content-md-start">
+                            <a class="btn btn-primary btn-lg px-4 py-3 rounded-pill shadow-sm"
+                               asp-controller="Blog" asp-action="RandomPost">
+                                <i class="fas fa-book-open me-2"></i>阅读文章
+                            </a>
+                            <a class="btn btn-outline-light btn-lg px-4 py-3 rounded-pill"
+                               asp-controller="Photography" asp-action="RandomPhoto">
+                                <i class="fas fa-camera me-2"></i>欣赏摄影
+                            </a>
+                            @if (Model.ChartVisible) {
+                                <button class="btn btn-outline-light btn-lg px-4 py-3 rounded-pill"
+                                        @@click="switchChartType">
+                                    <i class="fas fa-chart-bar me-2"></i>切换图表
+                                </button>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Status Badge -->
+                    <div class="hero-status mt-4">
+                        <div class="status-badge">
+                            <span class="status-indicator"></span>
+                            <span class="status-text">StarBlog v2 正在开发中</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scroll Indicator -->
+    <div class="scroll-indicator">
+        <div class="scroll-arrow">
+            <i class="fas fa-chevron-down"></i>
+        </div>
+    </div>
+</div>
+
+<div class="container px-4 py-4" id="custom-cards">
+    <h2 class="pb-2 border-bottom">照片</h2>
+
+    @if (Model.FeaturedPhotos.Any()) {
+        <div class="row row-cols-1 row-cols-lg-3 align-items-stretch g-4 py-5">
+            @foreach (var photo in Model.FeaturedPhotos) {
+                <a role="button" class="col hero-placeholder-image" asp-controller="Photography" asp-action="Photo" asp-route-id="@photo.Id">
+                    <partial name="Widgets/PhotoCardSmall" model="photo"/>
+                </a>
+            }
+        </div>
+    }
+    else {
+        @await Html.PartialAsync("Widgets/PlaceholderCard", "推荐图片")
+    }
+
+</div>
+
+<div class="container px-4 py-3">
+    <h2 class="pb-2 border-bottom">置顶文章</h2>
+
+    @if (Model.TopPost != null) {
+        <partial name="Widgets/TopPostCard" model="Model.TopPost"/>
+    }
+    else {
+        @await Html.PartialAsync("Widgets/PlaceholderCard", "置顶博客")
+    }
+
+
+    <h2 class="pb-2 border-bottom">推荐文章</h2>
+
+    @if (Model.FeaturedPosts.Any()) {
+        <div class="row mb-2">
+            @foreach (var post in @Model.FeaturedPosts) {
+                <partial name="Widgets/FeaturedPostCard" model="post"/>
+            }
+        </div>
+    }
+    else {
+        @await Html.PartialAsync("Widgets/PlaceholderCard", "推荐博客")
+    }
+</div>
+
+<div class="container px-4 py-3" id="featured-3">
+    <h2 class="pb-2 border-bottom">推荐分类</h2>
+    @if (Model.FeaturedCategories.Any()) {
+        <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
+            @foreach (var fc in Model.FeaturedCategories) {
+                @await Html.PartialAsync("Widgets/FeaturedCategoryCard", fc)
+            }
+        </div>
+    }
+    else {
+        @await Html.PartialAsync("Widgets/PlaceholderCard", "推荐分类")
+    }
+
+</div>
+
+<div class="container px-4 py-3">
+    <div class="d-flex justify-content-between mb-2 border-bottom">
+        <h2>友情链接</h2>
+        <a class="btn btn-link" asp-controller="LinkExchange" asp-action="Add">申请友链</a>
+    </div>
+    @if (Model.Links.Any()) {
+        <div class="d-grid gap-2 d-md-block">
+            @foreach (var link in Model.Links) {
+                @await Html.PartialAsync("Widgets/ColorfulButton",
+                    new ColorfulButtonViewModel { Name = link.Name, Url = link.Url, Tooltips = link.Description })
+            }
+        </div>
+    }
+    else {
+        @await Html.PartialAsync("Widgets/PlaceholderCard", "友情链接")
+    }
+</div>
+
+@section bottom {
+    <script src="~/lib/chart.js/dist/chart.min.js"></script>
+    @if (Model.ChartVisible) {
+        <script>const CHART_VISIBLE = true</script>
+    }
+    else {
+        <script>const CHART_VISIBLE = false</script>
+    }
+    <script type="module" src="~/js/home.js"></script>
+
+    <!-- Hero Section JavaScript -->
+    <script>
+        // 平滑滚动到下一个部分
+        document.querySelector('.scroll-arrow')?.addEventListener('click', function () {
+            document.querySelector('#custom-cards').scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
+
+        // 技能标签随机颜色效果
+        document.addEventListener('DOMContentLoaded', function () {
+            const skillTags = document.querySelectorAll('.skill-tag');
+            const colors = [
+                'rgba(255, 99, 132, 0.3)',
+                'rgba(54, 162, 235, 0.3)',
+                'rgba(255, 205, 86, 0.3)',
+                'rgba(75, 192, 192, 0.3)',
+                'rgba(153, 102, 255, 0.3)',
+                'rgba(255, 159, 64, 0.3)'
+            ];
+
+            skillTags.forEach((tag, index) => {
+                tag.style.background = colors[index % colors.length];
+            });
+        });
+    </script>
+}

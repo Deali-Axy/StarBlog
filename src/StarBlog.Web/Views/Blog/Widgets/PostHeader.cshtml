@@ -1,0 +1,35 @@
+﻿@model PostViewModel
+
+<header class="post-header py-3 mb-3">
+    <h1 class="post-title h3 font-weight-bold">@Model.Title</h1>
+    <div class="border-bottom my-3"></div>
+    <div class="post-meta">
+        <div class="d-flex justify-content-between">
+            <div>
+                发布：
+                <span>@Model.CreationTime.ToString("yyyy-MM-dd hh:mm")</span>
+            </div>
+            <div>
+                更新：
+                @Model.LastUpdateTime.ToString("yyyy-MM-dd hh:mm")
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item active">博客</li>
+                    @foreach (var category in Model.Categories) {
+                        <li class="breadcrumb-item">
+                            <a asp-controller="Blog" asp-action="List"
+                               asp-route-categoryId="@category.Id">
+                                @category.Name
+                            </a>
+                        </li>
+                    }
+                </ol>
+            </nav>
+            <div>字数：@Model.Content.Length.ToString()</div>
+        </div>
+    </div>
+</header>

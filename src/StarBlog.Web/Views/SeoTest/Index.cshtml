@@ -1,0 +1,97 @@
+@{
+    ViewData["Title"] = "SEO功能测试";
+}
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <h1 class="mb-4">SEO功能测试</h1>
+            
+            <div class="alert alert-info">
+                <h5>测试说明</h5>
+                <p>此页面用于测试StarBlog的SEO优化功能是否正常工作。</p>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h5>测试结果</h5>
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.TestResults != null) {
+                        <ul class="list-unstyled">
+                            @foreach (string result in ViewBag.TestResults) {
+                                <li class="mb-2">
+                                    @if (result.StartsWith("✅")) {
+                                        <span class="text-success">@result</span>
+                                    } else if (result.StartsWith("❌")) {
+                                        <span class="text-danger">@result</span>
+                                    } else if (result.StartsWith("🎉")) {
+                                        <span class="text-primary fw-bold">@result</span>
+                                    } else {
+                                        <span>@result</span>
+                                    }
+                                </li>
+                            }
+                        </ul>
+                    }
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <h5>其他测试页面</h5>
+                <div class="list-group">
+                    <a href="/seo-test/sitemap" class="list-group-item list-group-item-action">
+                        <strong>Sitemap测试</strong>
+                        <small class="d-block text-muted">测试XML sitemap生成功能</small>
+                    </a>
+                    <a href="/seo-test/meta" class="list-group-item list-group-item-action">
+                        <strong>Meta标签测试</strong>
+                        <small class="d-block text-muted">测试页面meta标签和结构化数据</small>
+                    </a>
+                    <a href="/sitemap.xml" class="list-group-item list-group-item-action" target="_blank">
+                        <strong>查看主Sitemap</strong>
+                        <small class="d-block text-muted">在新窗口中查看生成的sitemap.xml</small>
+                    </a>
+                    <a href="/sitemap-images.xml" class="list-group-item list-group-item-action" target="_blank">
+                        <strong>查看图片Sitemap</strong>
+                        <small class="d-block text-muted">在新窗口中查看生成的图片sitemap</small>
+                    </a>
+                    <a href="/robots.txt" class="list-group-item list-group-item-action" target="_blank">
+                        <strong>查看Robots.txt</strong>
+                        <small class="d-block text-muted">在新窗口中查看robots.txt文件</small>
+                    </a>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <h5>SEO检查清单</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>技术SEO</h6>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">✅ XML Sitemap</li>
+                            <li class="list-group-item">✅ 图片Sitemap</li>
+                            <li class="list-group-item">✅ Robots.txt</li>
+                            <li class="list-group-item">✅ 响应式设计</li>
+                            <li class="list-group-item">✅ 页面压缩</li>
+                            <li class="list-group-item">✅ 缓存策略</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>内容SEO</h6>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">✅ 页面标题优化</li>
+                            <li class="list-group-item">✅ Meta描述</li>
+                            <li class="list-group-item">✅ 结构化数据</li>
+                            <li class="list-group-item">✅ Open Graph标签</li>
+                            <li class="list-group-item">✅ Twitter Card</li>
+                            <li class="list-group-item">✅ 图片Alt属性</li>
+                            <li class="list-group-item">✅ 内链建设</li>
+                            <li class="list-group-item">✅ 面包屑导航</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

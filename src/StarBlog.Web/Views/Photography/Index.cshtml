@@ -1,0 +1,61 @@
+﻿@using StarBlog.Web.Utils
+@using X.PagedList.Mvc.Core
+@model PhotographyViewModel
+@{
+    ViewBag.Title = "摄影";
+}
+
+<div class="container px-4 py-3">
+    <h2 class="d-flex w-100 justify-content-between pb-2 mb-3 border-bottom">
+        <div>Photography</div>
+        <div>@Model.Photos.TotalItemCount.ToString() Photos</div>
+    </h2>
+
+    @if (Model.Photos.Any()) {
+        <div id="photo-grid" class="row">
+            @foreach (var photo in Model.Photos) {
+                <div class="col-sm-6 col-md-4 col-lg-3 mb-4 grid-item">
+                    <partial name="Widgets/PhotoCard" model="photo"/>
+                </div>
+            }
+        </div>
+
+        <nav aria-label="Page navigation example" class="mt-3">
+            @Html.PagedListPager(Model.Photos, page => Url.Action(
+                RazorHelper.GetCurrentActionName(ViewContext), new {page}),
+                new PagedListRenderOptions {
+                    LiElementClasses = new[] {"page-item"},
+                    PageClasses = new[] {"page-link"},
+                    UlElementClasses = new[] {"pagination justify-content-center"}
+                })
+        </nav>
+    }
+    else {
+        <div class="d-flex justify-content-center">
+            <div class="card" style="width: 18rem;">
+                <img src="~/images/codelab.jpg" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h5 class="card-title">当前没有图片数据</h5>
+                    <p class="card-text">No photos.</p>
+                    <a class="btn btn-primary" asp-controller="Home" asp-action="Index">返回主页</a>
+                </div>
+            </div>
+        </div>
+    }
+
+
+</div>
+
+@section bottom {
+    <environment include="Development">
+        <script src="~/lib/jquery/dist/jquery.js"></script>
+        <script src="~/lib/masonry-layout/dist/masonry.pkgd.js"></script>
+        <script src="~/lib/imagesloaded/imagesloaded.pkgd.js"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="~/lib/jquery/dist/jquery.min.js"></script>
+        <script src="~/lib/masonry-layout/dist/masonry.pkgd.min.js"></script>
+        <script src="~/lib/imagesloaded/imagesloaded.pkgd.min.js"></script>
+    </environment>
+    <script src="~/js/photo.js"></script>
+}

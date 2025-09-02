@@ -1,0 +1,527 @@
+﻿@model StarBlog.Web.ViewModels.Search.SearchResultViewModel
+
+@{
+    ViewData["Title"] = $"{Model.Keyword} - 搜索结果";
+}
+
+<style>
+    .search-page {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 0;
+    }
+    
+    .search-hero {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 2rem 0;
+        margin-bottom: 1.5rem;
+    }
+    
+    .search-hero h1 {
+        color: white;
+        font-weight: 700;
+        font-size: 2.2rem;
+        margin-bottom: 0.8rem;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    .search-keyword {
+        color: #ffd700;
+        background: rgba(255, 215, 0, 0.2);
+        padding: 0.2rem 0.8rem;
+        border-radius: 20px;
+        font-weight: 600;
+    }
+    
+    .search-meta {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 1rem;
+        margin-bottom: 0;
+    }
+    
+    .search-stats {
+        background: rgba(255, 255, 255, 0.15);
+        padding: 0.8rem 1.2rem;
+        border-radius: 15px;
+        color: white;
+        font-size: 1rem;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .results-container {
+        background: #f8f9fa;
+        min-height: calc(100vh - 180px);
+        padding: 1.5rem 0;
+    }
+    
+    .layout-controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding: 1rem 1.5rem;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 12px;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    .results-info {
+        color: #6c757d;
+        font-size: 0.95rem;
+    }
+
+    .layout-toggle {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .layout-btn {
+        padding: 0.5rem 1rem;
+        border: 2px solid #e9ecef;
+        background: white;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+        color: #6c757d;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .layout-btn:hover {
+        border-color: #007bff;
+        color: #007bff;
+        transform: translateY(-2px);
+    }
+
+    .layout-btn.active {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-color: transparent;
+        color: white;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+    
+    /* List Layout Styles */
+    .result-card {
+        background: rgba(255, 255, 255, 0.95);
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+        backdrop-filter: blur(10px);
+        margin-bottom: 1.5rem;
+        height: 100%;
+        position: relative;
+    }
+    
+    .result-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+    
+    .result-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+    }
+    
+    .card-header-custom {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-bottom: 1px solid #dee2e6;
+        padding: 1rem 1.2rem;
+    }
+    
+    .category-tag {
+        background: linear-gradient(135deg, #28a745, #20c997);
+        color: white;
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        box-shadow: 0 2px 6px rgba(40, 167, 69, 0.25);
+    }
+    
+    .relevance-score {
+        background: linear-gradient(135deg, #fd7e14, #e83e8c);
+        color: white;
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        box-shadow: 0 2px 6px rgba(253, 126, 20, 0.25);
+    }
+    
+    .result-title {
+        color: #2c3e50;
+        font-weight: 700;
+        font-size: 1.2rem;
+        line-height: 1.4;
+        margin: 1rem 0 0.8rem 0;
+    }
+    
+    .result-title:hover {
+        color: #667eea;
+    }
+    
+    .result-excerpt {
+        color: #6c757d;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    .result-footer {
+        background: #f8f9fa;
+        padding: 1rem 1.2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .read-more-link {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 0.6rem 1.5rem;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        transition: all 0.3s ease;
+        box-shadow: 0 3px 12px rgba(102, 126, 234, 0.3);
+        font-size: 0.9rem;
+    }
+    
+    .read-more-link:hover {
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+    
+    .post-date {
+        color: #6c757d;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        background: white;
+        padding: 0.4rem 0.8rem;
+        border-radius: 15px;
+        border: 1px solid #e9ecef;
+    }
+    
+    /* Grid Layout Styles */
+    .grid-layout .result-item {
+        margin-bottom: 1.5rem;
+    }
+
+    .grid-layout .result-card {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .grid-layout .card-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .grid-layout .result-title {
+        font-size: 1.1rem;
+        line-height: 1.4;
+        margin: 0.8rem 0 0.75rem 0;
+        -webkit-line-clamp: 2;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    .grid-layout .result-excerpt {
+        flex: 1;
+        font-size: 0.9rem;
+        line-height: 1.5;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    .grid-layout .card-header-custom {
+        padding: 0.8rem 1rem;
+    }
+    
+    .grid-layout .result-footer {
+        padding: 0.8rem 1rem;
+        margin-top: auto;
+    }
+    
+    .grid-layout .read-more-link {
+        padding: 0.5rem 1.2rem;
+        font-size: 0.85rem;
+    }
+    
+    .grid-layout .post-date {
+        font-size: 0.8rem;
+        padding: 0.3rem 0.6rem;
+    }
+
+    /* List Layout Styles */
+    .list-layout .result-item {
+        width: 100% !important;
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+
+    .list-layout .result-card {
+        margin-bottom: 1rem;
+    }
+
+    .list-layout .card-body {
+        padding: 1.5rem !important;
+    }
+
+    .list-layout .result-title {
+        font-size: 1.3rem;
+        margin-bottom: 1rem;
+    }
+
+    .list-layout .result-excerpt {
+        font-size: 1rem;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+    
+    .no-results-section {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+        margin: 2rem auto;
+        max-width: 600px;
+    }
+    
+    .no-results-icon {
+        font-size: 4rem;
+        color: #6c757d;
+        margin-bottom: 2rem;
+    }
+    
+    .no-results-title {
+        color: #2c3e50;
+        font-weight: 700;
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+    
+    .no-results-text {
+        color: #6c757d;
+        font-size: 1.1rem;
+        line-height: 1.6;
+        margin-bottom: 2rem;
+    }
+    
+    .home-button {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 1rem 2.5rem;
+        border-radius: 30px;
+        text-decoration: none;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+    
+    .home-button:hover {
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+    }
+    
+    @@media (max-width: 768px) {
+        .search-hero h1 {
+            font-size: 2rem;
+        }
+        
+        .search-stats {
+            margin-top: 1rem;
+            text-align: center;
+        }
+        
+        .result-footer {
+            flex-direction: column;
+            gap: 1rem;
+        }
+    }
+</style>
+
+<div class="search-page">
+    <!-- 搜索英雄区域 -->
+    <div class="search-hero">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <h1>
+                        <i class="fas fa-search me-3"></i>
+                        搜索结果：<span class="search-keyword">@Model.Keyword</span>
+                    </h1>
+                    <p class="search-meta">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        为您精心筛选出最相关的优质内容
+                    </p>
+                </div>
+                <div class="col-lg-4">
+                    <div class="search-stats text-center">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        找到 <strong>@Model.SearchPosts.Count</strong> 篇相关文章
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 搜索结果容器 -->
+    <div class="results-container">
+        <div class="container">
+            @if (Model.SearchPosts.Count == 0) {
+                <div class="no-results-section">
+                    <div class="no-results-icon">
+                        <i class="fas fa-search-minus"></i>
+                    </div>
+                    <h2 class="no-results-title">暂无搜索结果</h2>
+                    <p class="no-results-text">
+                        很抱歉，没有找到与 "<strong>@Model.Keyword</strong>" 相关的文章内容。<br>
+                        建议您尝试使用其他关键词，或者浏览我们的热门文章。
+                    </p>
+                    <a class="home-button" asp-controller="Home" asp-action="Index">
+                        <i class="fas fa-home me-2"></i>返回首页探索
+                    </a>
+                </div>
+            }
+            else {
+                <!-- 布局控制器 -->
+                <div class="layout-controls">
+                    <div class="results-info">
+                        <i class="fas fa-search me-1"></i>
+                        显示 <strong>@Model.SearchPosts.Count</strong> 个搜索结果
+                    </div>
+                    <div class="layout-toggle">
+                        <button class="layout-btn" id="gridBtn" onclick="switchLayout('grid')">
+                            <i class="fas fa-th"></i>
+                            网格视图
+                        </button>
+                        <button class="layout-btn" id="listBtn" onclick="switchLayout('list')">
+                            <i class="fas fa-list"></i>
+                            列表视图
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 搜索结果 -->
+                <div class="row grid-layout" id="resultsContainer">
+                    @foreach (var item in Model.SearchPosts) {
+                        <div class="col-lg-4 col-md-6 col-12 result-item">
+                            <article class="card result-card">
+                                <div class="card-header-custom">
+                                    <div class="d-flex justify-content-between align-items-center flex-wrap">
+                                        <span class="category-tag">
+                                            <i class="fas fa-tag me-1"></i>
+                                            @item.Post.Category.Name
+                                        </span>
+                                        <span class="relevance-score">
+                                            <i class="fas fa-star me-1"></i>
+                                            @item.Score%
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                <div class="card-body p-3">
+                                    <h3 class="result-title">
+                                        @Html.Raw(item.HighlightedTitle)
+                                    </h3>
+                                    
+                                    <div class="result-excerpt">
+                                        @Html.Raw(item.HighlightedSnippet)
+                                    </div>
+                                </div>
+                                
+                                <div class="result-footer">
+                                    <div>
+                                        @if (!string.IsNullOrWhiteSpace(item.Post.Slug)) {
+                                            <a class="read-more-link" href="/p/@item.Post.Slug">
+                                                <i class="fas fa-book-open me-1"></i>
+                                                深入阅读
+                                            </a>
+                                        }
+                                        else {
+                                            <a class="read-more-link" asp-controller="Blog" asp-action="Post" asp-route-id="@item.Post.Id">
+                                                <i class="fas fa-book-open me-1"></i>
+                                                深入阅读
+                                            </a>
+                                        }
+                                    </div>
+                                    
+                                    <div class="post-date">
+                                        <i class="fas fa-calendar-alt me-1"></i>
+                                        @item.Post.CreationTime.ToString("yyyy年MM月dd日")
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<script>
+    // 布局切换功能
+    function switchLayout(layout) {
+        const container = document.getElementById('resultsContainer');
+        const gridBtn = document.getElementById('gridBtn');
+        const listBtn = document.getElementById('listBtn');
+        
+        // 移除所有布局类
+        container.classList.remove('grid-layout', 'list-layout');
+        gridBtn.classList.remove('active');
+        listBtn.classList.remove('active');
+        
+        // 添加新的布局类
+        container.classList.add(layout + '-layout');
+        
+        if (layout === 'grid') {
+            gridBtn.classList.add('active');
+        } else {
+            listBtn.classList.add('active');
+        }
+        
+        // 保存用户偏好
+        localStorage.setItem('searchLayout', layout);
+    }
+    
+    // 页面加载时恢复用户偏好的布局
+    document.addEventListener('DOMContentLoaded', function() {
+        const savedLayout = localStorage.getItem('searchLayout') || 'grid';
+        switchLayout(savedLayout);
+    });
+</script>

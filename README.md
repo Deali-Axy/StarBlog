@@ -137,6 +137,7 @@ npm i -g bower
 npm install  # 或 yarn
 npm install --global gulp-cli
 gulp move
+gulp min
 ```
 
 **注意**：本项目依赖 [bootstrap5-treeview](https://www.npmjs.com/package/bootstrap5-treeview) 组件。而这个组件又使用 bower 进行构建，请先安装 [bower](https://bower.io/)：`npm i -g bower`，不然在执行 `npm install` 过程中会出错。

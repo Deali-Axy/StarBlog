@@ -1,0 +1,46 @@
+﻿@using StarBlog.Share.Extensions
+@model Photo
+@{
+    // 构建图片URL，确保路径正确性和安全性
+    var imageSrc = !string.IsNullOrEmpty(Model?.FilePath) 
+        ? $"media/photography/{Model.FilePath.Replace("\\", "/")}?width=300"
+        : "images/placeholder.jpg"; // 提供默认占位图
+    
+    // 生成安全的alt文本
+    var altText = !string.IsNullOrEmpty(Model?.Title) ? Model.Title : "照片";
+}
+
+<div class="card-cover overflow-hidden shadow-lg rounded-4 position-relative"
+     style="background-image: url('@imageSrc'); 
+            height: 20em; 
+            background-size: cover; 
+            background-position: center; 
+            background-repeat: no-repeat;
+            border: none; 
+            padding: 0; 
+            margin: 0;
+            box-sizing: border-box;
+            display: block;
+            width: 100%;">
+    
+    @* 添加渐变遮罩以提高可读性 *@
+    <div class="position-absolute top-0 start-0 w-100 h-100" 
+         style="background: linear-gradient(45deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.2) 100%);"></div>
+    
+    @* 可选：添加标题显示 *@
+    @if (!string.IsNullOrEmpty(Model?.Title))
+    {
+        <div class="position-absolute bottom-0 start-0 w-100 p-3 text-white">
+            <h6 class="mb-0 fw-bold text-shadow-1">@Model.Title.Limit(15)</h6>
+            @if (!string.IsNullOrEmpty(Model.Location))
+            {
+                <small class="text-white-50">
+                    <i class="fa-solid fa-location-pin me-1"></i>@Model.Location.Limit(10)
+                </small>
+            }
+        </div>
+    }
+    
+    @* 添加可访问性支持 *@
+    <span class="visually-hidden">@altText</span>
+</div>

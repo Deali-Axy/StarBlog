@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>default</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="EFCore.NamingConventions" Version="9.0.0" />
+        <PackageReference Include="FreeSql" Version="3.5.212" />
+        <PackageReference Include="FreeSql.Provider.MySql" Version="3.5.212" />
+        <PackageReference Include="FreeSql.Provider.PostgreSQL" Version="3.5.212" />
+        <PackageReference Include="FreeSql.Provider.Sqlite" Version="3.5.212" />
+        <PackageReference Include="FreeSql.Repository" Version="3.5.212" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.8" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.8" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.8">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.8" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    </ItemGroup>
+
+
+</Project>

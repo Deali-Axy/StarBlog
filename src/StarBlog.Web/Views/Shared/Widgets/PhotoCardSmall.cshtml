@@ -1,0 +1,29 @@
+﻿@using StarBlog.Share.Extensions
+@model Photo
+
+<div class="h-100 overflow-hidden text-white bg-dark rounded-5 shadow-lg"
+     style="background-image: url('media/photography/@Model.FilePath.Replace("\\", "/")?width=300');">
+    <div class="d-flex flex-column h-100 p-5 pb-3 text-white text-shadow-1">
+        <h2 class="pt-5 mt-5 mb-5 display-6 lh-1 fw-bold">
+            @Model.Title.Limit(8)
+            <p></p>
+        </h2>
+        <ul class="d-flex list-unstyled mt-auto">
+            <li class="me-auto">
+                <img src="~/images/star.jpg" alt="Bootstrap" width="32" height="32" class="rounded-circle border border-white">
+            </li>
+            <li class="d-flex align-items-center me-3">
+                <span class="bi me-2">
+                    <i class="fa-solid fa-location-pin"></i>
+                </span>
+                <small>@Model.Location.Limit(8)</small>
+            </li>
+            <li class="d-flex align-items-center">
+                <span class="bi me-2">
+                    <i class="fa-solid fa-calendar-days"></i>
+                </span>
+                <small>@Model.CreateTime.ToShortDateString()</small>
+            </li>
+        </ul>
+    </div>
+</div>

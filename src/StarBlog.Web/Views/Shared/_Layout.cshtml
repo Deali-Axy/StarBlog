@@ -1,0 +1,154 @@
+﻿@using StarBlog.Web.Utils
+@inject StarBlog.Web.Contrib.SiteMessage.MessageService Messages
+@inject StarBlog.Web.Services.MonitoringService MonitoringService
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+
+    @* SEO Meta标签 *@
+    @if (ViewData["SeoMetadata"] != null) {
+        <partial name="Widgets/SeoMeta" model='ViewData["SeoMetadata"]'/>
+    }
+    else {
+        <title>StarBlog · 画星星高手</title>
+        <meta name="description" content="画星星高手博客；程序设计实验室博客；">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="author" content="DealiAxy">
+        <meta name="generator" content="StarBlog">
+    }
+
+    @* 预加载关键资源 *@
+    <link rel="preload" href="~/lib/bootstrap/dist/css/bootstrap.css" as="style">
+    <link rel="preload" href="~/lib/font-awesome/css/all.css" as="style">
+    <link rel="preload" href="~/js/site.preload.js" as="script">
+
+    @* CSS资源 *@
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css">
+    <link rel="stylesheet" href="~/lib/font-awesome/css/all.css">
+    <link rel="stylesheet" href="~/css/features.css">
+    <link rel="stylesheet" href="~/css/metro.css">
+    <link rel="stylesheet" href="~/css/footer.css">
+
+    @* 预加载脚本 *@
+    <script src="~/js/site.preload.js"></script>
+    <environment exclude="Development">
+        @if (MonitoringService.IsUmamiEnabled) {
+            <script defer src="@MonitoringService.UmamiConfig.ScriptUrl"
+                    data-website-id="@MonitoringService.UmamiConfig.WebsiteId"></script>
+        }
+        @if (MonitoringService.IsClarityEnabled) {
+            <script type="text/javascript">
+                (function (c, l, a, r, i, t, y) {
+                    c[a] = c[a] || function () {
+                        (c[a].q = c[a].q || []).push(arguments)
+                    };
+                    t = l.createElement(r);
+                    t.async = 1;
+                    t.src = "https://www.clarity.ms/tag/" + i;
+                    y = l.getElementsByTagName(r)[0];
+                    y.parentNode.insertBefore(t, y);
+                })(window, document, "clarity", "script", "@MonitoringService.ClarityConfig.ProjectId");
+            </script>
+        }
+    </environment>
+
+    @await RenderSectionAsync("head", false)
+
+    @* 结构化数据 *@
+    @if (ViewData["StructuredData"] != null) {
+        <partial name="Widgets/StructuredData" model='ViewData["StructuredData"]'/>
+    }
+</head>
+<body>
+
+<partial name="Widgets/Header2"/>
+
+<main id="vue-app">
+    @if (!Messages.IsEmpty) {
+        <div class="container py-3">
+            @while (!Messages.IsEmpty) {
+                var message = Messages.Dequeue();
+                <partial name="Widgets/Alert" model="message"/>
+            }
+        </div>
+    }
+    @RenderBody()
+</main>
+
+<footer class="bg-dark">
+    <div id="footer">
+        <div class="container">
+            <div class="row">
+                <div id="footer-content" class="col-md-10 col-md-offset-3 footer-list text-center">
+                    <p class="social-icons">
+                        <a target="_blank" rel="nofollow" href="https://www.cnblogs.com/deali/">
+                            <i class="fa-solid fa-blog"></i>
+                        </a>
+                        <a asp-controller="About" asp-action="Index">
+                            <i class="fab fa-weixin"></i>
+                        </a>
+                        <a target="_blank" rel="nofollow" href="https://live.bilibili.com/11883038">
+                            <i class="fa-brands fa-bilibili"></i>
+                        </a>
+                        <a target="_blank" rel="nofollow" href="http://github.com/Deali-Axy">
+                            <i class="fab fa-github"></i>
+                        </a>
+                        <a target="_blank" rel="nofollow" href="https://www.zhihu.com/people/dealiaxy">
+                            <i class="fab fa-zhihu"></i>
+                        </a>
+                    </p>
+
+                    <p>
+                        Copyright © @DateTime.Now.Year.ToString()
+                        <a href="https://github.com/Deali-Axy">DealiAxy</a>. All Rights Reserved.
+                    </p>
+                    <p>
+                        All content is released under
+                        <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/deed.en" rel="external nofollow"
+                           target="_blank">
+                            Creative Commons
+                            BY-NC-SA 3.0
+                        </a>.
+                        <br>
+                        If articles including programming codes (e.g. Java, Python, C#, Go) are exceptions, which are
+                        released under
+                        <a href="http://www.gnu.org/licenses/gpl.html"
+                           rel="external nofollow" target="_blank">
+                            GPL
+                            v3
+                        </a>.
+                    </p>
+                    <p>
+                        所有內容皆以<a href="http://creativecommons.org/licenses/by-nc-sa/3.0/deed.en"
+                                       rel="external nofollow" target="_blank"> 知识共享署名-相同方式共享 4.0
+                            国际许可协议 </a>进行发布。<br>
+                        含有程序代码內容的文章 (如 Java, Python, C#, Go) 除外，包含的程序代码皆以 <a
+                            href="http://www.gnu.org/licenses/gpl.html" rel="external nofollow" target="_blank">GPL
+                            v3</a> 发布。
+                    </p>
+                    <p>
+                        本站使用 <a href="https://github.com/Deali-Axy/StarBlog">StarBlog</a> 开源博客系统，
+                        基于 <a href="https://dotnet.microsoft.com/zh-cn/">.NetCore</a> 技术构建
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/lib/vue/dist/vue.min.js"></script>
+
+<environment include="Development">
+    <script src="~/js/site.js"></script>
+</environment>
+<environment exclude="Development">
+    <script src="~/js/site.min.js"></script>
+</environment>
+
+@await RenderSectionAsync("bottom", false)
+</body>
+</html>

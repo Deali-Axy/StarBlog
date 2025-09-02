@@ -1,0 +1,18 @@
+﻿@model Post
+
+<div class="p-4 p-md-5 mb-4 text-white rounded bg-dark">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <div class="display-6 fst-italic">@Model.Title</div>
+            <p class="lead my-3">@Model.Summary</p>
+            <p class="lead mb-0">
+                <a class="text-white fw-bold" asp-controller="Blog" asp-action="Post" asp-route-id="@Model.Id">
+                    阅读全文
+                </a>
+            </p>
+        </div>
+        <div class="col-md-4 text-end px-0 d-flex justify-content-end">
+            <partial name="Widgets/Image" model="new ImageViewModel{Alt=Model.Title, Width=300, Height=350}"/>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,42 @@
+@using StarBlog.Share.Extensions
+@model Post
+
+@{
+    var postHref = Url.Action("Post", "Blog", new { id = Model.Id });
+    if (!string.IsNullOrWhiteSpace(Model.Slug)) {
+        postHref = $"/p/{Model.Slug}";
+    }
+}
+
+<div class="mb-3">
+    <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+        <div class="col-auto d-none d-lg-block text-center p-3" style="min-width: 250px;">
+            <div class="image-container" style="width: 250px; height: 160px; background-color: #f8f9fa; border-radius: 0.375rem; display: flex; align-items: center; justify-content: center;">
+                <partial name="Widgets/Image" model="new ImageViewModel{Alt=Model.Title, Width=250, Height=160}"/>
+            </div>
+        </div>
+        <div class="col p-4 d-flex flex-column position-static">
+            <a href="@postHref" class="mb-1 text-info">
+                <h5 class="card-title">@Model.Title</h5>
+            </a>
+            <small class="card-text text-muted mb-auto">@Model.Summary?.LimitWithEllipsis(120)</small>
+            <div class="d-flex justify-content-between mt-3">
+                <div>
+                    <span class="text-muted me-3">
+                        <i class="fa-regular fa-clock"></i>
+                        @Model.CreationTime.ToString("yyyy-MM-dd")
+                    </span>
+                    <span class="text-muted">
+                        <i class="fa-solid fa-fire-flame-curved"></i> @Random.Shared.Next(500, 2000).ToString()
+                    </span>
+                </div>
+                @if (Model.Category != null) {
+                    <a asp-controller="Blog" asp-action="List" asp-route-categoryId="@Model.Category.Id"
+                       class="text-primary">
+                        <strong>@Model.Category.Name</strong>
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+</div>
