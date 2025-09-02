@@ -7,13 +7,11 @@
         <div class="d-flex justify-content-between">
             <div>
                 发布：
-                <span>@Model.CreationTime.ToShortDateString()</span>
-                <span>@Model.CreationTime.ToString("hh:mm")</span>
+                <span>@Model.CreationTime.ToString("yyyy-MM-dd hh:mm")</span>
             </div>
             <div>
                 更新：
-                @Model.LastUpdateTime.ToShortDateString()
-                @Model.LastUpdateTime.ToString("hh:mm")
+                @Model.LastUpdateTime.ToString("yyyy-MM-dd hh:mm")
             </div>
         </div>
 
