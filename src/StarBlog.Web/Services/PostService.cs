@@ -159,11 +159,11 @@ public class PostService {
         // 筛选发布状态
         // 仅管理员能筛选发布状态
         if (param.IsPublish != null && adminMode) {
-            querySet = _postRepo.Select.Where(a => a.IsPublish == param.IsPublish);
+            querySet = querySet.Where(a => a.IsPublish == param.IsPublish);
         }
 
         if (!adminMode) {
-            querySet = _postRepo.Select.Where(a => a.IsPublish);
+            querySet = querySet.Where(a => a.IsPublish);
         }
 
         // 状态过滤
@@ -172,12 +172,14 @@ public class PostService {
         }
 
         // 分类过滤
-        // 支持包含子分类过滤
+        // 支持包含子分类递归过滤
         if (param.CategoryId != 0) {
             if (param.IncludeSubCategory) {
-                var subCategories = await _categoryRepo.Select.Where(e => e.ParentId == param.CategoryId).ToListAsync();
-                var targetCategoryIds = subCategories.Select(a => a.Id).ToList();
-                targetCategoryIds.Insert(0, param.CategoryId);
+                // 使用 FreeSql 的 AsTreeCte 递归获取所有子分类 ID（包括当前分类）
+                var targetCategoryIds = await _categoryRepo.Select
+                    .Where(a => a.Id == param.CategoryId)
+                    .AsTreeCte()
+                    .ToListAsync(a => a.Id);
                 querySet = querySet.Where(e => targetCategoryIds.Contains(e.CategoryId));
             }
             else {

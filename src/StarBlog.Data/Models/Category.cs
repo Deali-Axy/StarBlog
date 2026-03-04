@@ -9,7 +9,10 @@ public class Category {
     public string Name { get; set; }
 
     public int ParentId { get; set; }
+    [Navigate(nameof(ParentId))]
     public Category? Parent { get; set; }
+    [Navigate(nameof(ParentId))]
+    public List<Category> Children { get; set; }
 
     /// <summary>
     /// 分类是否可见
