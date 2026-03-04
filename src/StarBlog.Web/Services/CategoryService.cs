@@ -45,17 +45,26 @@ public class CategoryService {
             throw new Exception($"无法从 IHttpContextAccessor 里获取到 HttpContext!");
         }
 
-        return categories.Select(category => new CategoryNode {
-            Id = category.Id,
-            text = category.Name,
-            href = _generator.GetPathByAction(
-                nameof(BlogController.List),
-                "Blog",
-                new { categoryId = category.Id }
-            ),
-            tags = new List<string> { category.Posts.Count.ToString() },
-            nodes = GetNodes(categoryList, category.Id)
-        }).ToList();
+        var nodes = new List<CategoryNode>();
+        foreach (var category in categories) {
+            var childNodes = GetNodes(categoryList, category.Id);
+            // 计算当前分类及其所有子分类的文章总数
+            var totalPostsCount = category.Posts.Count + (childNodes?.Sum(n => int.Parse(n.tags[0])) ?? 0);
+
+            nodes.Add(new CategoryNode {
+                Id = category.Id,
+                text = category.Name,
+                href = _generator.GetPathByAction(
+                    nameof(BlogController.List),
+                    "Blog",
+                    new { categoryId = category.Id }
+                ),
+                tags = new List<string> { totalPostsCount.ToString() },
+                nodes = childNodes
+            });
+        }
+
+        return nodes;
     }
 
     public async Task<List<Category>> GetAll() {
@@ -88,13 +97,31 @@ public class CategoryService {
     /// </summary>
     /// <returns></returns>
     public async Task<List<object>> GetWordCloud() {
-        var list = await _cRepo.Select
-            .Where(a => a.Visible && a.ParentId == 0)
-            .IncludeMany(a => a.Posts).ToListAsync();
+        var allCategories = await _cRepo.Select
+            .IncludeMany(a => a.Posts.Select(p => new Post { Id = p.Id }))
+            .ToListAsync();
 
-        var data = list.Select(item => new { name = item.Name, value = item.Posts.Count }).ToList<object>();
+        var topLevelCategories = allCategories.Where(a => a.Visible && a.ParentId == 0).ToList();
+
+        var data = topLevelCategories.Select(item => new {
+            name = item.Name,
+            value = GetTotalPostCount(allCategories, item)
+        }).ToList<object>();
 
         return data;
+    }
+
+    /// <summary>
+    /// 递归计算分类及其所有子分类的文章总数
+    /// </summary>
+    private int GetTotalPostCount(List<Category> allCategories, Category currentCategory) {
+        var count = currentCategory.Posts.Count;
+        var children = allCategories.Where(a => a.ParentId == currentCategory.Id).ToList();
+        foreach (var child in children) {
+            count += GetTotalPostCount(allCategories, child);
+        }
+
+        return count;
     }
 
     public async Task<List<FeaturedCategory>> GetFeaturedCategories() {
