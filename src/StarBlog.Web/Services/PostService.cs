@@ -29,7 +29,8 @@ public class PostService {
 
     private string Host => _conf["host"];
 
-    public PostService(IBaseRepository<Post> postRepo,
+    public PostService(
+        IBaseRepository<Post> postRepo,
         IBaseRepository<Category> categoryRepo,
         IWebHostEnvironment environment,
         IHttpContextAccessor accessor,
@@ -129,7 +130,7 @@ public class PostService {
 
         // 直接生成唯一文件名，不保留原始文件名了。——2023-6-5 21:21:46
         var filename = GuidUtils.GuidTo16String() + Path.GetExtension(file.FileName);
-        var fileRelativePath = Path.Combine("media", "blog", post.Id, filename);
+        var fileRelativePath = Path.Combine("media",          "blog", post.Id, filename);
         var savePath = Path.Combine(_environment.WebRootPath, fileRelativePath);
 
         await using (var fs = new FileStream(savePath, FileMode.Create)) {
@@ -171,8 +172,17 @@ public class PostService {
         }
 
         // 分类过滤
+        // 支持包含子分类过滤
         if (param.CategoryId != 0) {
-            querySet = querySet.Where(a => a.CategoryId == param.CategoryId);
+            if (param.IncludeSubCategory) {
+                var subCategories = await _categoryRepo.Select.Where(e => e.ParentId == param.CategoryId).ToListAsync();
+                var targetCategoryIds = subCategories.Select(a => a.Id).ToList();
+                targetCategoryIds.Insert(0, param.CategoryId);
+                querySet = querySet.Where(e => targetCategoryIds.Contains(e.CategoryId));
+            }
+            else {
+                querySet = querySet.Where(a => a.CategoryId == param.CategoryId);
+            }
         }
 
         // 关键词过滤
@@ -248,9 +258,9 @@ public class PostService {
         // - 关于前端渲染 MarkDown 样式：https://blog.csdn.net/sprintline/article/details/122849907
         // - https://github.com/showdownjs/showdown
         var pipeline = new MarkdownPipelineBuilder()
-            .UseAdvancedExtensions()
-            .UseBootstrap5()
-            .Build();
+                       .UseAdvancedExtensions()
+                       .UseBootstrap5()
+                       .Build();
         return Markdown.ToHtml(post.Content ?? "", pipeline);
     }
 
@@ -280,7 +290,7 @@ public class PostService {
         var document = Markdown.Parse(post.Content);
 
         foreach (var node in document.AsEnumerable()) {
-            if (node is not ParagraphBlock { Inline: { } } paragraphBlock) continue;
+            if (node is not ParagraphBlock { Inline: {} } paragraphBlock) continue;
             foreach (var inline in paragraphBlock.Inline) {
                 if (inline is not LinkInline { IsImage: true } linkInline) continue;
 
@@ -315,7 +325,7 @@ public class PostService {
 
         var document = Markdown.Parse(post.Content);
         foreach (var node in document.AsEnumerable()) {
-            if (node is not ParagraphBlock { Inline: { } } paragraphBlock) continue;
+            if (node is not ParagraphBlock { Inline: {} } paragraphBlock) continue;
             foreach (var inline in paragraphBlock.Inline) {
                 if (inline is not LinkInline { IsImage: true } linkInline) continue;
 
@@ -346,7 +356,7 @@ public class PostService {
 
         var document = Markdown.Parse(post.Content);
         foreach (var node in document.AsEnumerable()) {
-            if (node is not ParagraphBlock { Inline: { } } paragraphBlock) continue;
+            if (node is not ParagraphBlock { Inline: {} } paragraphBlock) continue;
             foreach (var inline in paragraphBlock.Inline) {
                 if (inline is not LinkInline { IsImage: true } linkInline) continue;
 
@@ -383,14 +393,14 @@ public class PostService {
         // 1. 优先推荐同分类的文章（随机顺序）
         if (currentPost.CategoryId > 0) {
             var sameCategoryPosts = await _postRepo
-                .Where(p => p.IsPublish && p.Id != currentPost.Id && p.CategoryId == currentPost.CategoryId)
-                .ToListAsync();
+                                          .Where(p => p.IsPublish && p.Id != currentPost.Id && p.CategoryId == currentPost.CategoryId)
+                                          .ToListAsync();
 
             // 随机打乱同分类文章
             var randomSameCategoryPosts = sameCategoryPosts
-                .OrderBy(x => Random.Shared.Next())
-                .Take(count)
-                .ToList();
+                                          .OrderBy(x => Random.Shared.Next())
+                                          .Take(count)
+                                          .ToList();
             relatedPosts.AddRange(randomSameCategoryPosts);
         }
 
@@ -401,14 +411,14 @@ public class PostService {
             excludeIds.Add(currentPost.Id); // 排除当前文章
 
             var otherPosts = await _postRepo
-                .Where(p => p.IsPublish && !excludeIds.Contains(p.Id))
-                .ToListAsync();
+                                   .Where(p => p.IsPublish && !excludeIds.Contains(p.Id))
+                                   .ToListAsync();
 
             // 随机打乱其他文章
             var randomOtherPosts = otherPosts
-                .OrderBy(x => Random.Shared.Next())
-                .Take(remainingCount)
-                .ToList();
+                                   .OrderBy(x => Random.Shared.Next())
+                                   .Take(remainingCount)
+                                   .ToList();
             relatedPosts.AddRange(randomOtherPosts);
         }
 
@@ -420,10 +430,10 @@ public class PostService {
     /// </summary>
     public async Task<List<Post>> GetPopularPosts(int count = 10) {
         return await _postRepo
-            .Where(p => p.IsPublish)
-            .OrderByDescending(p => p.LastUpdateTime)
-            .Take(count)
-            .ToListAsync();
+                     .Where(p => p.IsPublish)
+                     .OrderByDescending(p => p.LastUpdateTime)
+                     .Take(count)
+                     .ToListAsync();
     }
 
     /// <summary>
@@ -431,9 +441,9 @@ public class PostService {
     /// </summary>
     public async Task<List<Post>> GetLatestPosts(int count = 10) {
         return await _postRepo
-            .Where(p => p.IsPublish)
-            .OrderByDescending(p => p.CreationTime)
-            .Take(count)
-            .ToListAsync();
+                     .Where(p => p.IsPublish)
+                     .OrderByDescending(p => p.CreationTime)
+                     .Take(count)
+                     .ToListAsync();
     }
 }

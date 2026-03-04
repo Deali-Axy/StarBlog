@@ -20,6 +20,11 @@ public class PostQueryParameters : QueryParameters {
     public int CategoryId { get; set; } = 0;
 
     /// <summary>
+    /// 是否包含子分类
+    /// </summary>
+    public bool IncludeSubCategory { get; set; } = false;
+
+    /// <summary>
     /// 排序字段
     /// </summary>
     public new string? SortBy { get; set; } = "-LastUpdateTime";

@@ -56,6 +56,7 @@ public class BlogController : Controller {
 
         var posts = await _postService.GetPagedList(new PostQueryParameters {
             CategoryId = categoryId,
+            IncludeSubCategory = true,
             Page = page,
             PageSize = pageSize,
             SortBy = sortType == "desc" ? $"-{sortBy}" : sortBy
