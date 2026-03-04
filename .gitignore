@@ -1,3 +1,4 @@
+dist/
 src/StarBlog.Web/wwwroot/lib/
 src/StarBlog.Web/wwwroot/assets
 src/StarBlog.Web/wwwroot/media
