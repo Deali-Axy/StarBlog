@@ -50,7 +50,7 @@ public class DataInsightScript(
 
         var prompt = PromptBuilder.Create(PromptTemplates.PostsRetrospectiveArchitectUnboxingEdition)
             .AddParameter("time_range", "2023-2026年")
-            .AddParameter("posts",      Json.Dumps(metadatas))
+            .AddParameter("posts", Json.Dumps(metadatas))
             .Build();
 
         Console.WriteLine(prompt);
@@ -71,21 +71,14 @@ record PostMetadata(
 // dotnet10 新的扩展成员（Extension Members）语法
 public static class MyExtensions {
     extension(Post post) {
-        // 1. 扩展属性 (以前做不到)
         public string SimpleExtProp => "hello";
 
-        // 2. 扩展方法 (不再需要写 static 和 this)
         public string GetSection(string title) {
             return ExtractSectionRegex(post.Content, title);
         }
 
         public Dictionary<string, string> GetSections(params string[] titles) {
-            var dict = new Dictionary<string, string>();
-            foreach (var title in titles) {
-                dict.Add(title, post.GetSection(title));
-            }
-
-            return dict;
+            return titles.ToDictionary(title => title, post.GetSection);
         }
     }
 
