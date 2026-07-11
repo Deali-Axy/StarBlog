@@ -89,7 +89,7 @@ public class CommentService {
 
         var data = await querySet.Page(param.Page, param.PageSize)
             .Include(a => a.AnonymousUser)
-            .Include(a => a.Parent.AnonymousUser)
+            .Include(a => a.Parent!.AnonymousUser)
             .ToListAsync();
 
         IPagedList<Comment> pagedList = new StaticPagedList<Comment>(data, param.Page, param.PageSize, Convert.ToInt32(await querySet.CountAsync()));
@@ -171,6 +171,8 @@ public class CommentService {
     /// <summary>
     /// 验证一次性密码
     /// </summary>
+    /// <param name="email">邮箱地址</param>
+    /// <param name="otp">一次性验证码</param>
     /// <param name="clear">验证通过后是否清除</param>
     public bool VerifyOtp(string email, string otp, bool clear = true) {
         var cacheKey = $"comment-otp-{email}";

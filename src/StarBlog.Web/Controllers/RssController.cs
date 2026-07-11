@@ -44,9 +44,10 @@ public class RssController : Controller {
         var items = new List<SyndicationItem>();
         foreach (var item in posts) {
             var postUrl = Url.Action("Post", "Blog", new {id = item.Id}, HttpContext.Request.Scheme);
+            var rssItemUrl = postUrl ?? _conf["host"];
             items.Add(new SyndicationItem(item.Title,
                 new TextSyndicationContent(PostService.GetContentHtml(item), TextSyndicationContentKind.Html),
-                new Uri(postUrl), item.Id, item.LastUpdateTime
+                new Uri(rssItemUrl), item.Id, item.LastUpdateTime
             ) {
                 Categories = {new SyndicationCategory(item.Category?.Name)},
                 Authors = {new SyndicationPerson("admin@deali.cn", "DealiAxy", "https://deali.cn")},

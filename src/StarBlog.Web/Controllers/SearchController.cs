@@ -1,4 +1,4 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 using FreeSql;
 using Microsoft.AspNetCore.Mvc;
 using StarBlog.Data.Models;
@@ -20,14 +20,14 @@ public class SearchController : Controller {
             .Where(a => a.IsPublish)
             .Where(a =>
                 a.Title!.Contains(keyword) ||
-                a.Content.Contains(keyword)
+                a.Content!.Contains(keyword)
             )
             .Include(a => a.Category)
             .ToList()
             .Select(p => new SearchPost {
                 Post = p,
-                TitleScore = p.Title.ToLower().Split(keyword).Length - 1,
-                ContentScore = p.Content?.ToLower().Split(keyword).Length - 1 ?? 0,
+                TitleScore = (p.Title ?? string.Empty).ToLower().Split(keyword).Length - 1,
+                ContentScore = (p.Content ?? string.Empty).ToLower().Split(keyword).Length - 1,
             })
             .OrderByDescending(x => x.Score)
             .ToList();
@@ -35,7 +35,7 @@ public class SearchController : Controller {
         // 实现搜索结果高亮
         var regex = new Regex(Regex.Escape(keyword), RegexOptions.IgnoreCase);
         foreach (var item in searchPosts) {
-            item.HighlightedTitle = regex.Replace(item.Post.Title, m => $"<mark>{m.Value}</mark>");
+            item.HighlightedTitle = regex.Replace(item.Post.Title ?? string.Empty, m => $"<mark>{m.Value}</mark>");
             item.HighlightedSnippet = GetHighlightedSnippet(item.Post.Content, keyword);
         }
 
@@ -45,7 +45,7 @@ public class SearchController : Controller {
         });
     }
 
-    public static string GetHighlightedSnippet(string content, string keyword, int snippetLength = 100) {
+    public static string GetHighlightedSnippet(string? content, string keyword, int snippetLength = 100) {
         if (string.IsNullOrEmpty(content) || string.IsNullOrEmpty(keyword))
             return string.Empty;
 

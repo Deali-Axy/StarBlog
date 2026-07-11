@@ -1,17 +1,17 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace StarBlog.Web.ViewModels;
 
 public class InitViewModel {
     [Display(Name = "用户名")]
-    public string Username { get; set; }
+    public string Username { get; set; } = string.Empty;
 
     [Display(Name = "密码")]
-    public string Password { get; set; }
+    public string Password { get; set; } = string.Empty;
 
     [Display(Name = "博客域名")]
-    public string Host { get; set; }
+    public string Host { get; set; } = string.Empty;
 
     [Display(Name = "文章默认渲染方式")]
-    public string DefaultRender { get; set; }
+    public string DefaultRender { get; set; } = string.Empty;
 }

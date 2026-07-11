@@ -28,7 +28,7 @@ public class ThemeService {
 }
 
 public class Theme {
-    public string Name { get; set; }
-    public string Path { get; set; }
-    public string CssUrl { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Path { get; set; } = string.Empty;
+    public string CssUrl { get; set; } = string.Empty;
 }

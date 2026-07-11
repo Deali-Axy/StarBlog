@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using StarBlog.Data.Models;
 using StarBlog.Api.Extensions;
 using StarBlog.Application.Services;
+using StarBlog.Application.ViewModels.Config;
 
 namespace StarBlog.Api.Apis.Admin;
 

@@ -1,4 +1,4 @@
-﻿namespace StarBlog.Web.ViewModels;
+namespace StarBlog.Web.ViewModels;
 
 public static class LinkTarget {
     public const string Blank = "_blank";
@@ -8,7 +8,7 @@ public static class LinkTarget {
 }
 
 public class ColorfulButtonViewModel {
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
     public string Url { get; set; } = "#";
     public string Target { get; set; } = LinkTarget.Blank;
     public string? Tooltips { get; set; }

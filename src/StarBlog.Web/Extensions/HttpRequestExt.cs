@@ -1,4 +1,4 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 
 namespace StarBlog.Web.Extensions; 
 
@@ -22,10 +22,11 @@ public static class HttpRequestExt {
 
     public static bool IsMobileBrowser(this HttpRequest request) {
         var userAgent = request.GetUserAgent();
-        return b.IsMatch(userAgent) || v.IsMatch(userAgent[..4]);
+        var prefix = userAgent.Length >= 4 ? userAgent[..4] : userAgent;
+        return b.IsMatch(userAgent) || v.IsMatch(prefix);
     }
 
     public static string GetUserAgent(this HttpRequest request) {
-        return request.Headers["User-Agent"];
+        return request.Headers["User-Agent"].ToString();
     }
 }

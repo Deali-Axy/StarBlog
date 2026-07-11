@@ -1,4 +1,4 @@
-﻿using System.ClientModel;
+using System.ClientModel;
 using DataProc.Entities;
 using FluentResults;
 using Microsoft.Extensions.AI;
@@ -10,12 +10,14 @@ namespace DataProc.Services;
 public class LLM : IService {
     public LLM(IOptions<LLMSettings> llmOptions) {
         var llmConfig = llmOptions.Value;
+        var endpoint = llmConfig.Endpoint
+            ?? throw new InvalidOperationException("LLM Endpoint 未配置。");
         ChatClient = new OpenAIClient(
-            new ApiKeyCredential(llmConfig.Key),
+            new ApiKeyCredential(llmConfig.Key ?? throw new InvalidOperationException("LLM Key 未配置。")),
             new OpenAIClientOptions {
-                Endpoint = new Uri(llmConfig.Endpoint)
+                Endpoint = new Uri(endpoint)
             }
-        ).GetChatClient(llmConfig.Model).AsIChatClient();
+        ).GetChatClient(llmConfig.Model ?? throw new InvalidOperationException("LLM Model 未配置。")).AsIChatClient();
     }
 
     public IChatClient ChatClient { get; }

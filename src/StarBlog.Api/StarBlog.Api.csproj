@@ -25,7 +25,7 @@
         <PackageReference Include="CodeLab.Share" Version="1.4.2" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.3" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.DynamicLinq" Version="10.7.1" />
-        <PackageReference Include="Microsoft.OpenApi" Version="2.4.1" />
+        <PackageReference Include="Microsoft.OpenApi" Version="2.9.0" />
         <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
         <PackageReference Include="SixLabors.ImageSharp.Web" Version="3.2.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.2" />

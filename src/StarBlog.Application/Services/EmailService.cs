@@ -24,9 +24,10 @@ public class EmailService {
 
     /// <summary>
     /// 发送邮箱验证码
-    /// <returns>生成随机验证码</returns>
-    /// <param name="mock">只生成验证码，不发邮件</param>
     /// </summary>
+    /// <param name="email">收件邮箱</param>
+    /// <param name="mock">只生成验证码，不发邮件</param>
+    /// <returns>生成随机验证码</returns>
     public async Task<string> SendOtpMail(string email, bool mock = false) {
         var otp = Random.Shared.NextInt64(1000, 9999).ToString();
 

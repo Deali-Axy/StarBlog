@@ -9,6 +9,7 @@
   "author": "DealiAxy",
   "license": "ISC",
   "devDependencies": {
+    "bower": "^1.8.14",
     "gulp": "^4.0.2",
     "gulp-changed": "^4.0.3",
     "gulp-clean-css": "^4.3.0",
@@ -29,9 +30,12 @@
     "editor.md-ext": "^1.5.4",
     "element-ui": "^2.15.13",
     "github-markdown-css": "^5.1.0",
+    "highlight.js": "^11.11.1",
     "imagesloaded": "^5.0.0",
     "jquery": "^3.6.0",
     "masonry-layout": "^4.2.2",
+    "popper.js": "^1.16.1",
+    "prismjs": "^1.30.0",
     "vue": "^2.6.14"
   }
 }

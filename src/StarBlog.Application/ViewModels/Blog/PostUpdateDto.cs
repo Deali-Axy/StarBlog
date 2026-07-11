@@ -1,12 +1,12 @@
 namespace StarBlog.Application.ViewModels.Blog;
 
 public class PostUpdateDto {
-    public string Id { get; set; }
+    public string Id { get; set; } = string.Empty;
 
     /// <summary>
     /// 标题
     /// </summary>
-    public string Title { get; set; }
+    public string Title { get; set; } = string.Empty;
 
     /// <summary>
     /// 文章链接，设置后可以通过以下形式访问文章
@@ -27,12 +27,12 @@ public class PostUpdateDto {
     /// <summary>
     /// 梗概
     /// </summary>
-    public string Summary { get; set; }
+    public string Summary { get; set; } = string.Empty;
 
     /// <summary>
     /// 内容（markdown格式）
     /// </summary>
-    public string Content { get; set; }
+    public string Content { get; set; } = string.Empty;
 
     /// <summary>
     /// 分类ID

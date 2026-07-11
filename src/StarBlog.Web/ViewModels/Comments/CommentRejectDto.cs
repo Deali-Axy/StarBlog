@@ -1,5 +1,5 @@
-﻿namespace StarBlog.Web.ViewModels.Comments; 
+namespace StarBlog.Web.ViewModels.Comments; 
 
 public class CommentRejectDto {
-    public string Reason { get; set; }
+    public string Reason { get; set; } = string.Empty;
 }

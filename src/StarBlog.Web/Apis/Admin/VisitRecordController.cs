@@ -56,6 +56,7 @@ public class VisitRecordController : ControllerBase {
     /// <summary>
     /// 趋势数据
     /// </summary>
+    /// <param name="p">访问记录筛选条件</param>
     /// <param name="days">查看最近几天的数据，默认7天</param>
     /// <returns></returns>
     [HttpGet("[action]")]
@@ -74,6 +75,7 @@ public class VisitRecordController : ControllerBase {
     /// <summary>
     /// 获取地理信息筛选参数
     /// </summary>
+    /// <param name="p">访问记录筛选条件</param>
     /// <param name="param">可选 country, province, city</param>
     [HttpGet("[action]")]
     public async Task<ApiResponse<List<string?>>> GeoFilterParams([FromQuery] VisitRecordParameters p, string param = "country") {

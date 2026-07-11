@@ -225,7 +225,7 @@ public class PostService {
             ),
             CreationTime = post.CreationTime,
             LastUpdateTime = post.LastUpdateTime,
-            Category = post.Category,
+            Category = post.Category ?? new Category(),
             Categories = new List<Category>(),
             TocNodes = post.ExtractToc()
         };

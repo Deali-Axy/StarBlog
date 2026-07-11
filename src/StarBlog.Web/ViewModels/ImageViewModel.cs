@@ -1,9 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace StarBlog.Web.ViewModels;
 
 public class ImageViewModel {
-    private readonly string _imageUrl;
+    private readonly string _imageUrl = string.Empty;
     public string Id { get; set; } = Guid.NewGuid().ToString();
 
     public string Src {
@@ -13,7 +13,7 @@ public class ImageViewModel {
         init => _imageUrl = value;
     }
 
-    public string Alt { get; set; }
+    public string Alt { get; set; } = string.Empty;
 
     [Required] public int Width { get; set; }
 

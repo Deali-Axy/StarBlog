@@ -76,6 +76,7 @@ public class PhotoService {
     /// <param name="quality">质量，默认85</param>
     public async Task<byte[]> GetThumb(string id, int width = 0, int quality = 85) {
         var photo = await _photoRepo.Where(a => a.Id == id).FirstAsync();
+        if (photo == null) throw new InvalidOperationException($"图片 {id} 不存在。");
         using var image = await Image.LoadAsync(GetPhotoFilePath(photo));
 
         if (width != 0) {
@@ -91,7 +92,9 @@ public class PhotoService {
     }
 
     public async Task<Photo> Update(PhotoUpdateDto dto) {
+        if (string.IsNullOrWhiteSpace(dto.Id)) throw new ArgumentException("图片 ID 不能为空。", nameof(dto));
         var photo = await GetById(dto.Id);
+        if (photo == null) throw new InvalidOperationException($"图片 {dto.Id} 不存在。");
         photo = _mapper.Map(dto, photo);
         await _photoRepo.UpdateAsync(photo);
         return photo;
@@ -241,6 +244,7 @@ public class PhotoService {
     private async Task<Photo> BuildPhotoData(Photo photo) {
         var savePath = GetPhotoFilePath(photo);
         var imgInfo = await Image.IdentifyAsync(savePath);
+        if (imgInfo == null) throw new InvalidOperationException($"无法识别图片文件：{savePath}");
         photo.Width = imgInfo.Width;
         photo.Height = imgInfo.Height;
 

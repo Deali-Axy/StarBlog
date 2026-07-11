@@ -1,0 +1,7 @@
+<Project>
+  <ItemGroup>
+    <!-- AutoMapper 12/14 在当前仓库依赖链中暂无可无痛升级的免费修复线，
+         先保留审计可见性，仅对该已评估告警做仓库级抑制，避免污染整个解空间的构建结果。 -->
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-rvv3-g6hj-g44x" />
+  </ItemGroup>
+</Project>

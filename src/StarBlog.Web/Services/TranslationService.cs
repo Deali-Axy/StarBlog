@@ -35,7 +35,7 @@ public class TranslationService {
     private readonly IBaseRepository<Post> _postRepo;
     private readonly IBaseRepository<PostTranslation> _translationRepo;
     private readonly TranslationConfig _config;
-    private readonly IChatClient _chatClient;
+    private readonly IChatClient? _chatClient;
 
     public TranslationService(
         ILogger<TranslationService> logger,
@@ -49,10 +49,12 @@ public class TranslationService {
 
         // 初始化 LLM 客户端（OpenAI 兼容接口）
         if (!string.IsNullOrEmpty(_config.LLM.Key)) {
+            var endpoint = _config.LLM.Endpoint
+                ?? throw new InvalidOperationException("Translation:LLM:Endpoint 未配置。");
             _chatClient = new OpenAIClient(
                 new ApiKeyCredential(_config.LLM.Key),
                 new OpenAIClientOptions {
-                    Endpoint = new Uri(_config.LLM.Endpoint)
+                    Endpoint = new Uri(endpoint)
                 }
             ).GetChatClient(_config.LLM.Model).AsIChatClient();
         }
@@ -221,7 +223,7 @@ public class TranslationService {
         for (int attempt = 1; attempt <= _config.MaxRetries; attempt++) {
             try {
                 var sb = new StringBuilder();
-                await foreach (var update in _chatClient.GetStreamingResponseAsync(prompt)) {
+                await foreach (var update in _chatClient!.GetStreamingResponseAsync(prompt)) {
                     if (!string.IsNullOrEmpty(update.Text)) {
                         sb.Append(update.Text);
                     }

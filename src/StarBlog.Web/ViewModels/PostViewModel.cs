@@ -6,17 +6,17 @@ using StarBlog.Content.Extensions.Markdown;
 namespace StarBlog.Web.ViewModels;
 
 public class PostViewModel {
-    public string Id { get; set; }
-    public string Title { get; set; }
-    public string Summary { get; set; }
-    public string Content { get; set; }
-    public string ContentHtml { get; set; }
-    public string Path { get; set; }
+    public string Id { get; set; } = string.Empty;
+    public string Title { get; set; } = string.Empty;
+    public string Summary { get; set; } = string.Empty;
+    public string Content { get; set; } = string.Empty;
+    public string ContentHtml { get; set; } = string.Empty;
+    public string Path { get; set; } = string.Empty;
     public string? Url { get; set; }
     public DateTime CreationTime { get; set; }
     public DateTime LastUpdateTime { get; set; }
-    public Category Category { get; set; }
-    public List<Category> Categories { get; set; }
+    public Category Category { get; set; } = new();
+    public List<Category> Categories { get; set; } = [];
     public List<TocNode>? TocNodes { get; set; }
 
     /// <summary>

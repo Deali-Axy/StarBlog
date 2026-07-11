@@ -1,4 +1,4 @@
-﻿using FreeSql;
+using FreeSql;
 using StarBlog.Data.Models;
 
 namespace StarBlog.Web.Services;
@@ -26,7 +26,7 @@ public class ConfigService {
             // 尝试读取初始化配置
             var section = _conf.GetSection($"StarBlog:Initial:{key}");
             if (!section.Exists()) return null;
-            item = new ConfigItem { Key = key, Value = section.Value, Description = "Initial" };
+            item = new ConfigItem { Key = key, Value = section.Value ?? string.Empty, Description = "Initial" };
             item = AddOrUpdate(item);
         }
 

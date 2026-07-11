@@ -1,4 +1,4 @@
-﻿/// <binding BeforeBuild='min' Clean='clean' ProjectOpened='auto' />
+/// <binding BeforeBuild='min' Clean='clean' ProjectOpened='auto' />
 "use strict";
 
 //加载使用到的 gulp 插件
@@ -61,7 +61,7 @@ const customLibs = [
     {name: 'element-ui/lib/theme-chalk', dist: './node_modules/element-ui/lib/theme-chalk/index.css'},
     {name: 'element-ui/lib/theme-chalk/fonts', dist: './node_modules/element-ui/lib/theme-chalk/fonts/*.*'},
     {name: 'font-awesome', dist: './node_modules/@fortawesome/fontawesome-free/**/*.*'},
-    {name: 'highlight.js', dist: './node_modules/highlight.js/**/*.*'},
+    {name: 'highlight', dist: './node_modules/highlight.js/**/*.*'},
     {name: 'github-markdown-css', dist: './node_modules/github-markdown-css/*.css'},
     {name: 'imagesloaded', dist: './node_modules/imagesloaded/*.js'},
 ]

@@ -1,4 +1,4 @@
-﻿using FluentResults;
+using FluentResults;
 using FreeSql;
 using Microsoft.Extensions.Logging;
 using StarBlog.Data.Models;
@@ -82,7 +82,8 @@ public static class MyExtensions {
         }
     }
 
-    private static string ExtractSectionRegex(string content, string title) {
+    private static string ExtractSectionRegex(string? content, string title) {
+        if (string.IsNullOrWhiteSpace(content)) return string.Empty;
         // 匹配目标标题开始，直到下一个标题或文档末尾
         string pattern = $@"##\s*{title}\s*([\s\S]*?)(?=\n##|$)";
         var match = Regex.Match(content, pattern);

@@ -1,7 +1,7 @@
 namespace StarBlog.Application.Contrib.SiteMessage; 
 
 public class Message {
-    public string Tag { get; set; }
+    public string Tag { get; set; } = string.Empty;
     public string? Title { get; set; }
     public string? Content { get; set; }
 }

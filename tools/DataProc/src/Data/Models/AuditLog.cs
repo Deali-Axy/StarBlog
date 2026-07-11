@@ -11,7 +11,7 @@ public class AuditLog {
     /// <summary>
     /// 事件类型（例如：登录、登出、数据修改等）
     /// </summary>
-    public string EventType { get; set; }
+    public string? EventType { get; set; }
 
     /// <summary>
     /// 执行操作的用户名

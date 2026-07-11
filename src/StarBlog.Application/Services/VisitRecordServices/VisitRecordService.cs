@@ -269,12 +269,8 @@ public class VisitRecordAnalyticsService {
         // 在内存中进行 Uri 解析和分组
         return records
             .Select(r => {
-                try {
-                    return new Uri(r!).Host;
-                }
-                catch {
-                    return r;
-                } // 处理无效的 URL
+                if (string.IsNullOrWhiteSpace(r)) return string.Empty;
+                return Uri.TryCreate(r, UriKind.Absolute, out var uri) ? uri.Host : r;
             })
             .GroupBy(host => host)
             .Select(g => new ReferrerDomain { Domain = g.Key, Count = g.Count() })
@@ -403,9 +399,9 @@ public class VisitRecordAnalyticsService {
             .ToListAsync();
 
         return new TechDistribution {
-            Browsers = browserStats.Select(b => new NameCountPair { Name = b.Browser, Count = b.Count }).ToList(),
-            OperatingSystems = osStats.Select(o => new NameCountPair { Name = o.OS, Count = o.Count }).ToList(),
-            Devices = deviceStats.Select(d => new NameCountPair { Name = d.Device, Count = d.Count }).ToList()
+            Browsers = browserStats.Select(b => new NameCountPair { Name = b.Browser ?? string.Empty, Count = b.Count }).ToList(),
+            OperatingSystems = osStats.Select(o => new NameCountPair { Name = o.OS ?? string.Empty, Count = o.Count }).ToList(),
+            Devices = deviceStats.Select(d => new NameCountPair { Name = d.Device ?? string.Empty, Count = d.Count }).ToList()
         };
     }
 

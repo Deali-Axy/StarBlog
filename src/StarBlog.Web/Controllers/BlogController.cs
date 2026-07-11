@@ -1,4 +1,4 @@
-﻿using FreeSql;
+using FreeSql;
 using Microsoft.AspNetCore.Mvc;
 using StarBlog.Data.Models;
 using StarBlog.Web.Contrib.SiteMessage;
@@ -117,9 +117,9 @@ public class BlogController : Controller {
         if (!string.IsNullOrEmpty(lang) && lang != "zh") {
             var translation = translations.FirstOrDefault(t => t.Language == lang);
             if (translation != null) {
-                postViewModel.Title = translation.Title;
-                postViewModel.Summary = translation.Summary;
-                postViewModel.Content = translation.Content;
+                postViewModel.Title = translation.Title ?? postViewModel.Title;
+                postViewModel.Summary = translation.Summary ?? postViewModel.Summary;
+                postViewModel.Content = translation.Content ?? postViewModel.Content;
                 postViewModel.CurrentLanguage = lang;
                 if (!string.IsNullOrEmpty(translation.Content)) {
                     postViewModel.ContentHtml = PostService.GetContentHtml(translation);

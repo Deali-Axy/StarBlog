@@ -7,11 +7,11 @@ public class PhotoCreationDto {
     /// 作品标题
     /// </summary>
     [Required(ErrorMessage = "作品标题不能为空")]
-    public string Title { get; set; }
+    public string Title { get; set; } = string.Empty;
 
     /// <summary>
     /// 拍摄地点
     /// </summary>
     [Required(ErrorMessage = "拍摄地点不能为空")]
-    public string Location { get; set; }
+    public string Location { get; set; } = string.Empty;
 }

@@ -1,4 +1,4 @@
-﻿using FluentResults;
+using FluentResults;
 using FreeSql;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -48,9 +48,9 @@ public class ProcessingStats {
 }
 
 public class ImageOptimizer : IService {
-    private readonly ILogger<ImageOptimizer> logger;
-    private readonly IConfiguration conf;
-    private readonly IBaseRepository<Post> postRepo;
+    private readonly ILogger<ImageOptimizer> _logger;
+    private readonly IConfiguration _conf;
+    private readonly IBaseRepository<Post> _postRepo;
 
     // 统计信息 - 使用线程安全的集合
     private readonly ConcurrentBag<ProcessingStats> _processingStats = new();
@@ -74,9 +74,9 @@ public class ImageOptimizer : IService {
         ILogger<ImageOptimizer> logger,
         IConfiguration conf,
         IBaseRepository<Post> postRepo) {
-        this.logger = logger;
-        this.conf = conf;
-        this.postRepo = postRepo;
+        _logger = logger;
+        _conf = conf;
+        _postRepo = postRepo;
 
         // 设置最大并发数，默认为CPU核心数
         _maxConcurrency = conf.GetValue<int>("ImageOptimizer:MaxConcurrency", Environment.ProcessorCount);
@@ -86,9 +86,9 @@ public class ImageOptimizer : IService {
         _compressionOptions = InitializeCompressionOptions(conf);
         _compressionModes = _compressionOptions.Modes;
 
-        logger.LogInformation("图片压缩器初始化 - 最大并发数: {MaxConcurrency}", _maxConcurrency);
-        logger.LogInformation("默认压缩模式: {DefaultMode}", _compressionOptions.DefaultMode);
-        logger.LogInformation("可用压缩模式: {ModeCount} 种", _compressionModes.Count);
+        _logger.LogInformation("图片压缩器初始化 - 最大并发数: {MaxConcurrency}", _maxConcurrency);
+        _logger.LogInformation("默认压缩模式: {DefaultMode}", _compressionOptions.DefaultMode);
+        _logger.LogInformation("可用压缩模式: {ModeCount} 种", _compressionModes.Count);
 
         // 显示压缩模式详情
         LogCompressionModes();
@@ -177,7 +177,7 @@ public class ImageOptimizer : IService {
         var newWidth = (int)(image.Width * scale);
         var newHeight = (int)(image.Height * scale);
 
-        logger.LogDebug("调整图片尺寸: {OriginalWidth}×{OriginalHeight} -> {NewWidth}×{NewHeight} (模式: {ModeName})",
+        _logger.LogDebug("调整图片尺寸: {OriginalWidth}×{OriginalHeight} -> {NewWidth}×{NewHeight} (模式: {ModeName})",
             image.Width, image.Height, newWidth, newHeight, mode.Name);
 
         image.Mutate(x => x.Resize(newWidth, newHeight));
@@ -187,44 +187,44 @@ public class ImageOptimizer : IService {
     /// 记录压缩模式配置信息
     /// </summary>
     private void LogCompressionModes() {
-        logger.LogInformation("");
-        logger.LogInformation("🎨 压缩模式配置:");
+        _logger.LogInformation("");
+        _logger.LogInformation("🎨 压缩模式配置:");
 
         foreach (var (key, mode) in _compressionModes) {
             var isDefault = key == _compressionOptions.DefaultMode ? " [默认]" : "";
             var sizeInfo = mode.MaxWidth == int.MaxValue ? "保持原尺寸" : $"{mode.MaxWidth}×{mode.MaxHeight}";
 
-            logger.LogInformation("   • {ModeName}{IsDefault}: {SizeInfo}, 质量{Quality}%",
+            _logger.LogInformation("   • {ModeName}{IsDefault}: {SizeInfo}, 质量{Quality}%",
                 mode.Name, isDefault, sizeInfo, mode.Quality);
-            logger.LogInformation("     {Description}", mode.Description);
+            _logger.LogInformation("     {Description}", mode.Description);
         }
 
-        logger.LogInformation("");
+        _logger.LogInformation("");
     }
     public async Task<Result> Run() {
-        var posts = await postRepo.Select.ToListAsync();
-        var wwwroot = conf.GetValue<string>("StarBlog:wwwroot");
+        var posts = await _postRepo.Select.ToListAsync();
+        var wwwroot = _conf.GetValue<string>("StarBlog:wwwroot");
         if (string.IsNullOrWhiteSpace(wwwroot)) {
             throw new Exception("wwwroot 配置错误");
         }
 
         // 获取输出目录配置
-        var outputBaseDir = conf.GetValue<string>("ImageOptimizer:OutputDir");
+        var outputBaseDir = _conf.GetValue<string>("ImageOptimizer:OutputDir");
         if (string.IsNullOrWhiteSpace(outputBaseDir)) {
             throw new Exception("未配置输出目录");
         }
 
-        logger.LogInformation("压缩后图片将保存到: {OutputBaseDir}", outputBaseDir);
+        _logger.LogInformation("压缩后图片将保存到: {OutputBaseDir}", outputBaseDir);
 
         // 确保输出基础目录存在
         Directory.CreateDirectory(outputBaseDir);
 
-        logger.LogInformation("开始处理 {TotalPosts} 篇文章的图片", posts.Count);
+        _logger.LogInformation("开始处理 {TotalPosts} 篇文章的图片", posts.Count);
         var processedCount = 0;
 
         foreach (var post in posts) {
             processedCount++;
-            logger.LogInformation("处理进度: {Current}/{Total} - 文章 {PostId}",
+            _logger.LogInformation("处理进度: {Current}/{Total} - 文章 {PostId}",
                 processedCount, posts.Count, post.Id);
 
             var blogImageDir = Path.Combine(wwwroot, "media", "blog", post.Id);
@@ -236,7 +236,7 @@ public class ImageOptimizer : IService {
             var outputDir = Path.Combine(outputBaseDir, post.Id);
             Directory.CreateDirectory(outputDir);
 
-            logger.LogInformation("处理文章 {PostId} 的图片, 源目录: {SourceDir}, 输出目录: {OutputDir}",
+            _logger.LogInformation("处理文章 {PostId} 的图片, 源目录: {SourceDir}, 输出目录: {OutputDir}",
                 post.Id, blogImageDir, outputDir);
 
             var files = Directory.GetFiles(blogImageDir);
@@ -253,7 +253,7 @@ public class ImageOptimizer : IService {
             var compressionTasks = imageFiles.Select(async file => {
                 await _concurrencyLimiter.WaitAsync();
                 try {
-                    logger.LogInformation("处理图片 {FileName}", file);
+                    _logger.LogInformation("处理图片 {FileName}", file);
                     Interlocked.Increment(ref _processedImages);
 
                     var result = await CompressImage(file, outputDir);
@@ -279,7 +279,7 @@ public class ImageOptimizer : IService {
                         var outputFormat = Path.GetExtension(result.NewFilePath).ToLower();
                         _formatStats.AddOrUpdate(outputFormat, 1, (key, value) => value + 1);
 
-                        logger.LogInformation("图片压缩成功: {OriginalFile} -> {NewFile}, 压缩率: {CompressionRatio:P2}",
+                        _logger.LogInformation("图片压缩成功: {OriginalFile} -> {NewFile}, 压缩率: {CompressionRatio:P2}",
                             originalFileName, newFileName, result.CompressionRatio);
                     } else {
                         Interlocked.Increment(ref _failedCompressions);
@@ -288,7 +288,7 @@ public class ImageOptimizer : IService {
                     return result;
                 }
                 catch (Exception ex) {
-                    logger.LogError(ex, "压缩图片失败: {FileName}", file);
+                    _logger.LogError(ex, "压缩图片失败: {FileName}", file);
                     Interlocked.Increment(ref _failedCompressions);
                     return null;
                 }
@@ -301,7 +301,7 @@ public class ImageOptimizer : IService {
             var results = await Task.WhenAll(compressionTasks);
 
             // 收集文章级别的统计信息
-            foreach (var result in results.Where(r => r != null)) {
+            foreach (var result in results.OfType<CompressionResult>()) {
                 postStats.OriginalSize += result.OriginalSize;
                 postStats.CompressedSize += result.CompressedSize;
                 postStats.ProcessedImages++;
@@ -324,12 +324,12 @@ public class ImageOptimizer : IService {
                     var updatedContent = UpdateMarkdownImageLinks(post, fileNameMappings);
                     if (updatedContent != post.Content) {
                         post.Content = updatedContent;
-                        await postRepo.UpdateAsync(post);
-                        logger.LogInformation("已更新文章 {PostId} 的图片链接", post.Id);
+                        await _postRepo.UpdateAsync(post);
+                        _logger.LogInformation("已更新文章 {PostId} 的图片链接", post.Id);
                     }
                 }
                 catch (Exception ex) {
-                    logger.LogError(ex, "更新文章 {PostId} 的图片链接失败", post.Id);
+                    _logger.LogError(ex, "更新文章 {PostId} 的图片链接失败", post.Id);
                     // 数据库更新失败不影响继续处理其他文章
                 }
             }
@@ -345,37 +345,37 @@ public class ImageOptimizer : IService {
     /// 生成汇总报告
     /// </summary>
     private void GenerateSummaryReport(string outputBaseDir, string wwwroot) {
-        logger.LogInformation("");
-        logger.LogInformation("🎉 ================ 图片压缩汇总报告 ================");
-        logger.LogInformation("");
+        _logger.LogInformation("");
+        _logger.LogInformation("🎉 ================ 图片压缩汇总报告 ================");
+        _logger.LogInformation("");
 
         // 基本统计
-        logger.LogInformation("📊 基本统计:");
-        logger.LogInformation("   • 处理的文章数量: {ProcessedPosts}", _processingStats.Count);
-        logger.LogInformation("   • 发现的图片总数: {TotalImages}", _totalImages);
-        logger.LogInformation("   • 处理的图片数量: {ProcessedImages}", _processedImages);
-        logger.LogInformation("   • 成功压缩数量: {SuccessfulCompressions}", _successfulCompressions);
-        logger.LogInformation("   • 压缩失败数量: {FailedCompressions}", _failedCompressions);
-        logger.LogInformation("");
+        _logger.LogInformation("📊 基本统计:");
+        _logger.LogInformation("   • 处理的文章数量: {ProcessedPosts}", _processingStats.Count);
+        _logger.LogInformation("   • 发现的图片总数: {TotalImages}", _totalImages);
+        _logger.LogInformation("   • 处理的图片数量: {ProcessedImages}", _processedImages);
+        _logger.LogInformation("   • 成功压缩数量: {SuccessfulCompressions}", _successfulCompressions);
+        _logger.LogInformation("   • 压缩失败数量: {FailedCompressions}", _failedCompressions);
+        _logger.LogInformation("");
 
         // 文件大小统计
         var totalSavedBytes = _totalOriginalSize - _totalCompressedSize;
         var overallCompressionRatio = _totalOriginalSize > 0 ? 1.0 - (double)_totalCompressedSize / _totalOriginalSize : 0;
 
-        logger.LogInformation("💾 文件大小统计:");
-        logger.LogInformation("   • 原始总大小: {OriginalSize}", FormatFileSize(_totalOriginalSize));
-        logger.LogInformation("   • 压缩后总大小: {CompressedSize}", FormatFileSize(_totalCompressedSize));
-        logger.LogInformation("   • 节省空间: {SavedSize}", FormatFileSize(totalSavedBytes));
-        logger.LogInformation("   • 总体压缩率: {CompressionRatio:P2}", overallCompressionRatio);
-        logger.LogInformation("");
+        _logger.LogInformation("💾 文件大小统计:");
+        _logger.LogInformation("   • 原始总大小: {OriginalSize}", FormatFileSize(_totalOriginalSize));
+        _logger.LogInformation("   • 压缩后总大小: {CompressedSize}", FormatFileSize(_totalCompressedSize));
+        _logger.LogInformation("   • 节省空间: {SavedSize}", FormatFileSize(totalSavedBytes));
+        _logger.LogInformation("   • 总体压缩率: {CompressionRatio:P2}", overallCompressionRatio);
+        _logger.LogInformation("");
 
         // 格式统计
         if (_formatStats.Count > 0) {
-            logger.LogInformation("📁 输出格式统计:");
+            _logger.LogInformation("📁 输出格式统计:");
             foreach (var format in _formatStats.OrderByDescending(x => x.Value)) {
-                logger.LogInformation("   • {Format}: {Count} 个文件", format.Key.ToUpper(), format.Value);
+                _logger.LogInformation("   • {Format}: {Count} 个文件", format.Key.ToUpper(), format.Value);
             }
-            logger.LogInformation("");
+            _logger.LogInformation("");
         }
 
         // 前10个压缩效果最好的文章
@@ -386,44 +386,44 @@ public class ImageOptimizer : IService {
             .ToList();
 
         if (topCompressionPosts.Count > 0) {
-            logger.LogInformation("🏆 压缩效果最佳的文章 (前10名):");
+            _logger.LogInformation("🏆 压缩效果最佳的文章 (前10名):");
             for (int i = 0; i < topCompressionPosts.Count; i++) {
                 var post = topCompressionPosts[i];
-                logger.LogInformation("   {Rank}. 文章 {PostId}: 节省 {SavedSize}, 压缩率 {CompressionRatio:P2} ({SuccessfulCount}/{TotalCount} 张图片)",
+                _logger.LogInformation("   {Rank}. 文章 {PostId}: 节省 {SavedSize}, 压缩率 {CompressionRatio:P2} ({SuccessfulCount}/{TotalCount} 张图片)",
                     i + 1, post.PostId, FormatFileSize(post.SavedBytes), post.CompressionRatio,
                     post.SuccessfulCompressions, post.TotalImages);
             }
-            logger.LogInformation("");
+            _logger.LogInformation("");
         }
 
         // 失败统计
         var failedPosts = _processingStats.Where(p => p.FailedCompressions > 0).ToList();
         if (failedPosts.Count > 0) {
-            logger.LogInformation("⚠️  压缩失败统计:");
+            _logger.LogInformation("⚠️  压缩失败统计:");
             foreach (var post in failedPosts.OrderByDescending(p => p.FailedCompressions)) {
-                logger.LogInformation("   • 文章 {PostId}: {FailedCount} 张图片压缩失败",
+                _logger.LogInformation("   • 文章 {PostId}: {FailedCount} 张图片压缩失败",
                     post.PostId, post.FailedCompressions);
             }
-            logger.LogInformation("");
+            _logger.LogInformation("");
         }
 
         // 目录信息
-        logger.LogInformation("📂 目录信息:");
-        logger.LogInformation("   • 原始图片目录: {OriginalDir}", Path.Combine(wwwroot, "media", "blog"));
-        logger.LogInformation("   • 压缩后图片目录: {OutputDir}", outputBaseDir);
-        logger.LogInformation("");
+        _logger.LogInformation("📂 目录信息:");
+        _logger.LogInformation("   • 原始图片目录: {OriginalDir}", Path.Combine(wwwroot, "media", "blog"));
+        _logger.LogInformation("   • 压缩后图片目录: {OutputDir}", outputBaseDir);
+        _logger.LogInformation("");
 
         // 操作建议
-        logger.LogInformation("💡 下一步操作建议:");
-        logger.LogInformation("   1. 检查压缩后的图片质量和效果");
-        logger.LogInformation("   2. 确认无误后，可以手动替换原目录中的图片文件");
-        logger.LogInformation("   3. 建议先备份原始图片目录");
+        _logger.LogInformation("💡 下一步操作建议:");
+        _logger.LogInformation("   1. 检查压缩后的图片质量和效果");
+        _logger.LogInformation("   2. 确认无误后，可以手动替换原目录中的图片文件");
+        _logger.LogInformation("   3. 建议先备份原始图片目录");
         if (failedPosts.Count > 0) {
-            logger.LogInformation("   4. 检查压缩失败的图片，可能需要手动处理");
+            _logger.LogInformation("   4. 检查压缩失败的图片，可能需要手动处理");
         }
-        logger.LogInformation("");
-        logger.LogInformation("🎉 ================ 报告结束 ================");
-        logger.LogInformation("");
+        _logger.LogInformation("");
+        _logger.LogInformation("🎉 ================ 报告结束 ================");
+        _logger.LogInformation("");
     }
 
     /// <summary>
@@ -496,7 +496,7 @@ public class ImageOptimizer : IService {
             };
         }
 
-        logger.LogDebug("选择的输出格式: {OutputFormat}", outputFormat);
+        _logger.LogDebug("选择的输出格式: {OutputFormat}", outputFormat);
 
         return new CompressionResult {
             Success = true,
@@ -531,7 +531,7 @@ public class ImageOptimizer : IService {
         bool hasTransparency = HasTransparency(image);
         bool isSimpleGraphic = IsSimpleGraphic(image);
 
-        logger.LogDebug("图片分析 - 透明度: {HasTransparency}, 图片类型: {ImageType}",
+        _logger.LogDebug("图片分析 - 透明度: {HasTransparency}, 图片类型: {ImageType}",
             hasTransparency, isSimpleGraphic ? "图形/图标" : "照片/复杂图像");
 
         // 智能选择格式
@@ -588,7 +588,7 @@ public class ImageOptimizer : IService {
             var webpSize = new FileInfo(tempWebp).Length;
             var jpegSize = new FileInfo(tempJpeg).Length;
 
-            logger.LogDebug("格式比较 - WebP: {WebpSize} bytes, JPEG: {JpegSize} bytes", webpSize, jpegSize);
+            _logger.LogDebug("格式比较 - WebP: {WebpSize} bytes, JPEG: {JpegSize} bytes", webpSize, jpegSize);
 
             // 选择更小的格式
             if (webpSize <= jpegSize) {
@@ -614,8 +614,9 @@ public class ImageOptimizer : IService {
     /// </summary>
     private static bool HasTransparency(Image image) {
         // 检查像素格式是否支持透明度
+        var pixelTypeText = image.PixelType.ToString() ?? string.Empty;
         return image.PixelType.BitsPerPixel == 32 ||
-               image.PixelType.ToString().Contains("Rgba");
+               pixelTypeText.Contains("Rgba", StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>
@@ -662,7 +663,7 @@ public class ImageOptimizer : IService {
                         linkInline.Url = Path.Combine(directory, newFileName).Replace('\\', '/');
                     }
 
-                    logger.LogDebug("更新图片链接: {OldUrl} -> {NewUrl}", imgUrl, linkInline.Url);
+                    _logger.LogDebug("更新图片链接: {OldUrl} -> {NewUrl}", imgUrl, linkInline.Url);
                 }
             }
         }

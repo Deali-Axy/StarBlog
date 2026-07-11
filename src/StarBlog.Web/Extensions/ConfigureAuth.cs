@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using StarBlog.Web.Models.Config;
@@ -14,7 +14,7 @@ public static class ConfigureAuth {
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
             .AddJwtBearer(options => {
-                var authSetting = configuration.GetSection(nameof(Auth)).Get<Auth>();
+                var authSetting = configuration.GetSection(nameof(Auth)).Get<Auth>() ?? new Auth();
                 options.TokenValidationParameters = new TokenValidationParameters {
                     ValidateAudience = true,
                     ValidateLifetime = true,

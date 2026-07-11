@@ -1,4 +1,4 @@
-﻿@model StarBlog.Web.ViewModels.Search.SearchResultViewModel
+@model StarBlog.Web.ViewModels.Search.SearchResultViewModel
 
 @{
     ViewData["Title"] = $"{Model.Keyword} - 搜索结果";
@@ -445,7 +445,7 @@
                                     <div class="d-flex justify-content-between align-items-center flex-wrap">
                                         <span class="category-tag">
                                             <i class="fas fa-tag me-1"></i>
-                                            @item.Post.Category.Name
+                                            @(item.Post.Category?.Name ?? "未分类")
                                         </span>
                                         <span class="relevance-score">
                                             <i class="fas fa-star me-1"></i>

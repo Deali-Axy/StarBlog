@@ -1,15 +1,15 @@
-﻿namespace StarBlog.Web.ViewModels.Categories; 
+namespace StarBlog.Web.ViewModels.Categories; 
 
 public class FeaturedCategoryCreationDto {
     /// <summary>
     /// 重新定义的推荐名称
     /// </summary>
-    public string Name { get; set; }
+    public string Name { get; set; } = string.Empty;
 
     /// <summary>
     /// 推荐分类解释
     /// </summary>
-    public string Description { get; set; }
+    public string Description { get; set; } = string.Empty;
 
     /// <summary>
     /// 图标
@@ -20,5 +20,5 @@ public class FeaturedCategoryCreationDto {
     ///     <item>fa-brands fa-android</item>
     /// </list>
     /// </summary>
-    public string IconCssClass { get; set; }
+    public string IconCssClass { get; set; } = string.Empty;
 }
