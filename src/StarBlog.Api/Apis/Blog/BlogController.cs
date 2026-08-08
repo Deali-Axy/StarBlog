@@ -15,6 +15,7 @@ namespace StarBlog.Api.Apis.Blog;
 /// </summary>
 [ApiController]
 [Route("Api/[controller]")]
+[Route("Api/Admin/Blog")]
 [ApiExplorerSettings(GroupName = ApiGroups.Blog)]
 public class BlogController : ControllerBase {
     private readonly ILogger<BlogController> _logger;

@@ -13,6 +13,7 @@ namespace StarBlog.Api.Apis.Admin;
 [Authorize]
 [ApiController]
 [Route("Api/[controller]")]
+[Route("Api/Admin/Config")]
 [ApiExplorerSettings(GroupName = ApiGroups.Admin)]
 public class ConfigController : ControllerBase {
     private readonly ConfigService _service;

@@ -15,6 +15,7 @@ namespace StarBlog.Api.Apis.Links;
 [Authorize]
 [ApiController]
 [Route("Api/[controller]")]
+[Route("Api/Admin/LinkExchanges")]
 [ApiExplorerSettings(GroupName = ApiGroups.Link)]
 public class LinkExchangeController : ControllerBase {
     private readonly ILogger<LinkExchangeController> _logger;

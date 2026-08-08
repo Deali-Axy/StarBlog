@@ -112,6 +112,9 @@ builder.Services.AddScoped<LinkExchangeService>();
 builder.Services.AddScoped<LinkService>();
 builder.Services.AddScoped<PhotoService>();
 builder.Services.AddScoped<PostService>();
+// 文章翻译是可选能力：未配置密钥时 API 仍可启动，调用时给出可读错误。
+builder.Services.Configure<TranslationConfig>(builder.Configuration.GetSection(TranslationConfig.SectionName));
+builder.Services.AddScoped<TranslationService>();
 
 // Outbox：将“需要后台处理的任务”（例如邮件发送）异步化，避免阻塞接口响应
 builder.Services.Configure<OutboxOptions>(builder.Configuration.GetSection("Outbox"));
@@ -148,6 +151,12 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions {
 // 说明：ImageSharp 中间件需要存在 webroot（本项目提供空的 wwwroot 目录以满足启动）
 app.UseImageSharp();
 app.UseResponseCompression();
+
+// 纯 API 不渲染 Razor，但文章图片、摄影原图等仍由 WebRoot 下的 media 目录承载。
+app.UseStaticFiles();
+
+// 访问分析服务已注册；将每个 HTTP 响应写入异步队列，供 /Api/Admin/Analytics 查询。
+app.UseMiddleware<StarBlog.Api.Middlewares.VisitRecordMiddleware>();
 
 app.UseRouting();
 app.UseCors();

@@ -14,6 +14,7 @@ namespace StarBlog.Api.Apis.Blog;
 [Authorize]
 [ApiController]
 [Route("Api/[controller]")]
+[Route("Api/Admin/Featured/Categories")]
 [ApiExplorerSettings(GroupName = ApiGroups.Blog)]
 public class FeaturedCategoryController : ControllerBase {
     private readonly CategoryService _categoryService;

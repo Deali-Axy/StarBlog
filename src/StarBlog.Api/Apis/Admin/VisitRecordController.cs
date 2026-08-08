@@ -15,6 +15,7 @@ namespace StarBlog.Api.Apis.Admin;
 [Authorize]
 [ApiController]
 [Route("Api/[controller]")]
+[Route("Api/Admin/Analytics")]
 [ApiExplorerSettings(GroupName = ApiGroups.Admin)]
 public class VisitRecordController : ControllerBase {
     private readonly VisitRecordAnalyticsService _service;

@@ -20,6 +20,7 @@ namespace StarBlog.Api.Apis.Blog;
 [Authorize]
 [ApiController]
 [Route("Api/[controller]")]
+[Route("Api/Admin/Posts")]
 [ApiExplorerSettings(GroupName = ApiGroups.Blog)]
 public class BlogPostController : ControllerBase {
     private readonly IMapper _mapper;
@@ -178,5 +179,39 @@ public class BlogPostController : ControllerBase {
         if (post == null) return ApiResponse.NotFound($"博客 {id} 不存在");
         var (data, rows) = await _blogService.SetTopPost(post);
         return new ApiResponse<TopPostDto> { Data = TopPostDto.From(data), Message = $"ok. deleted {rows} old topPosts." };
+    }
+
+    /// <summary>翻译文章并保存指定语言版本。</summary>
+    [HttpPost("{id}/[action]")]
+    public async Task<ApiResponse> Translate(string id, [FromServices] TranslationService translationService, [FromQuery] string language = "en") {
+        if (await _postService.GetById(id) == null) return ApiResponse.NotFound($"博客 {id} 不存在");
+        try {
+            var translation = await translationService.TranslatePostAsync(id, language);
+            return ApiResponse.Ok(new { translation.Id, translation.Language, translation.Title }, "文章翻译完成");
+        }
+        catch (Exception exception) {
+            return ApiResponse.BadRequest($"翻译失败: {exception.Message}");
+        }
+    }
+
+    /// <summary>获取指定语言的文章翻译。</summary>
+    [AllowAnonymous]
+    [HttpGet("{id}/[action]")]
+    public async Task<ApiResponse<PostTranslation>> GetTranslation(string id, [FromServices] TranslationService translationService, [FromQuery] string language = "en") {
+        var translation = await translationService.GetTranslation(id, language);
+        return translation == null ? ApiResponse.NotFound($"未找到 {language} 翻译") : new ApiResponse<PostTranslation>(translation);
+    }
+
+    /// <summary>返回文章已生成的翻译语言代码。</summary>
+    [AllowAnonymous]
+    [HttpGet("{id}/[action]")]
+    public async Task<ApiResponse<List<string>>> AvailableTranslations(string id, [FromServices] TranslationService translationService) =>
+        new(await translationService.GetAvailableLanguages(id));
+
+    /// <summary>删除文章的一个翻译版本。</summary>
+    [HttpDelete("{id}/[action]/{translationId}")]
+    public async Task<ApiResponse> DeleteTranslation(string id, string translationId, [FromServices] TranslationService translationService) {
+        var rows = await translationService.DeleteTranslation(translationId);
+        return rows > 0 ? ApiResponse.Ok("翻译已删除") : ApiResponse.NotFound("翻译不存在");
     }
 }

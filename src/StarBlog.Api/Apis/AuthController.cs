@@ -14,6 +14,7 @@ namespace StarBlog.Api.Apis;
 /// </summary>
 [ApiController]
 [Route("Api/[controller]")]
+[Route("Api/Admin/Auth")]
 [ApiExplorerSettings(GroupName = ApiGroups.Auth)]
 public class AuthController : ControllerBase {
     private readonly AuthService _authService;

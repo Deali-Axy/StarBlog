@@ -16,6 +16,7 @@ namespace StarBlog.Api.Apis.Photography;
 [Authorize]
 [ApiController]
 [Route("Api/[controller]")]
+[Route("Api/Admin/Photos")]
 [ApiExplorerSettings(GroupName = ApiGroups.Photo)]
 public class PhotoController : ControllerBase {
     private readonly PhotoService _photoService;
