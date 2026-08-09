@@ -14,8 +14,7 @@ namespace StarBlog.Api.Apis.Links;
 /// </summary>
 [Authorize]
 [ApiController]
-[Route("Api/[controller]")]
-[Route("Api/Admin/Links")]
+[Route("api/v1/admin/links")]
 [ApiExplorerSettings(GroupName = ApiGroups.Link)]
 public class LinkController : ControllerBase {
     private readonly LinkService _service;
@@ -30,7 +29,7 @@ public class LinkController : ControllerBase {
     /// 前台展示用：仅返回可见友情链接（匿名可访问）
     /// </summary>
     [AllowAnonymous]
-    [HttpGet("Public")]
+    [HttpGet("/api/v1/links")]
     public async Task<ApiResponse<List<Link>>> GetPublic() {
         var data = await _service.GetAll(true);
         return new ApiResponse<List<Link>>(data);

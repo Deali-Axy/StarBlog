@@ -14,8 +14,7 @@ namespace StarBlog.Api.Apis.Links;
 /// </summary>
 [Authorize]
 [ApiController]
-[Route("Api/[controller]")]
-[Route("Api/Admin/LinkExchanges")]
+[Route("api/v1/admin/link-exchange-requests")]
 [ApiExplorerSettings(GroupName = ApiGroups.Link)]
 public class LinkExchangeController : ControllerBase {
     private readonly ILogger<LinkExchangeController> _logger;
@@ -39,14 +38,14 @@ public class LinkExchangeController : ControllerBase {
         return item == null ? ApiResponse.NotFound() : new ApiResponse<LinkExchange>(item);
     }
 
-    [HttpPost("{id:int}/[action]")]
+    [HttpPatch("{id:int}/approval")]
     public async Task<ApiResponse> Accept(int id, [FromBody] LinkExchangeVerityDto dto) {
         if (!await _service.HasId(id)) return ApiResponse.NotFound();
         await _service.SetVerifyStatus(id, true, dto.Reason);
         return ApiResponse.Ok();
     }
 
-    [HttpPost("{id:int}/[action]")]
+    [HttpPatch("{id:int}/rejection")]
     public async Task<ApiResponse> Reject(int id, [FromBody] LinkExchangeVerityDto dto) {
         if (!await _service.HasId(id)) return ApiResponse.NotFound();
         await _service.SetVerifyStatus(id, false, dto.Reason);
