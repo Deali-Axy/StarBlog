@@ -1,0 +1,6 @@
+# 前端依赖、构建产物与 TypeScript 增量状态均可由 npm 命令重新生成。
+node_modules/
+dist/
+*.tsbuildinfo
+vite.config.js
+vite.config.d.ts
