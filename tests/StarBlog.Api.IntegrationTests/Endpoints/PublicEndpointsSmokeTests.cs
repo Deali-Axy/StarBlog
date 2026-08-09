@@ -22,31 +22,31 @@ public sealed class PublicEndpointsSmokeTests : IClassFixture<StarBlogApiApplica
 
     [Fact]
     public async Task BlogPostList_ReturnsOk() {
-        var response = await _client.GetAsync("/Api/BlogPost?page=1&pageSize=1");
+        var response = await _client.GetAsync("/api/v1/posts?page=1&pageSize=1");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
     [Fact]
     public async Task CategoryNodes_ReturnsOk() {
-        var response = await _client.GetAsync("/Api/Category/Nodes");
+        var response = await _client.GetAsync("/api/v1/categories/tree");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
     [Fact]
     public async Task Theme_ReturnsOk() {
-        var response = await _client.GetAsync("/Api/Theme");
+        var response = await _client.GetAsync("/api/v1/theme");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
     [Fact]
     public async Task PublicLinks_ReturnsOk() {
-        var response = await _client.GetAsync("/Api/Link/Public");
+        var response = await _client.GetAsync("/api/v1/links");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
     [Theory]
-    [InlineData("/Api/Site/home")]
-    [InlineData("/Api/Site/search?keyword=Test")]
+    [InlineData("/api/v1/site/home")]
+    [InlineData("/api/v1/site/search?keyword=Test")]
     [InlineData("/feed")]
     [InlineData("/robots.txt")]
     [InlineData("/sitemap-index.xml")]
@@ -61,7 +61,18 @@ public sealed class PublicEndpointsSmokeTests : IClassFixture<StarBlogApiApplica
     [Fact]
     public async Task AdminAlias_ReturnsOk_ForAuthenticatedRequest() {
         // 测试工厂注入的测试身份验证器会自动提供管理员身份。
-        var response = await _client.GetAsync("/Api/Admin/Comments?page=1&pageSize=10");
+        var response = await _client.GetAsync("/api/v1/admin/comments?page=1&pageSize=10");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+    }
+
+    [Theory]
+    [InlineData("/Api/BlogPost")]
+    [InlineData("/Api/Admin/Posts")]
+    [InlineData("/Api/Site/home")]
+    public async Task LegacyRoutes_AreNotExposed(string url) {
+        // 项目不保留旧 StarBlog.Web 路由别名，避免客户端继续依赖大小写不规范的历史地址。
+        var response = await _client.GetAsync(url);
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 }

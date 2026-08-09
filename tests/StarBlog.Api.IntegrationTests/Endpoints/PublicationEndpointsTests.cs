@@ -28,7 +28,7 @@ public sealed class PublicationEndpointsTests : IClassFixture<StarBlogApiApplica
 
     [Fact]
     public async Task PublicationChannels_ReturnsOk_ForAuthenticatedAdministrator() {
-        var response = await _client.GetAsync("/Api/Admin/Publishing/channels");
+        var response = await _client.GetAsync("/api/v1/admin/publication-channels");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
@@ -36,7 +36,7 @@ public sealed class PublicationEndpointsTests : IClassFixture<StarBlogApiApplica
     [Fact]
     public async Task CreateChannel_ReturnsOk_WithoutEchoingSecret() {
         // 使用知乎这一无需真实第三方凭证的平台，验证渠道能被持久化，同时 API 输出不会回显密钥。
-        var response = await _client.PostAsJsonAsync("/Api/Admin/Publishing/channels", new {
+        var response = await _client.PostAsJsonAsync("/api/v1/admin/publication-channels", new {
             name = $"integration-{Guid.NewGuid():N}",
             platform = 2,
             enabled = true,
