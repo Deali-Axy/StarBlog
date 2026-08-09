@@ -15,8 +15,7 @@ namespace StarBlog.Api.Apis.Photography;
 /// </summary>
 [Authorize]
 [ApiController]
-[Route("Api/[controller]")]
-[Route("Api/Admin/Photos")]
+[Route("api/v1/photos")]
 [ApiExplorerSettings(GroupName = ApiGroups.Photo)]
 public class PhotoController : ControllerBase {
     private readonly PhotoService _photoService;
@@ -51,7 +50,7 @@ public class PhotoController : ControllerBase {
     /// 获取指定宽度的缩略图
     /// </summary>
     [AllowAnonymous]
-    [HttpGet("{id}/Thumb")]
+    [HttpGet("{id}/thumbnail")]
     public async Task<IActionResult> GetThumb(string id, [FromQuery] int width = 300, [FromQuery] int quality = 85) {
         if (width is < 1 or > 2000) {
             return BadRequest(ApiResponse.BadRequest("width 参数范围为 1-2000"));
@@ -96,7 +95,7 @@ public class PhotoController : ControllerBase {
     /// <summary>
     /// 设置为推荐图片
     /// </summary>
-    [HttpPost("{id}/[action]")]
+    [HttpPost("{id}/featured-photo")]
     public async Task<ApiResponse<FeaturedPhoto>> SetFeatured(string id) {
         var photo = await _photoService.GetById(id);
         return photo == null
@@ -107,7 +106,7 @@ public class PhotoController : ControllerBase {
     /// <summary>
     /// 取消推荐
     /// </summary>
-    [HttpPost("{id}/[action]")]
+    [HttpDelete("{id}/featured-photo")]
     public async Task<ApiResponse> CancelFeatured(string id) {
         var photo = await _photoService.GetById(id);
         if (photo == null) return ApiResponse.NotFound($"图片 {id} 不存在");
@@ -118,7 +117,7 @@ public class PhotoController : ControllerBase {
     /// <summary>
     /// 重建图片库数据（重新扫描每张图片的大小等数据）
     /// </summary>
-    [HttpPost("[action]")]
+    [HttpPost("maintenance/rebuild-metadata")]
     public async Task<ApiResponse> ReBuildData() {
         return ApiResponse.Ok(new {
             Rows = await _photoService.ReBuildData()
@@ -128,7 +127,7 @@ public class PhotoController : ControllerBase {
     /// <summary>
     /// 批量导入图片
     /// </summary>
-    [HttpPost("[action]")]
+    [HttpPost("imports")]
     public async Task<ApiResponse<List<Photo>>> BatchImport() {
         var result = await _photoService.BatchImport();
         return new ApiResponse<List<Photo>> {
