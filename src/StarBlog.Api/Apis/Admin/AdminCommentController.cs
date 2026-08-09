@@ -11,11 +11,11 @@ namespace StarBlog.Api.Apis.Admin;
 
 /// <summary>
 /// 管理端评论工作台。
-/// 原 <c>/Api/Comment</c> 保留给前台读取和提交；此控制器提供只允许管理员访问的独立入口。
+/// 前台评论与管理审核使用独立资源地址；此控制器只提供管理员审核入口。
 /// </summary>
 [Authorize]
 [ApiController]
-[Route("Api/Admin/Comments")]
+[Route("api/v1/admin/comments")]
 [ApiExplorerSettings(GroupName = Extensions.ApiGroups.Admin)]
 public sealed class AdminCommentController : ControllerBase {
     private readonly CommentService _commentService;
@@ -30,14 +30,14 @@ public sealed class AdminCommentController : ControllerBase {
     }
 
     /// <summary>审核通过一条评论。</summary>
-    [HttpPost("{id}/accept")]
+    [HttpPatch("{id}/approval")]
     public async Task<ApiResponse<Comment>> Accept(string id, [FromBody] CommentAcceptDto dto) {
         var comment = await _commentService.GetById(id);
         return comment == null ? ApiResponse.NotFound() : new ApiResponse<Comment>(await _commentService.Accept(comment, dto.Reason));
     }
 
     /// <summary>审核拒绝一条评论。</summary>
-    [HttpPost("{id}/reject")]
+    [HttpPatch("{id}/rejection")]
     public async Task<ApiResponse<Comment>> Reject(string id, [FromBody] CommentRejectDto dto) {
         var comment = await _commentService.GetById(id);
         return comment == null ? ApiResponse.NotFound() : new ApiResponse<Comment>(await _commentService.Reject(comment, dto.Reason));

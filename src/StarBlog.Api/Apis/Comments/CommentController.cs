@@ -12,7 +12,7 @@ using StarBlog.Application.Criteria;
 namespace StarBlog.Api.Apis.Comments;
 
 [ApiController]
-[Route("Api/[controller]")]
+[Route("api/v1/comments")]
 [ApiExplorerSettings(GroupName = ApiGroups.Comment)]
 public class CommentController : ControllerBase {
     private readonly CommentService _commentService;
@@ -36,7 +36,7 @@ public class CommentController : ControllerBase {
     /// <summary>
     /// 根据邮箱和验证码，获取匿名用户信息
     /// </summary>
-    [HttpGet("[action]")]
+    [HttpGet("anonymous-user")]
     public async Task<ApiResponse> GetAnonymousUser(string email, string otp) {
         Response.Headers.CacheControl = "no-store, no-cache, must-revalidate";
         Response.Headers.Pragma = "no-cache";
@@ -60,7 +60,7 @@ public class CommentController : ControllerBase {
     /// <summary>
     /// 获取邮件验证码
     /// </summary>
-    [HttpGet("[action]")]
+    [HttpPost("email-otp")]
     public async Task<ApiResponse> GetEmailOtp(string email) {
         Response.Headers.CacheControl = "no-store, no-cache, must-revalidate";
         Response.Headers.Pragma = "no-cache";
@@ -116,8 +116,8 @@ public class CommentController : ControllerBase {
         };
     }
 
-    [HttpGet("[action]")]
-    public async Task<List<Comment>?> GetAll(string postId) {
+    [HttpGet("by-post/{postId}")]
+    public async Task<List<Comment>?> GetAll([FromRoute] string postId) {
         return await _commentService.GetAll(postId);
     }
 
@@ -125,7 +125,7 @@ public class CommentController : ControllerBase {
     /// 审核通过
     /// </summary>
     [Authorize]
-    [HttpPost("{id}/[action]")]
+    [HttpPatch("{id}/approval")]
     public async Task<ApiResponse<Comment>> Accept([FromRoute] string id, [FromBody] CommentAcceptDto dto) {
         var item = await _commentService.GetById(id);
         if (item == null) return ApiResponse.NotFound();
@@ -136,7 +136,7 @@ public class CommentController : ControllerBase {
     /// 审核拒绝
     /// </summary>
     [Authorize]
-    [HttpPost("{id}/[action]")]
+    [HttpPatch("{id}/rejection")]
     public async Task<ApiResponse<Comment>> Reject([FromRoute] string id, [FromBody] CommentRejectDto dto) {
         var item = await _commentService.GetById(id);
         if (item == null) return ApiResponse.NotFound();
