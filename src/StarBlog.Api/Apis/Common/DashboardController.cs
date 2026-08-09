@@ -8,11 +8,10 @@ namespace StarBlog.Api.Apis.Common;
 
 [Authorize]
 [ApiController]
-[Route("Api/[controller]")]
-[Route("Api/Admin/Dashboard")]
+[Route("api/v1/admin/runtime")]
 [ApiExplorerSettings(GroupName = ApiGroups.Admin)]
 public class DashboardController : ControllerBase {
-    [HttpGet("[action]")]
+    [HttpGet("statistics")]
     public ApiResponse ClrStats() {
         return ApiResponse.Ok(CLRStatsUtils.GetCurrentClrStats());
     }

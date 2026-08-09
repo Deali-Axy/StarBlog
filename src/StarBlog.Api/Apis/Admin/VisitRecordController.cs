@@ -14,8 +14,7 @@ namespace StarBlog.Api.Apis.Admin;
 /// </summary>
 [Authorize]
 [ApiController]
-[Route("Api/[controller]")]
-[Route("Api/Admin/Analytics")]
+[Route("api/v1/admin/visit-records")]
 [ApiExplorerSettings(GroupName = ApiGroups.Admin)]
 public class VisitRecordController : ControllerBase {
     private readonly VisitRecordAnalyticsService _service;
@@ -40,7 +39,7 @@ public class VisitRecordController : ControllerBase {
     /// 获取全部访问记录
     /// </summary>
     /// <returns></returns>
-    [HttpGet("All")]
+    [HttpGet("exports")]
     public async Task<ApiResponse<List<VisitRecord>>> GetAll([FromQuery] VisitRecordParameters p) {
         return await _service.GetAll(p);
     }
@@ -49,7 +48,7 @@ public class VisitRecordController : ControllerBase {
     /// 总览数据
     /// </summary>
     /// <returns></returns>
-    [HttpGet("[action]")]
+    [HttpGet("reports/overview")]
     public async Task<ApiResponse<VisitOverview>> Overview([FromQuery] VisitRecordParameters p) {
         return await _service.Overview(p);
     }
@@ -59,7 +58,7 @@ public class VisitRecordController : ControllerBase {
     /// </summary>
     /// <param name="days">查看最近几天的数据，默认7天</param>
     /// <returns></returns>
-    [HttpGet("[action]")]
+    [HttpGet("reports/daily-trends")]
     public async Task<ApiResponse<List<DailyTrend>>> DailyTrend([FromQuery] VisitRecordParameters p, int days = 7) {
         return await _service.GetDailyTrend(p, days);
     }
@@ -67,7 +66,7 @@ public class VisitRecordController : ControllerBase {
     /// <summary>
     /// 获取小时级趋势
     /// </summary>
-    [HttpGet("[action]")]
+    [HttpGet("reports/hourly-trends")]
     public async Task<ApiResponse<List<HourlyTrend>>> HourlyTrend([FromQuery] VisitRecordParameters p) {
         return await _service.GetHourlyTrend(p);
     }
@@ -76,7 +75,7 @@ public class VisitRecordController : ControllerBase {
     /// 获取地理信息筛选参数
     /// </summary>
     /// <param name="param">可选 country, province, city</param>
-    [HttpGet("[action]")]
+    [HttpGet("filters/geography")]
     public async Task<ApiResponse<List<string?>>> GeoFilterParams([FromQuery] VisitRecordParameters p, string param = "country") {
         return await _service.GetGeoFilterParams(p, param);
     }
@@ -84,7 +83,7 @@ public class VisitRecordController : ControllerBase {
     /// <summary>
     /// 获取 UserAgent 筛选参数
     /// </summary>
-    [HttpGet("[action]")]
+    [HttpGet("filters/user-agents")]
     public async Task<ApiResponse<UserAgentFilterParams>> UserAgentFilterParams([FromQuery] VisitRecordParameters p) {
         return await _service.GetUserAgentFilterParams(p);
     }
@@ -92,7 +91,7 @@ public class VisitRecordController : ControllerBase {
     /// <summary>
     /// 地理位置分布统计
     /// </summary>
-    [HttpGet("GeoDistribution")]
+    [HttpGet("reports/geographic-distribution")]
     public async Task<ApiResponse> GeoDistribution([FromQuery] VisitRecordParameters p) {
         return ApiResponse.Ok(await _service.GetGeoDistribution(p));
     }
@@ -100,7 +99,7 @@ public class VisitRecordController : ControllerBase {
     /// <summary>
     /// 获取来源域名分析
     /// </summary>
-    [HttpGet("[action]")]
+    [HttpGet("reports/referrer-domains")]
     public async Task<ApiResponse<List<ReferrerDomain>>> ReferrerDomains([FromQuery] VisitRecordParameters p, int top = 10) {
         return await _service.GetReferrerDomains(p, top);
     }
@@ -108,7 +107,7 @@ public class VisitRecordController : ControllerBase {
     /// <summary>
     /// 获取环比增长数据
     /// </summary>
-    [HttpGet("[action]")]
+    [HttpGet("reports/growth-rate")]
     public async Task<ApiResponse<GrowthRate>> GrowthRate([FromQuery] VisitRecordParameters p, int days = 7) {
         return await _service.GetGrowthRate(p, days);
     }
@@ -116,7 +115,7 @@ public class VisitRecordController : ControllerBase {
     /// <summary>
     /// 获取跳出率统计
     /// </summary>
-    [HttpGet("[action]")]
+    [HttpGet("reports/bounce-rate")]
     public async Task<ApiResponse<BounceRateStats>> BounceRate([FromQuery] VisitRecordParameters p) {
         return await _service.GetBounceRate(p);
     }
@@ -124,7 +123,7 @@ public class VisitRecordController : ControllerBase {
     /// <summary>
     /// 获取首次访问统计
     /// </summary>
-    [HttpGet("[action]")]
+    [HttpGet("reports/first-visits")]
     public async Task<ApiResponse<FirstVisitStats>> FirstVisit([FromQuery] VisitRecordParameters p, [FromQuery] int days = 7) {
         return await _service.GetFirstVisitStats(p, days);
     }
@@ -132,7 +131,7 @@ public class VisitRecordController : ControllerBase {
     /// <summary>
     /// 获取技术分布统计
     /// </summary>
-    [HttpGet("[action]")]
+    [HttpGet("reports/technology-distribution")]
     public async Task<ApiResponse<TechDistribution>> TechDistribution([FromQuery] VisitRecordParameters p) {
         return await _service.GetTechDistribution(p);
     }
@@ -140,7 +139,7 @@ public class VisitRecordController : ControllerBase {
     /// <summary>
     /// 获取慢请求排行
     /// </summary>
-    [HttpGet("[action]")]
+    [HttpGet("reports/slow-requests")]
     public async Task<ApiResponse<List<SlowRequest>>> SlowRequests([FromQuery] VisitRecordParameters p, int top = 10) {
         return await _service.GetSlowRequests(p, top);
     }
@@ -148,7 +147,7 @@ public class VisitRecordController : ControllerBase {
     /// <summary>
     /// 获取转化行为分析
     /// </summary>
-    [HttpGet("[action]")]
+    [HttpGet("reports/conversions")]
     public async Task<ApiResponse<ConversionStats>> Conversion([FromQuery] VisitRecordParameters p, string targetPath) {
         return await _service.GetConversionStats(p, targetPath);
     }
@@ -156,7 +155,7 @@ public class VisitRecordController : ControllerBase {
     /// <summary>
     /// 获取PV/UV统计
     /// </summary>
-    [HttpGet("[action]")]
+    [HttpGet("reports/page-and-visitor-views")]
     public async Task<ApiResponse<PvUv>> PvUv([FromQuery] VisitRecordParameters p) {
         return await _service.GetPvUv(p);
     }
@@ -164,7 +163,7 @@ public class VisitRecordController : ControllerBase {
     /// <summary>
     /// 获取响应时间统计
     /// </summary>
-    [HttpGet("[action]")]
+    [HttpGet("reports/response-times")]
     public async Task<ApiResponse> ResponseTimeStats([FromQuery] VisitRecordParameters p) {
         return ApiResponse.Ok(await _service.GetResponseTimeStats(p));
     }
@@ -172,7 +171,7 @@ public class VisitRecordController : ControllerBase {
     /// <summary>
     /// 获取Top N访问路径
     /// </summary>
-    [HttpGet("[action]")]
+    [HttpGet("reports/top-paths")]
     public async Task<ApiResponse<List<TopPath>>> TopPaths([FromQuery] VisitRecordParameters p, int top = 10) {
         return await _service.GetTopPaths(p, top);
     }
