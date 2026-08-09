@@ -81,7 +81,7 @@ public sealed class SiteResourceController : ControllerBase {
         var baseUrl = GetBaseUrl();
         var content = $"""
             User-agent: *
-            Disallow: /Api/Admin/
+            Disallow: /api/v1/admin/
             Disallow: /api-docs/
             Allow: /
             Sitemap: {baseUrl}/sitemap.xml

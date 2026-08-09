@@ -14,8 +14,7 @@ namespace StarBlog.Api.Apis.Blog;
 /// 博客
 /// </summary>
 [ApiController]
-[Route("Api/[controller]")]
-[Route("Api/Admin/Blog")]
+[Route("api/v1/site")]
 [ApiExplorerSettings(GroupName = ApiGroups.Blog)]
 public class BlogController : ControllerBase {
     private readonly ILogger<BlogController> _logger;
@@ -31,7 +30,7 @@ public class BlogController : ControllerBase {
     /// 获取置顶博客
     /// </summary>
     /// <returns></returns>
-    [HttpGet("Top")]
+    [HttpGet("top-post")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<PostDto?>))]
     public async Task<PostDto?> GetTopOnePost() {
         var post = await _blogService.GetTopOnePost();
@@ -42,7 +41,7 @@ public class BlogController : ControllerBase {
     /// 获取推荐博客
     /// </summary>
     /// <returns></returns>
-    [HttpGet("Featured")]
+    [HttpGet("featured-posts")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<List<PostDto>>))]
     public async Task<List<PostDto>> GetFeaturedPosts() {
         var posts = await _blogService.GetFeaturedPosts();
@@ -54,7 +53,7 @@ public class BlogController : ControllerBase {
     /// </summary>
     /// <returns></returns>
     // [Authorize]
-    [HttpGet("[action]")]
+    [HttpGet("overview")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<BlogOverview>))]
     public async Task<BlogOverview> Overview() {
         return await _blogService.Overview();
@@ -64,7 +63,7 @@ public class BlogController : ControllerBase {
     /// 博客文章状态列表
     /// </summary>
     /// <returns></returns>
-    [HttpGet("[action]")]
+    [HttpGet("post-statuses")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<string?>))]
     public async Task<List<string?>> GetStatusList() {
         return await _blogService.GetStatusList();
@@ -75,7 +74,7 @@ public class BlogController : ControllerBase {
     /// </summary>
     /// <returns></returns>
     [Authorize]
-    [HttpPost("[action]")]
+    [HttpPost("/api/v1/posts/imports")]
     public async Task<ApiResponse<PostDto>> Upload([FromForm] PostCreationDto dto, IFormFile file,
         [FromServices] CategoryService categoryService
     ) {

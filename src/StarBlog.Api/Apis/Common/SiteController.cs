@@ -17,7 +17,7 @@ namespace StarBlog.Api.Apis.Common;
 /// 所有页面组装逻辑均以 JSON 返回，渲染和跳转交由新的前端负责。
 /// </summary>
 [ApiController]
-[Route("Api/Site")]
+[Route("api/v1/site")]
 [ApiExplorerSettings(GroupName = ApiGroups.Common)]
 public sealed class SiteController : ControllerBase {
     private readonly BlogService _blogService;
@@ -106,7 +106,7 @@ public sealed class SiteController : ControllerBase {
 
     /// <summary>获取相邻照片，供前端实现上一张/下一张导航。</summary>
     [AllowAnonymous]
-    [HttpGet("photos/{id}/next")]
+    [HttpGet("photos/{id}/adjacent/next")]
     public async Task<ApiResponse<Photo>> NextPhoto(string id) {
         var photo = await _photoService.GetNext(id);
         return photo == null ? ApiResponse.NotFound("没有下一张图片") : new ApiResponse<Photo>(photo);
@@ -114,7 +114,7 @@ public sealed class SiteController : ControllerBase {
 
     /// <summary>获取相邻照片，供前端实现上一张/下一张导航。</summary>
     [AllowAnonymous]
-    [HttpGet("photos/{id}/previous")]
+    [HttpGet("photos/{id}/adjacent/previous")]
     public async Task<ApiResponse<Photo>> PreviousPhoto(string id) {
         var photo = await _photoService.GetPrevious(id);
         return photo == null ? ApiResponse.NotFound("没有上一张图片") : new ApiResponse<Photo>(photo);
@@ -128,7 +128,7 @@ public sealed class SiteController : ControllerBase {
         return photo == null ? ApiResponse.NotFound("当前没有图片") : new ApiResponse<Photo>(photo);
     }
 
-    /// <summary>提交友情链接申请；审核仍由 <c>/Api/LinkExchange</c> 管理端接口完成。</summary>
+    /// <summary>提交友情链接申请；审核由管理端的链接交换申请资源完成。</summary>
     [AllowAnonymous]
     [HttpPost("link-exchanges")]
     public async Task<ApiResponse<LinkExchange>> ApplyForLinkExchange([FromBody] LinkExchangeApplicationDto dto) {

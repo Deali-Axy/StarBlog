@@ -8,7 +8,7 @@ namespace StarBlog.Api.Apis.Common;
 /// 页面主题
 /// </summary>
 [ApiController]
-[Route("Api/[controller]")]
+[Route("api/v1/theme")]
 [ApiExplorerSettings(GroupName = ApiGroups.Common)]
 public class ThemeController : ControllerBase {
     private readonly ThemeService _themeService;
