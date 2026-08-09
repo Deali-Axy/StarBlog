@@ -19,8 +19,7 @@ namespace StarBlog.Api.Apis.Blog;
 /// </summary>
 [Authorize]
 [ApiController]
-[Route("Api/[controller]")]
-[Route("Api/Admin/Posts")]
+[Route("api/v1/posts")]
 [ApiExplorerSettings(GroupName = ApiGroups.Blog)]
 public class BlogPostController : ControllerBase {
     private readonly IMapper _mapper;
@@ -55,7 +54,7 @@ public class BlogPostController : ControllerBase {
     }
 
     [AllowAnonymous]
-    [HttpGet("slug/{slug}")]
+    [HttpGet("by-slug/{slug}")]
     public async Task<ApiResponse<PostDto>> GetBySlug(string slug) {
         var post = await _postService.GetBySlug(slug);
         return post == null ? ApiResponse.NotFound() : new ApiResponse<PostDto>(PostDto.From(post));
@@ -118,7 +117,7 @@ public class BlogPostController : ControllerBase {
     /// <param name="id"></param>
     /// <param name="file"></param>
     /// <returns></returns>
-    [HttpPost("{id}/[action]")]
+    [HttpPost("{id}/images")]
     public async Task<ApiResponse> UploadImage(string id, IFormFile file) {
         var post = await _postService.GetById(id);
         if (post == null) return ApiResponse.NotFound($"博客 {id} 不存在");
@@ -135,7 +134,7 @@ public class BlogPostController : ControllerBase {
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [HttpGet("{id}/[action]")]
+    [HttpGet("{id}/images")]
     public async Task<ApiResponse<List<string>>> Images(string id) {
         var post = await _postService.GetById(id);
         if (post == null) return ApiResponse.NotFound($"博客 {id} 不存在");
@@ -147,7 +146,7 @@ public class BlogPostController : ControllerBase {
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [HttpPost("{id}/[action]")]
+    [HttpPost("{id}/featured-post")]
     public async Task<ApiResponse<FeaturedPostDto>> SetFeatured(string id) {
         var post = await _postService.GetById(id);
         return post == null
@@ -160,7 +159,7 @@ public class BlogPostController : ControllerBase {
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [HttpPost("{id}/[action]")]
+    [HttpDelete("{id}/featured-post")]
     public async Task<ApiResponse> CancelFeatured(string id) {
         var post = await _postService.GetById(id);
         if (post == null) return ApiResponse.NotFound($"博客 {id} 不存在");
@@ -173,7 +172,7 @@ public class BlogPostController : ControllerBase {
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [HttpPost("{id}/[action]")]
+    [HttpPut("{id}/top-placement")]
     public async Task<ApiResponse<TopPostDto>> SetTop(string id) {
         var post = await _postService.GetById(id);
         if (post == null) return ApiResponse.NotFound($"博客 {id} 不存在");
@@ -182,7 +181,7 @@ public class BlogPostController : ControllerBase {
     }
 
     /// <summary>翻译文章并保存指定语言版本。</summary>
-    [HttpPost("{id}/[action]")]
+    [HttpPost("{id}/translations")]
     public async Task<ApiResponse> Translate(string id, [FromServices] TranslationService translationService, [FromQuery] string language = "en") {
         if (await _postService.GetById(id) == null) return ApiResponse.NotFound($"博客 {id} 不存在");
         try {
@@ -196,20 +195,20 @@ public class BlogPostController : ControllerBase {
 
     /// <summary>获取指定语言的文章翻译。</summary>
     [AllowAnonymous]
-    [HttpGet("{id}/[action]")]
-    public async Task<ApiResponse<PostTranslation>> GetTranslation(string id, [FromServices] TranslationService translationService, [FromQuery] string language = "en") {
+    [HttpGet("{id}/translations/{language}")]
+    public async Task<ApiResponse<PostTranslation>> GetTranslation(string id, [FromServices] TranslationService translationService, [FromRoute] string language) {
         var translation = await translationService.GetTranslation(id, language);
         return translation == null ? ApiResponse.NotFound($"未找到 {language} 翻译") : new ApiResponse<PostTranslation>(translation);
     }
 
     /// <summary>返回文章已生成的翻译语言代码。</summary>
     [AllowAnonymous]
-    [HttpGet("{id}/[action]")]
+    [HttpGet("{id}/translations")]
     public async Task<ApiResponse<List<string>>> AvailableTranslations(string id, [FromServices] TranslationService translationService) =>
         new(await translationService.GetAvailableLanguages(id));
 
     /// <summary>删除文章的一个翻译版本。</summary>
-    [HttpDelete("{id}/[action]/{translationId}")]
+    [HttpDelete("{id}/translations/{translationId}")]
     public async Task<ApiResponse> DeleteTranslation(string id, string translationId, [FromServices] TranslationService translationService) {
         var rows = await translationService.DeleteTranslation(translationId);
         return rows > 0 ? ApiResponse.Ok("翻译已删除") : ApiResponse.NotFound("翻译不存在");

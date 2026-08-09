@@ -13,8 +13,7 @@ namespace StarBlog.Api.Apis.Blog;
 /// </summary>
 [Authorize]
 [ApiController]
-[Route("Api/[controller]")]
-[Route("Api/Admin/Featured/Photos")]
+[Route("api/v1/featured-photos")]
 [ApiExplorerSettings(GroupName = ApiGroups.Blog)]
 public class FeaturedPhotoController : ControllerBase {
     private readonly PhotoService _photoService;

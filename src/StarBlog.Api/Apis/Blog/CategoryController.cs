@@ -16,8 +16,7 @@ namespace StarBlog.Api.Apis.Blog;
 /// </summary>
 [Authorize]
 [ApiController]
-[Route("Api/[controller]")]
-[Route("Api/Admin/Categories")]
+[Route("api/v1/categories")]
 [ApiExplorerSettings(GroupName = ApiGroups.Blog)]
 public class CategoryController : ControllerBase {
     private readonly CategoryService _cService;
@@ -34,15 +33,9 @@ public class CategoryController : ControllerBase {
     /// 获取分录目录树
     /// </summary>
     [AllowAnonymous]
-    [HttpGet("Nodes")]
+    [HttpGet("tree")]
     public async Task<List<CategoryNode>?> GetNodes() {
         return await _cService.GetNodes();
-    }
-
-    [AllowAnonymous]
-    [HttpGet("All")]
-    public async Task<List<Category>> GetAll() {
-        return await _cService.GetAll();
     }
 
     [AllowAnonymous]
@@ -95,7 +88,7 @@ public class CategoryController : ControllerBase {
     /// </summary>
     /// <returns></returns>
     [AllowAnonymous]
-    [HttpGet("[action]")]
+    [HttpGet("word-cloud")]
     public async Task<List<object>> WordCloud() {
         return await _cService.GetWordCloud();
     }
@@ -107,7 +100,7 @@ public class CategoryController : ControllerBase {
     /// <param name="id"></param>
     /// <param name="dto">推荐信息 <see cref="FeaturedCategoryCreationDto"/></param>
     /// <returns></returns>
-    [HttpPost("{id:int}/[action]")]
+    [HttpPost("{id:int}/featured-category")]
     public async Task<ApiResponse<FeaturedCategory>> SetFeatured(int id, [FromBody] FeaturedCategoryCreationDto dto) {
         var item = await _cService.GetById(id);
         return item == null
@@ -120,7 +113,7 @@ public class CategoryController : ControllerBase {
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [HttpPost("{id:int}/[action]")]
+    [HttpDelete("{id:int}/featured-category")]
     public async Task<ApiResponse> CancelFeatured(int id) {
         var item = await _cService.GetById(id);
         if (item == null) return ApiResponse.NotFound($"分类 {id} 不存在");
@@ -133,7 +126,7 @@ public class CategoryController : ControllerBase {
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [HttpPost("{id:int}/[action]")]
+    [HttpPatch("{id:int}/visibility")]
     public async Task<ApiResponse> SetVisible(int id) {
         var item = await _cService.GetById(id);
         if (item == null) return ApiResponse.NotFound($"分类 {id} 不存在");
@@ -146,7 +139,7 @@ public class CategoryController : ControllerBase {
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    [HttpPost("{id:int}/[action]")]
+    [HttpDelete("{id:int}/visibility")]
     public async Task<ApiResponse> SetInvisible(int id) {
         var item = await _cService.GetById(id);
         if (item == null) return ApiResponse.NotFound($"分类 {id} 不存在");
