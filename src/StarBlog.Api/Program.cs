@@ -73,6 +73,7 @@ builder.Services.AddCors(options => {
         policyBuilder.AllowAnyMethod();
         policyBuilder.WithOrigins(
             "http://localhost:3000",
+            "http://localhost:5173",
             "http://localhost:8080",
             "http://localhost:8081",
             "https://deali.cn",
@@ -112,6 +113,8 @@ builder.Services.AddScoped<LinkExchangeService>();
 builder.Services.AddScoped<LinkService>();
 builder.Services.AddScoped<PhotoService>();
 builder.Services.AddScoped<PostService>();
+// 多平台发布：渠道及投递记录持久化在业务数据库，HTTP 客户端用于公众号官方 API。
+builder.Services.AddScoped<PublicationService>();
 // 文章翻译是可选能力：未配置密钥时 API 仍可启动，调用时给出可读错误。
 builder.Services.Configure<TranslationConfig>(builder.Configuration.GetSection(TranslationConfig.SectionName));
 builder.Services.AddScoped<TranslationService>();
