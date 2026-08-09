@@ -74,7 +74,7 @@ public class SwaggerAuthMiddleware
         {
             error = "Unauthorized",
             message = "访问Swagger UI需要有效的JWT令牌认证",
-            details = "请先通过 /Api/Auth/login 接口获取JWT令牌，然后在请求头中添加 'Authorization: Bearer {token}'",
+            details = "请先通过 /api/v1/auth/tokens 接口获取 JWT 令牌，然后在请求头中添加 'Authorization: Bearer {token}'",
             timestamp = DateTime.UtcNow
         };
         

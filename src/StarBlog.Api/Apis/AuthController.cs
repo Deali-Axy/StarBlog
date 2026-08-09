@@ -13,8 +13,7 @@ namespace StarBlog.Api.Apis;
 /// 认证
 /// </summary>
 [ApiController]
-[Route("Api/[controller]")]
-[Route("Api/Admin/Auth")]
+[Route("api/v1/auth")]
 [ApiExplorerSettings(GroupName = ApiGroups.Auth)]
 public class AuthController : ControllerBase {
     private readonly AuthService _authService;
@@ -28,9 +27,7 @@ public class AuthController : ControllerBase {
     /// </summary>
     /// <param name="loginUser"></param>
     /// <returns></returns>
-    [HttpPost]
-    [Route("")]
-    [Route("[action]")]
+    [HttpPost("tokens")]
     [ProducesResponseType(typeof(ApiResponse<LoginToken>), StatusCodes.Status200OK)]
     public async Task<ApiResponse> Login(LoginUser loginUser) {
         var user = await _authService.GetUserByName(loginUser.Username);
@@ -44,9 +41,7 @@ public class AuthController : ControllerBase {
     /// </summary>
     /// <returns></returns>
     [Authorize]
-    [HttpGet]
-    [Route("")]
-    [Route("[action]")]
+    [HttpGet("/api/v1/users/me")]
     public ApiResponse<User> GetUser() {
         var user = _authService.GetUser(User);
         if (user == null) return ApiResponse.NotFound("找不到用户资料");
