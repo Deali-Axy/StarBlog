@@ -1,0 +1,45 @@
+# https://taskfile.dev
+version: "3"
+
+vars:
+  API_PROJECT: src/StarBlog.Api/StarBlog.Api.csproj
+  DATA_PROJECT: src/StarBlog.Data/StarBlog.Data.csproj
+  ROOT_SOLUTION: ../../StarBlog.slnx
+
+tasks:
+  restore:
+    desc: Restore API dependencies
+    cmds:
+      - dotnet restore {{.API_PROJECT}}
+
+  dev:
+    desc: Run the ASP.NET Core API with file watching
+    # 将进程工作目录固定为 Web 项目目录，确保 SQLite、words.json 和静态资源的相对路径保持稳定。
+    dir: src/StarBlog.Api
+    cmds:
+      - dotnet watch run
+
+  build:
+    desc: Build the ASP.NET Core API
+    cmds:
+      - dotnet build {{.API_PROJECT}}
+
+  format:
+    desc: Format all maintained .NET projects in the root solution
+    cmds:
+      - dotnet format {{.ROOT_SOLUTION}}
+
+  clean:
+    desc: Clean API build artifacts
+    cmds:
+      - dotnet clean {{.API_PROJECT}}
+
+  db:add:
+    desc: "Add an EF Core migration (usage: task api:db:add -- MigrationName)"
+    cmds:
+      - dotnet ef migrations add {{.CLI_ARGS}} --project {{.DATA_PROJECT}} --startup-project {{.API_PROJECT}}
+
+  db:update:
+    desc: Apply EF Core migrations to the configured database
+    cmds:
+      - dotnet ef database update --project {{.DATA_PROJECT}} --startup-project {{.API_PROJECT}}

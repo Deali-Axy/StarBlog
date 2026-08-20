@@ -64,8 +64,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\StarBlog.Data\StarBlog.Data.csproj" />
-      <ProjectReference Include="..\..\src\StarBlog.Infrastructure\StarBlog.Infrastructure.csproj" />
+      <ProjectReference Include="..\..\apps\api\src\StarBlog.Data\StarBlog.Data.csproj" />
+      <ProjectReference Include="..\..\apps\api\src\StarBlog.Infrastructure\StarBlog.Infrastructure.csproj" />
     </ItemGroup>
 
 </Project>

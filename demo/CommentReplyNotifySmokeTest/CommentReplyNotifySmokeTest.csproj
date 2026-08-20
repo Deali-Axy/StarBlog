@@ -12,8 +12,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\src\StarBlog.Data\StarBlog.Data.csproj" />
-        <ProjectReference Include="..\..\src\StarBlog.Web\StarBlog.Web.csproj" />
+        <ProjectReference Include="..\..\apps\api\src\StarBlog.Data\StarBlog.Data.csproj" />
+        <ProjectReference Include="..\..\apps\web-legacy\StarBlog.Web.csproj" />
     </ItemGroup>
 
 </Project>

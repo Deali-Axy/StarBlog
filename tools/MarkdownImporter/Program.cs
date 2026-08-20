@@ -26,12 +26,12 @@ if (!Directory.Exists(importDir)) {
 
 var repoRoot = RepoRootLocator.FindFrom(AppContext.BaseDirectory);
 if (repoRoot == null) {
-    Console.Error.WriteLine("无法定位仓库根目录（未找到 StarBlog.sln）。请在仓库内运行，或通过参数显式指定路径。");
+    Console.Error.WriteLine("无法定位仓库根目录（未找到 StarBlog.slnx）。请在仓库内运行，或通过参数显式指定路径。");
     Environment.ExitCode = 2;
     return;
 }
 
-var webDir = Path.Combine(repoRoot, "src", "StarBlog.Web");
+var webDir = Path.Combine(repoRoot, "apps", "web-legacy");
 var assetsPath = options.AssetsPath;
 if (string.IsNullOrWhiteSpace(assetsPath)) {
     assetsPath = Path.Combine(webDir, "wwwroot", "media", "blog");
@@ -65,7 +65,7 @@ var categoryRepo = freeSql.GetRepository<Category>();
 // 数据导入
 WalkDirectoryTree(new DirectoryInfo(importDir));
 
-// 复制数据库到 Web 项目目录（默认：src/StarBlog.Web/app.db）
+// 复制数据库到旧 Web 项目目录（默认：apps/web-legacy/app.db）
 if (File.Exists(localDbPath)) {
     Directory.CreateDirectory(Path.GetDirectoryName(destDbPath)!);
     Console.WriteLine($"复制数据库：{localDbPath} -> {destDbPath}");
@@ -209,9 +209,9 @@ internal sealed record ImportOptions(
         Console.WriteLine("  --importDir <目录>      Markdown 根目录（也可用环境变量 STAR_BLOG_IMPORT_DIR）");
         Console.WriteLine();
         Console.WriteLine("可选：");
-        Console.WriteLine("  --assetsPath <目录>     图片导入目录（默认：src/StarBlog.Web/wwwroot/media/blog）");
+        Console.WriteLine("  --assetsPath <目录>     图片导入目录（默认：apps/web-legacy/wwwroot/media/blog）");
         Console.WriteLine("  --localDb <文件>        生成的 SQLite DB 路径（默认：./app.db）");
-        Console.WriteLine("  --destDb <文件>         复制到 Web 的 DB 路径（默认：src/StarBlog.Web/app.db）");
+        Console.WriteLine("  --destDb <文件>         复制到 Web 的 DB 路径（默认：apps/web-legacy/app.db）");
         Console.WriteLine();
     }
 
@@ -236,7 +236,7 @@ internal static class RepoRootLocator {
     public static string? FindFrom(string startPath) {
         var dir = new DirectoryInfo(startPath);
         while (dir != null) {
-            if (File.Exists(Path.Combine(dir.FullName, "StarBlog.sln"))) {
+            if (File.Exists(Path.Combine(dir.FullName, "StarBlog.slnx"))) {
                 return dir.FullName;
             }
             dir = dir.Parent;

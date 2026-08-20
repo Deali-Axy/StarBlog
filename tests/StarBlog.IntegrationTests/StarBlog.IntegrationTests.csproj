@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\StarBlog.Web\StarBlog.Web.csproj" />
+    <ProjectReference Include="..\..\apps\web-legacy\StarBlog.Web.csproj" />
     <ProjectReference Include="..\StarBlog.Testing\StarBlog.Testing.csproj" />
   </ItemGroup>
 
