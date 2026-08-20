@@ -12,7 +12,7 @@
 
 ## 📝 简介
 
-StarBlog 是一个基于 .NET 6 和 ASP.NET Core 开发的现代博客系统，支持 Markdown 文章导入，遵循 RESTful 接口规范。前端基于 Vue + ElementUI 开发，可作为 .NET Core 入门学习项目，同时配套了一系列开发笔记，记录了从零开始构建这个博客系统的全过程，可以帮助学习理解 .Net Core 项目的开发流程。
+StarBlog 是一个基于 .NET 10 和 ASP.NET Core 的模块化单体博客系统。后端按业务能力组织（Identity、Content、Comments、Media、Links、Analytics、Site、Configuration、Notifications），持久化统一使用 EF Core 与 SQLite。仓库内的 `apps/admin` 是 Refine + Vite 管理后台。
 
 **在线演示**：[https://blog.deali.cn](https://blog.deali.cn)
 
@@ -78,9 +78,7 @@ StarBlog 不仅仅是一个博客系统，它正在发展成为一个完整的�
 - **监控调试**：Rin - ASP.NET Core 应用实时检查工具
 
 ##### 数据访问与处理
-- **主要ORM**：FreeSql - 高性能、支持多种数据库的 ORM 框架
-- **辅助ORM**：Entity Framework Core - 微软官方 ORM 框架
-- **对象映射**：AutoMapper - 简化对象-对象映射的工具库
+- **ORM**：Entity Framework Core + SQLite（单一 `StarBlogDbContext`）
 
 ##### API与认证
 - **API文档**：Swagger/OpenAPI (Swashbuckle.AspNetCore) - RESTful API 自动文档生成工具
@@ -90,15 +88,15 @@ StarBlog 不仅仅是一个博客系统，它正在发展成为一个完整的�
 ##### 内容处理
 - **Markdown引擎**：[Markdig](https://github.com/xoofx/markdig) - 高性能 Markdown 处理器
 - **图像处理**：ImageSharp - 跨平台图像处理库
-- **分页组件**：X.PagedList - 高效的数据分页解决方案
-- **RSS支持**：System.ServiceModel.Syndication - RSS 内容聚合工具
+- **分页**：项目内 `PageResult<T>`
+- **RSS**：Atom feed 由 Site 模块直接生成
 
 ##### 通信与工具
 - **邮件服务**：MailKit - 跨平台邮件客户端库
 
 #### 前端
 - **博客前台**：Bootstrap + Vue + ElementUI + editor.md + bootswatch
-- **管理后台**：Vue + Vuex + Vue Router + ElementUI + SCSS
+- **管理后台**：`apps/admin`（Refine + React + Ant Design + Vite）
 
 ### 项目结构
 
@@ -108,57 +106,28 @@ StarBlog 采用多语言 monorepo，产品应用统一放在 `apps/`，仓库级
 StarBlog/
 ├── apps/
 │   ├── api/
-│   │   ├── src/                    # 当前 .NET API 与过渡类库
+│   │   ├── src/StarBlog.Api/       # 模块化单体后端
+│   │   │   ├── Hosting/
+│   │   │   ├── Modules/
+│   │   │   ├── Infrastructure/
+│   │   │   └── Shared/
+│   │   ├── tests/StarBlog.Api.Tests/
 │   │   └── Taskfile.yml
-│   ├── admin/                      # Refine + Vite 管理后台
-│   └── web-legacy/                 # 旧 Razor/MVC 宿主，后续删除
-├── tools/                          # 导入、数据处理、图片优化和备份工具
-├── tests/                          # 测试项目，后续归并到所属应用
-├── demo/                           # 待清理的历史实验，不参与默认构建
-├── deploy/                         # 生产部署配置
-├── docs/                           # 架构和使用文档
-├── scripts/                        # 仓库自动化脚本
-├── Taskfile.yml                    # 多语言统一任务入口
-└── StarBlog.slnx                   # .NET 工作区
+│   └── admin/                      # Refine + Vite 管理后台
+├── tools/                          # 图片优化和备份等独立工具
+├── tests/StarBlog.E2ETests/         # 跨应用黑盒 E2E
+├── deploy/
+├── docs/
+├── scripts/
+├── Taskfile.yml
+└── StarBlog.slnx
 ```
 
-### 分层与职责（DDD/清洁架构取向）
+### 模块化单体
 
-这套拆分更接近“DDD 的分层思想/清洁架构”的方向：将 HTTP 适配层与“用例编排（Application Layer）”解耦，便于在不影响对外 API 的情况下演进业务逻辑与基础设施。
+后端只保留一个可部署的 ASP.NET Core 项目。代码按业务模块组织，`Program.cs` 只负责组合 Hosting、Infrastructure 和各模块的 `Add*` / `Map*`。持久化统一走 `StarBlogDbContext`；跨模块调用只允许公开查询/命令契约，不直接修改其他模块的实体。
 
-#### 当前过渡结构
-
-```
-apps/api/src/StarBlog.Api
-  └─ 依赖 → StarBlog.Application
-             └─ 依赖 → StarBlog.Data / StarBlog.Infrastructure / StarBlog.Content
-```
-
-- **apps/api/src/StarBlog.Api**
-  - 仅负责 HTTP：Controllers、鉴权/Swagger/HealthChecks 中间件、DI 组合根、路由与跨域策略等。
-  - 不承载业务规则与复杂编排，保持“薄控制器”。
-- **apps/api/src/StarBlog.Application**
-  - 承载应用层：应用服务（Use Case 编排）、DTO/ViewModels、查询参数对象、后台任务（Outbox/VisitRecord Worker 等）。
-  - 目标是“稳定业务行为 + 可测试”，同时避免依赖 StarBlog.Api（依赖方向单向）。
-
-#### 这是不是 DDD？
-
-- **是 DDD 的“分层思想”方向**：当前的 `StarBlog.Application` 基本对应 DDD 的 Application Layer；`StarBlog.Api` 对应 Presentation/Interface Adapter。
-- **但还不是“完整 DDD”**（现状是“分层架构 + 领域尚未显式化”）：
-  - 还没有独立的 `StarBlog.Domain` 模块来表达聚合/值对象/领域服务/领域事件等。
-  - `StarBlog.Data.Models` 仍然承担了大部分领域模型（更偏“持久化模型/贫血模型”），仓储抽象也未完全与基础设施解耦。
-
-#### 推荐的演进路径（可选）
-
-如果后续希望更贴近 DDD（或 Clean Architecture 的经典分层），可以逐步引入：
-
-```
-StarBlog.Api → StarBlog.Application → StarBlog.Domain
-                                 ↘  (接口) ↙
-                       StarBlog.Infrastructure / StarBlog.Data (实现)
-```
-
-核心原则：依赖朝内（业务规则更稳定的层不依赖更易变的层），HTTP/数据库/第三方服务都在边缘层实现与替换。
+本次重构明确不做完整 DDD 战术模式、MediatR 或按模块拆库。接口只用于可替换边界（存储、邮件、时钟、当前用户、外部 LLM）。
 
 ## 🚀 快速开始
 
@@ -204,34 +173,17 @@ task admin:dev
 
 4. **访问日志数据库同步**
 
-StarBlog 的访问日志模块为了优化性能，是独立的数据库，使用 EFCore 进行管理，详见: [StarBlog 番外篇 (1) 全新的访问统计功能，异步队列，分库存储](https://blog.deali.cn/Blog/Post/a97ecc01df52707a)
+业务数据与访问记录共用同一个 SQLite 数据库（`ConnectionStrings:Default`，默认 `app.db`）。生产启动会自动应用 `InitialCreate` 及后续 migrations。
 
-EFCore 不能像 FreeSQL 一样自动生成表结构，需要手动同步数据库，默认也是使用 SQLite 数据库，如有需要可以自行切换 MySQL 或者 PostgreSQL。
-
-首先安装 EFCore 的 cli 工具:
-
-```bash
-dotnet tool install --global dotnet-ef
-```
-
-同步数据库 (Windows10+)
+本地手动更新：
 
 ```powershell
-$env:CONNECTION_STRING = "Data Source=apps\api\src\StarBlog.Api\app.log.db"
 task api:db:update
-```
-
-同步数据库 (Linux/MacOS)
-
-```bash
-CONNECTION_STRING="Data Source=apps/api/src/StarBlog.Api/app.log.db" task api:db:update
 ```
 
 ### 初始化
 
-首次启动 StarBlog 项目后，访问 `/Home/Init` 进行管理员账户创建等初始化操作，之后才可以使用这个管理员账号登录管理后台。
-
-**注意**：初始化操作只能执行一次。详情请参考 [StarBlog - (16) 一些新功能 (监控/统计/配置/初始化)](https://www.cnblogs.com/deali/p/16523157.html)。
+启动 API 与管理后台后，打开管理端登录页。若用户表为空，会展示一次性创建首个管理员的表单（`GET/POST /api/v1/site/initialization`）。也可以运行 `scripts/Initialize-StarBlogAdmin.ps1`。初始化只能执行一次。
 
 ### 配置
 
