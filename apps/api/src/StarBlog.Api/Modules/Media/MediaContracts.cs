@@ -46,4 +46,6 @@ public interface IPhotoCatalog {
     Task<PhotoResponse?> GetNextAsync(string id, CancellationToken cancellationToken = default);
     Task<PhotoResponse?> GetPreviousAsync(string id, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<PhotoResponse>> GetFeaturedAsync(CancellationToken cancellationToken = default);
+    Task<int> CountAsync(CancellationToken cancellationToken = default);
+    Task<int> CountFeaturedAsync(CancellationToken cancellationToken = default);
 }

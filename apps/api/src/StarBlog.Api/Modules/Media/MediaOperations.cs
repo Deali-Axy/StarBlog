@@ -47,33 +47,38 @@ public sealed class MediaOperations : IPhotoCatalog {
         return photo == null ? null : PhotoResponse.From(photo);
     }
 
-    /// <summary>保存上传图片：先写文件再插入数据库，避免空记录。</summary>
+    /// <summary>先编码到内存再写存储并插入数据库；任一步失败时删除已写入的文件，避免空记录或孤儿文件。</summary>
     public async Task<PhotoResponse> AddAsync(string title, string location, Stream photoStream, CancellationToken cancellationToken) {
         var photoId = Guid.NewGuid().ToString("N")[..16];
+        var fileName = $"{photoId}.jpg";
+        var relativePath = $"{MediaDirectory}/{fileName}";
         var photo = new Photo {
             Id = photoId,
             Title = title,
             Location = location,
-            FilePath = $"{photoId}.jpg",
+            FilePath = fileName,
             CreateTime = _clock.Now
         };
 
-        await _storage.EnsureDirectoryAsync(MediaDirectory, cancellationToken);
-        var savePath = PhysicalPath(photo);
         await using var buffered = new MemoryStream();
         await photoStream.CopyToAsync(buffered, cancellationToken);
         buffered.Position = 0;
-        var resized = await ResizeIfNeededAsync(buffered, savePath);
-        if (!resized) {
-            buffered.Position = 0;
-            await using var file = new FileStream(savePath, FileMode.Create, FileAccess.Write, FileShare.None);
-            await buffered.CopyToAsync(file, cancellationToken);
-        }
+        await using var encoded = new MemoryStream();
+        await EncodeAsJpegAsync(buffered, encoded);
+        encoded.Position = 0;
 
-        await FillDimensionsAsync(photo);
-        _db.Photos.Add(photo);
-        await _db.SaveChangesAsync(cancellationToken);
-        return PhotoResponse.From(photo);
+        await _storage.EnsureDirectoryAsync(MediaDirectory, cancellationToken);
+        try {
+            await _storage.SaveAsync(relativePath, encoded, cancellationToken: cancellationToken);
+            await FillDimensionsAsync(photo);
+            _db.Photos.Add(photo);
+            await _db.SaveChangesAsync(cancellationToken);
+            return PhotoResponse.From(photo);
+        }
+        catch {
+            await _storage.DeleteAsync(relativePath, cancellationToken);
+            throw;
+        }
     }
 
     public async Task<PhotoResponse?> UpdateAsync(string id, PhotoUpdateRequest request, CancellationToken cancellationToken) {
@@ -102,7 +107,9 @@ public sealed class MediaOperations : IPhotoCatalog {
     public async Task<byte[]?> GetThumbAsync(string id, int width, int quality, CancellationToken cancellationToken) {
         var photo = await _db.Photos.AsNoTracking().FirstOrDefaultAsync(item => item.Id == id, cancellationToken);
         if (photo == null) return null;
-        using var image = await Image.LoadAsync(PhysicalPath(photo), cancellationToken);
+        var path = PhysicalPath(photo);
+        if (!File.Exists(path)) return null;
+        using var image = await Image.LoadAsync(path, cancellationToken);
         if (width > 0) image.Mutate(context => context.Resize(width, 0));
         await using var memory = new MemoryStream();
         await image.SaveAsync(memory, new JpegEncoder { Quality = quality }, cancellationToken);
@@ -166,6 +173,14 @@ public sealed class MediaOperations : IPhotoCatalog {
         return photos.Select(PhotoResponse.From).ToList();
     }
 
+    /// <summary>全部图片数量，供 Site 聚合概况使用。</summary>
+    public Task<int> CountAsync(CancellationToken cancellationToken = default) =>
+        _db.Photos.CountAsync(cancellationToken);
+
+    /// <summary>精选图片数量，供 Site 聚合概况使用。</summary>
+    public Task<int> CountFeaturedAsync(CancellationToken cancellationToken = default) =>
+        _db.FeaturedPhotos.CountAsync(cancellationToken);
+
     private string PhysicalPath(Photo photo) => Path.Combine(_paths.WebRootPath, "media", "photography", photo.FilePath);
 
     private async Task FillDimensionsAsync(Photo photo) {
@@ -174,22 +189,18 @@ public sealed class MediaOperations : IPhotoCatalog {
         photo.Height = info.Height;
     }
 
-    private static async Task<bool> ResizeIfNeededAsync(Stream stream, string savePath) {
+    /// <summary>把任意可解码图片转成边长不超过 1500 的 JPEG，写入完成后再落盘。</summary>
+    private static async Task EncodeAsJpegAsync(Stream stream, Stream output) {
         const int max = 1500;
         using var image = await Image.LoadAsync(stream);
-        var resized = false;
         if (image.Width > max) {
-            resized = true;
             image.Mutate(context => context.Resize(max, 0));
         }
 
         if (image.Height > max) {
-            resized = true;
             image.Mutate(context => context.Resize(0, max));
         }
 
-        if (!resized) return false;
-        await image.SaveAsJpegAsync(savePath);
-        return true;
+        await image.SaveAsJpegAsync(output);
     }
 }
