@@ -4,8 +4,8 @@
 
 
 <p align="center">
-  <a href="https://dotnet.microsoft.com/download/dotnet/6.0"><img src="https://img.shields.io/badge/.NET-6.0-512BD4?style=flat-square&logo=dotnet" alt=".NET 6"></a>
-  <a href="https://github.com/Deali-Axy/StarBlog-Admin"><img src="https://img.shields.io/badge/Admin-Vue3-4FC08D?style=flat-square&logo=vue.js" alt="Vue 3"></a>
+  <a href="https://dotnet.microsoft.com/download/dotnet/10.0"><img src="https://img.shields.io/badge/.NET-10.0-512BD4?style=flat-square&logo=dotnet" alt=".NET 10"></a>
+  <a href="https://github.com/Deali-Axy/StarBlog"><img src="https://img.shields.io/badge/Admin-Refine-4FC08D?style=flat-square&logo=react" alt="Refine Admin"></a>
   <a href="https://blog.deali.cn"><img src="https://img.shields.io/badge/Demo-Online-brightgreen?style=flat-square" alt="Online Demo"></a>
   <a href="https://github.com/Deali-Axy/StarBlog-Admin"><img src="https://img.shields.io/badge/Admin-Repository-181717?style=flat-square&logo=github" alt="Admin Repository"></a>
 </p>
@@ -16,7 +16,7 @@ StarBlog 是一个基于 .NET 10 和 ASP.NET Core 的模块化单体博客系统
 
 **在线演示**：[https://blog.deali.cn](https://blog.deali.cn)
 
-**管理后台项目**：[https://github.com/Deali-Axy/StarBlog-Admin](https://github.com/Deali-Axy/StarBlog-Admin)
+**管理后台**：本仓库 `apps/admin`（Refine + React + Ant Design）。历史独立仓库：[StarBlog-Admin](https://github.com/Deali-Axy/StarBlog-Admin)
 
 **AI文章发布工具**：[https://github.com/star-blog/starblog-publisher](https://github.com/star-blog/starblog-publisher)
 
@@ -61,7 +61,7 @@ StarBlog 不仅仅是一个博客系统，它正在发展成为一个完整的�
 
 ### StarBlog Admin
 
-[StarBlog Admin](https://github.com/Deali-Axy/StarBlog-Admin) 是 StarBlog 的管理后台项目，基于 Vue + ElementUI 开发，提供完整的博客内容管理功能。
+仓库内 `apps/admin` 是当前管理后台，基于 Refine + React + Ant Design。登录页在站点未初始化时会引导创建首个管理员。
 
 ### StarBlogHub
 
@@ -75,7 +75,7 @@ StarBlog 不仅仅是一个博客系统，它正在发展成为一个完整的�
 
 ##### 核心框架与基础设施
 - **Web框架**：ASP.NET Core - 跨平台、高性能的 .NET Web 应用框架
-- **监控调试**：Rin - ASP.NET Core 应用实时检查工具
+- **健康检查**：`/health/live`、`/health/ready`
 
 ##### 数据访问与处理
 - **ORM**：Entity Framework Core + SQLite（单一 `StarBlogDbContext`）
@@ -83,7 +83,7 @@ StarBlog 不仅仅是一个博客系统，它正在发展成为一个完整的�
 ##### API与认证
 - **API文档**：Swagger/OpenAPI (Swashbuckle.AspNetCore) - RESTful API 自动文档生成工具
 - **认证机制**：JWT (JSON Web Token) - 安全的跨域身份验证解决方案
-- **搜索引擎支持**：RobotsTxtCore - 管理搜索引擎爬虫访问策略
+- **搜索引擎支持**：Site 模块直接输出 `robots.txt` 与 Sitemap
 
 ##### 内容处理
 - **Markdown引擎**：[Markdig](https://github.com/xoofx/markdig) - 高性能 Markdown 处理器
@@ -95,7 +95,7 @@ StarBlog 不仅仅是一个博客系统，它正在发展成为一个完整的�
 - **邮件服务**：MailKit - 跨平台邮件客户端库
 
 #### 前端
-- **博客前台**：Bootstrap + Vue + ElementUI + editor.md + bootswatch
+- **博客前台**：由独立站点调用本 API；历史 Razor 前台位于 `apps/web-legacy`，不进入默认构建
 - **管理后台**：`apps/admin`（Refine + React + Ant Design + Vite）
 
 ### 项目结构
@@ -167,9 +167,7 @@ task api:dev
 task admin:dev
 ```
 
-.NET 开发使用根目录的 `StarBlog.slnx`。旧 `apps/web-legacy` 仅用于过渡维护，不进入默认开发启动流程。
-
-为了快速启动，本项目默认使用 SQLite 数据库，大部分功能都是使用 FreeSQL 作为 ORM，直接运行项目，无需额外配置 FreeSQL 会自动生成表结构。
+.NET 开发使用根目录的 `StarBlog.slnx`。默认数据库是 SQLite；API 启动时会自动应用 EF Core migrations（从 `InitialCreate` 开始），无需手动建表。
 
 4. **访问日志数据库同步**
 
@@ -205,7 +203,7 @@ StarBlog 的友情链接、评论系统都用到了发邮件功能，详情见: 
 
 #### 敏感词检测
 
-StarBlog 使用 DFA 技术实现评论敏感词检测，使用时需要在 `apps/api/src/StarBlog.Api` 或 `apps/web-legacy` 项目目录下放置敏感词库文件 `words.json`
+StarBlog 使用 DFA 技术实现评论敏感词检测，使用时需要在 `apps/api/src/StarBlog.Api` 项目目录下放置敏感词库文件 `words.json`
 
 为了网络环境的文明和谐，本项目的开源代码里不能提供，需要的同学可以自行搜集。
 
@@ -249,7 +247,7 @@ StarBlog 支持多种部署方式，门槛最低的是使用 self-container 模�
 dotnet publish -r linux-x64 -c Release -p:PublishSingleFile=true -p:PublishTrimmed=true  --self-contained true
 ```
 
-发布之后将 `publish` 目录下的文件上传到服务器，运行 **StarBlog.Web** 文件即可。
+发布之后将 `publish` 目录下的文件上传到服务器，运行 **StarBlog.Api** 即可。生产环境也可以使用 `deploy/compose.prod.yaml`。
 
 关于部署的更多方式可以参考: [StarBlog - (31) 发布和部署](https://blog.deali.cn/p/starblog-31)
 

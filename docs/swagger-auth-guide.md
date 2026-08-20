@@ -25,7 +25,7 @@ StarBlog.Api 的 Swagger UI 默认地址为 `http://localhost:5039/swagger`。�
    }
    ```
 
-2. 从统一响应的 `data.token` 取得 JWT。
+2. 从响应 JSON 的 `token` 字段取得 JWT。响应不再包装 `ApiResponse`。
 3. 点击 Swagger 页面右上角的 **Authorize**。
 4. 只粘贴 Token 本身。Swagger 使用标准 HTTP Bearer 方案，会自动添加 `Bearer ` 前缀。
 5. 再调用 `/api/v1/admin/*` 等受保护接口。

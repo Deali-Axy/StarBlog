@@ -1,5 +1,7 @@
 # StarBlog 架构重构 Code Review 报告
 
+> 本文是 2026-02-13 对旧分层架构的审查记录。当前后端已重建为模块化单体，见 `docs/changes/modular-monolith-ef-core-rebuild-plan.md`。下文提到的 `StarBlog.Application`、FreeSql 与 `ApiResponse` 均已不适用于现行代码。
+
 **日期**: 2026-02-13  
 **审查范围**: `StarBlog.Api`, `StarBlog.Application` 及其依赖项  
 **审查者**: 资深架构师 AI
