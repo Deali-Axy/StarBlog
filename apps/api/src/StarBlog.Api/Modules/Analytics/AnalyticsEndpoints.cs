@@ -23,7 +23,7 @@ public static class AnalyticsEndpoints {
         return endpoints;
     }
 
-    private static Task<PageResult<Domain.VisitRecord>> ListAsync(
+    private static Task<PageResult<VisitRecordResponse>> ListAsync(
         AnalyticsOperations operations,
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 10,
@@ -39,5 +39,6 @@ public static class AnalyticsEndpoints {
         CancellationToken cancellationToken = default) =>
         operations.DailyTrendAsync(days, cancellationToken);
 
-    private static object RuntimeAsync(AnalyticsOperations operations) => operations.RuntimeStatistics();
+    private static RuntimeStatisticsResponse RuntimeAsync(AnalyticsOperations operations) =>
+        operations.RuntimeStatistics();
 }
