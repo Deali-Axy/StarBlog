@@ -147,32 +147,39 @@ public sealed class SiteController : ControllerBase {
         return new ApiResponse<LinkExchange>(application) { Message = "友链申请已提交，正在处理中" };
     }
 
-    /// <summary>查询是否已经完成首次初始化；不返回敏感配置。</summary>
+    /// <summary>
+    /// 查询是否已经完成首次初始化；以 SQLite 用户表中的管理员记录为准。
+    /// 这样即使管理员由运维人员直接写入数据库，管理后台也能立即识别初始化状态。
+    /// </summary>
     [AllowAnonymous]
     [HttpGet("initialization")]
-    public ApiResponse<object> GetInitializationState() => ApiResponse.Ok(new {
-        IsInitialized = string.Equals(_configService["is_init"], "true", StringComparison.OrdinalIgnoreCase),
+    public ApiResponse<object> GetInitializationState() => new(new {
+        IsInitialized = _userRepository.Select.Any(),
         Host = _configService["host"],
         DefaultRender = _configService["default_render"]
     });
 
-    /// <summary>仅允许在未初始化时创建首个管理员，密码仅保存 SHA-256 哈希以兼容原有登录逻辑。</summary>
+    /// <summary>
+    /// 仅允许在 SQLite 用户表为空时创建首个管理员。
+    /// 密码仅保存 SHA-256 哈希以兼容现有登录逻辑，接口成功后不可再次调用。
+    /// </summary>
     [AllowAnonymous]
     [HttpPost("initialization")]
     public ApiResponse Initialize([FromBody] InitializeSiteDto dto) {
         if (!ModelState.IsValid) return ApiResponse.BadRequest(ModelState);
-        if (string.Equals(_configService["is_init"], "true", StringComparison.OrdinalIgnoreCase)) {
+        if (_userRepository.Select.Any()) {
             return ApiResponse.BadRequest("站点已经完成初始化");
         }
 
+        // 先写管理员，再更新初始化标记；即使后续配置写入失败，也不会出现标记已完成但没有账号的锁死状态。
+        _userRepository.Insert(new User {
+            Id = Guid.NewGuid().ToString("N"),
+            Name = dto.Username.Trim(),
+            Password = dto.Password.ToSHA256()
+        });
         _configService["host"] = dto.Host.TrimEnd('/');
         _configService["default_render"] = dto.DefaultRender;
         _configService["is_init"] = "true";
-        _userRepository.Insert(new User {
-            Id = Guid.NewGuid().ToString(),
-            Name = dto.Username,
-            Password = dto.Password.ToSHA256()
-        });
         return ApiResponse.Ok("初始化完成");
     }
 

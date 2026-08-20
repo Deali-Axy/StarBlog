@@ -17,6 +17,22 @@ npm install
 npm run dev
 ```
 
+首次打开 `http://localhost:5173/login` 时，后台会检查业务 SQLite 的用户表。若还没有管理员，页面会显示一次性初始化表单；提交后账号会写入 SQLite，并自动登录。已有任意管理员记录后，初始化接口会拒绝再次创建账号。
+
+如果数据库中已经存在管理员、但密码已经遗失，先停止 API，再从仓库根目录运行下面的脚本。密码会通过安全输入读取；脚本会备份数据库，然后直接创建或重置 `admin` 用户：
+
+```powershell
+.\scripts\Initialize-StarBlogAdmin.ps1 -Username admin
+```
+
+默认数据库是 `src\StarBlog.Api\app.db`。如实际运行使用了其他数据库，可显式指定：
+
+```powershell
+.\scripts\Initialize-StarBlogAdmin.ps1 -DatabasePath C:\data\starblog.db -Username admin
+```
+
+API 文档可直接从 `http://localhost:5039/swagger` 打开。需要调用管理接口时，先通过 `POST /api/v1/auth/tokens` 登录，再点击 Swagger 右上角的 **Authorize** 并粘贴返回的 JWT Token。
+
 开发时如 API 不在默认地址，复制 `.env.example` 为 `.env.local`，再修改 `VITE_API_PROXY_TARGET`。生产构建或不使用 Vite 代理时，设置 `VITE_API_URL`；例如：
 
 ```powershell

@@ -35,12 +35,59 @@ const authProvider = {
   getPermissions: async () => null, getIdentity: async () => ({ id: "admin", name: "管理员" }), onError: async () => ({ logout: false }),
 } as never;
 
+type InitializationState = { isInitialized: boolean; host?: string; defaultRender?: string };
+type LoginValues = { username: string; password: string };
+type InitializationValues = LoginValues & { confirmPassword: string; host: string; defaultRender: string };
+
 function Login() {
-  const navigate = useNavigate(); const [loading, setLoading] = useState(false);
-  const submit = async (values: { username: string; password: string }) => {
-    setLoading(true); try { await (authProvider as { login: (v: typeof values) => Promise<unknown> }).login(values); navigate("/"); } catch (error) { message.error(error instanceof Error ? error.message : "登录失败"); } finally { setLoading(false); }
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [initialization, setInitialization] = useState<InitializationState | null>(null);
+
+  // 登录页加载时查询 SQLite 用户表状态；没有管理员时直接展示一次性初始化表单。
+  useEffect(() => {
+    void request<InitializationState>("/api/v1/site/initialization")
+      .then(setInitialization)
+      .catch((error) => {
+        message.error(error instanceof Error ? error.message : "无法读取初始化状态");
+        // API 暂时不可达时仍展示登录表单，方便已有站点在服务恢复后直接重试。
+        setInitialization({ isInitialized: true });
+      });
+  }, []);
+
+  const login = async (values: LoginValues) => {
+    await (authProvider as { login: (value: LoginValues) => Promise<unknown> }).login(values);
+    navigate("/");
   };
-  return <main className="login-shell"><section className="login-manifesto"><div className="constellation">✦</div><p className="eyebrow">STARLOG / EDITORIAL SYSTEM</p><h1>写完一篇，<br />让它抵达更多地方。</h1><p>管理内容、渠道与每一次投递，不让发布成为写作的最后一道阻力。</p></section><Card className="login-card" variant="borderless"><p className="eyebrow">SIGN IN</p><Typography.Title level={2}>进入控制台</Typography.Title><Form layout="vertical" onFinish={submit}><Form.Item name="username" label="用户名" rules={[{ required: true }]}><Input autoFocus autoComplete="username" /></Form.Item><Form.Item name="password" label="密码" rules={[{ required: true }]}><Input.Password autoComplete="current-password" /></Form.Item><Button htmlType="submit" type="primary" loading={loading} block>登录并继续</Button></Form></Card></main>;
+
+  const submitLogin = async (values: LoginValues) => {
+    setLoading(true);
+    try { await login(values); }
+    catch (error) { message.error(error instanceof Error ? error.message : "登录失败"); }
+    finally { setLoading(false); }
+  };
+
+  const submitInitialization = async (values: InitializationValues) => {
+    setLoading(true);
+    try {
+      await request("/api/v1/site/initialization", {
+        method: "POST",
+        body: JSON.stringify({ username: values.username, password: values.password, host: values.host, defaultRender: values.defaultRender }),
+      });
+      message.success("管理员已写入 SQLite，正在登录");
+      await login(values);
+    } catch (error) {
+      message.error(error instanceof Error ? error.message : "初始化失败");
+    } finally { setLoading(false); }
+  };
+
+  const form = initialization === null
+    ? <div className="login-loading"><Spin /><span>检查站点状态…</span></div>
+    : initialization.isInitialized
+      ? <><p className="eyebrow">SIGN IN</p><Typography.Title level={2}>进入控制台</Typography.Title><Form layout="vertical" onFinish={submitLogin}><Form.Item name="username" label="用户名" rules={[{ required: true }]}><Input autoFocus autoComplete="username" /></Form.Item><Form.Item name="password" label="密码" rules={[{ required: true }]}><Input.Password autoComplete="current-password" /></Form.Item><Button htmlType="submit" type="primary" loading={loading} block>登录并继续</Button></Form></>
+      : <><p className="eyebrow">FIRST RUN</p><Typography.Title level={2}>创建首个管理员</Typography.Title><p className="setup-hint">账号将直接写入 StarBlog 的 SQLite 数据库；完成后该入口会自动关闭。</p><Form layout="vertical" onFinish={submitInitialization} initialValues={{ host: window.location.origin, defaultRender: "frontend" }}><Form.Item name="username" label="管理员用户名" rules={[{ required: true }, { min: 3 }]}><Input autoFocus autoComplete="username" /></Form.Item><Form.Item name="password" label="管理员密码" rules={[{ required: true }, { min: 8 }]}><Input.Password autoComplete="new-password" /></Form.Item><Form.Item name="confirmPassword" label="确认密码" dependencies={["password"]} rules={[{ required: true }, ({ getFieldValue }) => ({ validator(_, value) { return !value || getFieldValue("password") === value ? Promise.resolve() : Promise.reject(new Error("两次输入的密码不一致")); } })]}><Input.Password autoComplete="new-password" /></Form.Item><Form.Item name="host" label="站点地址" rules={[{ required: true }, { type: "url" }]}><Input placeholder="https://blog.example.com" /></Form.Item><Form.Item name="defaultRender" hidden><Input /></Form.Item><Button htmlType="submit" type="primary" loading={loading} block>初始化并进入后台</Button></Form></>;
+
+  return <main className="login-shell"><section className="login-manifesto"><div className="constellation">✦</div><p className="eyebrow">STARLOG / EDITORIAL SYSTEM</p><h1>写完一篇，<br />让它抵达更多地方。</h1><p>管理内容、渠道与每一次投递，不让发布成为写作的最后一道阻力。</p></section><Card className="login-card" variant="borderless">{form}</Card></main>;
 }
 
 function Shell() {
