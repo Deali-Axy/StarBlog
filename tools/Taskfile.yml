@@ -3,12 +3,9 @@ version: "3"
 
 tasks:
   build:
-    desc: Build all maintained StarBlog command-line tools
-    # 工具项目共享 StarBlog.Data/Content/Infrastructure，Windows 上并行 restore/build 会争用 obj 文件。
+    desc: Build maintained StarBlog command-line tools that no longer depend on deleted class libraries
     cmds:
       - task: build:image-optimizer
-      - task: build:data-proc
-      - task: build:markdown-importer
       - task: build:backup
 
   build:image-optimizer:
@@ -16,43 +13,21 @@ tasks:
     cmds:
       - dotnet build BlogImageOptimizer/BlogImageOptimizer.csproj
 
-  build:data-proc:
-    internal: true
-    cmds:
-      - dotnet build DataProc/DataProc.csproj
-
-  build:markdown-importer:
-    internal: true
-    cmds:
-      - dotnet build MarkdownImporter/MarkdownImporter.csproj
-
   build:backup:
     internal: true
     cmds:
       - dotnet build StarBlogBackup/StarBlog.BackupTool.csproj
 
   clean:
-    desc: Clean all maintained StarBlog command-line tools
+    desc: Clean maintained StarBlog command-line tools
     cmds:
       - task: clean:image-optimizer
-      - task: clean:data-proc
-      - task: clean:markdown-importer
       - task: clean:backup
 
   clean:image-optimizer:
     internal: true
     cmds:
       - dotnet clean BlogImageOptimizer/BlogImageOptimizer.csproj
-
-  clean:data-proc:
-    internal: true
-    cmds:
-      - dotnet clean DataProc/DataProc.csproj
-
-  clean:markdown-importer:
-    internal: true
-    cmds:
-      - dotnet clean MarkdownImporter/MarkdownImporter.csproj
 
   clean:backup:
     internal: true

@@ -26,6 +26,11 @@ tasks:
       - api:dev
       - admin:dev
 
+  test:
+    desc: Run API tests
+    cmds:
+      - task: api:test
+
   build:
     desc: Build product applications and maintained tools
     # Admin 与 .NET 可以并行；.NET 必须走同一个解决方案图，避免多个 dotnet build 同时写共享 obj。

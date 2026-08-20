@@ -7,8 +7,7 @@ services:
       - "5038:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - ConnectionStrings__SQLite=Data Source=/app/data/app.db;Synchronous=Off;Cache Size=5000;
-      - ConnectionStrings__SQLite-Log=Data Source=/app/data/app.log.db;
+      - ConnectionStrings__Default=Data Source=/app/data/app.db
     volumes:
       - starblog-data:/app/data
 

@@ -19,8 +19,6 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\StarBlog.Testing\StarBlog.Testing.csproj" />
-  </ItemGroup>
+
 
 </Project>
