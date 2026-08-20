@@ -1,6 +1,6 @@
 # StarBlog 纯 API 路由说明
 
-`src/StarBlog.Api` 已承接旧 Razor/MVC 项目的对外能力。旧的 `Api/*` 地址继续可用，方便渐进式替换前端；新的管理端统一提供 `/Api/Admin/*` 别名。
+`apps/api/src/StarBlog.Api` 已承接旧 Razor/MVC 项目的对外能力。旧的 `Api/*` 地址继续可用，方便渐进式替换前端；新的管理端统一提供 `/Api/Admin/*` 别名。
 
 ## 前台站点接口
 

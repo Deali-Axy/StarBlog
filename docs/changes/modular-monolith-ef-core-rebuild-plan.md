@@ -31,38 +31,40 @@ StarBlog.Api -> StarBlog.Application -> StarBlog.Data / StarBlog.Content / StarB
 目标结构：
 
 ```text
-src/
-  StarBlog.Api/
-    Program.cs
+apps/
+  api/
+    src/
+      StarBlog.Api/
+        Program.cs
 
-    Hosting/                         # ASP.NET Core 宿主、OpenAPI、认证和中间件
-      Authentication/
-      HealthChecks/
-      Middleware/
-      OpenApi/
+        Hosting/                         # ASP.NET Core 宿主、OpenAPI、认证和中间件
+          Authentication/
+          HealthChecks/
+          Middleware/
+          OpenApi/
 
-    Modules/
-      Identity/                      # 用户、登录、密码、JWT、首次初始化
-      Content/                       # 文章、分类、精选、Markdown、翻译、发布
-      Comments/                      # 评论、匿名用户、OTP、审核和回复通知
-      Media/                         # 照片、精选照片、缩略图和文件生命周期
-      Links/                         # 友链、友链申请与审核
-      Analytics/                     # 访问记录、IP/UA 解析和统计
-      Site/                          # 首页聚合、搜索、Feed 和 Sitemap
-      Configuration/                 # 运行时站点配置
-      Notifications/                 # Outbox、通知任务和邮件模板
+        Modules/
+          Identity/                      # 用户、登录、密码、JWT、首次初始化
+          Content/                       # 文章、分类、精选、Markdown、翻译、发布
+          Comments/                      # 评论、匿名用户、OTP、审核和回复通知
+          Media/                         # 照片、精选照片、缩略图和文件生命周期
+          Links/                         # 友链、友链申请与审核
+          Analytics/                     # 访问记录、IP/UA 解析和统计
+          Site/                          # 首页聚合、搜索、Feed 和 Sitemap
+          Configuration/                 # 运行时站点配置
+          Notifications/                 # Outbox、通知任务和邮件模板
 
-    Infrastructure/
-      Persistence/                   # DbContext、EF Core 通用约定和 migrations
-      Storage/                       # 本地或远程文件存储实现
-      Email/                         # SMTP 适配器
-      Background/                    # 有界任务队列与 HostedService
-      Time/                          # 系统时钟实现
+        Infrastructure/
+          Persistence/                   # DbContext、EF Core 通用约定和 migrations
+          Storage/                       # 本地或远程文件存储实现
+          Email/                         # SMTP 适配器
+          Background/                    # 有界任务队列与 HostedService
+          Time/                          # 系统时钟实现
 
-    Shared/                          # 仅放置已经被多个模块实际复用的少量契约
+        Shared/                          # 仅放置已经被多个模块实际复用的少量契约
 
-tests/
-  StarBlog.Api.Tests/
+    tests/
+      StarBlog.Api.Tests/
 ```
 
 模块内部建议采用以下结构；简单模块可以省略不需要的文件或目录：
@@ -122,7 +124,7 @@ Modules/Links/
 
 ### 3.4 删除独立 `StarBlog.Infrastructure`
 
-现有 IP 查询、CLR 统计等少量代码直接移动到 `StarBlog.Api/Infrastructure`。当前规模不足以证明独立基础设施程序集的收益。
+现有 IP 查询、CLR 统计等少量代码直接移动到 `apps/api/src/StarBlog.Api/Infrastructure`。当前规模不足以证明独立基础设施程序集的收益。
 
 ### 3.5 删除旧 `StarBlog.Web`
 

@@ -7,7 +7,7 @@
 先启动 API（默认开发端口为 `5039`）：
 
 ```powershell
-dotnet run --project src\StarBlog.Api\StarBlog.Api.csproj
+task api:dev
 ```
 
 然后在本目录执行：
@@ -25,7 +25,7 @@ npm run dev
 .\scripts\Initialize-StarBlogAdmin.ps1 -Username admin
 ```
 
-默认数据库是 `src\StarBlog.Api\app.db`。如实际运行使用了其他数据库，可显式指定：
+默认数据库是 `apps\api\src\StarBlog.Api\app.db`。如实际运行使用了其他数据库，可显式指定：
 
 ```powershell
 .\scripts\Initialize-StarBlogAdmin.ps1 -DatabasePath C:\data\starblog.db -Username admin

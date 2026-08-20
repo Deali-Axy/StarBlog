@@ -28,7 +28,7 @@
 ## 3. 关键问题 (Critical Issues)
 
 ### 3.1. `MessageService` 强耦合 `HttpContext`
-*   **位置**：[MessageService.cs](../src/StarBlog.Application/Contrib/SiteMessage/MessageService.cs)
+*   **位置**：[MessageService.cs](../apps/api/src/StarBlog.Application/Contrib/SiteMessage/MessageService.cs)
 *   **问题**：该服务直接注入 `IHttpContextAccessor` 并依赖 `Session` 存储消息。
     ```csharp
     if (HttpContext == null) {
@@ -41,7 +41,7 @@
     *   **方案 B**：将此服务移动到 `StarBlog.Web` 或 `StarBlog.Api` 层，因为它本质上是 UI 交互的一部分。
 
 ### 3.2. API 直接暴露数据库实体 (Domain Entity Leakage)
-*   **位置**：[PostService.cs](../src/StarBlog.Application/Services/PostService.cs) 及相关 Controllers。
+*   **位置**：[PostService.cs](../apps/api/src/StarBlog.Application/Services/PostService.cs) 及相关 Controllers。
 *   **问题**：`GetById`、`GetPagedList` 等方法直接返回 `Post` 实体（定义在 Data 层）。
     ```csharp
     public async Task<Post?> GetById(string id) { ... }

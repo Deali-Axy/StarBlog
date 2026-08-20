@@ -102,38 +102,42 @@ StarBlog 不仅仅是一个博客系统，它正在发展成为一个完整的�
 
 ### 项目结构
 
-```
+StarBlog 采用多语言 monorepo，产品应用统一放在 `apps/`，仓库级工具、部署资产和文档保持独立职责：
+
+```text
 StarBlog/
-├── src/
-│   ├── StarBlog.Api/       # 纯 WebAPI（HTTP 层/组合根：Controllers + Middlewares + DI）
-│   ├── StarBlog.Application/ # 应用层（用例编排/应用服务/DTO/后台任务等，供 StarBlog.Api 使用）
-│   ├── StarBlog.Infrastructure/ # 通用基础设施（诊断/杂项能力）
-│   ├── StarBlog.Content/   # 内容处理（Markdown/ToC/导入处理等）
-│   ├── StarBlog.Data/      # 数据模型与数据访问层（EF Core + FreeSql）
-│   └── StarBlog.Web/       # 主 Web 应用（MVC/Razor + API，历史路径，当前不做改动）
-├── tools/
-│   ├── MarkdownImporter/   # 博客文章导入 CLI 工具（原 StarBlog.Migrate）
-│   ├── DataProc/           # 数据处理工具（访问日志补全/图片优化/摘要等）
-│   └── BlogImageOptimizer/ # 图片优化工具
-└── demo/                   # 演示/实验项目（与主产品隔离）
+├── apps/
+│   ├── api/
+│   │   ├── src/                    # 当前 .NET API 与过渡类库
+│   │   └── Taskfile.yml
+│   ├── admin/                      # Refine + Vite 管理后台
+│   └── web-legacy/                 # 旧 Razor/MVC 宿主，后续删除
+├── tools/                          # 导入、数据处理、图片优化和备份工具
+├── tests/                          # 测试项目，后续归并到所属应用
+├── demo/                           # 待清理的历史实验，不参与默认构建
+├── deploy/                         # 生产部署配置
+├── docs/                           # 架构和使用文档
+├── scripts/                        # 仓库自动化脚本
+├── Taskfile.yml                    # 多语言统一任务入口
+└── StarBlog.slnx                   # .NET 工作区
 ```
 
 ### 分层与职责（DDD/清洁架构取向）
 
 这套拆分更接近“DDD 的分层思想/清洁架构”的方向：将 HTTP 适配层与“用例编排（Application Layer）”解耦，便于在不影响对外 API 的情况下演进业务逻辑与基础设施。
 
-#### 当前分层（已落地）
+#### 当前过渡结构
 
 ```
-StarBlog.Api (Presentation / Delivery)
-  └─ 依赖 → StarBlog.Application (Application Layer)
+apps/api/src/StarBlog.Api
+  └─ 依赖 → StarBlog.Application
              └─ 依赖 → StarBlog.Data / StarBlog.Infrastructure / StarBlog.Content
 ```
 
-- **StarBlog.Api**
+- **apps/api/src/StarBlog.Api**
   - 仅负责 HTTP：Controllers、鉴权/Swagger/HealthChecks 中间件、DI 组合根、路由与跨域策略等。
   - 不承载业务规则与复杂编排，保持“薄控制器”。
-- **StarBlog.Application**
+- **apps/api/src/StarBlog.Application**
   - 承载应用层：应用服务（Use Case 编排）、DTO/ViewModels、查询参数对象、后台任务（Outbox/VisitRecord Worker 等）。
   - 目标是“稳定业务行为 + 可测试”，同时避免依赖 StarBlog.Api（依赖方向单向）。
 
@@ -160,8 +164,9 @@ StarBlog.Api → StarBlog.Application → StarBlog.Domain
 
 ### 环境要求
 
-- **.NET 9 SDK**
+- **.NET 10 SDK**
 - **Node.js v18** 以上版本 和 **npm/yarn**（用于前端资源管理）
+- **Task 3.x**（统一运行仓库任务）
 
 ### 构建步骤
 
@@ -172,29 +177,28 @@ git clone https://github.com/Deali-Axy/StarBlog.git
 cd StarBlog
 ```
 
-2. **前端资源准备**
+2. **安装依赖**
 
-本项目使用 NPM + Gulp 管理前端静态文件，需要使用 Nodejs 18 以上版本，详情可查看: [AspNetCore开发笔记：使用NPM和gulp管理前端静态文件](https://www.cnblogs.com/deali/p/15905760.html)。
-
-```bash
-cd src/StarBlog.Web
-npm i -g bower
-npm install  # 或 yarn
-npm install --global gulp-cli
-gulp move
-gulp min
+```powershell
+task install
 ```
-
-**注意**：本项目依赖 [bootstrap5-treeview](https://www.npmjs.com/package/bootstrap5-treeview) 组件。而这个组件又使用 bower 进行构建，请先安装 [bower](https://bower.io/)：`npm i -g bower`，不然在执行 `npm install` 过程中会出错。
 
 3. **运行项目**
 
-使用 Visual Studio 或 Rider 打开解决方案，设置 `StarBlog.Web` 为启动项目并运行。
+同时启动 API 和管理后台：
 
-解决方案说明：
-- `StarBlog.sln`：主产品工程（src）
-- `StarBlog.Tools.sln`：工具工程（tools）
-- `StarBlog.Demo.sln`：演示/实验工程（demo）
+```powershell
+task dev
+```
+
+也可以单独运行：
+
+```powershell
+task api:dev
+task admin:dev
+```
+
+.NET 开发使用根目录的 `StarBlog.slnx`。旧 `apps/web-legacy` 仅用于过渡维护，不进入默认开发启动流程。
 
 为了快速启动，本项目默认使用 SQLite 数据库，大部分功能都是使用 FreeSQL 作为 ORM，直接运行项目，无需额外配置 FreeSQL 会自动生成表结构。
 
@@ -213,17 +217,14 @@ dotnet tool install --global dotnet-ef
 同步数据库 (Windows10+)
 
 ```powershell
-cd src/StarBlog.Data
-$env:CONNECTION_STRING = "Data Source=..\StarBlog.Web\app.log.db"
-dotnet ef database update
+$env:CONNECTION_STRING = "Data Source=apps\web-legacy\app.log.db"
+task api:db:update
 ```
 
 同步数据库 (Linux/MacOS)
 
 ```bash
-cd StarBlog.Data
-set CONNECTION_STRING = "Data Source=../StarBlog.Web/app.log.db"
-dotnet ef database update
+CONNECTION_STRING="Data Source=apps/web-legacy/app.log.db" task api:db:update
 ```
 
 ### 初始化

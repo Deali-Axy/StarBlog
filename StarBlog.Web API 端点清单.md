@@ -1,11 +1,11 @@
 # StarBlog.Web API 端点清单
 
-本文档用于梳理当前 `src/StarBlog.Web` 项目内已存在的 API 端点，按用途分为「公开」「后台」「站点资源」，并给出 Next.js 前端改造阶段需要调用的最小集合。
+本文档用于梳理当前 `apps/web-legacy` 项目内已存在的 API 端点，按用途分为「公开」「后台」「站点资源」，并给出 Next.js 前端改造阶段需要调用的最小集合。
 
 ## 约定与说明
 
-- API 端点主要位于：`src/StarBlog.Web/Apis/**`
-- 站点 MVC 页面主要位于：`src/StarBlog.Web/Controllers/**`（不属于 WebAPI，但其中部分是“资源输出型端点”，见「站点资源」）
+- API 端点主要位于：`apps/web-legacy/Apis/**`
+- 站点 MVC 页面主要位于：`apps/web-legacy/Controllers/**`（不属于 WebAPI，但其中部分是“资源输出型端点”，见「站点资源」）
 - API 路由以特性路由为主，多数使用 `Api/[controller]` 前缀
 - 鉴权方式：JWT Bearer（`[Authorize]` / `[AllowAnonymous]`）
 - 返回风格：项目注册了全局 `ResponseWrapperFilter`，多数返回会被包装成统一结构；但仍存在少量 Action “裸返回”的情况（需要前端注意或后续统一）
