@@ -1,217 +1,42 @@
-# Swagger UI 访问授权配置指南
+# Swagger 与 JWT 使用指南
 
-本指南介绍如何为 StarBlog 项目的 Swagger UI 添加访问授权保护，防止未授权用户访问 API 文档。
+StarBlog.Api 的 Swagger UI 默认地址为 `http://localhost:5039/swagger`。文档页面和 OpenAPI JSON 可以匿名访问；具体 API 是否需要登录，仍由控制器上的 `[Authorize]` 决定。
 
-## 🔒 功能特性
+## 获取管理员账号
 
-- **JWT 令牌验证**: 基于现有的 JWT 认证系统
-- **灵活配置**: 支持开启/关闭授权保护
-- **环境感知**: 可配置仅在生产环境启用
-- **详细日志**: 记录访问尝试和授权状态
-- **友好错误**: 提供清晰的未授权错误信息
+全新数据库第一次打开管理端 `http://localhost:5173/login` 时，会显示一次性初始化表单。提交后管理员账号会直接写入业务 SQLite；用户表已有记录后，该匿名初始化入口会自动关闭。
 
-## 🚀 快速开始
+如果数据库已有管理员但密码遗失，请先停止 API，然后在仓库根目录运行：
 
-### 1. 基本配置（推荐）
-
-在 `Program.cs` 中，Swagger 授权默认已启用：
-
-```csharp
-// 默认启用授权保护
-app.UseSwaggerPkg(); // requireAuth = true
+```powershell
+.\scripts\Initialize-StarBlogAdmin.ps1 -Username admin
 ```
 
-### 2. 禁用授权（仅开发环境）
+脚本会安全读取新密码、备份数据库，再创建或重置指定账号。
 
-```csharp
-// 禁用授权保护
-app.UseSwaggerPkg(requireAuth: false);
-```
+## 在 Swagger 中调用管理接口
 
-### 3. 环境条件配置
+1. 调用 `POST /api/v1/auth/tokens`，请求体示例：
 
-```csharp
-// 仅在生产环境启用授权
-var requireAuth = app.Environment.IsProduction();
-app.UseSwaggerPkg(requireAuth);
-```
-
-## 🔧 高级配置
-
-### 使用配置选项
-
-```csharp
-// 在 Program.cs 中配置
-builder.Services.ConfigureSwaggerAuth(options => {
-    options.RequireAuthentication = true;
-    options.OnlyInProduction = true;
-    options.UnauthorizedMessage = "请联系管理员获取访问权限";
-});
-
-// 使用配置选项
-var swaggerOptions = new SwaggerAuthOptions {
-    RequireAuthentication = true,
-    OnlyInProduction = false
-};
-app.UseSwaggerAuth(swaggerOptions);
-app.UseSwagger();
-app.UseSwaggerUI(/* ... */);
-```
-
-## 🔑 如何获取访问权限
-
-### 1. 获取 JWT 令牌
-
-首先通过登录接口获取 JWT 令牌：
-
-```bash
-# POST /Api/Auth/login
-curl -X POST "https://your-domain.com/Api/Auth/login" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "username": "your-username",
-    "password": "your-password"
-  }'
-```
-
-响应示例：
-```json
-{
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "expires": "2024-01-01T12:00:00Z"
-}
-```
-
-### 2. 访问 Swagger UI
-
-有两种方式使用令牌访问 Swagger UI：
-
-#### 方式一：通过浏览器开发者工具
-
-1. 打开浏览器开发者工具（F12）
-2. 在 Console 中执行：
-```javascript
-// 设置 Authorization 头
-fetch('/api-docs/swagger', {
-  headers: {
-    'Authorization': 'Bearer YOUR_JWT_TOKEN_HERE'
-  }
-}).then(() => {
-  // 刷新页面
-  location.reload();
-});
-```
-
-#### 方式二：使用 HTTP 客户端
-
-```bash
-# 使用 curl 访问
-curl -H "Authorization: Bearer YOUR_JWT_TOKEN_HERE" \
-  "https://your-domain.com/api-docs/swagger"
-```
-
-### 3. 在 Swagger UI 中使用令牌
-
-访问 Swagger UI 后，点击右上角的 "Authorize" 按钮，输入：
-```
-Bearer YOUR_JWT_TOKEN_HERE
-```
-
-## 📋 配置选项说明
-
-| 选项 | 类型 | 默认值 | 说明 |
-|------|------|--------|------|
-| `RequireAuthentication` | bool | true | 是否启用认证保护 |
-| `OnlyInProduction` | bool | false | 是否仅在生产环境启用 |
-| `AllowedRoles` | string[] | [] | 允许的角色列表（暂未实现） |
-| `UnauthorizedMessage` | string | null | 自定义未授权消息 |
-
-## 🛡️ 安全最佳实践
-
-### 1. 生产环境配置
-
-```csharp
-// 推荐的生产环境配置
-if (app.Environment.IsProduction()) {
-    // 生产环境必须启用授权
-    app.UseSwaggerPkg(requireAuth: true);
-} else {
-    // 开发环境可选择性启用
-    app.UseSwaggerPkg(requireAuth: false);
-}
-```
-
-### 2. 日志监控
-
-中间件会自动记录以下日志：
-- 未授权访问尝试（Warning 级别）
-- 成功授权访问（Information 级别）
-
-查看日志示例：
-```
-[Warning] 未授权访问Swagger UI: /swagger/index.html from 192.168.1.100
-[Information] 已授权用户访问Swagger: admin -> /api-docs/swagger
-```
-
-### 3. 错误响应格式
-
-未授权访问时返回的 JSON 响应：
-```json
-{
-  "error": "Unauthorized",
-  "message": "访问Swagger UI需要有效的JWT令牌认证",
-  "details": "请先通过 /Api/Auth/login 接口获取JWT令牌，然后在请求头中添加 'Authorization: Bearer {token}'",
-  "timestamp": "2024-01-01T12:00:00.000Z"
-}
-```
-
-## 🔍 故障排除
-
-### 常见问题
-
-1. **访问 Swagger 时显示 401 错误**
-   - 确认已获取有效的 JWT 令牌
-   - 检查令牌是否已过期
-   - 确认请求头格式正确：`Authorization: Bearer {token}`
-
-2. **令牌有效但仍无法访问**
-   - 检查 JWT 配置是否正确
-   - 确认认证中间件的顺序正确
-   - 查看应用程序日志获取详细错误信息
-
-3. **开发环境想要禁用授权**
-   ```csharp
-   app.UseSwaggerPkg(requireAuth: false);
-   ```
-
-### 调试技巧
-
-1. **启用详细日志**
    ```json
-   // appsettings.Development.json
    {
-     "Logging": {
-       "LogLevel": {
-         "StarBlog.Web.Middlewares.SwaggerAuthMiddleware": "Debug"
-       }
-     }
+     "username": "admin",
+     "password": "your-password"
    }
    ```
 
-2. **检查中间件顺序**
-   确保在 `Program.cs` 中的顺序正确：
-   ```csharp
-   app.UseAuthentication();  // 必须在 UseSwaggerPkg 之前
-   app.UseAuthorization();   // 必须在 UseSwaggerPkg 之前
-   app.UseSwaggerPkg();      // Swagger 配置
-   ```
+2. 从统一响应的 `data.token` 取得 JWT。
+3. 点击 Swagger 页面右上角的 **Authorize**。
+4. 只粘贴 Token 本身。Swagger 使用标准 HTTP Bearer 方案，会自动添加 `Bearer ` 前缀。
+5. 再调用 `/api/v1/admin/*` 等受保护接口。
 
-## 📚 相关文档
+## 常见问题
 
-- [ASP.NET Core JWT 认证](https://docs.microsoft.com/aspnet/core/security/authentication/jwt)
-- [Swagger/OpenAPI 文档](https://swagger.io/docs/)
-- [StarBlog 认证配置](./auth-configuration.md)
+- 访问 `/swagger` 仍返回“请先获取 JWT”：正在运行的仍是旧构建，请停止并重新启动 `StarBlog.Api`。
+- Swagger 可打开但管理接口返回 401：Token 缺失、过期，或粘贴时额外输入了 `Bearer `。
+- 管理端首次打开直接显示登录而不是初始化：SQLite 的 `user` 表已经有记录；密码未知时使用上面的初始化脚本重置。
+- Vite 报 `ECONNREFUSED`：确认 API 正在 `http://localhost:5039` 监听，或通过 `VITE_API_PROXY_TARGET` 修改代理目标。
 
-## 🤝 贡献
+## 安全说明
 
-如果您发现问题或有改进建议，请提交 Issue 或 Pull Request。
+公开 API 文档不等于公开管理 API。JWT 校验仍在认证与授权中间件中执行，Swagger 仅负责展示接口以及为测试请求附加令牌。生产环境若不希望公开接口结构，应在反向代理层限制 `/swagger` 和 `/swagger/*`，而不是让浏览器通过 URL 或查询参数传递 JWT。

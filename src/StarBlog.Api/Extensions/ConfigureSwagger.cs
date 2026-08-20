@@ -1,6 +1,5 @@
 using Microsoft.OpenApi;
 using StarBlog.Api.Models;
-using StarBlog.Api.Middlewares;
 using Swashbuckle.AspNetCore.Filters;
 using Swashbuckle.AspNetCore.SwaggerUI;
 
@@ -31,16 +30,19 @@ public static class ConfigureSwagger {
         services.AddSwaggerGen(options => {
             Groups.ForEach(group => options.SwaggerDoc(group.Name, group.ToOpenApiInfo()));
 
-            // 开启小绿锁
+            // Swagger UI 本身公开访问；受保护的 API 仍由 JWT Bearer 鉴权。
+            // 使用标准 HTTP Bearer 定义后，用户在 Authorize 对话框中只需粘贴令牌本身。
             var security = new OpenApiSecurityScheme {
-                Description = "JWT模式授权，请输入 \"Bearer {Token}\" 进行身份验证",
+                Description = "请输入登录接口返回的 JWT Token",
                 Name = "Authorization",
                 In = ParameterLocation.Header,
-                Type = SecuritySchemeType.ApiKey
+                Type = SecuritySchemeType.Http,
+                Scheme = "bearer",
+                BearerFormat = "JWT"
             };
-            options.AddSecurityDefinition("oauth2", security);
+            options.AddSecurityDefinition("Bearer", security);
             options.AddSecurityRequirement(doc => {
-                var securityRef = new OpenApiSecuritySchemeReference("oauth2", doc, string.Empty);
+                var securityRef = new OpenApiSecuritySchemeReference("Bearer", doc, string.Empty);
                 return new OpenApiSecurityRequirement { { securityRef, new List<string>() } };
             });
             options.OperationFilter<AddResponseHeadersFilter>();
@@ -57,16 +59,11 @@ public static class ConfigureSwagger {
     /// 配置Swagger中间件
     /// </summary>
     /// <param name="app">应用程序构建器</param>
-    /// <param name="requireAuth">是否需要授权访问，默认为true</param>
-    public static void UseSwaggerPkg(this IApplicationBuilder app, bool requireAuth = true) {
-        // 如果需要授权，则添加Swagger授权中间件
-        if (requireAuth) {
-            app.UseSwaggerAuth();
-        }
-        
+    public static void UseSwaggerPkg(this IApplicationBuilder app) {
         app.UseSwagger();
         app.UseSwaggerUI(opt => {
-            opt.RoutePrefix = "api-docs/swagger";
+            // 文档入口固定为 /swagger；Swagger JSON 仍位于 /swagger/{group}/swagger.json。
+            opt.RoutePrefix = "swagger";
             // 模型的默认扩展深度，设置为 -1 完全隐藏模型
             opt.DefaultModelsExpandDepth(-1);
             // API文档仅展开标记

@@ -166,7 +166,7 @@ app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Swagger UI 默认需要已认证用户才能访问（避免生产环境直接暴露文档）
+// Swagger UI 可匿名打开，并在页面内通过 Authorize 输入 JWT；具体管理 API 仍受 [Authorize] 保护。
 app.UseSwaggerPkg();
 
 app.MapStarBlogHealthChecks();
