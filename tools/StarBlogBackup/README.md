@@ -1,6 +1,6 @@
 # StarBlog.Web 备份工具
 
-该工具用于备份 `src/StarBlog.Web` 的关键可变数据：
+该工具用于备份 `apps/web-legacy` 的关键可变数据：
 - SQLite：`app.db`（必备）与 `app.log.db`（可选）
 - 媒体资源：`wwwroot/media/blog`、`wwwroot/media/photography`
 
@@ -36,7 +36,7 @@ dotnet run --project .\tools\StarBlogBackup\StarBlog.BackupTool.csproj -- backup
 
 ```powershell
 dotnet run --project .\tools\StarBlogBackup\StarBlog.BackupTool.csproj -- backup `
-  --webRoot C:\code\starblog\starblog\src\StarBlog.Web `
+  --webRoot C:\code\starblog\starblog\apps\web-legacy `
   --outputRoot D:\Backups\StarBlog `
   --retention 30
 ```
@@ -66,8 +66,7 @@ C:\code\starblog\starblog
 
 ```powershell
 dotnet run --project .\tools\StarBlogBackup\StarBlog.BackupTool.csproj -- restore `
-  --webRoot C:\code\starblog\starblog\src\StarBlog.Web `
+  --webRoot C:\code\starblog\starblog\apps\web-legacy `
   --input D:\Backups\StarBlog\StarBlog.Web_20260212_120000.zip `
   --overwrite
 ```
-

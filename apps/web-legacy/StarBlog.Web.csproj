@@ -15,10 +15,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\StarBlog.Infrastructure\StarBlog.Infrastructure.csproj" />
-        <ProjectReference Include="..\StarBlog.Application\StarBlog.Application.csproj" />
-        <ProjectReference Include="..\StarBlog.Data\StarBlog.Data.csproj" />
-        <ProjectReference Include="..\StarBlog.Content\StarBlog.Content.csproj" />
+        <ProjectReference Include="..\api\src\StarBlog.Infrastructure\StarBlog.Infrastructure.csproj" />
+        <ProjectReference Include="..\api\src\StarBlog.Application\StarBlog.Application.csproj" />
+        <ProjectReference Include="..\api\src\StarBlog.Data\StarBlog.Data.csproj" />
+        <ProjectReference Include="..\api\src\StarBlog.Content\StarBlog.Content.csproj" />
     </ItemGroup>
 
     <!--  复制静态资源  -->

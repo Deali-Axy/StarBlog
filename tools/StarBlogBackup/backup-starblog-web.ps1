@@ -10,7 +10,7 @@ $ErrorActionPreference = "Stop"
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
 
 if ([string]::IsNullOrWhiteSpace($WebRoot)) {
-  $WebRoot = (Join-Path $repoRoot "src\StarBlog.Web")
+  $WebRoot = (Join-Path $repoRoot "apps\web-legacy")
 }
 
 if ([string]::IsNullOrWhiteSpace($OutputRoot)) {
@@ -25,4 +25,3 @@ if ($NoZip) {
 }
 
 dotnet @argsList
-

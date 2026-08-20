@@ -43,14 +43,14 @@ internal sealed class App(string[] args) {
               restore  从备份包恢复到 StarBlog.Web（需要 --overwrite）
 
             backup 参数：
-              --webRoot <path>        StarBlog.Web 目录（默认：当前目录下 src/StarBlog.Web）
+              --webRoot <path>        StarBlog.Web 目录（默认：当前目录下 apps/web-legacy）
               --outputRoot <path>     备份输出目录（默认：当前目录下 backups/StarBlog.Web）
               --retention <n>         保留最近 n 份备份（默认：30；0 表示不清理）
               --no-zip                不生成 zip，只输出目录
               --includeLogDb <bool>   是否包含 app.log.db（默认：true）
 
             restore 参数：
-              --webRoot <path>        StarBlog.Web 目录（默认：当前目录下 src/StarBlog.Web）
+              --webRoot <path>        StarBlog.Web 目录（默认：当前目录下 apps/web-legacy）
               --input <path>          备份 zip 文件或备份目录
               --overwrite             允许覆盖现有文件（强制要求）
 
@@ -63,7 +63,7 @@ internal sealed class App(string[] args) {
 
     private static string GetDefaultWebRoot() {
         var cwd = Directory.GetCurrentDirectory();
-        return Path.Combine(cwd, "src", "StarBlog.Web");
+        return Path.Combine(cwd, "apps", "web-legacy");
     }
 
     private static string GetDefaultOutputRoot() {

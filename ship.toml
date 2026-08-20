@@ -26,8 +26,8 @@ driver = "docker"
 
 [build.docker]
 image = "{{ vars.namespace }}/{{ vars.image }}"
-context = "./src"
-dockerfile = "StarBlog.Web/Dockerfile"
+context = "."
+dockerfile = "apps/web-legacy/Dockerfile"
 platforms = ["linux/amd64"]
 load = true
 
