@@ -11,7 +11,7 @@ namespace StarBlog.Api.Mappings;
 /// API 层使用的 DTO 与实体映射。
 ///
 /// 原 Web 项目中的映射配置位于 Razor 项目，因此纯 API 启动时不会被
-/// <c>AddAutoMapper(typeof(Program))</c> 扫描到。将它们集中在 API 项目，
+/// <c>AddAutoMapper(cfg =&gt; cfg.AddMaps(typeof(Program).Assembly))</c> 扫描到。将它们集中在 API 项目，
 /// 可以确保文章、分类、图片和友链的写操作在迁移后仍能正常工作。
 /// </summary>
 public sealed class ApiMappingProfile : Profile {

@@ -63,7 +63,8 @@ builder.Services.AddSession(options => {
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
-builder.Services.AddAutoMapper(typeof(Program));
+// AutoMapper 15 起 DI 扩展已并入主包，按程序集扫描 Profile。
+builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(Program).Assembly));
 builder.Services.AddDbContext<AppDbContext>(options => {
     options.UseSqlite(builder.Configuration.GetConnectionString("SQLite-Log"));
 });

@@ -49,8 +49,8 @@ builder.Services.Configure<Microsoft.AspNetCore.ResponseCompression.GzipCompress
     options.Level = System.IO.Compression.CompressionLevel.Optimal;
 });
 
-// AutoMapper：控制器 DTO <-> Entity 的映射
-builder.Services.AddAutoMapper(typeof(Program));
+// AutoMapper 15 起 DI 扩展已并入主包，按程序集扫描 Profile。
+builder.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(Program).Assembly));
 
 // 访问日志/统计用的 EF Core SQLite（与 FreeSql 业务库并存）
 builder.Services.AddDbContext<AppDbContext>(options => {

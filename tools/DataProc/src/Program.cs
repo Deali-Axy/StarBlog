@@ -36,7 +36,8 @@ else {
     app.Services.AddSingleton<ISearcher>(new StarBlog.Infrastructure.Ip.FakeIpSearcher());
 }
 
-app.Services.AddAutoMapper(typeof(Program));
+// AutoMapper 15 起 DI 扩展已并入主包，按程序集扫描 Profile。
+app.Services.AddAutoMapper(cfg => cfg.AddMaps(typeof(Program).Assembly));
 
 // 显示服务选择菜单
 Console.WriteLine();
