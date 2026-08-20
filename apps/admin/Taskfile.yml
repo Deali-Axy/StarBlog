@@ -1,0 +1,32 @@
+# https://taskfile.dev
+version: "3"
+
+tasks:
+  install:
+    desc: Install Admin dependencies from package-lock.json
+    cmds:
+      - npm install
+
+  dev:
+    desc: Run the Vite Admin development server
+    cmds:
+      - npm run dev
+
+  build:
+    desc: Type-check and build the Admin application
+    cmds:
+      - npm run build
+
+  preview:
+    desc: Preview the production Admin build
+    cmds:
+      - npm run preview
+
+  clean:
+    desc: Clean Admin build and TypeScript incremental artifacts
+    cmds:
+      # PowerShell 使用显式路径，避免删除应用目录之外的文件。
+      - cmd: powershell -NoProfile -Command "Remove-Item -LiteralPath 'dist' -Recurse -Force -ErrorAction SilentlyContinue; Remove-Item -Path '*.tsbuildinfo' -Force -ErrorAction SilentlyContinue"
+        platforms: [windows]
+      - cmd: rm -rf dist *.tsbuildinfo
+        platforms: [linux, darwin]

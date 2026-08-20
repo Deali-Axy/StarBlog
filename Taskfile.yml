@@ -1,0 +1,46 @@
+# https://taskfile.dev
+version: "3"
+
+# 各应用维护自己的任务和工作目录；根 Taskfile 只提供统一入口。
+includes:
+  api:
+    taskfile: apps/api/Taskfile.yml
+    dir: apps/api
+  admin:
+    taskfile: apps/admin/Taskfile.yml
+    dir: apps/admin
+  tools:
+    taskfile: tools/Taskfile.yml
+    dir: tools
+
+tasks:
+  install:
+    desc: Install or restore dependencies for all product applications
+    deps:
+      - api:restore
+      - admin:install
+
+  dev:
+    desc: Start the API and Admin development servers in parallel
+    deps:
+      - api:dev
+      - admin:dev
+
+  build:
+    desc: Build product applications and maintained tools in parallel
+    deps:
+      - api:build
+      - admin:build
+      - tools:build
+
+  format:
+    desc: Format maintained .NET source code
+    cmds:
+      - task: api:format
+
+  clean:
+    desc: Clean build artifacts without deleting dependencies or runtime data
+    deps:
+      - api:clean
+      - admin:clean
+      - tools:clean

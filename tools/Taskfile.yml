@@ -1,0 +1,59 @@
+# https://taskfile.dev
+version: "3"
+
+tasks:
+  build:
+    desc: Build all maintained StarBlog command-line tools
+    deps:
+      - build:image-optimizer
+      - build:data-proc
+      - build:markdown-importer
+      - build:backup
+
+  build:image-optimizer:
+    internal: true
+    cmds:
+      - dotnet build BlogImageOptimizer/BlogImageOptimizer.csproj
+
+  build:data-proc:
+    internal: true
+    cmds:
+      - dotnet build DataProc/DataProc.csproj
+
+  build:markdown-importer:
+    internal: true
+    cmds:
+      - dotnet build MarkdownImporter/MarkdownImporter.csproj
+
+  build:backup:
+    internal: true
+    cmds:
+      - dotnet build StarBlogBackup/StarBlog.BackupTool.csproj
+
+  clean:
+    desc: Clean all maintained StarBlog command-line tools
+    deps:
+      - clean:image-optimizer
+      - clean:data-proc
+      - clean:markdown-importer
+      - clean:backup
+
+  clean:image-optimizer:
+    internal: true
+    cmds:
+      - dotnet clean BlogImageOptimizer/BlogImageOptimizer.csproj
+
+  clean:data-proc:
+    internal: true
+    cmds:
+      - dotnet clean DataProc/DataProc.csproj
+
+  clean:markdown-importer:
+    internal: true
+    cmds:
+      - dotnet clean MarkdownImporter/MarkdownImporter.csproj
+
+  clean:backup:
+    internal: true
+    cmds:
+      - dotnet clean StarBlogBackup/StarBlog.BackupTool.csproj

@@ -3,15 +3,15 @@
 deploy/.env
 
 dist/
-src/StarBlog.Web/wwwroot/lib/
-src/StarBlog.Web/wwwroot/assets
-src/StarBlog.Web/wwwroot/media
-src/StarBlog.Web/wwwroot/is-cache
-src/StarBlog.Web/package-lock.json
-src/StarBlog.Web/yarn.lock
-src/StarBlog.Web/appsettings-email.json
-src/StarBlog.Web/appsettings-monitoring.json
-src/StarBlog.Web/words.json
+apps/web-legacy/wwwroot/lib/
+apps/web-legacy/wwwroot/assets
+apps/web-legacy/wwwroot/media
+apps/web-legacy/wwwroot/is-cache
+apps/web-legacy/package-lock.json
+apps/web-legacy/yarn.lock
+apps/web-legacy/appsettings-email.json
+apps/web-legacy/appsettings-monitoring.json
+apps/web-legacy/words.json
 app*.db*
 *.xdb
 *.min.css

@@ -17,10 +17,10 @@ jobs:
           dotnet-version: 10.0.x
 
       - name: Restore
-        run: dotnet restore StarBlog.sln
+        run: dotnet restore StarBlog.slnx
 
       - name: Test (with coverage)
-        run: dotnet test StarBlog.sln -c Release --collect:"XPlat Code Coverage" --settings tests/coverlet.runsettings --results-directory TestResults
+        run: dotnet test StarBlog.slnx -c Release --collect:"XPlat Code Coverage" --settings tests/coverlet.runsettings --results-directory TestResults
 
       - name: Upload TestResults
         if: always()
@@ -28,4 +28,3 @@ jobs:
         with:
           name: TestResults
           path: TestResults
-

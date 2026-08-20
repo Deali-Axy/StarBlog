@@ -1,0 +1,18 @@
+<Solution>
+  <Project Path="apps/api/src/StarBlog.Api/StarBlog.Api.csproj" />
+  <Project Path="apps/api/src/StarBlog.Application/StarBlog.Application.csproj" />
+  <Project Path="apps/api/src/StarBlog.Content/StarBlog.Content.csproj" />
+  <Project Path="apps/api/src/StarBlog.Data/StarBlog.Data.csproj" />
+  <Project Path="apps/api/src/StarBlog.Infrastructure/StarBlog.Infrastructure.csproj" />
+  <Project Path="apps/web-legacy/StarBlog.Web.csproj" />
+  <Project Path="tests/StarBlog.Api.IntegrationTests/StarBlog.Api.IntegrationTests.csproj" />
+  <Project Path="tests/StarBlog.Application.UnitTests/StarBlog.Application.UnitTests.csproj" />
+  <Project Path="tests/StarBlog.E2ETests/StarBlog.E2ETests.csproj" />
+  <Project Path="tests/StarBlog.IntegrationTests/StarBlog.IntegrationTests.csproj" />
+  <Project Path="tests/StarBlog.Testing/StarBlog.Testing.csproj" />
+  <Project Path="tests/StarBlog.UnitTests/StarBlog.UnitTests.csproj" />
+  <Project Path="tools/BlogImageOptimizer/BlogImageOptimizer.csproj" />
+  <Project Path="tools/DataProc/DataProc.csproj" />
+  <Project Path="tools/MarkdownImporter/MarkdownImporter.csproj" />
+  <Project Path="tools/StarBlogBackup/StarBlog.BackupTool.csproj" />
+</Solution>

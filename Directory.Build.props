@@ -1,0 +1,8 @@
+<Project>
+  <PropertyGroup>
+    <!-- 所有 .NET 项目共享确定性构建；项目仍自行决定 TargetFramework 和 Nullable 策略。 -->
+    <Deterministic>true</Deterministic>
+    <LangVersion>default</LangVersion>
+    <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+</Project>

@@ -9,7 +9,7 @@
 [CmdletBinding()]
 param(
     [Parameter()]
-    [string]$DatabasePath = (Join-Path $PSScriptRoot "..\src\StarBlog.Api\app.db"),
+    [string]$DatabasePath = (Join-Path $PSScriptRoot "..\apps\api\src\StarBlog.Api\app.db"),
 
     [Parameter()]
     [ValidatePattern('^[A-Za-z0-9_.-]{3,64}$')]
