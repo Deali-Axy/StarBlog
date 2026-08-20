@@ -1,10 +1,11 @@
-# StarBlog.Web 备份工具
+# StarBlog.Api 备份工具
 
-该工具用于备份 `apps/web-legacy` 的关键可变数据：
-- SQLite：`app.db`（必备）与 `app.log.db`（可选）
+该工具用于备份 `apps/api/src/StarBlog.Api` 的关键可变数据：
+
+- SQLite：`app.db`（必备）与 `app.log.db`（可选，若仍存在）
 - 媒体资源：`wwwroot/media/blog`、`wwwroot/media/photography`
 
-默认输出为 zip 备份包，并可按数量做保留策略清理。
+默认输出为 zip 备份包，并可按数量做保留策略清理。旧版 `StarBlog.Web_*` 备份包在恢复时仍可识别。
 
 ## 1. 直接执行（推荐）
 
@@ -36,7 +37,7 @@ dotnet run --project .\tools\StarBlogBackup\StarBlog.BackupTool.csproj -- backup
 
 ```powershell
 dotnet run --project .\tools\StarBlogBackup\StarBlog.BackupTool.csproj -- backup `
-  --webRoot C:\code\starblog\starblog\apps\web-legacy `
+  --webRoot C:\code\starblog\starblog\apps\api\src\StarBlog.Api `
   --outputRoot D:\Backups\StarBlog `
   --retention 30
 ```
@@ -46,27 +47,30 @@ dotnet run --project .\tools\StarBlogBackup\StarBlog.BackupTool.csproj -- backup
 建议用“每天/每周”调度 `pwsh`，并指向脚本：
 
 程序/脚本：
+
 ```
 pwsh
 ```
 
 添加参数：
+
 ```
 -NoProfile -ExecutionPolicy Bypass -File "C:\code\starblog\starblog\tools\StarBlogBackup\backup-starblog-web.ps1" -OutputRoot "D:\Backups\StarBlog" -Retention 30
 ```
 
 起始于（可选）：
+
 ```
 C:\code\starblog\starblog
 ```
 
-## 4. 恢复（可选）
+## 4. 恢复
 
-恢复会覆盖 `StarBlog.Web` 下同名文件，务必在站点停止时执行：
+恢复会覆盖 `StarBlog.Api` 下同名文件，务必在站点停止时执行：
 
 ```powershell
 dotnet run --project .\tools\StarBlogBackup\StarBlog.BackupTool.csproj -- restore `
-  --webRoot C:\code\starblog\starblog\apps\web-legacy `
-  --input D:\Backups\StarBlog\StarBlog.Web_20260212_120000.zip `
+  --webRoot C:\code\starblog\starblog\apps\api\src\StarBlog.Api `
+  --input D:\Backups\StarBlog\StarBlog.Api_20260820_120000.zip `
   --overwrite
 ```

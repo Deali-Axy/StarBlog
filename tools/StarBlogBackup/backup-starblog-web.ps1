@@ -10,11 +10,11 @@ $ErrorActionPreference = "Stop"
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
 
 if ([string]::IsNullOrWhiteSpace($WebRoot)) {
-  $WebRoot = (Join-Path $repoRoot "apps\web-legacy")
+  $WebRoot = (Join-Path $repoRoot "apps\api\src\StarBlog.Api")
 }
 
 if ([string]::IsNullOrWhiteSpace($OutputRoot)) {
-  $OutputRoot = (Join-Path $repoRoot "backups\StarBlog.Web")
+  $OutputRoot = (Join-Path $repoRoot "backups\StarBlog.Api")
 }
 
 $project = (Join-Path $repoRoot "tools\StarBlogBackup\StarBlog.BackupTool.csproj")

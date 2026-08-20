@@ -39,18 +39,18 @@ internal sealed class App(string[] args) {
             StarBlog.BackupTool
 
             命令：
-              backup   备份 StarBlog.Web（SQLite + 媒体目录）
-              restore  从备份包恢复到 StarBlog.Web（需要 --overwrite）
+              backup   备份 StarBlog.Api（SQLite + 媒体目录）
+              restore  从备份包恢复到 StarBlog.Api（需要 --overwrite）
 
             backup 参数：
-              --webRoot <path>        StarBlog.Web 目录（默认：当前目录下 apps/web-legacy）
-              --outputRoot <path>     备份输出目录（默认：当前目录下 backups/StarBlog.Web）
+              --webRoot <path>        StarBlog.Api 目录（默认：当前目录下 apps/api/src/StarBlog.Api）
+              --outputRoot <path>     备份输出目录（默认：当前目录下 backups/StarBlog.Api）
               --retention <n>         保留最近 n 份备份（默认：30；0 表示不清理）
               --no-zip                不生成 zip，只输出目录
               --includeLogDb <bool>   是否包含 app.log.db（默认：true）
 
             restore 参数：
-              --webRoot <path>        StarBlog.Web 目录（默认：当前目录下 apps/web-legacy）
+              --webRoot <path>        StarBlog.Api 目录（默认：当前目录下 apps/api/src/StarBlog.Api）
               --input <path>          备份 zip 文件或备份目录
               --overwrite             允许覆盖现有文件（强制要求）
 
@@ -61,14 +61,22 @@ internal sealed class App(string[] args) {
             """);
     }
 
+    /// <summary>同时识别新备份包中的 StarBlog.Api 目录和旧包中的 StarBlog.Web 目录。</summary>
+    private static string ResolvePayloadRoot(string parent) {
+        var api = Path.Combine(parent, "StarBlog.Api");
+        if (Directory.Exists(api)) return api;
+        var legacy = Path.Combine(parent, "StarBlog.Web");
+        return Directory.Exists(legacy) ? legacy : api;
+    }
+
     private static string GetDefaultWebRoot() {
         var cwd = Directory.GetCurrentDirectory();
-        return Path.Combine(cwd, "apps", "web-legacy");
+        return Path.Combine(cwd, "apps", "api", "src", "StarBlog.Api");
     }
 
     private static string GetDefaultOutputRoot() {
         var cwd = Directory.GetCurrentDirectory();
-        return Path.Combine(cwd, "backups", "StarBlog.Web");
+        return Path.Combine(cwd, "backups", "StarBlog.Api");
     }
 
     private static async Task<int> RunBackupAsync(OptionValues options) {
@@ -79,16 +87,16 @@ internal sealed class App(string[] args) {
         var includeLogDb = options.GetBool("includeLogDb") ?? true;
 
         if (!Directory.Exists(webRoot)) {
-            Console.Error.WriteLine($"找不到 StarBlog.Web 目录：{webRoot}");
+            Console.Error.WriteLine($"找不到 StarBlog.Api 目录：{webRoot}");
             return 3;
         }
 
         Directory.CreateDirectory(outputRoot);
 
         var timestamp = DateTimeOffset.Now.ToString("yyyyMMdd_HHmmss");
-        var backupName = $"StarBlog.Web_{timestamp}";
+        var backupName = $"StarBlog.Api_{timestamp}";
         var tempRoot = Path.Combine(outputRoot,  $".tmp_{backupName}_{Guid.NewGuid():N}");
-        var payloadRoot = Path.Combine(tempRoot, "StarBlog.Web");
+        var payloadRoot = Path.Combine(tempRoot, "StarBlog.Api");
         Directory.CreateDirectory(payloadRoot);
 
         try {
@@ -191,7 +199,7 @@ internal sealed class App(string[] args) {
         }
 
         if (!Directory.Exists(webRoot)) {
-            Console.Error.WriteLine($"找不到 StarBlog.Web 目录：{webRoot}");
+            Console.Error.WriteLine($"找不到 StarBlog.Api 目录：{webRoot}");
             return 3;
         }
 
@@ -203,10 +211,10 @@ internal sealed class App(string[] args) {
             string payloadRoot;
             if (File.Exists(inputPath) && Path.GetExtension(inputPath).Equals(".zip", StringComparison.OrdinalIgnoreCase)) {
                 ZipFile.ExtractToDirectory(inputPath, tempDir);
-                payloadRoot = Path.Combine(tempDir, "StarBlog.Web");
+                payloadRoot = ResolvePayloadRoot(tempDir);
             }
             else if (Directory.Exists(inputPath)) {
-                payloadRoot = Path.Combine(inputPath, "StarBlog.Web");
+                payloadRoot = ResolvePayloadRoot(inputPath);
                 if (!Directory.Exists(payloadRoot)) {
                     payloadRoot = inputPath;
                 }
@@ -217,7 +225,7 @@ internal sealed class App(string[] args) {
             }
 
             if (!Directory.Exists(payloadRoot)) {
-                Console.Error.WriteLine($"输入中未找到 StarBlog.Web 备份内容：{payloadRoot}");
+                Console.Error.WriteLine($"输入中未找到 StarBlog.Api 备份内容：{payloadRoot}");
                 return 4;
             }
 
