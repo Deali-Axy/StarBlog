@@ -186,12 +186,15 @@ public sealed class PostPublicationResponse {
     };
 }
 
-/// <summary>博客概况。</summary>
-public sealed class BlogOverviewResponse {
-    public long PostsCount { get; init; }
-    public long CategoriesCount { get; init; }
-    public long PhotosCount { get; init; }
-    public long FeaturedPostsCount { get; init; }
-    public long FeaturedCategoriesCount { get; init; }
-    public long FeaturedPhotosCount { get; init; }
+/// <summary>推荐或置顶文章的放置结果。</summary>
+public sealed class FeaturedPlacementResponse {
+    public int Id { get; init; }
+    public required string PostId { get; init; }
+}
+
+/// <summary>Markdown 压缩包导入结果。</summary>
+public sealed class MarkdownImportResult {
+    public int PostsImported { get; init; }
+    public int CategoriesCreated { get; init; }
+    public IReadOnlyList<string> PostIds { get; init; } = [];
 }

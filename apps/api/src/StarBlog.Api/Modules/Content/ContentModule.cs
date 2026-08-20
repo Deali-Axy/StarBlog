@@ -8,6 +8,7 @@ public static class ContentModule {
         services.Configure<TranslationOptions>(configuration.GetSection(TranslationOptions.SectionName));
         services.AddScoped<ContentOperations>();
         services.AddScoped<IPublishedContentQueries>(provider => provider.GetRequiredService<ContentOperations>());
+        services.AddScoped<MarkdownPostImporter>();
         services.AddScoped<PublicationOperations>();
         services.AddScoped<TranslationOperations>();
         return services;

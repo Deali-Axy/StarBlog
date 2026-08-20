@@ -120,25 +120,26 @@ public sealed class ContentOperations : IPublishedContentQueries {
         return $"{host}/{relative.Replace('\\', '/')}";
     }
 
-    public async Task<FeaturedPost?> AddFeaturedPostAsync(string postId, CancellationToken cancellationToken) {
+    /// <summary>将文章加入精选；已精选时返回原记录。</summary>
+    public async Task<FeaturedPlacementResponse?> AddFeaturedPostAsync(string postId, CancellationToken cancellationToken) {
         if (!await _db.Posts.AnyAsync(post => post.Id == postId, cancellationToken)) return null;
         var existing = await _db.FeaturedPosts.FirstOrDefaultAsync(item => item.PostId == postId, cancellationToken);
-        if (existing != null) return existing;
+        if (existing != null) return new FeaturedPlacementResponse { Id = existing.Id, PostId = existing.PostId };
         var featured = new FeaturedPost { PostId = postId };
         _db.FeaturedPosts.Add(featured);
         await _db.SaveChangesAsync(cancellationToken);
-        return featured;
+        return new FeaturedPlacementResponse { Id = featured.Id, PostId = featured.PostId };
     }
 
     /// <summary>将文章设为唯一置顶。</summary>
-    public async Task<TopPost?> SetTopPostAsync(string postId, CancellationToken cancellationToken) {
+    public async Task<FeaturedPlacementResponse?> SetTopPostAsync(string postId, CancellationToken cancellationToken) {
         if (!await _db.Posts.AnyAsync(post => post.Id == postId, cancellationToken)) return null;
         var current = await _db.TopPosts.ToListAsync(cancellationToken);
         _db.TopPosts.RemoveRange(current);
         var top = new TopPost { PostId = postId };
         _db.TopPosts.Add(top);
         await _db.SaveChangesAsync(cancellationToken);
-        return top;
+        return new FeaturedPlacementResponse { Id = top.Id, PostId = top.PostId };
     }
 
     public async Task<PageResult<CategoryResponse>> GetCategoriesAsync(int page, int pageSize, CancellationToken cancellationToken) {
@@ -238,13 +239,12 @@ public sealed class ContentOperations : IPublishedContentQueries {
         return items.Select(ToCategory).ToList();
     }
 
-    public async Task<BlogOverviewResponse> OverviewAsync(CancellationToken cancellationToken) => new() {
+    /// <summary>返回本模块拥有的数量快照，不读取 Media 实体。</summary>
+    public async Task<ContentInventory> GetInventoryAsync(CancellationToken cancellationToken = default) => new() {
         PostsCount = await _db.Posts.CountAsync(cancellationToken),
         CategoriesCount = await _db.Categories.CountAsync(cancellationToken),
-        PhotosCount = await _db.Photos.CountAsync(cancellationToken),
         FeaturedPostsCount = await _db.FeaturedPosts.CountAsync(cancellationToken),
-        FeaturedCategoriesCount = await _db.FeaturedCategories.CountAsync(cancellationToken),
-        FeaturedPhotosCount = await _db.FeaturedPhotos.CountAsync(cancellationToken)
+        FeaturedCategoriesCount = await _db.FeaturedCategories.CountAsync(cancellationToken)
     };
 
     private static List<CategoryNodeResponse>? BuildTree(List<Category> categories, int parentId) {

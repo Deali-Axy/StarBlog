@@ -12,6 +12,15 @@ public interface IPublishedContentQueries {
     Task<IReadOnlyList<PublishedPostSummary>> GetFeaturedPostsAsync(CancellationToken cancellationToken = default);
     Task<IReadOnlyList<FeaturedCategoryResponse>> GetFeaturedCategoriesAsync(CancellationToken cancellationToken = default);
     Task<IReadOnlyList<CategoryResponse>> GetVisibleCategoriesAsync(CancellationToken cancellationToken = default);
+    Task<ContentInventory> GetInventoryAsync(CancellationToken cancellationToken = default);
+}
+
+/// <summary>Content 模块对外提供的数量快照，供 Site 聚合概况。</summary>
+public sealed class ContentInventory {
+    public int PostsCount { get; init; }
+    public int CategoriesCount { get; init; }
+    public int FeaturedPostsCount { get; init; }
+    public int FeaturedCategoriesCount { get; init; }
 }
 
 /// <summary>跨模块使用的已发布文章摘要。</summary>

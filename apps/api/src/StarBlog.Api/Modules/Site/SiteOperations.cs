@@ -73,6 +73,19 @@ public sealed class SiteOperations {
             .ToList();
     }
 
+    /// <summary>组合 Content 与 Media 的数量快照，Site 不直接读取其他模块实体。</summary>
+    public async Task<SiteOverviewResponse> GetOverviewAsync(CancellationToken cancellationToken) {
+        var content = await _content.GetInventoryAsync(cancellationToken);
+        return new SiteOverviewResponse {
+            PostsCount = content.PostsCount,
+            CategoriesCount = content.CategoriesCount,
+            FeaturedPostsCount = content.FeaturedPostsCount,
+            FeaturedCategoriesCount = content.FeaturedCategoriesCount,
+            PhotosCount = await _photos.CountAsync(cancellationToken),
+            FeaturedPhotosCount = await _photos.CountFeaturedAsync(cancellationToken)
+        };
+    }
+
     public IReadOnlyList<ThemeResponse> GetThemes() {
         var themes = new List<ThemeResponse> {
             new() { Name = "Bootstrap", Path = string.Empty, CssUrl = string.Empty }

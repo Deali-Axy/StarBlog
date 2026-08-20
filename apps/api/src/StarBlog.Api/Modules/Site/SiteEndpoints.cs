@@ -11,6 +11,7 @@ public static class SiteEndpoints {
     public static IEndpointRouteBuilder MapSiteEndpoints(this IEndpointRouteBuilder endpoints) {
         var site = endpoints.MapGroup("/api/v1/site").WithTags("common").WithGroupName("common");
         site.MapGet("/home", Home).AllowAnonymous();
+        site.MapGet("/overview", Overview).AllowAnonymous();
         site.MapGet("/search", Search).AllowAnonymous();
         site.MapGet("/photos/random", RandomPhoto).AllowAnonymous();
         site.MapGet("/photos/{id}/adjacent/next", NextPhoto).AllowAnonymous();
@@ -27,6 +28,9 @@ public static class SiteEndpoints {
 
     private static Task<HomeResponse> Home(SiteOperations operations, CancellationToken cancellationToken) =>
         operations.GetHomeAsync(cancellationToken);
+
+    private static Task<SiteOverviewResponse> Overview(SiteOperations operations, CancellationToken cancellationToken) =>
+        operations.GetOverviewAsync(cancellationToken);
 
     private static async Task<IResult> Search(
         SiteOperations operations,

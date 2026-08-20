@@ -29,4 +29,22 @@ public sealed class ModularMonolithArchitectureTests {
             .ToList();
         Assert.True(hits.Count == 0, string.Join(Environment.NewLine, hits.Select(item => $"{item.file}:{item.index + 1}: {item.line.Trim()}")));
     }
+
+    [Fact]
+    public void Project_file_does_not_reference_FreeSql() {
+        var csproj = File.ReadAllText(Path.Combine(ApiRoot, "StarBlog.Api.csproj"));
+        Assert.DoesNotContain("FreeSql", csproj, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void Endpoints_do_not_reference_domain_types() {
+        var files = Directory.GetFiles(ApiRoot, "*Endpoints.cs", SearchOption.AllDirectories);
+        var hits = files
+            .SelectMany(file => File.ReadAllLines(file).Select((line, index) => (file, line, index)))
+            .Where(item => item.line.Contains(".Domain", StringComparison.Ordinal)
+                           || (item.line.Contains("using StarBlog.Api.Modules.", StringComparison.Ordinal)
+                               && item.line.Contains("Domain", StringComparison.Ordinal)))
+            .ToList();
+        Assert.True(hits.Count == 0, string.Join(Environment.NewLine, hits.Select(item => $"{item.file}:{item.index + 1}: {item.line.Trim()}")));
+    }
 }

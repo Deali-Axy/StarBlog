@@ -32,3 +32,13 @@ public sealed class ThemeResponse {
     public required string Path { get; init; }
     public required string CssUrl { get; init; }
 }
+
+/// <summary>站点概况，由 Site 扇出读取各模块只读契约组装。</summary>
+public sealed class SiteOverviewResponse {
+    public int PostsCount { get; init; }
+    public int CategoriesCount { get; init; }
+    public int PhotosCount { get; init; }
+    public int FeaturedPostsCount { get; init; }
+    public int FeaturedCategoriesCount { get; init; }
+    public int FeaturedPhotosCount { get; init; }
+}

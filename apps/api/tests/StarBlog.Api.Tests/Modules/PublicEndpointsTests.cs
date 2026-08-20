@@ -21,6 +21,7 @@ public sealed class PublicEndpointsTests : IClassFixture<StarBlogApiFactory> {
     [InlineData("/api/v1/theme")]
     [InlineData("/api/v1/links")]
     [InlineData("/api/v1/site/home")]
+    [InlineData("/api/v1/site/overview")]
     [InlineData("/api/v1/site/search?keyword=Test")]
     [InlineData("/feed")]
     [InlineData("/robots.txt")]

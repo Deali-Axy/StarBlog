@@ -14,6 +14,7 @@ public static class ContentEndpoints {
         posts.MapPost("/", CreatePost).RequireAuthorization();
         posts.MapPut("/{id}", UpdatePost).RequireAuthorization();
         posts.MapDelete("/{id}", DeletePost).RequireAuthorization();
+        posts.MapPost("/imports", ImportMarkdown).RequireAuthorization().DisableAntiforgery();
         posts.MapPost("/{id}/images", UploadImage).RequireAuthorization().DisableAntiforgery();
         posts.MapPost("/{id}/featured-post", FeaturePost).RequireAuthorization();
         posts.MapPut("/{id}/top-placement", TopPost).RequireAuthorization();
@@ -26,11 +27,6 @@ public static class ContentEndpoints {
         categories.MapPut("/{id:int}", UpdateCategory).RequireAuthorization();
         categories.MapDelete("/{id:int}", DeleteCategory).RequireAuthorization();
         categories.MapPost("/{id:int}/featured-category", FeatureCategory).RequireAuthorization();
-
-        endpoints.MapGet("/api/v1/site/overview", Overview)
-            .AllowAnonymous()
-            .WithTags("blog")
-            .WithGroupName("blog");
 
         var channels = endpoints.MapGroup("/api/v1/admin/publication-channels")
             .RequireAuthorization()
@@ -92,14 +88,24 @@ public static class ContentEndpoints {
         return url == null ? HttpErrors.NotFound($"文章 {id} 不存在") : Results.Ok(new { url });
     }
 
+    /// <summary>接收 Markdown zip，按文件夹创建分类并导入文章。</summary>
+    private static async Task<IResult> ImportMarkdown(HttpRequest request, MarkdownPostImporter importer, CancellationToken cancellationToken) {
+        var form = await request.ReadFormAsync(cancellationToken);
+        var file = form.Files.FirstOrDefault();
+        if (file == null) return HttpErrors.BadRequest("请上传包含 Markdown 的 zip 文件");
+        await using var stream = file.OpenReadStream();
+        var result = await importer.ImportZipAsync(stream, cancellationToken);
+        return Results.Ok(result);
+    }
+
     private static async Task<IResult> FeaturePost(string id, ContentOperations operations, CancellationToken cancellationToken) {
         var featured = await operations.AddFeaturedPostAsync(id, cancellationToken);
-        return featured == null ? HttpErrors.NotFound($"文章 {id} 不存在") : Results.Ok(new { featured.Id, featured.PostId });
+        return featured == null ? HttpErrors.NotFound($"文章 {id} 不存在") : Results.Ok(featured);
     }
 
     private static async Task<IResult> TopPost(string id, ContentOperations operations, CancellationToken cancellationToken) {
         var top = await operations.SetTopPostAsync(id, cancellationToken);
-        return top == null ? HttpErrors.NotFound($"文章 {id} 不存在") : Results.Ok(new { top.Id, top.PostId });
+        return top == null ? HttpErrors.NotFound($"文章 {id} 不存在") : Results.Ok(top);
     }
 
     private static async Task<IResult> Translate(string id, TranslationOperations operations, [FromQuery] string language = "en", CancellationToken cancellationToken = default) {
@@ -135,9 +141,6 @@ public static class ContentEndpoints {
         var featured = await operations.AddFeaturedCategoryAsync(id, request, cancellationToken);
         return featured == null ? HttpErrors.NotFound($"分类 {id} 不存在") : Results.Ok(featured);
     }
-
-    private static Task<BlogOverviewResponse> Overview(ContentOperations operations, CancellationToken cancellationToken) =>
-        operations.OverviewAsync(cancellationToken);
 
     private static Task<IReadOnlyList<PublicationChannelResponse>> ListChannels(PublicationOperations operations, CancellationToken cancellationToken) =>
         operations.GetChannelsAsync(cancellationToken);
