@@ -1,9 +1,11 @@
-FROM mcr.microsoft.com/dotnet/runtime:9.0 AS base
+FROM mcr.microsoft.com/dotnet/runtime:10.0 AS base
 WORKDIR /app
 
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 COPY ["tools/MarkdownImporter/MarkdownImporter.csproj", "tools/MarkdownImporter/"]
+COPY ["apps/api/src/StarBlog.Data/StarBlog.Data.csproj", "apps/api/src/StarBlog.Data/"]
+COPY ["apps/api/src/StarBlog.Content/StarBlog.Content.csproj", "apps/api/src/StarBlog.Content/"]
 RUN dotnet restore "tools/MarkdownImporter/MarkdownImporter.csproj"
 COPY . .
 WORKDIR "/src/tools/MarkdownImporter"
