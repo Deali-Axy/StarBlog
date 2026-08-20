@@ -4,11 +4,12 @@ version: "3"
 tasks:
   build:
     desc: Build all maintained StarBlog command-line tools
-    deps:
-      - build:image-optimizer
-      - build:data-proc
-      - build:markdown-importer
-      - build:backup
+    # 工具项目共享 StarBlog.Data/Content/Infrastructure，Windows 上并行 restore/build 会争用 obj 文件。
+    cmds:
+      - task: build:image-optimizer
+      - task: build:data-proc
+      - task: build:markdown-importer
+      - task: build:backup
 
   build:image-optimizer:
     internal: true
@@ -32,11 +33,11 @@ tasks:
 
   clean:
     desc: Clean all maintained StarBlog command-line tools
-    deps:
-      - clean:image-optimizer
-      - clean:data-proc
-      - clean:markdown-importer
-      - clean:backup
+    cmds:
+      - task: clean:image-optimizer
+      - task: clean:data-proc
+      - task: clean:markdown-importer
+      - task: clean:backup
 
   clean:image-optimizer:
     internal: true

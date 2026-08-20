@@ -27,11 +27,16 @@ tasks:
       - admin:dev
 
   build:
-    desc: Build product applications and maintained tools in parallel
+    desc: Build product applications and maintained tools
+    # Admin 与 .NET 可以并行；.NET 必须走同一个解决方案图，避免多个 dotnet build 同时写共享 obj。
     deps:
-      - api:build
       - admin:build
-      - tools:build
+      - build:dotnet
+
+  build:dotnet:
+    internal: true
+    cmds:
+      - dotnet build StarBlog.slnx
 
   format:
     desc: Format maintained .NET source code
@@ -41,6 +46,10 @@ tasks:
   clean:
     desc: Clean build artifacts without deleting dependencies or runtime data
     deps:
-      - api:clean
       - admin:clean
-      - tools:clean
+      - clean:dotnet
+
+  clean:dotnet:
+    internal: true
+    cmds:
+      - dotnet clean StarBlog.slnx
