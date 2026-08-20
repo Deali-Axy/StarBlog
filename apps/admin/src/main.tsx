@@ -120,7 +120,7 @@ function ResourcePage({ resource }: { resource: string }) {
   const identifier = (row: RecordRow) => String(row[config.idKey ?? "id"] ?? "");
   const [data, setData] = useState<RecordRow[]>([]); const [busy, setBusy] = useState(true); const [selected, setSelected] = useState<RecordRow | null>(null);
   const [editing, setEditing] = useState<RecordRow | null | "new">(null); const [json, setJson] = useState(""); const [saving, setSaving] = useState(false); const [photoFile, setPhotoFile] = useState<File | null>(null);
-  const load = async () => { setBusy(true); try { const result = await request<RecordRow[] | { data: RecordRow[] }>(config.endpoint); setData(Array.isArray(result) ? result : result.data ?? []); } catch (error) { message.error(error instanceof Error ? error.message : "读取失败"); } finally { setBusy(false); } };
+  const load = async () => { setBusy(true); try { const result = await request<RecordRow[] | { items?: RecordRow[]; data?: RecordRow[] }>(config.endpoint); setData(Array.isArray(result) ? result : result.items ?? result.data ?? []); } catch (error) { message.error(error instanceof Error ? error.message : "读取失败"); } finally { setBusy(false); } };
   useEffect(() => { void load(); }, [resource]);
   const openEditor = (row: RecordRow | "new") => { setEditing(row); setPhotoFile(null); setJson(JSON.stringify(row === "new" ? config.createTemplate : row, null, 2)); };
   const save = async () => {
@@ -147,7 +147,7 @@ function ResourcePage({ resource }: { resource: string }) {
 
 function PublishingStudio() {
   const [channels, setChannels] = useState<Channel[]>([]); const [posts, setPosts] = useState<RecordRow[]>([]); const [active, setActive] = useState<Publication | null>(null); const [form] = Form.useForm(); const [publishing, setPublishing] = useState(false);
-  const load = async () => { try { const [channelData, postData] = await Promise.all([request<Channel[]>("/api/v1/admin/publication-channels"), request<RecordRow[] | { data: RecordRow[] }>("/api/v1/posts?page=1&pageSize=100")]); setChannels(channelData); setPosts(Array.isArray(postData) ? postData : postData.data ?? []); } catch (error) { message.error(error instanceof Error ? error.message : "加载发布工作台失败"); } };
+  const load = async () => { try { const [channelData, postData] = await Promise.all([request<Channel[]>("/api/v1/admin/publication-channels"), request<RecordRow[] | { items?: RecordRow[]; data?: RecordRow[] }>("/api/v1/posts?page=1&pageSize=100")]); setChannels(channelData); setPosts(Array.isArray(postData) ? postData : postData.items ?? postData.data ?? []); } catch (error) { message.error(error instanceof Error ? error.message : "加载发布工作台失败"); } };
   useEffect(() => { void load(); }, []);
   const saveChannel = async (values: Record<string, unknown>) => { try { await request("/api/v1/admin/publication-channels", { method: "POST", body: JSON.stringify({ ...values, platform: Number(values.platform) }) }); message.success("渠道已保存"); form.resetFields(); await load(); } catch (error) { message.error(error instanceof Error ? error.message : "保存失败"); } };
   const prepare = async (postId: string, channelId: string) => { try { const item = await request<Publication>(`/api/v1/admin/posts/${postId}/publications`, { method: "POST", body: JSON.stringify({ channelId }) }); setActive(item); message.success("已生成发布快照"); } catch (error) { message.error(error instanceof Error ? error.message : "生成快照失败"); } };
