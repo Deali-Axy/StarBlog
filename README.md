@@ -217,14 +217,14 @@ dotnet tool install --global dotnet-ef
 同步数据库 (Windows10+)
 
 ```powershell
-$env:CONNECTION_STRING = "Data Source=apps\web-legacy\app.log.db"
+$env:CONNECTION_STRING = "Data Source=apps\api\src\StarBlog.Api\app.log.db"
 task api:db:update
 ```
 
 同步数据库 (Linux/MacOS)
 
 ```bash
-CONNECTION_STRING="Data Source=apps/web-legacy/app.log.db" task api:db:update
+CONNECTION_STRING="Data Source=apps/api/src/StarBlog.Api/app.log.db" task api:db:update
 ```
 
 ### 初始化
@@ -253,7 +253,7 @@ StarBlog 的友情链接、评论系统都用到了发邮件功能，详情见: 
 
 #### 敏感词检测
 
-StarBlog 使用 DFA 技术实现评论敏感词检测，使用时需要在 StarBlog.Web 项目下放置一个敏感词库文件 `words.json`
+StarBlog 使用 DFA 技术实现评论敏感词检测，使用时需要在 `apps/api/src/StarBlog.Api` 或 `apps/web-legacy` 项目目录下放置敏感词库文件 `words.json`
 
 为了网络环境的文明和谐，本项目的开源代码里不能提供，需要的同学可以自行搜集。
 
