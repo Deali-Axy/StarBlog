@@ -131,10 +131,69 @@ export interface ListPostsQuery {
   pageSize?: number
   search?: string
   categoryId?: number
+  sortBy?: string
+  sortType?: "asc" | "desc"
+  includeDescendants?: boolean
+}
+
+export interface ListPhotosQuery {
+  page?: number
+  pageSize?: number
 }
 
 export interface SearchQuery {
   keyword: string
   page?: number
   pageSize?: number
+}
+
+export interface CategoryWordCloudItem {
+  id: number
+  name: string
+  count: number
+}
+
+export interface CommentResponse {
+  id: string
+  parentId?: string | null
+  postId: string
+  content: string
+  visible: boolean
+  isNeedAudit: boolean
+  reason?: string | null
+  createdTime: string
+  anonymousUserName?: string | null
+  comments?: CommentResponse[] | null
+}
+
+export interface CommentCreateRequest {
+  postId: string
+  parentId?: string | null
+  content: string
+  userName: string
+  email: string
+  url?: string | null
+  emailOtp: string
+}
+
+export interface CommentCreateResult {
+  comment: CommentResponse
+  message: string
+}
+
+export interface LinkExchangeApplicationRequest {
+  name: string
+  description?: string
+  url: string
+  webMaster: string
+  email: string
+}
+
+export interface PostTranslationResponse {
+  id: string
+  postId: string
+  language: string
+  title: string
+  summary?: string | null
+  content?: string | null
 }

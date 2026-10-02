@@ -16,6 +16,9 @@ export function SiteFooter({ links = [] }: { links?: LinkResponse[] }) {
           <Link href={routes.blog} className="text-muted-foreground hover:text-foreground">
             文章
           </Link>
+          <Link href={routes.photography} className="text-muted-foreground hover:text-foreground">
+            摄影
+          </Link>
           <Link href={routes.search} className="text-muted-foreground hover:text-foreground">
             搜索
           </Link>

@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils"
 const navItems = [
   { href: routes.home, label: "首页" },
   { href: routes.blog, label: "文章" },
+  { href: routes.photography, label: "摄影" },
   { href: routes.search, label: "搜索" },
 ]
 

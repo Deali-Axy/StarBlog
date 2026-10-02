@@ -66,10 +66,10 @@
 
 旧站：[`PhotographyController.cs`](../../apps/web-legacy/Controllers/PhotographyController.cs)、[`Views/Photography`](../../apps/web-legacy/Views/Photography)。
 
-- `/photography`：`GET /api/v1/photos` 分页，Masonry 或 CSS 网格，缩略图走 `/api/v1/photos/{id}/thumbnail`。
-- `/photography/[id]`：原图 `/media/photography/{filePath}`，标题/地点/时间。
-- 上一张 / 下一张 / 随机：`GET /api/v1/site/photos/{id}/adjacent/*`、`GET /api/v1/site/photos/random`。
-- 首页精选图可点进详情（第一版只展示）。
+- `/photography`：`GET /api/v1/photos` 分页，CSS 多列瀑布流，缩略图走 `/api/v1/photos/{id}/thumbnail`。**已完成**
+- `/photography/[id]`：原图 `/media/photography/{filePath}`，标题/地点/时间。**已完成**
+- 上一张 / 下一张 / 随机：`GET /api/v1/site/photos/{id}/adjacent/*`、`GET /api/v1/site/photos/random`。**已完成**
+- 首页精选图可点进详情（第一版只展示）。**已完成**
 
 API：已具备，无需新契约。
 
@@ -162,7 +162,7 @@ Next 侧：
 
 ## 7. 验收清单
 
-- [ ] 摄影列表、详情、上一张/下一张/随机
+- [x] 摄影列表、详情、上一张/下一张/随机
 - [ ] 文章下评论列表、OTP 发送、发表、回复
 - [ ] 友链列表与申请成功/校验失败
 - [ ] 关于页、RSS 说明页、顶栏入口

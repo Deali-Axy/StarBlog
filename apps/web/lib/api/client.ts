@@ -49,3 +49,7 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
 export function apiGet<T>(path: string, query?: RequestOptions["query"], init?: RequestOptions) {
   return apiRequest<T>(path, { ...init, method: "GET", query })
 }
+
+export function apiPost<T>(path: string, body?: unknown, query?: RequestOptions["query"], init?: RequestOptions) {
+  return apiRequest<T>(path, { ...init, method: "POST", body, query, cache: "no-store" })
+}

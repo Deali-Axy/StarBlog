@@ -1,20 +1,34 @@
 export const routes = {
   home: "/",
   blog: "/blog",
+  blogRandom: "/blog/random",
   search: "/search",
   feed: "/feed",
+  photography: "/photography",
+  photographyRandom: "/photography/random",
+  about: "/about",
+  links: "/links",
+  rss: "/rss",
   post(idOrSlug: string) {
     return `/blog/${encodeURIComponent(idOrSlug)}`
   },
-  blogList(params: {
-    page?: number
-    pageSize?: number
-    search?: string
-    categoryId?: number
-    sortBy?: string
-    sortType?: "asc" | "desc"
-    view?: "grid" | "list"
-  } = {}) {
+  legacyPost(slug: string) {
+    return `/p/${encodeURIComponent(slug)}`
+  },
+  photo(id: string) {
+    return `/photography/${encodeURIComponent(id)}`
+  },
+  blogList(
+    params: {
+      page?: number
+      pageSize?: number
+      search?: string
+      categoryId?: number
+      sortBy?: string
+      sortType?: "asc" | "desc"
+      view?: "grid" | "list"
+    } = {},
+  ) {
     const query = new URLSearchParams()
     if (params.page && params.page > 1) query.set("page", String(params.page))
     if (params.pageSize && params.pageSize !== 12) query.set("pageSize", String(params.pageSize))
@@ -25,6 +39,13 @@ export const routes = {
     if (params.view && params.view !== "grid") query.set("view", params.view)
     const suffix = query.toString()
     return suffix ? `/blog?${suffix}` : "/blog"
+  },
+  photographyList(params: { page?: number; pageSize?: number } = {}) {
+    const query = new URLSearchParams()
+    if (params.page && params.page > 1) query.set("page", String(params.page))
+    if (params.pageSize && params.pageSize !== 12) query.set("pageSize", String(params.pageSize))
+    const suffix = query.toString()
+    return suffix ? `/photography?${suffix}` : "/photography"
   },
   searchResults(keyword: string) {
     return `/search?keyword=${encodeURIComponent(keyword)}`

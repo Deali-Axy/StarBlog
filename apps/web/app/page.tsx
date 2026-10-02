@@ -76,7 +76,7 @@ export default async function HomePage() {
             }}
           />
         ) : photo ? (
-          <div className="overflow-hidden rounded-2xl border border-border/70 shadow-lg">
+          <Link href={routes.photo(photo.id)} className="hidden overflow-hidden rounded-2xl border border-border/70 shadow-lg md:block">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={`/api/v1/photos/${photo.id}/thumbnail?width=900`}
@@ -87,7 +87,7 @@ export default async function HomePage() {
               <p className="font-medium">{photo.title}</p>
               <p className="text-sm text-muted-foreground">{photo.location}</p>
             </div>
-          </div>
+          </Link>
         ) : null}
       </section>
 
@@ -117,17 +117,26 @@ export default async function HomePage() {
 
         {home.featuredPhotos.length > 0 ? (
           <section className="mt-16">
-            <h2 className="mb-6 text-2xl font-bold">精选摄影</h2>
+            <div className="mb-6 flex items-center justify-between">
+              <h2 className="text-2xl font-bold">精选摄影</h2>
+              <Button variant="ghost" size="sm" asChild>
+                <Link href={routes.photography}>全部摄影 →</Link>
+              </Button>
+            </div>
             <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
               {home.featuredPhotos.map((item) => (
-                <figure key={item.id} className="overflow-hidden rounded-xl border border-border/70">
+                <Link
+                  key={item.id}
+                  href={routes.photo(item.id)}
+                  className="overflow-hidden rounded-xl border border-border/70 transition hover:shadow-md"
+                >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={`/api/v1/photos/${item.id}/thumbnail?width=480`}
                     alt={item.title}
                     className="h-40 w-full object-cover"
                   />
-                </figure>
+                </Link>
               ))}
             </div>
           </section>
