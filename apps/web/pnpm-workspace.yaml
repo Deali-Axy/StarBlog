@@ -1,0 +1,7 @@
+# 单包应用：声明 packages 以满足 pnpm 10+ 对 workspace 文件的校验。
+packages:
+  - "."
+
+allowBuilds:
+  sharp: true
+  unrs-resolver: true

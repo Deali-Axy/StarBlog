@@ -1,0 +1,31 @@
+# https://taskfile.dev
+version: "3"
+
+tasks:
+  install:
+    desc: Install Web dependencies from pnpm-lock.yaml
+    cmds:
+      - pnpm install
+
+  dev:
+    desc: Run the Next.js development server on port 3001
+    cmds:
+      - pnpm dev
+
+  build:
+    desc: Type-check and build the Web application
+    cmds:
+      - pnpm build
+
+  start:
+    desc: Start the production Next.js server
+    cmds:
+      - pnpm start
+
+  clean:
+    desc: Clean Web build artifacts
+    cmds:
+      - cmd: powershell -NoProfile -Command "Remove-Item -LiteralPath '.next' -Recurse -Force -ErrorAction SilentlyContinue; Remove-Item -Path '*.tsbuildinfo' -Force -ErrorAction SilentlyContinue"
+        platforms: [windows]
+      - cmd: rm -rf .next *.tsbuildinfo
+        platforms: [linux, darwin]

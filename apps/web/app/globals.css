@@ -1,0 +1,256 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "highlight.js/styles/github-dark.min.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-heading: var(--font-sans);
+  --font-sans: var(--font-sans);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --animate-marquee: marquee var(--duration) infinite linear;
+  --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(calc(-100% - var(--gap)));
+    }
+  }
+
+  @keyframes marquee-vertical {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(calc(-100% - var(--gap)));
+    }
+  }
+}
+
+:root {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --radius: 0.625rem;
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  html {
+    @apply font-sans;
+  }
+}
+
+.content-prose {
+  color: color-mix(in oklab, var(--foreground) 92%, transparent);
+}
+
+.content-prose > :first-child {
+  margin-top: 0;
+}
+
+.content-prose > :last-child {
+  margin-bottom: 0;
+}
+
+.content-prose h1,
+.content-prose h2,
+.content-prose h3,
+.content-prose h4,
+.content-prose h5,
+.content-prose h6 {
+  margin-top: 2.25rem;
+  margin-bottom: 0.9rem;
+  scroll-margin-top: 5rem;
+  font-weight: 650;
+  letter-spacing: -0.04em;
+  color: color-mix(in oklab, var(--foreground) 96%, transparent);
+}
+
+.content-prose h1 {
+  font-size: 2rem;
+  line-height: 1.2;
+}
+
+.content-prose h2 {
+  font-size: 1.6rem;
+  line-height: 1.28;
+}
+
+.content-prose h3 {
+  font-size: 1.25rem;
+  line-height: 1.35;
+}
+
+.content-prose p,
+.content-prose ul,
+.content-prose ol,
+.content-prose blockquote,
+.content-prose pre,
+.content-prose table {
+  margin: 1rem 0;
+}
+
+.content-prose p {
+  line-height: 1.9;
+}
+
+.content-prose ul,
+.content-prose ol {
+  padding-left: 1.35rem;
+}
+
+.content-prose ul {
+  list-style: disc;
+}
+
+.content-prose ol {
+  list-style: decimal;
+}
+
+.content-prose li {
+  margin: 0.4rem 0;
+  line-height: 1.8;
+}
+
+.content-prose a {
+  color: color-mix(in oklab, var(--primary) 82%, white 18%);
+  text-decoration: underline;
+  text-underline-offset: 0.22em;
+}
+
+.content-prose strong {
+  font-weight: 650;
+}
+
+.content-prose code {
+  border: 1px solid color-mix(in oklab, var(--border) 85%, transparent);
+  background: color-mix(in oklab, var(--background) 70%, var(--muted) 30%);
+  border-radius: 0.5rem;
+  padding: 0.18rem 0.45rem;
+  font-size: 0.9em;
+}
+
+.content-prose pre {
+  overflow-x: auto;
+  border: 1px solid color-mix(in oklab, var(--border) 88%, transparent);
+  background: #0d1117;
+  border-radius: 1rem;
+  padding: 1rem 1.1rem;
+}
+
+.content-prose pre code {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+}
+
+.content-prose blockquote {
+  border-left: 3px solid color-mix(in oklab, var(--primary) 55%, transparent);
+  padding: 0.2rem 0 0.2rem 1rem;
+  color: color-mix(in oklab, var(--muted-foreground) 92%, transparent);
+}
+
+.content-prose hr {
+  margin: 1.75rem 0;
+  border: 0;
+  border-top: 1px solid color-mix(in oklab, var(--border) 88%, transparent);
+}
+
+.content-prose table {
+  width: 100%;
+  border-collapse: collapse;
+  overflow: hidden;
+  border-radius: 1rem;
+  border: 1px solid color-mix(in oklab, var(--border) 88%, transparent);
+}
+
+.content-prose th,
+.content-prose td {
+  border-bottom: 1px solid color-mix(in oklab, var(--border) 88%, transparent);
+  padding: 0.85rem 1rem;
+  text-align: left;
+}
+
+.content-prose img {
+  margin: 1.5rem 0;
+  border-radius: 1rem;
+  box-shadow: 0 10px 30px rgb(15 23 42 / 12%);
+}
+
+.search-hit mark {
+  background: color-mix(in oklab, #facc15 70%, transparent);
+  color: inherit;
+  border-radius: 0.2rem;
+  padding: 0 0.15rem;
+}
