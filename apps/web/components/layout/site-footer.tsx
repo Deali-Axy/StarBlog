@@ -19,12 +19,15 @@ export function SiteFooter({ links = [] }: { links?: LinkResponse[] }) {
           <Link href={routes.photography} className="text-muted-foreground hover:text-foreground">
             摄影
           </Link>
-          <Link href={routes.search} className="text-muted-foreground hover:text-foreground">
-            搜索
+          <Link href={routes.links} className="text-muted-foreground hover:text-foreground">
+            友链
           </Link>
-          <a href={routes.feed} className="text-muted-foreground hover:text-foreground">
+          <Link href={routes.about} className="text-muted-foreground hover:text-foreground">
+            关于
+          </Link>
+          <Link href={routes.rss} className="text-muted-foreground hover:text-foreground">
             RSS
-          </a>
+          </Link>
         </div>
         {links.length > 0 ? (
           <div className="max-w-sm">
