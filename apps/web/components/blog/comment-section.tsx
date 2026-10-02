@@ -1,6 +1,6 @@
 "use client"
 
-import { FormEvent, useEffect, useMemo, useState } from "react"
+import { FormEvent, useEffect, useMemo, useState, useSyncExternalStore } from "react"
 import { MessageSquare, RefreshCw, Reply } from "lucide-react"
 import { toast } from "sonner"
 
@@ -23,11 +23,13 @@ interface StoredProfile {
   url: string
 }
 
+const emptyProfile: StoredProfile = { userName: "", email: "", url: "" }
+
 function readProfile(): StoredProfile {
-  if (typeof window === "undefined") return { userName: "", email: "", url: "" }
+  if (typeof window === "undefined") return emptyProfile
   try {
     const raw = localStorage.getItem(PROFILE_KEY)
-    if (!raw) return { userName: "", email: "", url: "" }
+    if (!raw) return emptyProfile
     const parsed = JSON.parse(raw) as Partial<StoredProfile>
     return {
       userName: parsed.userName ?? "",
@@ -35,12 +37,22 @@ function readProfile(): StoredProfile {
       url: parsed.url ?? "",
     }
   } catch {
-    return { userName: "", email: "", url: "" }
+    return emptyProfile
+  }
+}
+
+function subscribeProfile(onChange: () => void) {
+  window.addEventListener("storage", onChange)
+  window.addEventListener("starblog-comment-profile", onChange)
+  return () => {
+    window.removeEventListener("storage", onChange)
+    window.removeEventListener("starblog-comment-profile", onChange)
   }
 }
 
 function saveProfile(profile: StoredProfile) {
   localStorage.setItem(PROFILE_KEY, JSON.stringify(profile))
+  window.dispatchEvent(new Event("starblog-comment-profile"))
 }
 
 function countComments(nodes: CommentResponse[]): number {
@@ -92,16 +104,17 @@ export function CommentSection({ postId }: { postId: string }) {
   const commentsQuery = useComments(postId)
   const sendOtp = useSendCommentOtp()
   const createComment = useCreateComment(postId)
-  const [profile, setProfile] = useState<StoredProfile>({ userName: "", email: "", url: "" })
+  const storedProfile = useSyncExternalStore(subscribeProfile, readProfile, () => emptyProfile)
+  const [draft, setDraft] = useState<StoredProfile | null>(null)
+  const profile = draft ?? storedProfile
+  const setProfile = (updater: (current: StoredProfile) => StoredProfile) => {
+    setDraft((current) => updater(current ?? storedProfile))
+  }
   const [otp, setOtp] = useState("")
   const [content, setContent] = useState("")
   const [replyTo, setReplyTo] = useState<CommentResponse | null>(null)
   const [pending, setPending] = useState<CommentResponse[]>([])
   const [cooldown, setCooldown] = useState(0)
-
-  useEffect(() => {
-    setProfile(readProfile())
-  }, [])
 
   useEffect(() => {
     if (cooldown <= 0) return
@@ -144,6 +157,7 @@ export function CommentSection({ postId }: { postId: string }) {
         emailOtp: otp.trim(),
       })
       saveProfile(profile)
+      setDraft(null)
       setOtp("")
       setContent("")
       setReplyTo(null)
