@@ -1,14 +1,13 @@
 "use client"
 
 import { FormEvent, useEffect, useMemo, useState, useSyncExternalStore } from "react"
-import { MessageSquare, RefreshCw, Reply } from "lucide-react"
+import { RefreshCw, Reply } from "lucide-react"
 import { toast } from "sonner"
 
 import { useCreateComment, useComments, useSendCommentOtp } from "@/features/comments/api"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { ApiError, type CommentResponse } from "@/lib/api/types"
@@ -173,15 +172,12 @@ export function CommentSection({ postId }: { postId: string }) {
   }
 
   return (
-    <Card className="mt-8 border-0 bg-white/80 py-6 shadow-lg backdrop-blur-sm dark:bg-slate-900/80">
-      <CardHeader className="flex flex-row items-center justify-between px-6">
-        <h2 className="flex items-center gap-2 text-lg font-semibold">
-          <MessageSquare className="size-5" />
-          讨论区
-        </h2>
-        <span className="text-sm text-muted-foreground">共 {total} 条讨论</span>
-      </CardHeader>
-      <CardContent className="space-y-8">
+    <section className="mt-16 border-t border-border/70 pt-10">
+      <div className="mb-8 flex items-end justify-between">
+        <h2 className="text-xl">讨论</h2>
+        <span className="text-sm text-muted-foreground">共 {total} 条</span>
+      </div>
+      <div className="space-y-8">
         <form className="space-y-3" onSubmit={handleSubmit}>
           <div className="grid gap-3 md:grid-cols-4">
             <Input
@@ -254,7 +250,7 @@ export function CommentSection({ postId }: { postId: string }) {
             ))}
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </section>
   )
 }

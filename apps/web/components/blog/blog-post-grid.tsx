@@ -23,7 +23,7 @@ export function BlogPostGrid({
 
   return (
     <div>
-      {title ? <h2 className="mb-6 text-2xl font-bold">{title}</h2> : null}
+      {title ? <h2 className="mb-6 text-2xl">{title}</h2> : null}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {posts.map((post) => (
           <EnhancedPostCard key={post.id} post={post} />

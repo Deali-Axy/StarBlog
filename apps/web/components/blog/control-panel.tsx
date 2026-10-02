@@ -41,7 +41,7 @@ export function ControlPanel({
             key={option.value}
             variant="ghost"
             size="sm"
-            className={`h-7 px-2 text-xs ${currentSortBy === option.value ? "bg-blue-50 text-blue-600 dark:bg-blue-950/20 dark:text-blue-400" : ""}`}
+            className={`h-7 px-2 text-xs ${currentSortBy === option.value ? "bg-accent text-primary" : ""}`}
             asChild
           >
             <Link href={routes.blogList({ ...shared, sortBy: option.value })}>{option.label}</Link>
@@ -50,7 +50,7 @@ export function ControlPanel({
         <Button
           variant="ghost"
           size="icon-sm"
-          className={currentSortType === "desc" ? "bg-blue-50 text-blue-600" : ""}
+          className={currentSortType === "desc" ? "bg-accent text-primary" : ""}
           asChild
         >
           <Link href={routes.blogList({ ...shared, sortType: "desc" })} title="降序">
@@ -60,7 +60,7 @@ export function ControlPanel({
         <Button
           variant="ghost"
           size="icon-sm"
-          className={currentSortType === "asc" ? "bg-blue-50 text-blue-600" : ""}
+          className={currentSortType === "asc" ? "bg-accent text-primary" : ""}
           asChild
         >
           <Link href={routes.blogList({ ...shared, sortType: "asc" })} title="升序">
@@ -79,7 +79,7 @@ export function ControlPanel({
       <Button
         variant="ghost"
         size="icon-sm"
-        className={currentView === "grid" ? "bg-blue-50 text-blue-600" : ""}
+        className={currentView === "grid" ? "bg-accent text-primary" : ""}
         asChild
       >
         <Link href={routes.blogList({ ...shared, view: "grid" })} title="网格视图">
@@ -89,7 +89,7 @@ export function ControlPanel({
       <Button
         variant="ghost"
         size="icon-sm"
-        className={currentView === "list" ? "bg-blue-50 text-blue-600" : ""}
+        className={currentView === "list" ? "bg-accent text-primary" : ""}
         asChild
       >
         <Link href={routes.blogList({ ...shared, view: "list" })} title="列表视图">

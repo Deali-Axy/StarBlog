@@ -37,9 +37,9 @@ export function PostCopyright({
   permalink: string
 }) {
   return (
-    <section className="mt-10 rounded-xl border border-border/70 bg-card p-6 shadow-sm">
-      <p className="mb-4 text-center text-2xl text-muted-foreground">_EOF_</p>
-      <h2 className="text-lg font-semibold">{title}</h2>
+    <section className="mt-16 border-t border-border/70 pt-8">
+      <p className="mb-4 font-mono text-sm text-muted-foreground">_EOF_</p>
+      <h2 className="text-lg">{title}</h2>
       <dl className="mt-4 space-y-2 text-sm">
         <div>
           <dt className="inline font-medium">本文作者：</dt>
@@ -48,7 +48,7 @@ export function PostCopyright({
         <div>
           <dt className="inline font-medium">本文链接：</dt>
           <dd className="inline">
-            <Link href={permalink} className="break-all text-blue-600 hover:underline">
+            <Link href={permalink} className="break-all text-primary hover:underline">
               {permalink}
             </Link>
           </dd>
