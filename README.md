@@ -95,8 +95,9 @@ StarBlog 不仅仅是一个博客系统，它正在发展成为一个完整的�
 - **邮件服务**：MailKit - 跨平台邮件客户端库
 
 #### 前端
-- **博客前台**：由独立站点调用本 API；历史 Razor 前台位于 `apps/web-legacy`，不进入默认构建
+- **博客前台**：`apps/web`（Next.js + shadcn + Magic UI + TanStack Query），开发地址 `http://localhost:3001`
 - **管理后台**：`apps/admin`（Refine + React + Ant Design + Vite）
+- 历史 Razor 前台位于 `apps/web-legacy`，不进入默认构建
 
 ### 项目结构
 
@@ -113,7 +114,8 @@ StarBlog/
 │   │   │   └── Shared/
 │   │   ├── tests/StarBlog.Api.Tests/
 │   │   └── Taskfile.yml
-│   └── admin/                      # Refine + Vite 管理后台
+│   ├── admin/                      # Refine + Vite 管理后台
+│   └── web/                        # Next.js 博客前台
 ├── tools/                          # 图片优化和备份等独立工具
 ├── tests/StarBlog.E2ETests/         # 跨应用黑盒 E2E
 ├── deploy/
@@ -134,7 +136,7 @@ StarBlog/
 ### 环境要求
 
 - **.NET 10 SDK**
-- **Node.js v18** 以上版本 和 **npm/yarn**（用于前端资源管理）
+- **Node.js v18** 以上版本、**pnpm**（博客前台）和 **npm**（管理后台）
 - **Task 3.x**（统一运行仓库任务）
 
 ### 构建步骤
@@ -154,7 +156,7 @@ task install
 
 3. **运行项目**
 
-同时启动 API 和管理后台：
+同时启动 API、博客前台和管理后台：
 
 ```powershell
 task dev
@@ -164,6 +166,7 @@ task dev
 
 ```powershell
 task api:dev
+task web:dev
 task admin:dev
 ```
 

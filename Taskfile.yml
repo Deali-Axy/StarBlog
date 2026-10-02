@@ -9,6 +9,9 @@ includes:
   admin:
     taskfile: apps/admin/Taskfile.yml
     dir: apps/admin
+  web:
+    taskfile: apps/web/Taskfile.yml
+    dir: apps/web
   tools:
     taskfile: tools/Taskfile.yml
     dir: tools
@@ -19,12 +22,14 @@ tasks:
     deps:
       - api:restore
       - admin:install
+      - web:install
 
   dev:
-    desc: Start the API and Admin development servers in parallel
+    desc: Start the API, Admin, and Web development servers in parallel
     deps:
       - api:dev
       - admin:dev
+      - web:dev
 
   test:
     desc: Run API tests
@@ -36,6 +41,7 @@ tasks:
     # Admin 与 .NET 可以并行；.NET 必须走同一个解决方案图，避免多个 dotnet build 同时写共享 obj。
     deps:
       - admin:build
+      - web:build
       - build:dotnet
 
   build:dotnet:
@@ -52,6 +58,7 @@ tasks:
     desc: Clean build artifacts without deleting dependencies or runtime data
     deps:
       - admin:clean
+      - web:clean
       - clean:dotnet
 
   clean:dotnet:
