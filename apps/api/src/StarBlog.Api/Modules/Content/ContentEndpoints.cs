@@ -10,7 +10,11 @@ public static class ContentEndpoints {
     public static IEndpointRouteBuilder MapContentEndpoints(this IEndpointRouteBuilder endpoints) {
         var posts = endpoints.MapGroup("/api/v1/posts").WithTags("blog").WithGroupName("blog");
         posts.MapGet("/", ListPosts).AllowAnonymous();
+        posts.MapGet("/random", GetRandomPost).AllowAnonymous();
         posts.MapGet("/by-slug/{slug}", GetPostBySlug).AllowAnonymous();
+        posts.MapGet("/{id}/related", GetRelatedPosts).AllowAnonymous();
+        posts.MapGet("/{id}/translations", ListTranslations).AllowAnonymous();
+        posts.MapGet("/{id}/translations/{language}", GetTranslation).AllowAnonymous();
         posts.MapGet("/{id}", GetPost).AllowAnonymous();
         posts.MapPost("/", CreatePost).RequireAuthorization();
         posts.MapPut("/{id}", UpdatePost).RequireAuthorization();
@@ -24,6 +28,7 @@ public static class ContentEndpoints {
         var categories = endpoints.MapGroup("/api/v1/categories").WithTags("blog").WithGroupName("blog");
         categories.MapGet("/", ListCategories).AllowAnonymous();
         categories.MapGet("/tree", CategoryTree).AllowAnonymous();
+        categories.MapGet("/word-cloud", WordCloud).AllowAnonymous();
         categories.MapPost("/", CreateCategory).RequireAuthorization();
         categories.MapPut("/{id:int}", UpdateCategory).RequireAuthorization();
         categories.MapDelete("/{id:int}", DeleteCategory).RequireAuthorization();
@@ -55,13 +60,83 @@ public static class ContentEndpoints {
         [FromQuery] string? search = null,
         [FromQuery] int? categoryId = null,
         [FromQuery] bool? isPublish = null,
+        [FromQuery] string? sortBy = null,
+        [FromQuery] string? sortType = null,
+        [FromQuery] bool includeDescendants = false,
         CancellationToken cancellationToken = default) =>
-        operations.GetPostsAsync(page, pageSize, context.User.Identity?.IsAuthenticated == true, search, categoryId, isPublish, cancellationToken);
+        operations.GetPostsAsync(
+            page,
+            pageSize,
+            context.User.Identity?.IsAuthenticated == true,
+            search,
+            categoryId,
+            isPublish,
+            sortBy,
+            sortType,
+            includeDescendants,
+            cancellationToken);
 
-    private static async Task<IResult> GetPost(string id, ContentOperations operations, CancellationToken cancellationToken) {
-        var post = await operations.GetPostAsync(id, cancellationToken);
-        return post == null ? HttpErrors.NotFound($"文章 {id} 不存在") : Results.Ok(post);
+    private static async Task<IResult> GetRandomPost(ContentOperations operations, CancellationToken cancellationToken) {
+        var post = await operations.GetRandomPublishedAsync(cancellationToken);
+        return post == null ? HttpErrors.NotFound("当前没有已发布文章") : Results.Ok(post);
     }
+
+    private static async Task<IResult> GetRelatedPosts(
+        string id,
+        ContentOperations operations,
+        HttpContext context,
+        [FromQuery] int limit = 4,
+        CancellationToken cancellationToken = default) {
+        if (await HideUnpublishedAsync(id, operations, context, cancellationToken)) {
+            return HttpErrors.NotFound($"文章 {id} 不存在");
+        }
+
+        return Results.Ok(await operations.GetRelatedPublishedAsync(id, limit, cancellationToken));
+    }
+
+    private static async Task<IResult> ListTranslations(string id, ContentOperations operations, HttpContext context, CancellationToken cancellationToken) {
+        if (await HideUnpublishedAsync(id, operations, context, cancellationToken)) {
+            return HttpErrors.NotFound($"文章 {id} 不存在");
+        }
+
+        return Results.Ok(await operations.ListPublishedTranslationsAsync(id, cancellationToken));
+    }
+
+    private static async Task<IResult> GetTranslation(string id, string language, ContentOperations operations, HttpContext context, CancellationToken cancellationToken) {
+        if (await HideUnpublishedAsync(id, operations, context, cancellationToken)) {
+            return HttpErrors.NotFound($"文章 {id} 不存在");
+        }
+
+        var translation = await operations.GetPublishedTranslationAsync(id, language, cancellationToken);
+        return translation == null ? HttpErrors.NotFound($"译文 {language} 不存在") : Results.Ok(translation);
+    }
+
+    private static async Task<IResult> GetPost(
+        string id,
+        ContentOperations operations,
+        HttpContext context,
+        [FromQuery] string? lang = null,
+        CancellationToken cancellationToken = default) {
+        var post = await operations.GetPostAsync(id, cancellationToken);
+        if (post == null || HideFromAnonymous(post.IsPublish, context)) {
+            return HttpErrors.NotFound($"文章 {id} 不存在");
+        }
+
+        if (!string.IsNullOrWhiteSpace(lang) && post.IsPublish) {
+            var translation = await operations.GetPublishedTranslationAsync(id, lang, cancellationToken);
+            if (translation != null) post = ContentOperations.ApplyTranslation(post, translation);
+        }
+
+        return Results.Ok(post);
+    }
+
+    private static async Task<bool> HideUnpublishedAsync(string id, ContentOperations operations, HttpContext context, CancellationToken cancellationToken) {
+        var post = await operations.GetPostAsync(id, cancellationToken);
+        return post == null || HideFromAnonymous(post.IsPublish, context);
+    }
+
+    private static bool HideFromAnonymous(bool isPublish, HttpContext context) =>
+        !isPublish && context.User.Identity?.IsAuthenticated != true;
 
     private static async Task<IResult> GetPostBySlug(string slug, ContentOperations operations, CancellationToken cancellationToken) {
         var post = await operations.GetPublishedPostBySlugAsync(slug, cancellationToken);
@@ -129,6 +204,9 @@ public static class ContentEndpoints {
 
     private static Task<IReadOnlyList<CategoryNodeResponse>?> CategoryTree(ContentOperations operations, CancellationToken cancellationToken) =>
         operations.GetCategoryTreeAsync(cancellationToken);
+
+    private static Task<IReadOnlyList<CategoryWordCloudItem>> WordCloud(ContentOperations operations, CancellationToken cancellationToken) =>
+        operations.GetWordCloudAsync(cancellationToken);
 
     private static Task<CategoryResponse> CreateCategory([FromBody] CategoryUpsertRequest request, ContentOperations operations, CancellationToken cancellationToken) =>
         operations.CreateCategoryAsync(request, cancellationToken);

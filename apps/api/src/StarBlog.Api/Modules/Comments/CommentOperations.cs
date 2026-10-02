@@ -188,9 +188,7 @@ public sealed class CommentOperations {
 
         var post = await _posts.GetByIdAsync(reply.PostId, cancellationToken);
         var baseUrl = (await _configuration.GetAsync("host", cancellationToken) ?? "https://blog.deali.cn").TrimEnd('/');
-        var postUrl = post?.Slug != null
-            ? $"{baseUrl}/p/{Uri.EscapeDataString(post.Slug)}"
-            : $"{baseUrl}/Blog/Post/{Uri.EscapeDataString(reply.PostId)}";
+        var postUrl = $"{baseUrl}{PublicContentPaths.Post(post?.Id ?? reply.PostId, post?.Slug)}";
         var encoder = HtmlEncoder.Default;
         var subject = $"[StarBlog]你在《{encoder.Encode(post?.Title ?? reply.PostId)}》下的评论收到了回复";
         var body = new StringBuilder();

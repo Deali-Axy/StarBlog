@@ -85,6 +85,10 @@ public sealed class LinkOperations : IPublicLinkCatalog {
     public async Task<(LinkExchangeResponse? Response, string? Error)> ApplyAsync(
         LinkExchangeApplicationRequest request,
         CancellationToken cancellationToken) {
+        if (string.IsNullOrWhiteSpace(request.Name)) return (null, "网站名称不能为空");
+        if (string.IsNullOrWhiteSpace(request.Url)) return (null, "网址不能为空");
+        if (string.IsNullOrWhiteSpace(request.WebMaster)) return (null, "站长名称不能为空");
+        if (string.IsNullOrWhiteSpace(request.Email)) return (null, "邮箱不能为空");
         var duplicated = await _db.LinkExchanges.AnyAsync(item => item.Url.Contains(request.Url), cancellationToken);
         if (duplicated) return (null, "相同网址的友链申请已提交");
 

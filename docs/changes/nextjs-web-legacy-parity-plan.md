@@ -1,7 +1,7 @@
 # Next.js 前台对齐 web-legacy 计划
 
 日期：2026-10-02
-状态：待开始
+状态：进行中
 前置：`apps/web` 第一版已覆盖首页聚合、文章列表/分类、搜索、文章 Markdown 详情。
 
 ## 1. 目标
@@ -140,15 +140,15 @@ Next 侧：
 
 只补公开只读或已有模块上的小扩展，不改管理契约。
 
-| 缺口 | 建议 | 阻塞的前台 |
-| --- | --- | --- |
-| 相关文章 | `GET /api/v1/posts/{id}/related?limit=4` | 详情「相关」 |
-| 随机文章 | `GET /api/v1/posts/random`（仅已发布） | `/blog/random`、首页 CTA |
-| 分类词云 | `GET /api/v1/categories/word-cloud` 或在 `site/overview` 带 `[{id,name,count}]` | 首页图表 |
-| 公开译文 | `GET /api/v1/posts/{id}?lang=` 或 `GET /api/v1/posts/{id}/translations/{lang}` | 详情语言切换 |
-| 列表排序 / 子分类 | `sortBy`、`includeDescendants` | 列表与旧站一致 |
-| Sitemap 路径 | `SiteResourceOperations` 使用前台路由前缀 | SEO |
-| 未发布 `GET /posts/{id}` | 匿名 404 | 安全加固，前台已当 404 |
+| 缺口 | 建议 | 阻塞的前台 | 完成 |
+| --- | --- | --- | --- |
+| 相关文章 | `GET /api/v1/posts/{id}/related?limit=4` | 详情「相关」 | 已完成 |
+| 随机文章 | `GET /api/v1/posts/random`（仅已发布） | `/blog/random`、首页 CTA | 已完成 |
+| 分类词云 | `GET /api/v1/categories/word-cloud` | 首页图表 | 已完成 |
+| 公开译文 | `GET /api/v1/posts/{id}?lang=`、`GET /api/v1/posts/{id}/translations`、`GET /api/v1/posts/{id}/translations/{lang}` | 详情语言切换 | 已完成 |
+| 列表排序 / 子分类 | `sortBy`、`includeDescendants` | 列表与旧站一致 | 已完成 |
+| Sitemap 路径 | `SiteResourceOperations` 使用 `/blog`、`/photography` 等前台路由 | SEO | 已完成 |
+| 未发布 `GET /posts/{id}` | 匿名 404 | 安全加固，前台已当 404 | 已完成 |
 
 评论、友链、摄影、分类树、搜索、首页聚合：**不必为功能本身新增端点**。
 
@@ -170,7 +170,7 @@ Next 侧：
 - [ ] 详情有相关文章与版权/永久链接
 - [ ] 首页有友链申请入口；词云在 API 就绪后出现
 - [ ] 文章与摄影详情有 OG；`/robots.txt` 与 sitemap 经 Next 可访问且 loc 为新路由
-- [ ] 未发布文章详情仍为 404
+- [x] 未发布文章详情仍为 404（API 匿名 `GET /api/v1/posts/{id}` 返回 404；前台按未发布处理）
 
 ## 8. 再下一批（不在本次）
 

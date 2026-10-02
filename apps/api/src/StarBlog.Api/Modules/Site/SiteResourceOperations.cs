@@ -3,6 +3,7 @@ using System.Xml;
 using StarBlog.Api.Modules.Configuration;
 using StarBlog.Api.Modules.Content;
 using StarBlog.Api.Modules.Content.Markdown;
+using StarBlog.Api.Modules.Media;
 
 namespace StarBlog.Api.Modules.Site;
 
@@ -11,10 +12,12 @@ namespace StarBlog.Api.Modules.Site;
 /// </summary>
 public sealed class SiteResourceOperations {
     private readonly IPublishedContentQueries _content;
+    private readonly IPhotoCatalog _photos;
     private readonly ISiteConfiguration _configuration;
 
-    public SiteResourceOperations(IPublishedContentQueries content, ISiteConfiguration configuration) {
+    public SiteResourceOperations(IPublishedContentQueries content, IPhotoCatalog photos, ISiteConfiguration configuration) {
         _content = content;
+        _photos = photos;
         _configuration = configuration;
     }
 
@@ -36,7 +39,7 @@ public sealed class SiteResourceOperations {
             await writer.WriteAttributeStringAsync(null, "href", null, $"{baseUrl}/feed");
             await writer.WriteEndElementAsync();
             foreach (var post in posts) {
-                var postUrl = string.IsNullOrWhiteSpace(post.Slug) ? $"{baseUrl}/Blog/Post/{post.Id}" : $"{baseUrl}/p/{Uri.EscapeDataString(post.Slug)}";
+                var postUrl = $"{baseUrl}{PublicContentPaths.Post(post.Id, post.Slug)}";
                 await writer.WriteStartElementAsync(null, "entry", null);
                 await writer.WriteElementStringAsync(null, "title", null, post.Title);
                 await writer.WriteElementStringAsync(null, "id", null, postUrl);
@@ -86,14 +89,17 @@ public sealed class SiteResourceOperations {
         return await WriteXmlAsync(async writer => {
             await writer.WriteStartElementAsync(null, "urlset", "http://www.sitemaps.org/schemas/sitemap/0.9");
             await WriteUrl(writer, baseUrl, DateTime.UtcNow, "daily", "1.0");
-            await WriteUrl(writer, $"{baseUrl}/Blog/List", DateTime.UtcNow, "daily", "0.8");
+            await WriteUrl(writer, $"{baseUrl}/blog", DateTime.UtcNow, "daily", "0.8");
+            await WriteUrl(writer, $"{baseUrl}/photography", DateTime.UtcNow, "weekly", "0.6");
+            await WriteUrl(writer, $"{baseUrl}/about", DateTime.UtcNow, "monthly", "0.5");
+            await WriteUrl(writer, $"{baseUrl}/links", DateTime.UtcNow, "weekly", "0.5");
+            await WriteUrl(writer, $"{baseUrl}/rss", DateTime.UtcNow, "monthly", "0.4");
             foreach (var category in categories) {
-                await WriteUrl(writer, $"{baseUrl}/Blog/List?categoryId={category.Id}", DateTime.UtcNow, "weekly", "0.7");
+                await WriteUrl(writer, $"{baseUrl}{PublicContentPaths.BlogList(category.Id)}", DateTime.UtcNow, "weekly", "0.7");
             }
 
             foreach (var post in posts) {
-                var url = string.IsNullOrWhiteSpace(post.Slug) ? $"{baseUrl}/Blog/Post/{post.Id}" : $"{baseUrl}/p/{Uri.EscapeDataString(post.Slug)}";
-                await WriteUrl(writer, url, post.LastUpdateTime.ToUniversalTime(), "weekly", "0.6");
+                await WriteUrl(writer, $"{baseUrl}{PublicContentPaths.Post(post.Id, post.Slug)}", post.LastUpdateTime.ToUniversalTime(), "weekly", "0.6");
             }
 
             await writer.WriteEndElementAsync();
@@ -102,10 +108,19 @@ public sealed class SiteResourceOperations {
 
     public async Task<byte[]> BuildImageSitemapAsync(CancellationToken cancellationToken) {
         var baseUrl = await GetBaseUrlAsync(cancellationToken);
+        var photos = await _photos.GetAllAsync(cancellationToken);
         return await WriteXmlAsync(async writer => {
             await writer.WriteStartElementAsync(null, "urlset", "http://www.sitemaps.org/schemas/sitemap/0.9");
             await writer.WriteAttributeStringAsync("xmlns", "image", null, "http://www.google.com/schemas/sitemap-image/1.1");
-            await WriteUrl(writer, $"{baseUrl}/Photography", DateTime.UtcNow, "weekly", "0.5");
+            await WriteUrl(writer, $"{baseUrl}{PublicContentPaths.Photography()}", DateTime.UtcNow, "weekly", "0.5");
+            foreach (var photo in photos) {
+                await WriteImageUrl(
+                    writer,
+                    $"{baseUrl}{PublicContentPaths.Photo(photo.Id)}",
+                    $"{baseUrl}{PublicContentPaths.MediaPhoto(photo.FilePath)}",
+                    photo.Title);
+            }
+
             await writer.WriteEndElementAsync();
         });
     }
@@ -122,6 +137,16 @@ public sealed class SiteResourceOperations {
         await writer.WriteElementStringAsync(null, "lastmod", null, lastmod.ToString("O"));
         await writer.WriteElementStringAsync(null, "changefreq", null, changefreq);
         await writer.WriteElementStringAsync(null, "priority", null, priority);
+        await writer.WriteEndElementAsync();
+    }
+
+    private static async Task WriteImageUrl(XmlWriter writer, string pageUrl, string imageUrl, string title) {
+        await writer.WriteStartElementAsync(null, "url", null);
+        await writer.WriteElementStringAsync(null, "loc", null, pageUrl);
+        await writer.WriteStartElementAsync("image", "image", "http://www.google.com/schemas/sitemap-image/1.1");
+        await writer.WriteElementStringAsync("image", "loc", "http://www.google.com/schemas/sitemap-image/1.1", imageUrl);
+        await writer.WriteElementStringAsync("image", "title", "http://www.google.com/schemas/sitemap-image/1.1", title);
+        await writer.WriteEndElementAsync();
         await writer.WriteEndElementAsync();
     }
 

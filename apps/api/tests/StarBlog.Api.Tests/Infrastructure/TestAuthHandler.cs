@@ -19,6 +19,10 @@ public sealed class TestAuthHandler : AuthenticationHandler<AuthenticationScheme
     }
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync() {
+        if (Request.Headers.ContainsKey("X-Test-Anonymous")) {
+            return Task.FromResult(AuthenticateResult.NoResult());
+        }
+
         var claims = new[] {
             new Claim("user_id", "test-user"),
             new Claim("user_name", "test-user"),

@@ -54,6 +54,13 @@ public sealed class StarBlogApiFactory : WebApplicationFactory<Program> {
         });
     }
 
+    /// <summary>模拟匿名访问：测试认证方案默认始终登录，用此头跳过。</summary>
+    public HttpClient CreateAnonymousClient() {
+        var client = CreateClient();
+        client.DefaultRequestHeaders.Add("X-Test-Anonymous", "1");
+        return client;
+    }
+
     /// <summary>写入一篇已发布文章，供公开接口使用。</summary>
     public async Task SeedPublishedPostAsync() {
         using var scope = Services.CreateScope();

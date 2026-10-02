@@ -173,6 +173,11 @@ public sealed class MediaOperations : IPhotoCatalog {
         return photos.Select(PhotoResponse.From).ToList();
     }
 
+    public async Task<IReadOnlyList<PhotoResponse>> GetAllAsync(CancellationToken cancellationToken = default) {
+        var photos = await _db.Photos.AsNoTracking().OrderByDescending(photo => photo.CreateTime).ToListAsync(cancellationToken);
+        return photos.Select(PhotoResponse.From).ToList();
+    }
+
     /// <summary>全部图片数量，供 Site 聚合概况使用。</summary>
     public Task<int> CountAsync(CancellationToken cancellationToken = default) =>
         _db.Photos.CountAsync(cancellationToken);

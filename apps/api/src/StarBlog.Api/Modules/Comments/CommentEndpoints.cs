@@ -9,10 +9,10 @@ namespace StarBlog.Api.Modules.Comments;
 public static class CommentEndpoints {
     public static IEndpointRouteBuilder MapCommentEndpoints(this IEndpointRouteBuilder endpoints) {
         var comments = endpoints.MapGroup("/api/v1/comments").WithTags("comment").WithGroupName("comment");
-        comments.MapGet("/", ListPublic);
-        comments.MapGet("/by-post/{postId}", Tree);
-        comments.MapPost("/email-otp", SendOtp);
-        comments.MapPost("/", Create);
+        comments.MapGet("/", ListPublic).AllowAnonymous();
+        comments.MapGet("/by-post/{postId}", Tree).AllowAnonymous();
+        comments.MapPost("/email-otp", SendOtp).AllowAnonymous();
+        comments.MapPost("/", Create).AllowAnonymous();
 
         var admin = endpoints.MapGroup("/api/v1/admin/comments")
             .RequireAuthorization()

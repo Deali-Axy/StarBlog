@@ -192,6 +192,13 @@ public sealed class FeaturedPlacementResponse {
     public required string PostId { get; init; }
 }
 
+/// <summary>分类词云：可见分类及其已发布文章数。</summary>
+public sealed class CategoryWordCloudItem {
+    public int Id { get; init; }
+    public required string Name { get; init; }
+    public int Count { get; init; }
+}
+
 /// <summary>Markdown 压缩包导入结果。</summary>
 public sealed class MarkdownImportResult {
     public int PostsImported { get; init; }

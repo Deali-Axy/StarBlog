@@ -4,6 +4,7 @@ using StarBlog.Api.Infrastructure.Storage;
 using StarBlog.Api.Infrastructure.Time;
 using StarBlog.Api.Modules.Configuration;
 using StarBlog.Api.Modules.Content.Domain;
+using StarBlog.Api.Modules.Content.Markdown;
 using StarBlog.Api.Shared;
 
 namespace StarBlog.Api.Modules.Content;
@@ -31,15 +32,34 @@ public sealed class ContentOperations : IPublishedContentQueries {
         await _db.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task<PageResult<PostResponse>> GetPostsAsync(int page, int pageSize, bool adminMode, string? search, int? categoryId, bool? isPublish, CancellationToken cancellationToken) {
+    public async Task<PageResult<PostResponse>> GetPostsAsync(
+        int page,
+        int pageSize,
+        bool adminMode,
+        string? search,
+        int? categoryId,
+        bool? isPublish,
+        string? sortBy,
+        string? sortType,
+        bool includeDescendants,
+        CancellationToken cancellationToken) {
         page = Paging.NormalizePage(page);
         pageSize = Paging.NormalizePageSize(pageSize);
         var query = _db.Posts.AsNoTracking().Include(post => post.Category).AsQueryable();
         if (!adminMode) query = query.Where(post => post.IsPublish);
         else if (isPublish != null) query = query.Where(post => post.IsPublish == isPublish);
-        if (categoryId is > 0) query = query.Where(post => post.CategoryId == categoryId);
+        if (categoryId is > 0) {
+            if (includeDescendants) {
+                var categoryIds = await GetCategoryAndDescendantIdsAsync(categoryId.Value, cancellationToken);
+                query = query.Where(post => categoryIds.Contains(post.CategoryId));
+            }
+            else {
+                query = query.Where(post => post.CategoryId == categoryId);
+            }
+        }
+
         if (!string.IsNullOrWhiteSpace(search)) query = query.Where(post => post.Title.Contains(search));
-        query = query.OrderByDescending(post => post.LastUpdateTime);
+        query = ApplySort(query, sortBy, sortType);
         var total = await query.CountAsync(cancellationToken);
         var items = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync(cancellationToken);
         return new PageResult<PostResponse> {
@@ -253,6 +273,126 @@ public sealed class ContentOperations : IPublishedContentQueries {
         CategoriesCount = await _db.Categories.CountAsync(cancellationToken),
         FeaturedPostsCount = await _db.FeaturedPosts.CountAsync(cancellationToken),
         FeaturedCategoriesCount = await _db.FeaturedCategories.CountAsync(cancellationToken)
+    };
+
+    /// <summary>随机一篇已发布文章；没有已发布内容时返回 null。</summary>
+    public async Task<PostResponse?> GetRandomPublishedAsync(CancellationToken cancellationToken) {
+        var query = _db.Posts.AsNoTracking().Include(post => post.Category).Where(post => post.IsPublish);
+        var count = await query.CountAsync(cancellationToken);
+        if (count == 0) return null;
+        var post = await query.OrderBy(item => item.Id).Skip(Random.Shared.Next(count)).FirstAsync(cancellationToken);
+        return PostResponse.From(post, includeToc: true);
+    }
+
+    /// <summary>同分类随机补齐相关文章，仅已发布。</summary>
+    public async Task<IReadOnlyList<PostResponse>> GetRelatedPublishedAsync(string id, int limit, CancellationToken cancellationToken) {
+        limit = Math.Clamp(limit, 1, 12);
+        var source = await _db.Posts.AsNoTracking().FirstOrDefaultAsync(post => post.Id == id, cancellationToken);
+        if (source == null) return [];
+
+        var sameCategory = await _db.Posts.AsNoTracking().Include(post => post.Category)
+            .Where(post => post.IsPublish && post.Id != id && post.CategoryId == source.CategoryId)
+            .ToListAsync(cancellationToken);
+        var related = sameCategory.OrderBy(_ => Random.Shared.Next()).Take(limit).ToList();
+        if (related.Count >= limit) return related.Select(post => PostResponse.From(post)).ToList();
+
+        var excluded = related.Select(post => post.Id).Append(id).ToHashSet();
+        var fillers = await _db.Posts.AsNoTracking().Include(post => post.Category)
+            .Where(post => post.IsPublish && !excluded.Contains(post.Id))
+            .ToListAsync(cancellationToken);
+        related.AddRange(fillers.OrderBy(_ => Random.Shared.Next()).Take(limit - related.Count));
+        return related.Select(post => PostResponse.From(post)).ToList();
+    }
+
+    public async Task<IReadOnlyList<CategoryWordCloudItem>> GetWordCloudAsync(CancellationToken cancellationToken) {
+        return await _db.Categories.AsNoTracking()
+            .Where(category => category.Visible)
+            .Select(category => new CategoryWordCloudItem {
+                Id = category.Id,
+                Name = category.Name,
+                Count = category.Posts.Count(post => post.IsPublish)
+            })
+            .Where(item => item.Count > 0)
+            .OrderByDescending(item => item.Count)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<PostTranslationResponse>> ListPublishedTranslationsAsync(string postId, CancellationToken cancellationToken) {
+        if (!await _db.Posts.AsNoTracking().AnyAsync(post => post.Id == postId && post.IsPublish, cancellationToken)) {
+            return [];
+        }
+
+        var items = await _db.PostTranslations.AsNoTracking()
+            .Where(item => item.PostId == postId)
+            .OrderBy(item => item.Language)
+            .ToListAsync(cancellationToken);
+        return items.Select(ToTranslation).ToList();
+    }
+
+    public async Task<PostTranslationResponse?> GetPublishedTranslationAsync(string postId, string language, CancellationToken cancellationToken) {
+        if (string.IsNullOrWhiteSpace(language)) return null;
+        if (!await _db.Posts.AsNoTracking().AnyAsync(post => post.Id == postId && post.IsPublish, cancellationToken)) {
+            return null;
+        }
+
+        var translation = await _db.PostTranslations.AsNoTracking()
+            .FirstOrDefaultAsync(item => item.PostId == postId && item.Language == language, cancellationToken);
+        return translation == null ? null : ToTranslation(translation);
+    }
+
+    public static PostResponse ApplyTranslation(PostResponse post, PostTranslationResponse translation) => new() {
+        Id = post.Id,
+        Title = translation.Title,
+        Slug = post.Slug,
+        Status = post.Status,
+        IsPublish = post.IsPublish,
+        Summary = translation.Summary,
+        Content = translation.Content,
+        Path = post.Path,
+        CreationTime = post.CreationTime,
+        LastUpdateTime = post.LastUpdateTime,
+        CategoryId = post.CategoryId,
+        CategoryName = post.CategoryName,
+        Categories = post.Categories,
+        Toc = TableOfContents.Extract(translation.Content)
+    };
+
+    private async Task<List<int>> GetCategoryAndDescendantIdsAsync(int categoryId, CancellationToken cancellationToken) {
+        var categories = await _db.Categories.AsNoTracking()
+            .Select(category => new { category.Id, category.ParentId })
+            .ToListAsync(cancellationToken);
+        var ids = new HashSet<int> { categoryId };
+        var added = true;
+        while (added) {
+            added = false;
+            foreach (var category in categories) {
+                if (ids.Contains(category.ParentId) && ids.Add(category.Id)) added = true;
+            }
+        }
+
+        return ids.ToList();
+    }
+
+    private static IQueryable<Post> ApplySort(IQueryable<Post> query, string? sortBy, string? sortType) {
+        var descending = !string.Equals(sortType, "asc", StringComparison.OrdinalIgnoreCase);
+        return (sortBy ?? string.Empty).Trim().ToLowerInvariant() switch {
+            "title" => descending ? query.OrderByDescending(post => post.Title) : query.OrderBy(post => post.Title),
+            "creationtime" => descending
+                ? query.OrderByDescending(post => post.CreationTime)
+                : query.OrderBy(post => post.CreationTime),
+            _ => descending
+                ? query.OrderByDescending(post => post.LastUpdateTime)
+                : query.OrderBy(post => post.LastUpdateTime)
+        };
+    }
+
+    private static PostTranslationResponse ToTranslation(PostTranslation translation) => new() {
+        Id = translation.Id,
+        PostId = translation.PostId,
+        Language = translation.Language,
+        Title = translation.Title,
+        Summary = translation.Summary,
+        Content = translation.Content
     };
 
     private static List<CategoryNodeResponse>? BuildTree(List<Category> categories, int parentId) {
