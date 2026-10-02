@@ -1,3 +1,5 @@
+backups/
+
 # ship 部署工具
 .ship/
 deploy/.env
