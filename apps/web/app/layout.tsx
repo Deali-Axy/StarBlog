@@ -6,17 +6,37 @@ import { AppProviders } from "@/components/app-providers"
 import { SiteFooter } from "@/components/layout/site-footer"
 import { SiteHeader } from "@/components/layout/site-header"
 import { Toaster } from "@/components/ui/sonner"
-import { site } from "@/lib/site"
+import { absoluteUrl, site } from "@/lib/site"
 import { cn } from "@/lib/utils"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
 
 export const metadata: Metadata = {
+  metadataBase: new URL(site.url),
   title: {
     default: site.name,
     template: `%s · ${site.name}`,
   },
   description: site.description,
+  alternates: {
+    canonical: "/",
+    types: {
+      "application/atom+xml": "/feed",
+    },
+  },
+  openGraph: {
+    type: "website",
+    locale: "zh_CN",
+    siteName: site.name,
+    title: site.name,
+    description: site.description,
+    url: absoluteUrl("/"),
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: site.name,
+    description: site.description,
+  },
 }
 
 export default function RootLayout({

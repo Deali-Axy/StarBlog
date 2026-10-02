@@ -31,6 +31,22 @@ const nextConfig: NextConfig = {
         source: "/feed",
         destination: `${BACKEND_URL}/feed`,
       },
+      {
+        source: "/robots.txt",
+        destination: `${BACKEND_URL}/robots.txt`,
+      },
+      {
+        source: "/sitemap.xml",
+        destination: `${BACKEND_URL}/sitemap.xml`,
+      },
+      {
+        source: "/sitemap-index.xml",
+        destination: `${BACKEND_URL}/sitemap-index.xml`,
+      },
+      {
+        source: "/sitemap-images.xml",
+        destination: `${BACKEND_URL}/sitemap-images.xml`,
+      },
     ]
   },
 }
