@@ -1,22 +1,37 @@
 "use client"
 
+import Link from "next/link"
 import { BookOpen, CalendarDays, Clock, Share2, Tag, User } from "lucide-react"
 import { toast } from "sonner"
 
 import { flattenToc, SidebarTOC } from "@/components/blog/sidebar-toc"
 import { MarkdownContent } from "@/components/blog/markdown"
 import { CommentSection } from "@/components/blog/comment-section"
+import { PostCopyright, RelatedPosts } from "@/components/blog/post-extras"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
-import type { PostResponse } from "@/lib/api/types"
+import type { PostResponse, PostTranslationResponse } from "@/lib/api/types"
+import { postHref } from "@/lib/routes"
 import { getAuthorInitials, site } from "@/lib/site"
 import { formatDate, readingMinutes } from "@/lib/format"
 
-export function BlogPostRenderer({ post }: { post: PostResponse }) {
+export function BlogPostRenderer({
+  post,
+  related = [],
+  permalink,
+  translations = [],
+  lang,
+}: {
+  post: PostResponse
+  related?: PostResponse[]
+  permalink: string
+  translations?: PostTranslationResponse[]
+  lang?: string
+}) {
   const toc = flattenToc(post.toc)
   const author = site.authorName
   const initials = getAuthorInitials()
@@ -66,6 +81,25 @@ export function BlogPostRenderer({ post }: { post: PostResponse }) {
             {post.summary ? (
               <p className="mt-3 text-lg leading-relaxed text-muted-foreground">{post.summary}</p>
             ) : null}
+            {translations.length > 0 ? (
+              <div className="mt-4 flex flex-wrap gap-2">
+                <Button variant={!lang ? "default" : "outline"} size="sm" asChild>
+                  <Link href={postHref(post)}>原文</Link>
+                </Button>
+                {translations.map((item) => (
+                  <Button
+                    key={item.language}
+                    variant={lang === item.language ? "default" : "outline"}
+                    size="sm"
+                    asChild
+                  >
+                    <Link href={`${postHref(post)}?lang=${encodeURIComponent(item.language)}`}>
+                      {item.language}
+                    </Link>
+                  </Button>
+                ))}
+              </div>
+            ) : null}
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
@@ -94,6 +128,8 @@ export function BlogPostRenderer({ post }: { post: PostResponse }) {
                 <MarkdownContent content={post.content ?? ""} />
               </CardContent>
             </Card>
+            <PostCopyright title={post.title} permalink={permalink} />
+            <RelatedPosts posts={related} />
             <CommentSection postId={post.id} />
           </article>
           <aside className="lg:col-span-1">
