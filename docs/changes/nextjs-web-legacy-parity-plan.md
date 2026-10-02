@@ -1,7 +1,7 @@
 # Next.js 前台对齐 web-legacy 计划
 
 日期：2026-10-02
-状态：进行中
+状态：已完成
 前置：`apps/web` 第一版已覆盖首页聚合、文章列表/分类、搜索、文章 Markdown 详情。
 
 ## 1. 目标
@@ -86,17 +86,17 @@ API：读写已有。若缺「按邮箱回填昵称」可在前端用 localStora
 
 ### 4.3 友链
 
-- `/links`：`GET /api/v1/links` 展示可见友链。
-- 申请表单：`POST /api/v1/site/link-exchanges`（Name、Description、Url、WebMaster、Email），成功用 sonner 提示，错误解析 ProblemDetails。
-- 首页友链区加「申请友链」按钮。
+- `/links`：`GET /api/v1/links` 展示可见友链。**已完成**
+- 申请表单：`POST /api/v1/site/link-exchanges`（Name、Description、Url、WebMaster、Email），成功用 sonner 提示，错误解析 ProblemDetails。**已完成**
+- 首页友链区加「申请友链」按钮。**已完成**
 
 API：已有。
 
 ### 4.4 关于页与 RSS 说明
 
-- `/about`：从旧 [`Views/About/Index.cshtml`](../../apps/web-legacy/Views/About/Index.cshtml) 迁文案与外链；站长名、社交链接放入 `NEXT_PUBLIC_*` 或 `lib/site.ts`，二维码等静态资源放到 `apps/web/public`。
-- `/rss`：说明 Atom 地址，链到 `/feed`。
-- 顶栏补「摄影 / 关于 / 友链」。
+- `/about`：从旧 [`Views/About/Index.cshtml`](../../apps/web-legacy/Views/About/Index.cshtml) 迁文案与外链；站长名、社交链接放入 `NEXT_PUBLIC_*` 或 `lib/site.ts`，二维码等静态资源放到 `apps/web/public`。**已完成**
+- `/rss`：说明 Atom 地址，链到 `/feed`。**已完成**
+- 顶栏补「摄影 / 关于 / 友链」。**已完成**
 
 无需新 API。
 
@@ -104,20 +104,20 @@ API：已有。
 
 对照 [`BlogController.Post`](../../apps/web-legacy/Controllers/BlogController.cs) 与 `PostHeader` / `PostBottom` / `RelatedPosts`。
 
-- 相关文章：同分类随机补齐。优先加只读 API（见第 5 节）；短期也可用当前分类的 `GET /api/v1/posts?categoryId=` 在服务端排除本文后取几篇。
-- 随机一篇：`/blog/random` 跳转到详情。
-- 版权声明、永久链接、二维码（可选，可用当前 URL 的客户端 QR）。
-- 兼容路由：`/p/[slug]` → 内部 `redirect` 到 `/blog/{slug}`，避免旧外链 404。
-- 译文：旧站 `?lang=` 读 `PostTranslation`。公开读接口目前没有，列入 API 缺口；本批次若来不及做接口，详情页先不展示语言切换。
+- 相关文章：同分类随机补齐。优先加只读 API（见第 5 节）；短期也可用当前分类的 `GET /api/v1/posts?categoryId=` 在服务端排除本文后取几篇。**已完成**（`GET /api/v1/posts/{id}/related`）
+- 随机一篇：`/blog/random` 跳转到详情。**已完成**
+- 版权声明、永久链接、二维码（可选，可用当前 URL 的客户端 QR）。**已完成**（版权与永久链接；二维码未做）
+- 兼容路由：`/p/[slug]` → 内部 `redirect` 到 `/blog/{slug}`，避免旧外链 404。**已完成**
+- 译文：旧站 `?lang=` 读 `PostTranslation`。公开读接口目前没有，列入 API 缺口；本批次若来不及做接口，详情页先不展示语言切换。**已完成**（`?lang=` + 详情语言切换）
 
 ### 4.6 首页补全
 
 对照 [`Views/Home/Index.cshtml`](../../apps/web-legacy/Views/Home/Index.cshtml)。
 
-- 分类词云 / 图表：旧站 `GET /Api/Category/WordCloud` + Chart.js。新 API 无此资源，见第 5 节。没有接口前不要用假数据。
-- 技能标签：链到 `/search?keyword=`。
-- 随机文章、随机摄影 CTA。
-- 移动端可隐藏大图（CSS/`use-mobile`），不必复刻 User-Agent 判断。
+- 分类词云 / 图表：旧站 `GET /Api/Category/WordCloud` + Chart.js。新 API 无此资源，见第 5 节。没有接口前不要用假数据。**已完成**（`GET /api/v1/categories/word-cloud`，受 `chartVisible` 控制）
+- 技能标签：链到 `/search?keyword=`。**已完成**
+- 随机文章、随机摄影 CTA。**已完成**
+- 移动端可隐藏大图（CSS/`use-mobile`），不必复刻 User-Agent 判断。**已完成**
 
 ### 4.7 SEO 与站点协议
 
@@ -125,16 +125,16 @@ API：已有。
 
 Next 侧：
 
-- 根布局与文章/摄影详情补 `openGraph`、`twitter`、canonical。
-- 文章页 JSON-LD：`BlogPosting` + `BreadcrumbList`；首页 `WebSite`（`SearchAction` 指向 `/search?keyword=`，不要写成旧的 `/Search?q=`）。
-- `next.config.ts` rewrite 增加 `/robots.txt`、`/sitemap.xml`、`/sitemap-index.xml`、`/sitemap-images.xml`。
-- **API 生成的 sitemap / robots 必须改为 Next 路径**（`/blog`、`/blog/{slug}`、`/photography` 等），否则切流后搜索引擎仍指向 Razor 路由。
+- 根布局与文章/摄影详情补 `openGraph`、`twitter`、canonical。**已完成**
+- 文章页 JSON-LD：`BlogPosting` + `BreadcrumbList`；首页 `WebSite`（`SearchAction` 指向 `/search?keyword=`，不要写成旧的 `/Search?q=`）。**已完成**
+- `next.config.ts` rewrite 增加 `/robots.txt`、`/sitemap.xml`、`/sitemap-index.xml`、`/sitemap-images.xml`。**已完成**
+- **API 生成的 sitemap / robots 必须改为 Next 路径**（`/blog`、`/blog/{slug}`、`/photography` 等），否则切流后搜索引擎仍指向 Razor 路由。**已完成**
 
 ### 4.8 列表与搜索体验（小项）
 
-- 分类筛选含子分类：旧站 `IncludeSubCategory`。若 `GET /api/v1/posts?categoryId=` 只匹配自身，需 API 支持 `includeDescendants` 或前端展开子 id 多次请求。
-- 服务端排序：旧站 `CreationTime` / `LastUpdateTime` / `Title`。现在标题排序在客户端，翻页后不正确；应对齐到 `GET /api/v1/posts` 的 `sortBy`（若没有则补查询参数）。
-- 搜索页可保留高亮；grid/list 切换非必须。
+- 分类筛选含子分类：旧站 `IncludeSubCategory`。若 `GET /api/v1/posts?categoryId=` 只匹配自身，需 API 支持 `includeDescendants` 或前端展开子 id 多次请求。**已完成**（`includeDescendants=true`）
+- 服务端排序：旧站 `CreationTime` / `LastUpdateTime` / `Title`。现在标题排序在客户端，翻页后不正确；应对齐到 `GET /api/v1/posts` 的 `sortBy`（若没有则补查询参数）。**已完成**
+- 搜索页可保留高亮；grid/list 切换非必须。**已有**
 
 ## 5. API 缺口（本批次建议补）
 
@@ -164,12 +164,12 @@ Next 侧：
 
 - [x] 摄影列表、详情、上一张/下一张/随机
 - [x] 文章下评论列表、OTP 发送、发表、回复
-- [ ] 友链列表与申请成功/校验失败
-- [ ] 关于页、RSS 说明页、顶栏入口
-- [ ] `/p/{slug}` 能打开对应文章
-- [ ] 详情有相关文章与版权/永久链接
-- [ ] 首页有友链申请入口；词云在 API 就绪后出现
-- [ ] 文章与摄影详情有 OG；`/robots.txt` 与 sitemap 经 Next 可访问且 loc 为新路由
+- [x] 友链列表与申请成功/校验失败
+- [x] 关于页、RSS 说明页、顶栏入口
+- [x] `/p/{slug}` 能打开对应文章
+- [x] 详情有相关文章与版权/永久链接
+- [x] 首页有友链申请入口；词云在 API 就绪后出现
+- [x] 文章与摄影详情有 OG；`/robots.txt` 与 sitemap 经 Next 可访问且 loc 为新路由
 - [x] 未发布文章详情仍为 404（API 匿名 `GET /api/v1/posts/{id}` 返回 404；前台按未发布处理）
 
 ## 8. 再下一批（不在本次）
