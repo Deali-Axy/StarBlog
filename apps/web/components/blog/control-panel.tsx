@@ -34,6 +34,7 @@ export function ControlPanel({
         <span className="hidden text-muted-foreground sm:inline">排序</span>
         {[
           { value: "lastUpdateTime", label: "更新时间" },
+          { value: "creationTime", label: "创建时间" },
           { value: "title", label: "标题" },
         ].map((option) => (
           <Button

@@ -35,20 +35,25 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   const pageSize = Math.min(100, Math.max(1, Number(params.pageSize) || 12))
   const search = params.search?.trim() || undefined
   const categoryId = params.categoryId ? Number(params.categoryId) : undefined
-  const sortBy = params.sortBy === "title" ? "title" : "lastUpdateTime"
+  const sortBy =
+    params.sortBy === "title" || params.sortBy === "creationTime" ? params.sortBy : "lastUpdateTime"
   const sortType = params.sortType === "asc" ? "asc" : "desc"
   const view = params.view === "list" ? "list" : "grid"
 
   const [tree, posts] = await Promise.all([
     getCategoryTree(),
-    listPosts({ page, pageSize, search, categoryId }),
+    listPosts({
+      page,
+      pageSize,
+      search,
+      categoryId,
+      sortBy,
+      sortType,
+      includeDescendants: Boolean(categoryId),
+    }),
   ])
 
-  const items = [...posts.items].sort((left, right) => {
-    const direction = sortType === "asc" ? 1 : -1
-    if (sortBy === "title") return left.title.localeCompare(right.title, "zh-CN") * direction
-    return (new Date(left.lastUpdateTime).getTime() - new Date(right.lastUpdateTime).getTime()) * direction
-  })
+  const items = posts.items
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
