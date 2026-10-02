@@ -5,6 +5,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { FormEvent, Suspense } from "react"
 import { Rss, Search } from "lucide-react"
 
+import { StarMark } from "@/components/brand/star-mark"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -43,7 +44,7 @@ function SearchBox() {
         name="keyword"
         defaultValue={defaultKeyword}
         placeholder="搜索文章"
-        className="w-48 pl-8 lg:w-64"
+        className="h-8 w-44 bg-transparent pl-8 lg:w-56"
       />
     </form>
   )
@@ -53,12 +54,13 @@ export function SiteHeader() {
   const pathname = usePathname()
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-md">
-      <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-4 px-4">
-        <Link href={routes.home} className="font-heading text-lg font-semibold tracking-tight">
+    <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur-md">
+      <div className="page-wrap flex h-14 items-center gap-6">
+        <Link href={routes.home} className="flex items-center gap-2 font-heading text-base tracking-tight">
+          <StarMark className="size-3.5 text-primary" />
           {site.name}
         </Link>
-        <nav className="flex items-center gap-1">
+        <nav className="flex items-center gap-5 text-sm">
           {navItems.map((item) => {
             const active = item.href === routes.home ? pathname === item.href : pathname.startsWith(item.href)
             return (
@@ -66,8 +68,8 @@ export function SiteHeader() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground",
-                  active && "bg-muted text-foreground",
+                  "text-muted-foreground transition-colors hover:text-foreground",
+                  active && "text-foreground",
                 )}
               >
                 {item.label}
@@ -75,11 +77,18 @@ export function SiteHeader() {
             )
           })}
         </nav>
-        <div className="ml-auto flex items-center gap-2">
-          <Suspense fallback={null}>
+        <div className="ml-auto flex items-center gap-1">
+          <Suspense
+            fallback={
+              <form className="relative hidden md:block">
+                <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
+                <Input name="keyword" placeholder="搜索文章" className="h-8 w-44 bg-transparent pl-8 lg:w-56" />
+              </form>
+            }
+          >
             <SearchBox />
           </Suspense>
-          <Button variant="ghost" size="icon" asChild>
+          <Button variant="ghost" size="icon-sm" asChild>
             <a href={routes.feed} aria-label="RSS">
               <Rss />
             </a>
