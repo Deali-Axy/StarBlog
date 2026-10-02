@@ -5,6 +5,7 @@ import { toast } from "sonner"
 
 import { flattenToc, SidebarTOC } from "@/components/blog/sidebar-toc"
 import { MarkdownContent } from "@/components/blog/markdown"
+import { CommentSection } from "@/components/blog/comment-section"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -93,6 +94,7 @@ export function BlogPostRenderer({ post }: { post: PostResponse }) {
                 <MarkdownContent content={post.content ?? ""} />
               </CardContent>
             </Card>
+            <CommentSection postId={post.id} />
           </article>
           <aside className="lg:col-span-1">
             <div className="sticky top-24 space-y-6">

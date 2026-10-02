@@ -77,10 +77,10 @@ API：已具备，无需新契约。
 
 旧站仅后端渲染页挂了 [`Widgets/Comment.cshtml`](../../apps/web-legacy/Views/Blog/Widgets/Comment.cshtml) + `comment.js`。新站用 React Query 接到现有评论 API。
 
-- 文章详情底部：树形列表 `GET /api/v1/comments/by-post/{postId}`。
-- 发表：邮箱 + `POST /api/v1/comments/email-otp` + `POST /api/v1/comments`（`userName`、`email`、`url?`、`emailOtp`、`parentId?`）。
-- 审核中评论按 API 的 `visible` / `isNeedAudit` 显示「待审核」而不是当成失败。
-- 不移植 `GetAnonymousUser` 和 PicLib 头像；头像用昵称首字母。
+- 文章详情底部：树形列表 `GET /api/v1/comments/by-post/{postId}`。**已完成**
+- 发表：邮箱 + `POST /api/v1/comments/email-otp` + `POST /api/v1/comments`（`userName`、`email`、`url?`、`emailOtp`、`parentId?`）。**已完成**
+- 审核中评论按 API 的 `visible` / `isNeedAudit` 显示「待审核」而不是当成失败。**已完成**
+- 不移植 `GetAnonymousUser` 和 PicLib 头像；头像用昵称首字母。**已完成**
 
 API：读写已有。若缺「按邮箱回填昵称」可在前端用 localStorage 记住上次昵称/网址。
 
@@ -163,7 +163,7 @@ Next 侧：
 ## 7. 验收清单
 
 - [x] 摄影列表、详情、上一张/下一张/随机
-- [ ] 文章下评论列表、OTP 发送、发表、回复
+- [x] 文章下评论列表、OTP 发送、发表、回复
 - [ ] 友链列表与申请成功/校验失败
 - [ ] 关于页、RSS 说明页、顶栏入口
 - [ ] `/p/{slug}` 能打开对应文章
