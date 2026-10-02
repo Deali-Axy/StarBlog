@@ -160,8 +160,13 @@ export async function getPublishedPost(idOrSlug: string, lang?: string) {
     }
   }
 
-  if (POST_ID.test(idOrSlug)) {
-    return (await tryFetch(() => getPost(idOrSlug, lang))) ?? tryFetch(() => getPostBySlug(idOrSlug))
+  const byId = POST_ID.test(idOrSlug)
+  const post = byId
+    ? ((await tryFetch(() => getPost(idOrSlug, lang))) ?? (await tryFetch(() => getPostBySlug(idOrSlug))))
+    : ((await tryFetch(() => getPostBySlug(idOrSlug))) ?? (await tryFetch(() => getPost(idOrSlug, lang))))
+
+  if (post && lang && !byId) {
+    return (await tryFetch(() => getPost(post.id, lang))) ?? post
   }
-  return (await tryFetch(() => getPostBySlug(idOrSlug))) ?? tryFetch(() => getPost(idOrSlug, lang))
+  return post
 }
