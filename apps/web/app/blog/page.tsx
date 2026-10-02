@@ -56,70 +56,72 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   const items = posts.items
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
-      <div className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-10 lg:grid-cols-[280px_1fr]">
-        <aside className="lg:sticky lg:top-24 lg:self-start">
-          <CategoryTree
-            categoryNodes={tree}
-            currentCategoryId={Number.isFinite(categoryId) ? categoryId : undefined}
-            searchQuery={search}
-          />
-        </aside>
-        <div className="space-y-6">
-          <form className="flex gap-2" action={routes.blog} method="get">
-            {categoryId ? <input type="hidden" name="categoryId" value={categoryId} /> : null}
-            <Input name="search" defaultValue={search} placeholder="在文章中搜索标题" />
-            <Button type="submit">
-              <Search />
-              搜索
-            </Button>
-          </form>
-          <ControlPanel
-            currentSortBy={sortBy}
-            currentSortType={sortType}
-            currentView={view}
-            searchQuery={search}
-            categoryId={Number.isFinite(categoryId) ? categoryId : undefined}
-          />
-          {items.length === 0 ? (
-            <div className="rounded-xl border border-dashed p-12 text-center text-muted-foreground">
-              没有找到文章。
-              <div className="mt-4">
-                <Button variant="outline" asChild>
-                  <Link href={routes.blog}>查看全部</Link>
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <div className={view === "list" ? "space-y-4" : "grid grid-cols-1 gap-6 md:grid-cols-2"}>
-              {items.map((post) => (
-                <PostCard
-                  key={post.id}
-                  viewMode={view}
-                  post={{
-                    id: post.id,
-                    title: post.title,
-                    slug: post.slug,
-                    summary: post.summary,
-                    categoryName: post.categoryName,
-                    lastUpdateTime: post.lastUpdateTime,
-                    content: post.content,
-                  }}
-                />
-              ))}
-            </div>
-          )}
-          <PaginationNav
-            currentPage={posts.page}
-            totalPages={posts.totalPages}
-            searchQuery={search}
-            categoryId={Number.isFinite(categoryId) ? categoryId : undefined}
-            sortBy={sortBy}
-            sortType={sortType}
-            pageSize={pageSize}
-            viewMode={view}
-          />
+    <div className="page-wrap grid gap-12 py-12 lg:grid-cols-[14rem_minmax(0,1fr)]">
+      <aside className="lg:sticky lg:top-24 lg:self-start">
+        <CategoryTree
+          categoryNodes={tree}
+          currentCategoryId={Number.isFinite(categoryId) ? categoryId : undefined}
+          searchQuery={search}
+        />
+      </aside>
+      <div className="space-y-6">
+        <div>
+          <p className="kicker">观测记录</p>
+          <h1 className="mt-2 text-3xl">文章</h1>
         </div>
+        <form className="flex gap-2" action={routes.blog} method="get">
+          {categoryId ? <input type="hidden" name="categoryId" value={categoryId} /> : null}
+          <Input name="search" defaultValue={search} placeholder="在文章中搜索标题" />
+          <Button type="submit">
+            <Search />
+            搜索
+          </Button>
+        </form>
+        <ControlPanel
+          currentSortBy={sortBy}
+          currentSortType={sortType}
+          currentView={view}
+          searchQuery={search}
+          categoryId={Number.isFinite(categoryId) ? categoryId : undefined}
+        />
+        {items.length === 0 ? (
+          <div className="border-y border-dashed border-border py-16 text-center text-muted-foreground">
+            这片星空里暂时没有匹配的文章。
+            <div className="mt-4">
+              <Button variant="outline" asChild>
+                <Link href={routes.blog}>查看全部</Link>
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <div className={view === "list" ? "divide-y divide-border/70" : "grid grid-cols-1 gap-8 md:grid-cols-2"}>
+            {items.map((post) => (
+              <PostCard
+                key={post.id}
+                viewMode={view}
+                post={{
+                  id: post.id,
+                  title: post.title,
+                  slug: post.slug,
+                  summary: post.summary,
+                  categoryName: post.categoryName,
+                  lastUpdateTime: post.lastUpdateTime,
+                  content: post.content,
+                }}
+              />
+            ))}
+          </div>
+        )}
+        <PaginationNav
+          currentPage={posts.page}
+          totalPages={posts.totalPages}
+          searchQuery={search}
+          categoryId={Number.isFinite(categoryId) ? categoryId : undefined}
+          sortBy={sortBy}
+          sortType={sortType}
+          pageSize={pageSize}
+          viewMode={view}
+        />
       </div>
     </div>
   )
