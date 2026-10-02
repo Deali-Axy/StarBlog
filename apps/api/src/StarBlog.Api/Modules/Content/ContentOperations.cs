@@ -56,6 +56,14 @@ public sealed class ContentOperations : IPublishedContentQueries {
         return post == null ? null : PostResponse.From(post, includeToc: true);
     }
 
+    /// <summary>按 slug 读取已发布文章；草稿与未知 slug 返回 null。</summary>
+    public async Task<PostResponse?> GetPublishedPostBySlugAsync(string slug, CancellationToken cancellationToken) {
+        if (string.IsNullOrWhiteSpace(slug)) return null;
+        var post = await _db.Posts.AsNoTracking().Include(item => item.Category)
+            .FirstOrDefaultAsync(item => item.Slug == slug && item.IsPublish, cancellationToken);
+        return post == null ? null : PostResponse.From(post, includeToc: true);
+    }
+
     /// <summary>创建文章。Slug 冲突时返回错误。</summary>
     public async Task<(PostResponse? Post, string? Error)> CreatePostAsync(PostUpsertRequest request, CancellationToken cancellationToken) {
         if (!string.IsNullOrWhiteSpace(request.Slug) &&

@@ -23,6 +23,7 @@
 | --- | --- | --- | --- |
 | GET | `/api/v1/posts` | 匿名；登录后可见草稿 | 文章分页 |
 | GET | `/api/v1/posts/{id}` | 匿名 | 文章详情，含 ToC |
+| GET | `/api/v1/posts/by-slug/{slug}` | 匿名 | 按 slug 读取已发布文章，含 ToC |
 | POST | `/api/v1/posts` | JWT | 创建文章 |
 | PUT | `/api/v1/posts/{id}` | JWT | 更新文章 |
 | DELETE | `/api/v1/posts/{id}` | JWT | 删除文章 |

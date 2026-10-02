@@ -17,6 +17,7 @@ public sealed class PublicEndpointsTests : IClassFixture<StarBlogApiFactory> {
     [InlineData("/swagger/blog/swagger.json")]
     [InlineData("/swagger/index.html")]
     [InlineData("/api/v1/posts?page=1&pageSize=1")]
+    [InlineData("/api/v1/posts/by-slug/test-post")]
     [InlineData("/api/v1/categories/tree")]
     [InlineData("/api/v1/theme")]
     [InlineData("/api/v1/links")]

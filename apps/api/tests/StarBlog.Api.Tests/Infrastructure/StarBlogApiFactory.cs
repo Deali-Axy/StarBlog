@@ -68,6 +68,7 @@ public sealed class StarBlogApiFactory : WebApplicationFactory<Program> {
             db.Posts.Add(new Post {
                 Id = "testpost00000001",
                 Title = "Test Post",
+                Slug = "test-post",
                 Summary = "Test summary",
                 Content = "# Hello\nThis is a Test article.",
                 IsPublish = true,

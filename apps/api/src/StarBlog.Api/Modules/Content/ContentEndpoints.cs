@@ -10,6 +10,7 @@ public static class ContentEndpoints {
     public static IEndpointRouteBuilder MapContentEndpoints(this IEndpointRouteBuilder endpoints) {
         var posts = endpoints.MapGroup("/api/v1/posts").WithTags("blog").WithGroupName("blog");
         posts.MapGet("/", ListPosts).AllowAnonymous();
+        posts.MapGet("/by-slug/{slug}", GetPostBySlug).AllowAnonymous();
         posts.MapGet("/{id}", GetPost).AllowAnonymous();
         posts.MapPost("/", CreatePost).RequireAuthorization();
         posts.MapPut("/{id}", UpdatePost).RequireAuthorization();
@@ -60,6 +61,11 @@ public static class ContentEndpoints {
     private static async Task<IResult> GetPost(string id, ContentOperations operations, CancellationToken cancellationToken) {
         var post = await operations.GetPostAsync(id, cancellationToken);
         return post == null ? HttpErrors.NotFound($"文章 {id} 不存在") : Results.Ok(post);
+    }
+
+    private static async Task<IResult> GetPostBySlug(string slug, ContentOperations operations, CancellationToken cancellationToken) {
+        var post = await operations.GetPublishedPostBySlugAsync(slug, cancellationToken);
+        return post == null ? HttpErrors.NotFound($"文章 {slug} 不存在") : Results.Ok(post);
     }
 
     private static async Task<IResult> CreatePost([FromBody] PostUpsertRequest request, ContentOperations operations, CancellationToken cancellationToken) {
