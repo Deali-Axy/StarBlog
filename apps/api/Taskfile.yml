@@ -47,3 +47,9 @@ tasks:
     desc: Apply EF Core migrations to the configured database
     cmds:
       - dotnet ef database update --project {{.API_PROJECT}} --startup-project {{.API_PROJECT}}
+
+  db:reset:
+    desc: Drop the local SQLite database and apply migrations from empty state
+    cmds:
+      - dotnet ef database drop --force --project {{.API_PROJECT}} --startup-project {{.API_PROJECT}}
+      - dotnet ef database update --project {{.API_PROJECT}} --startup-project {{.API_PROJECT}}
