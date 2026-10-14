@@ -182,6 +182,14 @@ task admin:dev
 task api:db:update
 ```
 
+`InitialCreate` 只能应用到空数据库。如果 `app.db` 仍是重构前的 FreeSql 结构（例如报错 `table "anonymous_user" already exists`），请丢弃该文件后重建：
+
+```powershell
+task api:db:reset
+```
+
+重置后用户表为空，需要重新初始化管理员。
+
 ### 初始化
 
 启动 API 与管理后台后，打开管理端登录页。若用户表为空，会展示一次性创建首个管理员的表单（`GET/POST /api/v1/site/initialization`）。也可以运行 `scripts/Initialize-StarBlogAdmin.ps1`。初始化只能执行一次。
