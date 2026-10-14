@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using StarBlog.Api.Hosting;
 using StarBlog.Api.Hosting.Middleware;
 using StarBlog.Api.Infrastructure;
@@ -38,7 +37,7 @@ var app = builder.Build();
 
 await using (var scope = app.Services.CreateAsyncScope()) {
     var db = scope.ServiceProvider.GetRequiredService<StarBlogDbContext>();
-    await db.Database.MigrateAsync();
+    await StarBlogDatabase.ApplyMigrationsAsync(db);
 
     await scope.ServiceProvider.GetRequiredService<ContentOperations>().EnsureDefaultCategoryAsync(CancellationToken.None);
 }
