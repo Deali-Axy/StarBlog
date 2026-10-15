@@ -7,9 +7,9 @@ namespace StarBlog.Api.Modules.Content;
 /// </summary>
 public interface IPublishedContentQueries {
     Task<PublishedPostSummary?> GetByIdAsync(string id, CancellationToken cancellationToken = default);
-    Task<IReadOnlyList<PublishedPostSummary>> GetPublishedAsync(CancellationToken cancellationToken = default);
-    Task<PublishedPostSummary?> GetTopAsync(CancellationToken cancellationToken = default);
-    Task<IReadOnlyList<PublishedPostSummary>> GetFeaturedPostsAsync(CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<PublishedPostSummary>> GetPublishedAsync(CancellationToken cancellationToken = default, string? language = null);
+    Task<PublishedPostSummary?> GetTopAsync(CancellationToken cancellationToken = default, string? language = null);
+    Task<IReadOnlyList<PublishedPostSummary>> GetFeaturedPostsAsync(CancellationToken cancellationToken = default, string? language = null);
     Task<IReadOnlyList<FeaturedCategoryResponse>> GetFeaturedCategoriesAsync(CancellationToken cancellationToken = default);
     Task<IReadOnlyList<CategoryResponse>> GetVisibleCategoriesAsync(CancellationToken cancellationToken = default);
     Task<ContentInventory> GetInventoryAsync(CancellationToken cancellationToken = default);

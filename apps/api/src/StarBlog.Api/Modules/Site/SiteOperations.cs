@@ -31,27 +31,27 @@ public sealed class SiteOperations {
         _paths = paths;
     }
 
-    public async Task<HomeResponse> GetHomeAsync(CancellationToken cancellationToken) {
+    public async Task<HomeResponse> GetHomeAsync(CancellationToken cancellationToken, string? language = null) {
         var chart = await _configuration.GetAsync("home_chart_visible", cancellationToken);
         var randomPhoto = await _configuration.GetAsync("home_random_photo_visible", cancellationToken);
         return new HomeResponse {
             ChartVisible = string.Equals(chart, "true", StringComparison.OrdinalIgnoreCase),
             RandomPhotoVisible = string.Equals(randomPhoto, "true", StringComparison.OrdinalIgnoreCase),
             RandomPhoto = await _photos.GetRandomAsync(cancellationToken),
-            TopPost = await _content.GetTopAsync(cancellationToken),
-            FeaturedPosts = await _content.GetFeaturedPostsAsync(cancellationToken),
+            TopPost = await _content.GetTopAsync(cancellationToken, language),
+            FeaturedPosts = await _content.GetFeaturedPostsAsync(cancellationToken, language),
             FeaturedPhotos = await _photos.GetFeaturedAsync(cancellationToken),
             FeaturedCategories = await _content.GetFeaturedCategoriesAsync(cancellationToken),
             Links = await _links.GetVisibleAsync(cancellationToken)
         };
     }
 
-    public async Task<IReadOnlyList<SearchResultResponse>> SearchAsync(string keyword, int page, int pageSize, CancellationToken cancellationToken) {
+    public async Task<IReadOnlyList<SearchResultResponse>> SearchAsync(string keyword, int page, int pageSize, CancellationToken cancellationToken, string? language = null) {
         page = Paging.NormalizePage(page);
         pageSize = Paging.NormalizePageSize(pageSize);
         var normalized = keyword.Trim();
         var pattern = new Regex(Regex.Escape(normalized), RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
-        var posts = await _content.GetPublishedAsync(cancellationToken);
+        var posts = await _content.GetPublishedAsync(cancellationToken, language);
         return posts
             .Select(post => new {
                 Post = post,

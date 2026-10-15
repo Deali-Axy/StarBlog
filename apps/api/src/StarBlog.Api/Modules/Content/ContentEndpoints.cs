@@ -63,6 +63,7 @@ public static class ContentEndpoints {
         [FromQuery] string? sortBy = null,
         [FromQuery] string? sortType = null,
         [FromQuery] bool includeDescendants = false,
+        [FromQuery] string? lang = null,
         CancellationToken cancellationToken = default) =>
         operations.GetPostsAsync(
             page,
@@ -74,7 +75,8 @@ public static class ContentEndpoints {
             sortBy,
             sortType,
             includeDescendants,
-            cancellationToken);
+            cancellationToken,
+            lang);
 
     private static async Task<IResult> GetRandomPost(ContentOperations operations, CancellationToken cancellationToken) {
         var post = await operations.GetRandomPublishedAsync(cancellationToken);
@@ -86,12 +88,13 @@ public static class ContentEndpoints {
         ContentOperations operations,
         HttpContext context,
         [FromQuery] int limit = 4,
+        [FromQuery] string? lang = null,
         CancellationToken cancellationToken = default) {
         if (await HideUnpublishedAsync(id, operations, context, cancellationToken)) {
             return HttpErrors.NotFound($"文章 {id} 不存在");
         }
 
-        return Results.Ok(await operations.GetRelatedPublishedAsync(id, limit, cancellationToken));
+        return Results.Ok(await operations.GetRelatedPublishedAsync(id, limit, cancellationToken, lang));
     }
 
     private static async Task<IResult> ListTranslations(string id, ContentOperations operations, HttpContext context, CancellationToken cancellationToken) {
@@ -117,14 +120,9 @@ public static class ContentEndpoints {
         HttpContext context,
         [FromQuery] string? lang = null,
         CancellationToken cancellationToken = default) {
-        var post = await operations.GetPostAsync(id, cancellationToken);
+        var post = await operations.GetPostAsync(id, cancellationToken, lang);
         if (post == null || HideFromAnonymous(post.IsPublish, context)) {
             return HttpErrors.NotFound($"文章 {id} 不存在");
-        }
-
-        if (!string.IsNullOrWhiteSpace(lang) && post.IsPublish) {
-            var translation = await operations.GetPublishedTranslationAsync(id, lang, cancellationToken);
-            if (translation != null) post = ContentOperations.ApplyTranslation(post, translation);
         }
 
         return Results.Ok(post);

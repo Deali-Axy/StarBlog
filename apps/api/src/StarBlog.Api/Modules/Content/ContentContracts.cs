@@ -52,6 +52,8 @@ public sealed class FeaturedCategoryCreateRequest {
 public sealed class PostResponse {
     public required string Id { get; init; }
     public required string Title { get; init; }
+    /// <summary>实际使用的译文语言；null 表示原文。</summary>
+    public string? Language { get; init; }
     public string? Slug { get; init; }
     public string? Status { get; init; }
     public bool IsPublish { get; init; }
@@ -65,22 +67,26 @@ public sealed class PostResponse {
     public string? Categories { get; init; }
     public List<TocNode>? Toc { get; init; }
 
-    public static PostResponse From(Post post, bool includeToc = false) => new() {
-        Id = post.Id,
-        Title = post.Title,
-        Slug = post.Slug,
-        Status = post.Status,
-        IsPublish = post.IsPublish,
-        Summary = post.Summary,
-        Content = post.Content,
-        Path = post.Path,
-        CreationTime = post.CreationTime,
-        LastUpdateTime = post.LastUpdateTime,
-        CategoryId = post.CategoryId,
-        CategoryName = post.Category?.Name,
-        Categories = post.Categories,
-        Toc = includeToc ? TableOfContents.Extract(post.Content) : null
-    };
+    public static PostResponse From(Post post, bool includeToc = false, string? language = null) {
+        var translation = post.Translations.FirstOrDefault(item => item.Language == language);
+        return new() {
+            Id = post.Id,
+            Title = translation?.Title ?? post.Title,
+            Language = translation?.Language,
+            Slug = post.Slug,
+            Status = post.Status,
+            IsPublish = post.IsPublish,
+            Summary = translation == null ? post.Summary : translation.Summary,
+            Content = translation == null ? post.Content : translation.Content,
+            Path = post.Path,
+            CreationTime = post.CreationTime,
+            LastUpdateTime = post.LastUpdateTime,
+            CategoryId = post.CategoryId,
+            CategoryName = post.Category?.Name,
+            Categories = post.Categories,
+            Toc = includeToc ? TableOfContents.Extract(translation == null ? post.Content : translation.Content) : null
+        };
+    }
 }
 
 /// <summary>创建或更新文章。</summary>

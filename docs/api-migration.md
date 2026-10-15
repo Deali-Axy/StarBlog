@@ -37,6 +37,8 @@
 | POST/PUT/DELETE | `/api/v1/categories` | JWT | 分类写入 |
 | POST | `/api/v1/categories/{id}/featured-category` | JWT | 推荐分类 |
 
+文章分页、详情、`GET /api/v1/posts/{id}/related`、首页聚合与站点搜索支持可选的 `lang` 查询参数，例如 `?lang=en`。有对应译文时返回译文标题、摘要、正文；没有译文时保留原文。详情和分页的 `PostResponse.language` 表示实际使用的译文语言，`null` 表示原文，详情目录同步取自所显示的正文。列表标题筛选与排序支持译文，站点搜索在所选语言的正文中匹配。省略 `lang` 时保持原有行为。
+
 ## 站点聚合
 
 | 方法 | 路径 | 鉴权 | 说明 |

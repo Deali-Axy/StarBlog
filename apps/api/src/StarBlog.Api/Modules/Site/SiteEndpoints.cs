@@ -26,8 +26,8 @@ public static class SiteEndpoints {
         return endpoints;
     }
 
-    private static Task<HomeResponse> Home(SiteOperations operations, CancellationToken cancellationToken) =>
-        operations.GetHomeAsync(cancellationToken);
+    private static Task<HomeResponse> Home(SiteOperations operations, CancellationToken cancellationToken, [FromQuery] string? lang = null) =>
+        operations.GetHomeAsync(cancellationToken, lang);
 
     private static Task<SiteOverviewResponse> Overview(SiteOperations operations, CancellationToken cancellationToken) =>
         operations.GetOverviewAsync(cancellationToken);
@@ -37,9 +37,10 @@ public static class SiteEndpoints {
         [FromQuery] string keyword,
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 10,
+        [FromQuery] string? lang = null,
         CancellationToken cancellationToken = default) {
         if (string.IsNullOrWhiteSpace(keyword)) return HttpErrors.BadRequest("keyword 不能为空");
-        return Results.Ok(await operations.SearchAsync(keyword, page, pageSize, cancellationToken));
+        return Results.Ok(await operations.SearchAsync(keyword, page, pageSize, cancellationToken, lang));
     }
 
     private static async Task<IResult> RandomPhoto(IPhotoCatalog photos, CancellationToken cancellationToken) {
