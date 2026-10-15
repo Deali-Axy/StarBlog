@@ -6,6 +6,7 @@ import { Camera, Rss, Shuffle } from "lucide-react"
 import { CategoryCard } from "@/components/blog/category-card"
 import { EnhancedPostCard } from "@/components/blog/enhanced-post-card"
 import { FeaturedPosts, LatestPosts } from "@/components/home/featured-sections"
+import { HeroPhoto } from "@/components/home/hero-photo"
 import { CategoryWordCloud } from "@/components/home/category-word-cloud"
 import { JsonLd } from "@/components/seo/json-ld"
 import { Button } from "@/components/ui/button"
@@ -119,20 +120,7 @@ export default async function HomePage() {
           </div>
         </div>
         {photo ? (
-          <Link href={routes.photo(photo.id)} className="group hidden md:block">
-            <figure>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={`/api/v1/photos/${photo.id}/thumbnail?width=900`}
-                alt={photo.title}
-                className="h-80 w-full object-cover"
-              />
-              <figcaption className="mt-3 flex items-baseline justify-between gap-3 text-xs text-muted-foreground">
-                <span>{photo.title}</span>
-                <span>{photo.location}</span>
-              </figcaption>
-            </figure>
-          </Link>
+          <HeroPhoto photo={photo} />
         ) : home.topPost ? (
           <EnhancedPostCard
             variant="featured"
