@@ -1,3 +1,4 @@
+import { getI18n } from "@/lib/i18n-server"
 import Link from "next/link"
 import type { Metadata } from "next"
 import { Search } from "lucide-react"
@@ -13,8 +14,9 @@ import { routes } from "@/lib/routes"
 
 export const revalidate = 300
 
-export const metadata: Metadata = {
-  title: "文章",
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getI18n()
+  return { title: t.posts }
 }
 
 interface BlogPageProps {
@@ -30,6 +32,7 @@ interface BlogPageProps {
 }
 
 export default async function BlogPage({ searchParams }: BlogPageProps) {
+  const { locale, t } = await getI18n()
   const params = await searchParams
   const page = Math.max(1, Number(params.page) || 1)
   const pageSize = Math.min(100, Math.max(1, Number(params.pageSize) || 12))
@@ -50,7 +53,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
       sortBy,
       sortType,
       includeDescendants: Boolean(categoryId),
-    }),
+    }, locale),
   ])
 
   const items = posts.items
@@ -66,15 +69,15 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
       </aside>
       <div className="space-y-6">
         <div>
-          <p className="kicker">观测记录</p>
-          <h1 className="mt-2 text-3xl">文章</h1>
+          <p className="kicker">{t.observations}</p>
+          <h1 className="mt-2 text-3xl">{t.posts}</h1>
         </div>
         <form className="flex gap-2" action={routes.blog} method="get">
           {categoryId ? <input type="hidden" name="categoryId" value={categoryId} /> : null}
-          <Input name="search" defaultValue={search} placeholder="在文章中搜索标题" />
+          <Input name="search" defaultValue={search} placeholder={t.searchTitle} />
           <Button type="submit">
             <Search />
-            搜索
+            {t.search}
           </Button>
         </form>
         <ControlPanel
@@ -86,10 +89,10 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
         />
         {items.length === 0 ? (
           <div className="border-y border-dashed border-border py-16 text-center text-muted-foreground">
-            这片星空里暂时没有匹配的文章。
+            {t.noMatchingPosts}
             <div className="mt-4">
               <Button variant="outline" asChild>
-                <Link href={routes.blog}>查看全部</Link>
+                <Link href={routes.blog}>{t.viewAll}</Link>
               </Button>
             </div>
           </div>

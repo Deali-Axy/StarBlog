@@ -1,3 +1,5 @@
+import type { Locale } from "@/lib/i18n"
+
 export const site = {
   name: process.env.NEXT_PUBLIC_SITE_NAME ?? "StarBlog",
   description: process.env.NEXT_PUBLIC_SITE_DESCRIPTION ?? "基于 .NET 的开源博客",
@@ -24,6 +26,24 @@ export const site = {
     { label: "Go", keyword: "Go语言" },
     { label: "LLM", keyword: "LLM" },
   ],
+}
+
+export function getSite(locale: Locale) {
+  if (locale === "zh") return site
+  return {
+    ...site,
+    description:
+      process.env.NEXT_PUBLIC_SITE_DESCRIPTION_EN ?? process.env.NEXT_PUBLIC_SITE_DESCRIPTION ?? "An open source blog built with .NET",
+    authorTitle:
+      process.env.NEXT_PUBLIC_AUTHOR_TITLE_EN ?? process.env.NEXT_PUBLIC_AUTHOR_TITLE ?? "Independent developer",
+    authorBio:
+      process.env.NEXT_PUBLIC_AUTHOR_BIO_EN ?? process.env.NEXT_PUBLIC_AUTHOR_BIO ??
+      "Full stack developer, Linux enthusiast, amateur photographer and literature lover",
+    labName: process.env.NEXT_PUBLIC_LAB_NAME_EN ?? process.env.NEXT_PUBLIC_LAB_NAME ?? "Programming Lab",
+    labDescription:
+      process.env.NEXT_PUBLIC_LAB_DESCRIPTION_EN ?? process.env.NEXT_PUBLIC_LAB_DESCRIPTION ??
+      "Exploring new technologies and agile development, from web and mobile development to machine learning, data analysis, algorithms and Linux. A place to share ideas and practical experience.",
+  }
 }
 
 export function getAuthorInitials(name = site.authorName) {

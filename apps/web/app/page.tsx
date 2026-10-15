@@ -1,3 +1,4 @@
+import { getI18n } from "@/lib/i18n-server"
 import Link from "next/link"
 import type { Metadata } from "next"
 import { Camera, Rss, Shuffle } from "lucide-react"
@@ -10,26 +11,27 @@ import { JsonLd } from "@/components/seo/json-ld"
 import { Button } from "@/components/ui/button"
 import { getCategoryWordCloud, getHome, getOverview, listPosts } from "@/lib/api/queries"
 import { postHref, routes } from "@/lib/routes"
-import { absoluteUrl, site } from "@/lib/site"
+import { absoluteUrl, getSite } from "@/lib/site"
 
 export const revalidate = 300
 
-export const metadata: Metadata = {
-  title: "首页",
-  alternates: { canonical: "/" },
-  openGraph: {
-    title: site.name,
-    description: site.description,
-    url: absoluteUrl("/"),
-    type: "website",
-  },
+export async function generateMetadata(): Promise<Metadata> {
+  const { locale, t } = await getI18n()
+  const site = getSite(locale)
+  return {
+    title: t.home,
+    alternates: { canonical: "/" },
+    openGraph: { title: site.name, description: site.description, url: absoluteUrl("/"), type: "website" },
+  }
 }
 
 export default async function HomePage() {
+  const { locale, t } = await getI18n()
+  const site = getSite(locale)
   const [home, overview, latest, wordCloud] = await Promise.all([
-    getHome(),
+    getHome(locale),
     getOverview().catch(() => null),
-    listPosts({ page: 1, pageSize: 12 }),
+    listPosts({ page: 1, pageSize: 12 }, locale),
     getCategoryWordCloud().catch(() => []),
   ])
 
@@ -53,22 +55,22 @@ export default async function HomePage() {
       />
       <section className="page-wrap relative grid gap-12 py-16 lg:grid-cols-2 lg:items-end lg:py-20">
         <div>
-          <p className="kicker">写作 · 摄影 · 观星</p>
+          <p className="kicker">{t.hero}</p>
           <h1 className="mt-3 text-4xl md:text-5xl">{site.authorName}</h1>
           <p className="mt-3 text-muted-foreground">{site.authorTitle}</p>
           <p className="mt-5 max-w-xl text-[0.95rem] leading-relaxed text-muted-foreground">{site.authorBio}</p>
           {overview ? (
             <dl className="mt-8 flex flex-wrap gap-8 text-sm">
               <div>
-                <dt className="text-muted-foreground">文章</dt>
+                <dt className="text-muted-foreground">{t.posts}</dt>
                 <dd className="font-heading text-2xl">{overview.postsCount}</dd>
               </div>
               <div>
-                <dt className="text-muted-foreground">分类</dt>
+                <dt className="text-muted-foreground">{t.categories}</dt>
                 <dd className="font-heading text-2xl">{overview.categoriesCount}</dd>
               </div>
               <div>
-                <dt className="text-muted-foreground">摄影</dt>
+                <dt className="text-muted-foreground">{t.photography}</dt>
                 <dd className="font-heading text-2xl">{overview.photosCount}</dd>
               </div>
             </dl>
@@ -89,23 +91,23 @@ export default async function HomePage() {
               GitHub
             </a>
             <a href={site.zhihuUrl} target="_blank" rel="noreferrer" className="hover:text-primary">
-              知乎
+              {t.zhihu}
             </a>
             <a href={site.cnblogsUrl} target="_blank" rel="noreferrer" className="hover:text-primary">
-              博客园
+              {t.cnblogs}
             </a>
           </div>
           <div className="mt-8 flex flex-wrap gap-3">
             <Button asChild>
               <Link href={routes.blogRandom}>
                 <Shuffle />
-                随机一篇
+                {t.randomPost}
               </Link>
             </Button>
             <Button variant="outline" asChild>
               <Link href={routes.photographyRandom}>
                 <Camera />
-                随机一张
+                {t.randomPhoto}
               </Link>
             </Button>
             <Button variant="ghost" asChild>
@@ -155,8 +157,8 @@ export default async function HomePage() {
 
         {home.featuredCategories.length > 0 ? (
           <section className="mt-20">
-            <p className="kicker">路径</p>
-            <h2 className="mt-2 mb-6 text-2xl">精选分类</h2>
+            <p className="kicker">{t.paths}</p>
+            <h2 className="mt-2 mb-6 text-2xl">{t.featuredCategories}</h2>
             <div className="grid grid-cols-1 gap-x-8 md:grid-cols-2 lg:grid-cols-3">
               {home.featuredCategories.map((category) => (
                 <CategoryCard
@@ -173,11 +175,11 @@ export default async function HomePage() {
           <section className="mt-20">
             <div className="mb-6 flex items-end justify-between">
               <div>
-                <p className="kicker">相纸</p>
-                <h2 className="mt-2 text-2xl">精选摄影</h2>
+                <p className="kicker">{t.photoPaper}</p>
+                <h2 className="mt-2 text-2xl">{t.featuredPhotos}</h2>
               </div>
               <Button variant="ghost" size="sm" asChild>
-                <Link href={routes.photography}>全部摄影</Link>
+                <Link href={routes.photography}>{t.allPhotos}</Link>
               </Button>
             </div>
             <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
@@ -198,11 +200,11 @@ export default async function HomePage() {
         <section className="mt-20">
           <div className="mb-4 flex items-end justify-between gap-4">
             <div>
-              <p className="kicker">往来</p>
-              <h2 className="mt-2 text-2xl">友情链接</h2>
+              <p className="kicker">{t.exchange}</p>
+              <h2 className="mt-2 text-2xl">{t.friendLinks}</h2>
             </div>
             <Button variant="ghost" size="sm" asChild>
-              <Link href={routes.links}>申请友链</Link>
+              <Link href={routes.links}>{t.applyLink}</Link>
             </Button>
           </div>
           {home.links.length > 0 ? (
@@ -216,13 +218,13 @@ export default async function HomePage() {
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-muted-foreground">还没有友链，欢迎申请交换。</p>
+            <p className="text-sm text-muted-foreground">{t.noLinks}</p>
           )}
         </section>
 
         {home.topPost ? (
           <p className="sr-only">
-            置顶文章：
+            {t.pinnedPost}
             <Link href={postHref(home.topPost)}>{home.topPost.title}</Link>
           </p>
         ) : null}

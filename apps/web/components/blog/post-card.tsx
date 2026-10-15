@@ -1,3 +1,7 @@
+"use client"
+
+import { useI18n } from "@/components/app-providers"
+
 import Link from "next/link"
 
 import type { PostCardModel } from "@/components/blog/enhanced-post-card"
@@ -11,6 +15,7 @@ export function PostCard({
   post: PostCardModel & { content?: string | null }
   viewMode?: "grid" | "list"
 }) {
+  const { t } = useI18n()
   const href = postHref(post)
 
   return (
@@ -18,7 +23,7 @@ export function PostCard({
       <Link href={href} className="group block">
         <div className="flex items-baseline justify-between gap-3">
           <h3 className="text-lg leading-snug group-hover:text-primary">{post.title}</h3>
-          {post.featured ? <span className="kicker shrink-0">精选</span> : null}
+          {post.featured ? <span className="kicker shrink-0">{t.featured}</span> : null}
         </div>
         {post.summary ? (
           <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-muted-foreground">{post.summary}</p>
@@ -26,7 +31,7 @@ export function PostCard({
         <p className="mt-3 text-xs text-muted-foreground">
           {formatDate(post.lastUpdateTime)}
           {post.categoryName ? ` · ${post.categoryName}` : ""}
-          {` · ${readingMinutes(post.content ?? post.summary)} 分钟`}
+          {` · ${t.readingTime(readingMinutes(post.content ?? post.summary))}`}
         </p>
       </Link>
     </article>

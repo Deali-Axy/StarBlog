@@ -1,4 +1,5 @@
 import { apiGet } from "@/lib/api/client"
+import { articleLanguage, type Locale } from "@/lib/i18n"
 import type {
   CategoryNodeResponse,
   CategoryWordCloudItem,
@@ -24,15 +25,15 @@ function notFoundToNull(error: unknown) {
   throw error
 }
 
-export function getHome() {
-  return apiGet<HomeResponse>("/api/v1/site/home", undefined, revalidate)
+export function getHome(locale: Locale = "zh") {
+  return apiGet<HomeResponse>("/api/v1/site/home", { lang: articleLanguage(locale) }, revalidate)
 }
 
 export function getOverview() {
   return apiGet<SiteOverviewResponse>("/api/v1/site/overview", undefined, revalidate)
 }
 
-export function listPosts(query: ListPostsQuery = {}) {
+export function listPosts(query: ListPostsQuery = {}, locale: Locale = "zh") {
   return apiGet<PageResult<PostResponse>>(
     "/api/v1/posts",
     {
@@ -43,6 +44,7 @@ export function listPosts(query: ListPostsQuery = {}) {
       sortBy: query.sortBy,
       sortType: query.sortType,
       includeDescendants: query.includeDescendants,
+      lang: articleLanguage(locale),
     },
     revalidate,
   )
@@ -64,10 +66,10 @@ export function getPostBySlug(slug: string) {
   )
 }
 
-export function getRelatedPosts(id: string, limit = 4) {
+export function getRelatedPosts(id: string, limit = 4, locale: Locale = "zh") {
   return apiGet<PostResponse[]>(
     `/api/v1/posts/${encodeURIComponent(id)}/related`,
-    { limit },
+    { limit, lang: articleLanguage(locale) },
     revalidate,
   )
 }
@@ -92,13 +94,14 @@ export function getCategoryWordCloud() {
   return apiGet<CategoryWordCloudItem[]>("/api/v1/categories/word-cloud", undefined, revalidate)
 }
 
-export function searchPosts(query: SearchQuery) {
+export function searchPosts(query: SearchQuery, locale: Locale = "zh") {
   return apiGet<SearchResultResponse[]>(
     "/api/v1/site/search",
     {
       keyword: query.keyword,
       page: query.page ?? 1,
       pageSize: query.pageSize ?? 20,
+      lang: articleLanguage(locale),
     },
     noStore,
   )
@@ -162,10 +165,10 @@ export async function getPublishedPost(idOrSlug: string, lang?: string) {
 
   const byId = POST_ID.test(idOrSlug)
   const post = byId
-    ? ((await tryFetch(() => getPost(idOrSlug, lang))) ?? (await tryFetch(() => getPostBySlug(idOrSlug))))
-    : ((await tryFetch(() => getPostBySlug(idOrSlug))) ?? (await tryFetch(() => getPost(idOrSlug, lang))))
+    ? ((await tryFetch(() => getPost(idOrSlug))) ?? (await tryFetch(() => getPostBySlug(idOrSlug))))
+    : ((await tryFetch(() => getPostBySlug(idOrSlug))) ?? (await tryFetch(() => getPost(idOrSlug))))
 
-  if (post && lang && !byId) {
+  if (post && lang) {
     return (await tryFetch(() => getPost(post.id, lang))) ?? post
   }
   return post

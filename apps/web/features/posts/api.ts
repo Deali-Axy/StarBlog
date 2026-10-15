@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query"
 
 import { getCategoryTree, getHome, listPosts, searchPosts } from "@/lib/api/queries"
 import type { ListPostsQuery, SearchQuery } from "@/lib/api/types"
+import { useI18n } from "@/components/app-providers"
 
 export const queryKeys = {
   home: ["site", "home"] as const,
@@ -13,11 +14,13 @@ export const queryKeys = {
 }
 
 export function useHome() {
-  return useQuery({ queryKey: queryKeys.home, queryFn: getHome })
+  const { locale } = useI18n()
+  return useQuery({ queryKey: [...queryKeys.home, locale], queryFn: () => getHome(locale) })
 }
 
 export function usePosts(query: ListPostsQuery) {
-  return useQuery({ queryKey: queryKeys.posts(query), queryFn: () => listPosts(query) })
+  const { locale } = useI18n()
+  return useQuery({ queryKey: [...queryKeys.posts(query), locale], queryFn: () => listPosts(query, locale) })
 }
 
 export function useCategoryTree() {
@@ -25,9 +28,10 @@ export function useCategoryTree() {
 }
 
 export function useSearch(query: SearchQuery, enabled = true) {
+  const { locale } = useI18n()
   return useQuery({
-    queryKey: queryKeys.search(query),
-    queryFn: () => searchPosts(query),
+    queryKey: [...queryKeys.search(query), locale],
+    queryFn: () => searchPosts(query, locale),
     enabled: enabled && Boolean(query.keyword.trim()),
   })
 }

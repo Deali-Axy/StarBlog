@@ -16,6 +16,7 @@ export interface TocNode {
 export interface PostResponse {
   id: string
   title: string
+  language?: string | null
   slug?: string | null
   status?: string | null
   isPublish: boolean

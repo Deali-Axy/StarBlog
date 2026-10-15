@@ -1,5 +1,7 @@
 "use client"
 
+import { useI18n } from "@/components/app-providers"
+
 import { FormEvent, useState } from "react"
 import { toast } from "sonner"
 
@@ -19,6 +21,7 @@ const emptyForm = {
 }
 
 export function LinkApplyForm() {
+  const { locale, t } = useI18n()
   const apply = useApplyLinkExchange()
   const [form, setForm] = useState(emptyForm)
 
@@ -32,17 +35,17 @@ export function LinkApplyForm() {
         webMaster: form.webMaster.trim(),
         email: form.email.trim(),
       })
-      toast.success("友链申请已提交，请留意邮件通知。")
+      toast.success(t.linkSubmitted)
       setForm(emptyForm)
     } catch (error) {
-      toast.error(error instanceof ApiError ? error.message : "提交失败")
+      toast.error(locale === "zh" && error instanceof ApiError ? error.message : t.submitFailed)
     }
   }
 
   return (
     <form className="space-y-4" onSubmit={onSubmit}>
       <div className="space-y-2">
-        <Label htmlFor="link-name">网站名称</Label>
+        <Label htmlFor="link-name">{t.websiteName}</Label>
         <Input
           id="link-name"
           required
@@ -51,7 +54,7 @@ export function LinkApplyForm() {
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="link-description">简介</Label>
+        <Label htmlFor="link-description">{t.description}</Label>
         <Textarea
           id="link-description"
           value={form.description}
@@ -59,7 +62,7 @@ export function LinkApplyForm() {
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="link-url">网址</Label>
+        <Label htmlFor="link-url">{t.url}</Label>
         <Input
           id="link-url"
           type="url"
@@ -70,7 +73,7 @@ export function LinkApplyForm() {
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="link-webmaster">站长</Label>
+        <Label htmlFor="link-webmaster">{t.webmaster}</Label>
         <Input
           id="link-webmaster"
           required
@@ -79,7 +82,7 @@ export function LinkApplyForm() {
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="link-email">邮箱</Label>
+        <Label htmlFor="link-email">{t.email}</Label>
         <Input
           id="link-email"
           type="email"
@@ -90,10 +93,10 @@ export function LinkApplyForm() {
       </div>
       <div className="flex gap-2">
         <Button type="submit" disabled={apply.isPending}>
-          提交
+          {t.submit}
         </Button>
         <Button type="reset" variant="outline" onClick={() => setForm(emptyForm)}>
-          重置
+          {t.reset}
         </Button>
       </div>
     </form>

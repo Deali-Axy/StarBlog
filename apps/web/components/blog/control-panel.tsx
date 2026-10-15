@@ -1,3 +1,7 @@
+"use client"
+
+import { useI18n } from "@/components/app-providers"
+
 import Link from "next/link"
 import { ArrowUpDown, ChevronDown, ChevronUp, Grid3X3, List, RotateCcw } from "lucide-react"
 
@@ -19,6 +23,7 @@ export function ControlPanel({
   searchQuery,
   categoryId,
 }: ControlPanelProps) {
+  const { t } = useI18n()
   const shared = {
     search: searchQuery,
     categoryId,
@@ -31,11 +36,11 @@ export function ControlPanel({
     <div className="flex flex-wrap items-center gap-2 py-1">
       <div className="flex items-center gap-1 text-xs">
         <ArrowUpDown className="size-4 text-muted-foreground" />
-        <span className="hidden text-muted-foreground sm:inline">排序</span>
+        <span className="hidden text-muted-foreground sm:inline">{t.sort}</span>
         {[
-          { value: "lastUpdateTime", label: "更新时间" },
-          { value: "creationTime", label: "创建时间" },
-          { value: "title", label: "标题" },
+          { value: "lastUpdateTime", label: t.updated },
+          { value: "creationTime", label: t.created },
+          { value: "title", label: t.title },
         ].map((option) => (
           <Button
             key={option.value}
@@ -53,7 +58,7 @@ export function ControlPanel({
           className={currentSortType === "desc" ? "bg-accent text-primary" : ""}
           asChild
         >
-          <Link href={routes.blogList({ ...shared, sortType: "desc" })} title="降序">
+          <Link href={routes.blogList({ ...shared, sortType: "desc" })} title={t.descending}>
             <ChevronDown />
           </Link>
         </Button>
@@ -63,7 +68,7 @@ export function ControlPanel({
           className={currentSortType === "asc" ? "bg-accent text-primary" : ""}
           asChild
         >
-          <Link href={routes.blogList({ ...shared, sortType: "asc" })} title="升序">
+          <Link href={routes.blogList({ ...shared, sortType: "asc" })} title={t.ascending}>
             <ChevronUp />
           </Link>
         </Button>
@@ -72,7 +77,7 @@ export function ControlPanel({
       <Button variant="ghost" size="sm" className="h-7 px-2 text-xs" asChild>
         <Link href={routes.blog}>
           <RotateCcw className="size-3" />
-          清除
+          {t.clear}
         </Link>
       </Button>
       <div className="mx-1 h-4 w-px bg-border" />
@@ -82,7 +87,7 @@ export function ControlPanel({
         className={currentView === "grid" ? "bg-accent text-primary" : ""}
         asChild
       >
-        <Link href={routes.blogList({ ...shared, view: "grid" })} title="网格视图">
+        <Link href={routes.blogList({ ...shared, view: "grid" })} title={t.gridView}>
           <Grid3X3 />
         </Link>
       </Button>
@@ -92,7 +97,7 @@ export function ControlPanel({
         className={currentView === "list" ? "bg-accent text-primary" : ""}
         asChild
       >
-        <Link href={routes.blogList({ ...shared, view: "list" })} title="列表视图">
+        <Link href={routes.blogList({ ...shared, view: "list" })} title={t.listView}>
           <List />
         </Link>
       </Button>

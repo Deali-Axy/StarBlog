@@ -1,5 +1,7 @@
 "use client"
 
+import { useI18n } from "@/components/app-providers"
+
 import { FormEvent, useEffect, useMemo, useState, useSyncExternalStore } from "react"
 import { RefreshCw, Reply } from "lucide-react"
 import { toast } from "sonner"
@@ -65,7 +67,8 @@ function CommentItem({
   comment: CommentResponse
   onReply: (comment: CommentResponse) => void
 }) {
-  const name = comment.anonymousUserName || "匿名"
+  const { t } = useI18n()
+  const name = comment.anonymousUserName || t.anonymous
   const pending = !comment.visible || comment.isNeedAudit
   return (
     <div className="space-y-4">
@@ -76,14 +79,14 @@ function CommentItem({
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <p className="font-medium">{name}</p>
-            {pending ? <Badge variant="secondary">待审核</Badge> : null}
+            {pending ? <Badge variant="secondary">{t.pending}</Badge> : null}
             <span className="text-xs text-muted-foreground">{formatDate(comment.createdTime, "YYYY-MM-DD HH:mm")}</span>
           </div>
           <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed">{comment.content}</p>
           {!pending ? (
             <Button variant="ghost" size="sm" className="mt-1 h-7 px-2 text-xs" onClick={() => onReply(comment)}>
               <Reply />
-              回复
+              {t.reply}
             </Button>
           ) : null}
         </div>
@@ -100,6 +103,7 @@ function CommentItem({
 }
 
 export function CommentSection({ postId }: { postId: string }) {
+  const { locale, t } = useI18n()
   const commentsQuery = useComments(postId)
   const sendOtp = useSendCommentOtp()
   const createComment = useCreateComment(postId)
@@ -127,22 +131,22 @@ export function CommentSection({ postId }: { postId: string }) {
   async function handleOtp() {
     const email = profile.email.trim()
     if (!email) {
-      toast.error("请先填写邮箱")
+      toast.error(t.emailRequired)
       return
     }
     try {
-      const result = await sendOtp.mutateAsync(email)
-      toast.success(result.message)
+      await sendOtp.mutateAsync(email)
+      toast.success(t.otpSent)
       setCooldown(60)
     } catch (error) {
-      toast.error(error instanceof ApiError ? error.message : "验证码发送失败")
+      toast.error(locale === "zh" && error instanceof ApiError ? error.message : t.otpFailed)
     }
   }
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault()
     if (!profile.email.trim() || !profile.userName.trim() || !content.trim() || !otp.trim()) {
-      toast.error("请填写邮箱、验证码、昵称和评论内容")
+      toast.error(t.commentRequired)
       return
     }
     try {
@@ -162,87 +166,87 @@ export function CommentSection({ postId }: { postId: string }) {
       setReplyTo(null)
       if (!result.comment.visible || result.comment.isNeedAudit) {
         setPending((items) => [result.comment, ...items])
-        toast.message(result.message, { description: "该评论待审核，通过后会公开显示。" })
+        toast.message(t.pending, { description: t.commentPending })
       } else {
-        toast.success(result.message)
+        toast.success(t.commentPublished)
       }
     } catch (error) {
-      toast.error(error instanceof ApiError ? error.message : "发表失败")
+      toast.error(locale === "zh" && error instanceof ApiError ? error.message : t.publishFailed)
     }
   }
 
   return (
     <section className="mt-16 border-t border-border/70 pt-10">
       <div className="mb-8 flex items-end justify-between">
-        <h2 className="text-xl">讨论</h2>
-        <span className="text-sm text-muted-foreground">共 {total} 条</span>
+        <h2 className="text-xl">{t.discussion}</h2>
+        <span className="text-sm text-muted-foreground">{t.commentCount(total)}</span>
       </div>
       <div className="space-y-8">
         <form className="space-y-3" onSubmit={handleSubmit}>
           <div className="grid gap-3 md:grid-cols-4">
             <Input
               type="email"
-              placeholder="邮箱地址"
+              placeholder={t.emailAddress}
               value={profile.email}
               onChange={(event) => setProfile((current) => ({ ...current, email: event.target.value }))}
               required
             />
             <div className="flex gap-2">
               <Input
-                placeholder="验证码"
+                placeholder={t.otp}
                 value={otp}
                 onChange={(event) => setOtp(event.target.value)}
                 maxLength={4}
                 required
               />
               <Button type="button" variant="outline" onClick={() => void handleOtp()} disabled={sendOtp.isPending || cooldown > 0}>
-                {cooldown > 0 ? `${cooldown}s` : "发送"}
+                {cooldown > 0 ? `${cooldown}s` : t.send}
               </Button>
             </div>
             <Input
-              placeholder="昵称"
+              placeholder={t.nickname}
               value={profile.userName}
               onChange={(event) => setProfile((current) => ({ ...current, userName: event.target.value }))}
               required
             />
             <Input
-              placeholder="网址（可选）"
+              placeholder={t.optionalUrl}
               value={profile.url}
               onChange={(event) => setProfile((current) => ({ ...current, url: event.target.value }))}
             />
           </div>
           <Textarea
-            placeholder="友善的评论是交流的起点"
+            placeholder={t.commentPlaceholder}
             maxLength={300}
             value={content}
             onChange={(event) => setContent(event.target.value)}
             required
           />
-          <p className="text-xs text-muted-foreground">良言一句三冬暖，恶语伤人六月寒。</p>
+          <p className="text-xs text-muted-foreground">{t.commentHint}</p>
           {replyTo ? (
             <div className="flex items-center gap-2 text-sm">
-              <span className="text-muted-foreground">回复</span>
-              <Badge variant="secondary">@{replyTo.anonymousUserName || "匿名"}</Badge>
+              <span className="text-muted-foreground">{t.reply}</span>
+              <Badge variant="secondary">@{replyTo.anonymousUserName || t.anonymous}</Badge>
               <Button type="button" variant="ghost" size="sm" onClick={() => setReplyTo(null)}>
-                取消
+                {t.cancel}
               </Button>
             </div>
           ) : null}
           <div className="flex justify-between">
             <Button type="button" variant="outline" onClick={() => void commentsQuery.refetch()} disabled={commentsQuery.isFetching}>
               <RefreshCw />
-              刷新
+              {t.refresh}
             </Button>
             <Button type="submit" disabled={createComment.isPending}>
-              发表
+              {t.publish}
             </Button>
           </div>
         </form>
 
         {commentsQuery.isLoading ? (
-          <p className="text-sm text-muted-foreground">加载评论中…</p>
+          <p className="text-sm text-muted-foreground">{t.loadingComments}</p>
         ) : tree.length === 0 ? (
-          <p className="py-8 text-center text-sm text-muted-foreground">暂无讨论</p>
+          <p className="py-8 text-center text-sm text-muted-foreground">{t.noDiscussion}</p>
         ) : (
           <div className="space-y-6">
             {tree.map((comment) => (

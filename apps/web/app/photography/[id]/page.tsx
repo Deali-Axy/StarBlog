@@ -1,3 +1,4 @@
+import { getI18n } from "@/lib/i18n-server"
 import Link from "next/link"
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
@@ -9,7 +10,7 @@ import { getAdjacentPhoto, getPhoto } from "@/lib/api/queries"
 import { formatDate } from "@/lib/format"
 import { photoOriginal, photoThumbnail } from "@/lib/media"
 import { routes } from "@/lib/routes"
-import { site } from "@/lib/site"
+import { getSite } from "@/lib/site"
 
 export const revalidate = 300
 
@@ -18,6 +19,8 @@ interface PhotoPageProps {
 }
 
 export async function generateMetadata({ params }: PhotoPageProps): Promise<Metadata> {
+  const { locale, t } = await getI18n()
+  const site = getSite(locale)
   const { id } = await params
   try {
     const photo = await getPhoto(decodeURIComponent(id))
@@ -39,11 +42,12 @@ export async function generateMetadata({ params }: PhotoPageProps): Promise<Meta
       },
     }
   } catch {
-    return { title: "图片不存在" }
+    return { title: t.photoNotFound }
   }
 }
 
 export default async function PhotoPage({ params }: PhotoPageProps) {
+  const { t } = await getI18n()
   const { id } = await params
   const photoId = decodeURIComponent(id)
   let photo
@@ -64,31 +68,31 @@ export default async function PhotoPage({ params }: PhotoPageProps) {
       <div className="mx-auto w-full max-w-6xl px-4 py-8">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3 text-sm">
           <Link href={routes.photography} className="text-white/60 hover:text-white">
-            返回摄影
+            {t.backToPhotos}
           </Link>
           <div className="flex gap-2">
             {previous ? (
               <Button variant="ghost" size="sm" className="text-white/80 hover:text-white" asChild>
-                <Link href={routes.photo(previous.id)}>上一张</Link>
+                <Link href={routes.photo(previous.id)}>{t.previousPhoto}</Link>
               </Button>
             ) : (
               <Button variant="ghost" size="sm" disabled>
-                上一张
+                {t.previousPhoto}
               </Button>
             )}
             {next ? (
               <Button variant="ghost" size="sm" className="text-white/80 hover:text-white" asChild>
-                <Link href={routes.photo(next.id)}>下一张</Link>
+                <Link href={routes.photo(next.id)}>{t.nextPhoto}</Link>
               </Button>
             ) : (
               <Button variant="ghost" size="sm" disabled>
-                下一张
+                {t.nextPhoto}
               </Button>
             )}
             <Button variant="ghost" size="sm" className="text-white/80 hover:text-white" asChild>
               <Link href={routes.photographyRandom}>
                 <Shuffle />
-                随机
+                {t.random}
               </Link>
             </Button>
           </div>
@@ -104,7 +108,7 @@ export default async function PhotoPage({ params }: PhotoPageProps) {
             <div>
               <h1 className="text-xl font-normal text-white">{photo.title}</h1>
               <p className="mt-1 text-sm text-white/55">
-                {photo.location || "未知地点"}
+                {photo.location || t.unknownLocation}
                 {" · "}
                 {formatDate(photo.createTime, "YYYY-MM-DD HH:mm")}
               </p>

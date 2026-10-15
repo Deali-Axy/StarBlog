@@ -1,3 +1,7 @@
+"use client"
+
+import { useI18n } from "@/components/app-providers"
+
 import Link from "next/link"
 
 import { EnhancedPostCard } from "@/components/blog/enhanced-post-card"
@@ -7,17 +11,18 @@ import type { PostResponse, PublishedPostSummary } from "@/lib/api/types"
 import { postHref, routes } from "@/lib/routes"
 
 export function LatestPosts({ posts }: { posts: PostResponse[] }) {
+  const { t } = useI18n()
   if (posts.length === 0) return null
 
   return (
     <section className="mt-20">
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
-          <p className="kicker">最近记录</p>
-          <h2 className="mt-2 text-2xl">最新文章</h2>
+          <p className="kicker">{t.latest}</p>
+          <h2 className="mt-2 text-2xl">{t.latestPosts}</h2>
         </div>
         <Button variant="ghost" size="sm" asChild>
-          <Link href={routes.blog}>全部文章</Link>
+          <Link href={routes.blog}>{t.allPosts}</Link>
         </Button>
       </div>
       <ul className="divide-y divide-border/70 border-y border-border/70">
@@ -35,17 +40,18 @@ export function LatestPosts({ posts }: { posts: PostResponse[] }) {
 }
 
 export function FeaturedPosts({ posts }: { posts: PublishedPostSummary[] }) {
+  const { t } = useI18n()
   if (posts.length === 0) return null
 
   return (
     <section className="mt-8">
       <div className="mb-8 flex items-end justify-between gap-4">
         <div>
-          <p className="kicker">精选</p>
-          <h2 className="mt-2 text-2xl">推荐阅读</h2>
+          <p className="kicker">{t.featured}</p>
+          <h2 className="mt-2 text-2xl">{t.recommended}</h2>
         </div>
         <Button variant="ghost" size="sm" asChild>
-          <Link href={routes.blog}>查看全部</Link>
+          <Link href={routes.blog}>{t.viewAll}</Link>
         </Button>
       </div>
       <div className="grid grid-cols-1 gap-10 md:grid-cols-2">

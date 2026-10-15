@@ -1,3 +1,4 @@
+import { getI18n } from "@/lib/i18n-server"
 import type { Metadata } from "next"
 
 import { LinkApplyForm } from "@/components/links/link-apply-form"
@@ -5,28 +6,21 @@ import { listVisibleLinks } from "@/lib/api/queries"
 
 export const revalidate = 300
 
-export const metadata: Metadata = {
-  title: "友情链接",
-  description: "申请友链并查看已展示的站点。",
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getI18n()
+  return { title: t.friendLinks, description: t.linksDescription }
 }
 
-const requirements = [
-  { title: "相互性", detail: "请先在您的网站添加本站链接，再进行友链申请。" },
-  { title: "内容类别", detail: "本站优先招同类原创、内容相近的博客或网站。" },
-  { title: "SEO", detail: "Baidu 和 Google 有正常收录，有近期快照的网站优先。" },
-  { title: "合法性", detail: "不含有违反相关国家法律内容的合法网站，不接受垃圾站链接。" },
-  { title: "更新及时性", detail: "不接受原创内容很少，且长期不更新的网站。" },
-  { title: "可访问性", detail: "如您的网站无法访问，将会暂时撤销友情链接。" },
-]
 
 export default async function LinksPage() {
+  const { t } = await getI18n()
   const links = await listVisibleLinks()
 
   return (
     <div className="page-wrap space-y-14 py-16">
       <div>
-        <p className="kicker">往来</p>
-        <h1 className="mt-2 text-3xl">友情链接</h1>
+        <p className="kicker">{t.exchange}</p>
+        <h1 className="mt-2 text-3xl">{t.friendLinks}</h1>
       </div>
 
       {links.length > 0 ? (
@@ -44,20 +38,20 @@ export default async function LinksPage() {
           ))}
         </ul>
       ) : (
-        <p className="text-muted-foreground">暂时还没有公开友链，欢迎申请交换。</p>
+        <p className="text-muted-foreground">{t.noLinks}</p>
       )}
 
       <div className="grid gap-12 lg:grid-cols-2">
         <section>
-          <h2 className="text-xl">申请友链</h2>
+          <h2 className="text-xl">{t.applyLink}</h2>
           <div className="mt-6">
             <LinkApplyForm />
           </div>
         </section>
         <section>
-          <h2 className="text-xl">注意事项</h2>
+          <h2 className="text-xl">{t.requirements}</h2>
           <ol className="mt-6 space-y-4 text-sm">
-            {requirements.map((item, index) => (
+            {t.linkRequirements.map((item, index) => (
               <li key={item.title}>
                 <p className="font-medium">
                   {index + 1}. {item.title}

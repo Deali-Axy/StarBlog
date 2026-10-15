@@ -1,3 +1,7 @@
+"use client"
+
+import { useI18n } from "@/components/app-providers"
+
 import Link from "next/link"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 
@@ -41,6 +45,7 @@ export function PaginationNav({
   pageSize = 12,
   viewMode = "grid",
 }: PaginationNavProps) {
+  const { t } = useI18n()
   const shared = {
     search: searchQuery,
     categoryId,
@@ -53,12 +58,12 @@ export function PaginationNav({
   if (totalPages <= 0) return null
 
   return (
-    <nav className="flex flex-wrap items-center justify-between gap-4 border-t border-border/70 pt-6">
+    <nav aria-label={t.perPage} className="flex flex-wrap items-center justify-between gap-4 border-t border-border/70 pt-6">
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
         <span>
           {currentPage} / {totalPages}
         </span>
-        <span className="text-xs">每页</span>
+        <span className="text-xs">{t.perPage}</span>
         {[6, 12, 24].map((size) => (
           <Button
             key={size}
@@ -74,7 +79,7 @@ export function PaginationNav({
       <div className="flex items-center gap-1">
         <Button variant="ghost" size="icon-sm" disabled={currentPage <= 1} asChild={currentPage > 1}>
           {currentPage > 1 ? (
-            <Link href={routes.blogList({ ...shared, page: currentPage - 1 })}>
+            <Link href={routes.blogList({ ...shared, page: currentPage - 1 })} aria-label={t.previousPage}>
               <ChevronLeft />
             </Link>
           ) : (
@@ -107,7 +112,7 @@ export function PaginationNav({
           asChild={currentPage < totalPages}
         >
           {currentPage < totalPages ? (
-            <Link href={routes.blogList({ ...shared, page: currentPage + 1 })}>
+            <Link href={routes.blogList({ ...shared, page: currentPage + 1 })} aria-label={t.nextPage}>
               <ChevronRight />
             </Link>
           ) : (

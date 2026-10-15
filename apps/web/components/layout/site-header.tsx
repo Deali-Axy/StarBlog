@@ -12,16 +12,11 @@ import { Input } from "@/components/ui/input"
 import { routes } from "@/lib/routes"
 import { site } from "@/lib/site"
 import { cn } from "@/lib/utils"
-
-const navItems = [
-  { href: routes.home, label: "首页" },
-  { href: routes.blog, label: "文章" },
-  { href: routes.photography, label: "摄影" },
-  { href: routes.links, label: "友链" },
-  { href: routes.about, label: "关于" },
-]
+import { useI18n } from "@/components/app-providers"
+import { localeCookie } from "@/lib/i18n"
 
 function SearchBox() {
+  const { t } = useI18n()
   const router = useRouter()
   const searchParams = useSearchParams()
   const defaultKeyword = searchParams.get("keyword") ?? searchParams.get("search") ?? ""
@@ -43,7 +38,8 @@ function SearchBox() {
       <Input
         name="keyword"
         defaultValue={defaultKeyword}
-        placeholder="搜索文章"
+        placeholder={t.searchPosts}
+        aria-label={t.searchPosts}
         className="h-8 w-44 bg-transparent pl-8 lg:w-56"
       />
     </form>
@@ -52,15 +48,32 @@ function SearchBox() {
 
 export function SiteHeader() {
   const pathname = usePathname()
+  const { locale, t } = useI18n()
+  const navItems = [
+    { href: routes.home, label: t.home },
+    { href: routes.blog, label: t.posts },
+    { href: routes.photography, label: t.photography },
+    { href: routes.links, label: t.links },
+    { href: routes.about, label: t.about },
+  ]
+
+  function switchLanguage() {
+    const next = locale === "zh" ? "en" : "zh"
+    document.cookie = `${localeCookie}=${next}; Path=/; Max-Age=31536000; SameSite=Lax${location.protocol === "https:" ? "; Secure" : ""}`
+    const url = new URL(window.location.href)
+    // An explicit article language must not override the new site preference.
+    url.searchParams.delete("lang")
+    window.location.assign(url.toString())
+  }
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur-md">
-      <div className="page-wrap flex h-14 items-center gap-6">
+      <div className="page-wrap flex flex-wrap items-center gap-x-4 gap-y-3 py-3 lg:flex-nowrap">
         <Link href={routes.home} className="flex items-center gap-2 font-heading text-base tracking-tight">
           <StarMark className="size-3.5 text-primary" />
           {site.name}
         </Link>
-        <nav className="flex items-center gap-5 text-sm">
+        <nav className="order-last flex w-full items-center gap-5 overflow-x-auto whitespace-nowrap text-sm lg:order-none lg:w-auto">
           {navItems.map((item) => {
             const active = item.href === routes.home ? pathname === item.href : pathname.startsWith(item.href)
             return (
@@ -82,7 +95,12 @@ export function SiteHeader() {
             fallback={
               <form className="relative hidden md:block">
                 <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
-                <Input name="keyword" placeholder="搜索文章" className="h-8 w-44 bg-transparent pl-8 lg:w-56" />
+                <Input
+                  name="keyword"
+                  placeholder={t.searchPosts}
+                  aria-label={t.searchPosts}
+                  className="h-8 w-44 bg-transparent pl-8 lg:w-56"
+                />
               </form>
             }
           >
@@ -94,6 +112,15 @@ export function SiteHeader() {
             </a>
           </Button>
           <ThemeToggle />
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={switchLanguage}
+            aria-label={t.switchLanguage}
+            title={t.switchLanguage}
+          >
+            {locale === "zh" ? "EN" : "中文"}
+          </Button>
         </div>
       </div>
     </header>

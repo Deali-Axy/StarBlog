@@ -1,5 +1,7 @@
 "use client"
 
+import { useI18n } from "@/components/app-providers"
+
 import { useState } from "react"
 import Link from "next/link"
 import { ChevronDown, ChevronRight } from "lucide-react"
@@ -26,6 +28,7 @@ function CategoryTreeNode({
   searchQuery?: string
   depth?: number
 }) {
+  const { t } = useI18n()
   const [isExpanded, setIsExpanded] = useState(true)
   const hasChildren = Boolean(node.nodes?.length)
   const isSelected = currentCategoryId === node.id
@@ -42,7 +45,7 @@ function CategoryTreeNode({
             type="button"
             onClick={() => setIsExpanded((value) => !value)}
             className="flex size-6 items-center justify-center text-muted-foreground"
-            aria-label={isExpanded ? "折叠分类" : "展开分类"}
+            aria-label={isExpanded ? t.collapseCategory : t.expandCategory}
           >
             {isExpanded ? <ChevronDown className="size-3" /> : <ChevronRight className="size-3" />}
           </button>
@@ -81,9 +84,10 @@ export function CategoryTree({
   searchQuery,
   className,
 }: CategoryTreeProps) {
+  const { t } = useI18n()
   return (
-    <nav className={cn(className)} aria-label="分类目录">
-      <p className="kicker mb-4">分类</p>
+    <nav className={cn(className)} aria-label={t.categoryTree}>
+      <p className="kicker mb-4">{t.categories}</p>
       <Link
         href={routes.blogList({ search: searchQuery })}
         className={cn(
@@ -91,7 +95,7 @@ export function CategoryTree({
           !currentCategoryId ? "text-primary" : "text-muted-foreground hover:text-foreground",
         )}
       >
-        全部
+        {t.all}
       </Link>
       {categoryNodes.length > 0 ? (
         categoryNodes.map((node) => (
@@ -103,7 +107,7 @@ export function CategoryTree({
           />
         ))
       ) : (
-        <p className="py-8 text-sm text-muted-foreground">暂无分类</p>
+        <p className="py-8 text-sm text-muted-foreground">{t.noCategories}</p>
       )}
     </nav>
   )

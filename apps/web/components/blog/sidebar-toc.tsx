@@ -1,5 +1,7 @@
 "use client"
 
+import { useI18n } from "@/components/app-providers"
+
 import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
 import { BookOpen, ChevronRight } from "lucide-react"
@@ -26,7 +28,7 @@ export function flattenToc(nodes: TocNode[] | null | undefined, depth = 2): Flat
 export function SidebarTOC({
   items,
   className,
-  title = "目录",
+  title,
   maxDepth = 4,
 }: {
   items: FlatTocItem[]
@@ -34,6 +36,7 @@ export function SidebarTOC({
   title?: string
   maxDepth?: number
 }) {
+  const { t } = useI18n()
   const filtered = useMemo(
     () => items.filter((item) => item.depth <= maxDepth && item.href),
     [items, maxDepth],
@@ -68,7 +71,7 @@ export function SidebarTOC({
     <nav className={cn("space-y-1", className)}>
       <div className="mb-3 flex items-center gap-2">
         <BookOpen className="size-4 text-primary" />
-        <h3 className="text-sm font-semibold">{title}</h3>
+        <h3 className="text-sm font-semibold">{title ?? t.toc}</h3>
       </div>
       <div className="space-y-1">
         {filtered.map((item, index) => {
@@ -93,7 +96,7 @@ export function SidebarTOC({
         })}
       </div>
       <p className="mt-4 border-t border-border/50 pt-3 text-center text-xs text-muted-foreground">
-        {filtered.length} 个章节
+        {t.sectionCount(filtered.length)}
       </p>
     </nav>
   )

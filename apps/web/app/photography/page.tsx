@@ -1,3 +1,4 @@
+import { getI18n } from "@/lib/i18n-server"
 import Link from "next/link"
 import type { Metadata } from "next"
 import { Camera } from "lucide-react"
@@ -10,8 +11,9 @@ import { routes } from "@/lib/routes"
 
 export const revalidate = 300
 
-export const metadata: Metadata = {
-  title: "摄影",
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getI18n()
+  return { title: t.photography }
 }
 
 interface PhotographyPageProps {
@@ -19,6 +21,7 @@ interface PhotographyPageProps {
 }
 
 export default async function PhotographyPage({ searchParams }: PhotographyPageProps) {
+  const { t } = await getI18n()
   const params = await searchParams
   const page = Math.max(1, Number(params.page) || 1)
   const pageSize = Math.min(48, Math.max(1, Number(params.pageSize) || 12))
@@ -28,22 +31,22 @@ export default async function PhotographyPage({ searchParams }: PhotographyPageP
     <div className="page-wrap py-12">
       <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="kicker">暗房</p>
-          <h1 className="mt-2 text-3xl">摄影</h1>
-          <p className="mt-2 text-sm text-muted-foreground">{photos.totalCount} 张</p>
+          <p className="kicker">{t.darkroom}</p>
+          <h1 className="mt-2 text-3xl">{t.photography}</h1>
+          <p className="mt-2 text-sm text-muted-foreground">{t.photoCount(photos.totalCount)}</p>
         </div>
         <Button variant="outline" asChild>
-          <Link href={routes.photographyRandom}>随机一张</Link>
+          <Link href={routes.photographyRandom}>{t.randomPhoto}</Link>
         </Button>
       </div>
 
       {photos.items.length === 0 ? (
         <div className="border-y border-dashed border-border py-20 text-center text-muted-foreground">
           <Camera className="mx-auto mb-4 size-8 opacity-50" />
-          暗房里还没有照片。
+          {t.noPhotos}
           <div className="mt-4">
             <Button variant="outline" asChild>
-              <Link href={routes.home}>返回首页</Link>
+              <Link href={routes.home}>{t.backHome}</Link>
             </Button>
           </div>
         </div>
@@ -77,7 +80,7 @@ export default async function PhotographyPage({ searchParams }: PhotographyPageP
         <nav className="mt-10 flex items-center justify-center gap-2">
           {page > 1 ? (
             <Button variant="outline" asChild>
-              <Link href={routes.photographyList({ page: page - 1, pageSize })}>上一页</Link>
+              <Link href={routes.photographyList({ page: page - 1, pageSize })}>{t.previousPage}</Link>
             </Button>
           ) : null}
           <span className="px-3 text-sm text-muted-foreground">
@@ -85,7 +88,7 @@ export default async function PhotographyPage({ searchParams }: PhotographyPageP
           </span>
           {page < photos.totalPages ? (
             <Button variant="outline" asChild>
-              <Link href={routes.photographyList({ page: page + 1, pageSize })}>下一页</Link>
+              <Link href={routes.photographyList({ page: page + 1, pageSize })}>{t.nextPage}</Link>
             </Button>
           ) : null}
         </nav>

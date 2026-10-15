@@ -1,17 +1,21 @@
+import { getI18n } from "@/lib/i18n-server"
 import type { Metadata } from "next"
 
-import { site } from "@/lib/site"
+import { getSite } from "@/lib/site"
 
-export const metadata: Metadata = {
-  title: "关于本网站",
-  description: `${site.authorName} · ${site.authorBio}`,
+export async function generateMetadata(): Promise<Metadata> {
+  const { locale, t } = await getI18n()
+  const site = getSite(locale)
+  return { title: t.aboutTitle, description: `${site.authorName} · ${site.authorBio}` }
 }
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const { locale, t } = await getI18n()
+  const site = getSite(locale)
   return (
     <div className="page-wrap py-16">
       <p className="kicker">Colophon</p>
-      <h1 className="mt-2 text-3xl">关于</h1>
+      <h1 className="mt-2 text-3xl">{t.about}</h1>
       <div className="mt-12 grid gap-16 lg:grid-cols-[minmax(0,1fr)_18rem]">
         <div className="max-w-2xl space-y-12">
           <section>
@@ -22,22 +26,18 @@ export default function AboutPage() {
                 GitHub
               </a>
               <a href={site.zhihuUrl} target="_blank" rel="noreferrer" className="text-primary hover:underline">
-                知乎
+                {t.zhihu}
               </a>
               <a href={site.cnblogsUrl} target="_blank" rel="noreferrer" className="text-primary hover:underline">
-                博客园
+                {t.cnblogs}
               </a>
             </div>
           </section>
           <section>
-            <h2 className="text-xl">技能</h2>
-            <p className="mt-2 text-sm text-muted-foreground">以 CRUD 为主，熟练使用搜索引擎，擅长各种 CV 操作</p>
+            <h2 className="text-xl">{t.skills}</h2>
+            <p className="mt-2 text-sm text-muted-foreground">{t.skillsIntro}</p>
             <ul className="mt-4 space-y-2 text-sm leading-relaxed">
-              <li>后端开发 / C# / Python / Kotlin / Go / PHP</li>
-              <li>前端开发 / React / Vue</li>
-              <li>移动端开发 / Flutter / Android</li>
-              <li>桌面端开发 / Winform / PyQt</li>
-              <li>数据分析 · 爬虫 · 机器学习 / NLP / CV</li>
+              {t.skillList.map((skill) => <li key={skill}>{skill}</li>)}
             </ul>
           </section>
           <section>
@@ -50,8 +50,8 @@ export default function AboutPage() {
           <img src={site.labImage} alt={site.labName} className="w-full object-cover" />
           <div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={site.wechatQr} alt="微信公众号二维码" className="w-full bg-white p-4 object-contain" />
-            <p className="mt-3 text-sm text-muted-foreground">微信公众号，欢迎扫码交流。</p>
+            <img src={site.wechatQr} alt={t.wechatQr} className="w-full bg-white p-4 object-contain" />
+            <p className="mt-3 text-sm text-muted-foreground">{t.wechatHint}</p>
           </div>
         </aside>
       </div>
