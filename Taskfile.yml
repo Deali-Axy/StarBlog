@@ -25,11 +25,34 @@ tasks:
       - web:install
 
   dev:
-    desc: Start the API, Admin, and Web development servers in parallel
-    deps:
-      - api:dev
-      - admin:dev
-      - web:dev
+    desc: Start the API, Admin, and Web development servers with goreman
+    interactive: true
+    preconditions:
+      - sh: command -v goreman
+        msg: "goreman not found. Install with: go install github.com/mattn/goreman@latest"
+    cmds:
+      # -set-ports=false keeps API 5039, Admin 5173, and Web 3001.
+      - goreman -set-ports=false start
+
+  dev:status:
+    desc: Show goreman process status (requires a running task dev)
+    cmds:
+      - goreman run status
+
+  dev:restart:
+    desc: "Restart a goreman process (usage: task dev:restart -- admin)"
+    preconditions:
+      - sh: test -n '{{.CLI_ARGS}}'
+        msg: "Specify a process name: task dev:restart -- api|admin|web"
+    cmds:
+      - goreman run restart {{.CLI_ARGS}}
+
+  dev:stop:
+    desc: Stop all goreman processes started by task dev
+    cmds:
+      # goreman exits after stop-all, so the RPC client often sees EOF.
+      - cmd: goreman run stop-all
+        ignore_error: true
 
   test:
     desc: Run API tests

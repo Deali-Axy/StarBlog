@@ -11,7 +11,7 @@ task api:dev
 task web:dev
 ```
 
-或在仓库根目录执行 `task dev`，会并行启动 API、Admin 和 Web。
+或在仓库根目录执行 `task dev`，会通过 goreman 同时启动 API、Admin 和 Web。
 
 Web 开发服务器：<http://localhost:3001>
 

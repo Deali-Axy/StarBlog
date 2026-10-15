@@ -121,6 +121,7 @@ StarBlog/
 ├── deploy/
 ├── docs/
 ├── scripts/
+├── Procfile                     # goreman 本地进程列表
 ├── Taskfile.yml
 └── StarBlog.slnx
 ```
@@ -138,6 +139,7 @@ StarBlog/
 - **.NET 10 SDK**
 - **Node.js v18** 以上版本、**pnpm**（博客前台）和 **npm**（管理后台）
 - **Task 3.x**（统一运行仓库任务）
+- **goreman**（本地同时启动 API / Admin / Web；`go install github.com/mattn/goreman@latest`）
 
 ### 构建步骤
 
@@ -156,10 +158,22 @@ task install
 
 3. **运行项目**
 
-同时启动 API、博客前台和管理后台：
+同时启动 API、博客前台和管理后台（goreman 按根目录 `Procfile` 编排，日志带进程名前缀）：
 
 ```powershell
 task dev
+```
+
+默认地址：API `http://localhost:5039`，Admin `http://localhost:5173`，Web `http://localhost:3001`。
+
+`task dev` 运行时，可在另一个终端单独查看状态或重启某个进程：
+
+```powershell
+task dev:status
+task dev:restart -- api
+task dev:restart -- admin
+task dev:restart -- web
+task dev:stop
 ```
 
 也可以单独运行：
