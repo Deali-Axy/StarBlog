@@ -118,6 +118,10 @@ export function listPhotos(query: ListPhotosQuery = {}) {
   )
 }
 
+export function listFeaturedPhotos() {
+  return apiGet<PhotoResponse[]>("/api/v1/featured-photos", undefined, revalidate)
+}
+
 export function getPhoto(id: string) {
   return apiGet<PhotoResponse>(`/api/v1/photos/${encodeURIComponent(id)}`, undefined, revalidate)
 }

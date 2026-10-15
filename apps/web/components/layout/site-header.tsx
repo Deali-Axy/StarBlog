@@ -9,6 +9,7 @@ import { StarMark } from "@/components/brand/star-mark"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { isPhotographyPath } from "@/lib/photography/path"
 import { routes } from "@/lib/routes"
 import { site } from "@/lib/site"
 import { cn } from "@/lib/utils"
@@ -18,6 +19,8 @@ import { localeCookie } from "@/lib/i18n"
 function SearchBox() {
   const { t } = useI18n()
   const router = useRouter()
+  const pathname = usePathname()
+  const darkroom = isPhotographyPath(pathname)
   const searchParams = useSearchParams()
   const defaultKeyword = searchParams.get("keyword") ?? searchParams.get("search") ?? ""
 
@@ -34,13 +37,21 @@ function SearchBox() {
 
   return (
     <form onSubmit={onSubmit} className="relative hidden md:block">
-      <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
+      <Search
+        className={cn(
+          "pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground",
+          darkroom && "text-white/40",
+        )}
+      />
       <Input
         name="keyword"
         defaultValue={defaultKeyword}
         placeholder={t.searchPosts}
         aria-label={t.searchPosts}
-        className="h-8 w-44 bg-transparent pl-8 lg:w-56"
+        className={cn(
+          "h-8 w-44 bg-transparent pl-8 lg:w-56",
+          darkroom && "border-white/15 text-white placeholder:text-white/40",
+        )}
       />
     </form>
   )
@@ -48,6 +59,7 @@ function SearchBox() {
 
 export function SiteHeader() {
   const pathname = usePathname()
+  const darkroom = isPhotographyPath(pathname)
   const { locale, t } = useI18n()
   const navItems = [
     { href: routes.home, label: t.home },
@@ -67,7 +79,12 @@ export function SiteHeader() {
   }
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border/70 bg-background/85 backdrop-blur-md">
+    <header
+      className={cn(
+        "sticky top-0 z-40 border-b backdrop-blur-md",
+        darkroom ? "border-white/10 bg-black/90 text-white" : "border-border/70 bg-background/85",
+      )}
+    >
       <div className="page-wrap flex flex-wrap items-center gap-x-4 gap-y-3 py-3 lg:flex-nowrap">
         <Link href={routes.home} className="flex items-center gap-2 font-heading text-base tracking-tight">
           <StarMark className="size-3.5 text-primary" />
@@ -81,8 +98,14 @@ export function SiteHeader() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "text-muted-foreground transition-colors hover:text-foreground",
-                  active && "text-foreground",
+                  "transition-colors",
+                  darkroom
+                    ? active
+                      ? "text-white"
+                      : "text-white/55 hover:text-white"
+                    : active
+                      ? "text-foreground"
+                      : "text-muted-foreground hover:text-foreground",
                 )}
               >
                 {item.label}
@@ -94,30 +117,44 @@ export function SiteHeader() {
           <Suspense
             fallback={
               <form className="relative hidden md:block">
-                <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
+                <Search
+                  className={cn(
+                    "pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground",
+                    darkroom && "text-white/40",
+                  )}
+                />
                 <Input
                   name="keyword"
                   placeholder={t.searchPosts}
                   aria-label={t.searchPosts}
-                  className="h-8 w-44 bg-transparent pl-8 lg:w-56"
+                  className={cn(
+                    "h-8 w-44 bg-transparent pl-8 lg:w-56",
+                    darkroom && "border-white/15 text-white placeholder:text-white/40",
+                  )}
                 />
               </form>
             }
           >
             <SearchBox />
           </Suspense>
-          <Button variant="ghost" size="icon-sm" asChild>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            className={darkroom ? "text-white/80 hover:bg-white/10 hover:text-white" : undefined}
+            asChild
+          >
             <a href={routes.feed} aria-label="RSS">
               <Rss />
             </a>
           </Button>
-          <ThemeToggle />
+          <ThemeToggle className={darkroom ? "text-white/80 hover:bg-white/10 hover:text-white" : undefined} />
           <Button
             variant="ghost"
             size="sm"
             onClick={switchLanguage}
             aria-label={t.switchLanguage}
             title={t.switchLanguage}
+            className={darkroom ? "text-white/80 hover:bg-white/10 hover:text-white" : undefined}
           >
             {locale === "zh" ? "EN" : "中文"}
           </Button>
