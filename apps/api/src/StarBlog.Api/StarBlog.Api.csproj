@@ -34,6 +34,9 @@
 
     <ItemGroup>
         <Content Include="words.json" CopyToOutputDirectory="PreserveNewest" Condition="Exists('words.json')" />
+        <!-- Media assets do not trigger hot reload. Watching them creates one inotify
+             instance per directory and exceeds the Linux default of 256. -->
+        <Content Update="wwwroot/media/**" Watch="false" />
     </ItemGroup>
 
 </Project>

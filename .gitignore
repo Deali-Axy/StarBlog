@@ -8,6 +8,7 @@ dist/
 apps/web-legacy/wwwroot/lib/
 apps/web-legacy/wwwroot/assets
 apps/web-legacy/wwwroot/media
+apps/api/src/StarBlog.Api/wwwroot/media/
 apps/web-legacy/wwwroot/is-cache
 apps/web-legacy/package-lock.json
 apps/web-legacy/yarn.lock

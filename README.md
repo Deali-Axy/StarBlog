@@ -190,6 +190,17 @@ task api:db:reset
 
 重置后用户表为空，需要重新初始化管理员。
 
+需要用旧版真实内容预览新版时，先启动一次 API 创建新版数据库，再从项目根目录运行（需要 Python 3）：
+
+```sh
+task api:db:import-legacy -- --dry-run
+task api:db:import-legacy
+```
+
+导入默认读取 `apps/web-legacy/app.db`，将文章（保留发布状态）、分类、译文、照片、推荐与置顶内容、友链、申请记录和未删除的评论复制到 `apps/api/src/StarBlog.Api/app.db`，并复制旧版 `wwwroot/media` 到新版 API 的同名目录。旧库保持不变，新库导入前会备份到 `backups/legacy-import/`。数据库及媒体文件均不提交到 Git。
+
+导入只允许空博客（可以保留启动时自动生成的“未分类”），已有内容时会报错退出；同名图片内容不同时也会退出。新版管理员、站点地址、已有配置和访问日志保持原状，只补充旧版首页显示及默认渲染配置，不导入管理员密码或待发送邮件。旧库可以用 `--source` 指定，目标库可以用 `--target` 指定；媒体目录分别按数据库所在目录的 `wwwroot/media` 查找。导入后重启 `task dev`，即可清除新版页面的数据缓存并看到真实内容。
+
 ### 初始化
 
 启动 API 与管理后台后，打开管理端登录页。若用户表为空，会展示一次性创建首个管理员的表单（`GET/POST /api/v1/site/initialization`）。也可以运行 `scripts/Initialize-StarBlogAdmin.ps1`。初始化只能执行一次。

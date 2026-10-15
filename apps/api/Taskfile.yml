@@ -53,3 +53,8 @@ tasks:
     cmds:
       - dotnet ef database drop --force --project {{.API_PROJECT}} --startup-project {{.API_PROJECT}}
       - dotnet ef database update --project {{.API_PROJECT}} --startup-project {{.API_PROJECT}}
+
+  db:import-legacy:
+    desc: "Import legacy blog content and media into the local EF Core database (requires Python 3)"
+    cmds:
+      - python3 ../../scripts/Import-LegacyBlog.py {{.CLI_ARGS}}
