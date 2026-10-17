@@ -4,16 +4,17 @@ import { Award, ChevronLeft, ChevronRight, LoaderCircle, Share2, X } from "lucid
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Dialog } from "radix-ui"
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
 
 import { useI18n } from "@/components/app-providers"
 import { PhotoImage } from "@/components/photography/photo-image"
+import { PhotoLightboxImage } from "@/components/photography/photo-lightbox-image"
 import { AuthorMark, usePhotoStudio } from "@/components/photography/photo-studio"
 import { getAdjacentPhoto } from "@/lib/api/queries"
 import type { PhotoResponse } from "@/lib/api/types"
 import { formatDate, formatRelativeTime } from "@/lib/format"
-import { photoOriginal, photoThumbnail, photoThumbnailSet } from "@/lib/media"
+import { photoThumbnail, photoThumbnailSet } from "@/lib/media"
 import { photoLocation } from "@/lib/photography/path"
 import { routes } from "@/lib/routes"
 import { cn } from "@/lib/utils"
@@ -23,12 +24,17 @@ const roundIcon = "grid size-11 shrink-0 place-items-center rounded-full bg-blac
 export function PhotoDetail({ photo }: { photo: PhotoResponse }) {
   const { t, locale } = useI18n()
   const router = useRouter()
-  const { photos, featured, featuredIds, filter, hasMore, loadMore, closePhoto, restoreWallFocus, authorName, lightbox, setLightbox } = usePhotoStudio()
+  const { photos, featured, featuredIds, filter, hasMore, loadMore, closePhoto, restoreWallFocus, authorName, lightbox, setLightbox, lightboxImages } = usePhotoStudio()
   const closeRef = useRef<HTMLButtonElement>(null)
   const lightboxCloseRef = useRef<HTMLButtonElement>(null)
   const zoomRef = useRef<HTMLButtonElement>(null)
   const [navigating, setNavigating] = useState(false)
   const navigationPending = useRef(false)
+  const [preview, setPreview] = useState<{ id: string; src: string } | null>(null)
+  const rememberPreview = useCallback((image: HTMLImageElement) => {
+    const src = image.currentSrc || image.src
+    setPreview((current) => current?.id === photo.id && current.src === src ? current : { id: photo.id, src })
+  }, [photo.id])
   const [adjacent, setAdjacent] = useState<{ id: string; previous: PhotoResponse | null; next: PhotoResponse | null } | null>(null)
 
   const collection = filter === "featured" ? featured : photos
@@ -100,7 +106,7 @@ export function PhotoDetail({ photo }: { photo: PhotoResponse }) {
         <Dialog.Content aria-describedby={undefined} onOpenAutoFocus={(event) => { event.preventDefault(); closeRef.current?.focus({ preventScroll: true }) }} onCloseAutoFocus={(event) => { event.preventDefault(); restoreWallFocus() }} onKeyDown={onKeyDown} className="photography-theme fixed inset-0 z-50 overflow-y-auto text-foreground outline-none">
           <div className="flex min-h-full items-center justify-center sm:p-4 lg:px-16" onPointerDown={(event) => { if (event.target === event.currentTarget) closePhoto() }}>
             <div className="relative flex min-h-dvh w-full flex-col bg-background sm:min-h-0 sm:max-w-[1240px] sm:overflow-hidden sm:rounded-xl sm:shadow-2xl lg:grid lg:grid-cols-[minmax(0,1fr)_22rem]">
-              <PhotoImage key={`preview-${photo.id}`} src={photoThumbnail(photo.id, 1600)} srcSet={photoThumbnailSet(photo.id)} sizes="(min-width: 1400px) 888px, (min-width: 1024px) calc(100vw - 480px), 100vw" alt={photo.title || t.photography} width={photo.width || 1500} height={photo.height || 1000} priority className="flex min-h-[220px] items-center justify-center bg-muted/40" imageClassName="h-auto max-h-[44dvh] w-full object-contain lg:max-h-[82dvh]">
+              <PhotoImage key={`preview-${photo.id}`} onReady={rememberPreview} src={photoThumbnail(photo.id, 1600)} srcSet={photoThumbnailSet(photo.id)} sizes="(min-width: 1400px) 888px, (min-width: 1024px) calc(100vw - 480px), 100vw" alt={photo.title || t.photography} width={photo.width || 1500} height={photo.height || 1000} priority className="flex min-h-[220px] items-center justify-center bg-muted/40" imageClassName="h-auto max-h-[44dvh] w-full object-contain lg:max-h-[82dvh]">
                 <button ref={zoomRef} type="button" aria-label={t.viewLargePhoto} onClick={() => setLightbox(true)} className="absolute inset-0 cursor-zoom-in" />
               </PhotoImage>
               <aside className="min-w-0 px-6 py-7 lg:max-h-[82dvh] lg:overflow-y-auto lg:border-l lg:border-border">
@@ -130,7 +136,7 @@ export function PhotoDetail({ photo }: { photo: PhotoResponse }) {
               <Dialog.Overlay className="fixed inset-0 z-[60] bg-black" />
               <Dialog.Content aria-describedby={undefined} onKeyDown={onKeyDown} onOpenAutoFocus={(event) => { event.preventDefault(); lightboxCloseRef.current?.focus({ preventScroll: true }) }} onCloseAutoFocus={(event) => { event.preventDefault(); zoomRef.current?.focus({ preventScroll: true }) }} className="photography-theme fixed inset-0 z-[60] flex items-center justify-center bg-black p-3 text-white outline-none sm:px-16" onPointerDown={(event) => { if (event.target === event.currentTarget) setLightbox(false) }}>
                 <Dialog.Title className="sr-only">{t.viewLargePhoto}: {photo.title || t.photography}</Dialog.Title>
-                <PhotoImage key={`original-${photo.id}`} src={photoOriginal(photo.filePath)} alt={photo.title || t.photography} width={photo.width || 1500} height={photo.height || 1000} priority className="flex min-h-40 min-w-40 max-w-full items-center justify-center bg-black" imageClassName="h-auto max-h-[calc(100dvh-6rem)] w-auto max-w-full object-contain" />
+                <PhotoLightboxImage key={photo.id} photo={photo} previewSrc={preview?.id === photo.id ? preview.src : undefined} previous={previous} next={next} cache={lightboxImages} />
                 <Dialog.Close asChild><button ref={lightboxCloseRef} type="button" aria-label={t.closeLargePhoto} className={cn(roundIcon, "absolute top-3 right-3 z-20 sm:top-4 sm:right-4")}><X className="size-5" /></button></Dialog.Close>
                 <NavControl lightbox direction="previous" label={t.previousPhoto} disabled={!previous || navigating} onClick={() => void go("previous")} />
                 <NavControl lightbox direction="next" label={t.nextPhoto} disabled={(!next && !canLoadNext) || navigating} loading={navigating} onClick={() => void go("next")} />

@@ -3,7 +3,7 @@
 import { Award, Camera, Check, Grid2X2, LayoutGrid, LoaderCircle, Shuffle } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { createContext, useCallback, useContext, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from "react"
+import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from "react"
 import { toast } from "sonner"
 
 import { useI18n } from "@/components/app-providers"
@@ -15,6 +15,7 @@ import { photoThumbnail, photoThumbnailSet } from "@/lib/media"
 import { layoutJustified, photoAspect, targetRowHeight } from "@/lib/photography/justify"
 import { densityScale, layoutMasonry, photoColumns, type PhotoDensity, type PhotoView } from "@/lib/photography/layout"
 import { photoPageSize } from "@/lib/photography/page-size"
+import { LightboxImageCache } from "@/lib/photography/image-cache"
 import { routes } from "@/lib/routes"
 import { site } from "@/lib/site"
 import { cn } from "@/lib/utils"
@@ -37,6 +38,7 @@ interface PhotoStudioContextValue {
   restoreWallFocus: () => void
   lightbox: boolean
   setLightbox: (open: boolean) => void
+  lightboxImages: LightboxImageCache
   authorName: string
 }
 
@@ -95,6 +97,7 @@ export function PhotoStudio({ initialPage, featured: featuredPhotos, children }:
   const [loadError, setLoadError] = useState(false)
   const [openingRandom, setOpeningRandom] = useState(false)
   const [lightbox, setLightbox] = useState(false)
+  const [lightboxImages] = useState(() => new LightboxImageCache())
   const preferences = useSyncExternalStore(subscribePreferences, preferenceSnapshot, () => "masonry:standard")
   const [view, density] = preferences.split(":") as [PhotoView, PhotoDensity]
   const paging = useRef({ page: initialPage.page, hasMore: initialPage.page < initialPage.totalPages })
@@ -102,6 +105,8 @@ export function PhotoStudio({ initialPage, featured: featuredPhotos, children }:
   const fromWall = useRef(false)
   const wallPosition = useRef({ scrollY: 0, trigger: null as HTMLElement | null })
   const anchor = useRef<{ id: string; top: number } | null>(null)
+
+  useEffect(() => () => lightboxImages.clear(), [lightboxImages])
 
   const featured = useMemo(() => [...featuredPhotos].sort((a, b) => Date.parse(b.createTime) - Date.parse(a.createTime)), [featuredPhotos])
   const featuredIds = useMemo(() => new Set(featured.map((photo) => photo.id)), [featured])
@@ -192,8 +197,8 @@ export function PhotoStudio({ initialPage, featured: featuredPhotos, children }:
 
   const value = useMemo<PhotoStudioContextValue>(() => ({
     photos, featured, featuredIds, filter, view, density, setView, setDensity, hasMore, loadMore,
-    rememberWall, closePhoto, restoreWallFocus, lightbox, setLightbox, authorName: site.authorName,
-  }), [photos, featured, featuredIds, filter, view, density, setView, setDensity, hasMore, loadMore, rememberWall, closePhoto, restoreWallFocus, lightbox])
+    rememberWall, closePhoto, restoreWallFocus, lightbox, setLightbox, lightboxImages, authorName: site.authorName,
+  }), [photos, featured, featuredIds, filter, view, density, setView, setDensity, hasMore, loadMore, rememberWall, closePhoto, restoreWallFocus, lightbox, lightboxImages])
 
   return (
     <PhotoStudioContext.Provider value={value}>

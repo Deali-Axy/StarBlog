@@ -346,3 +346,16 @@
 @media (max-width: 639px), (hover: none), (pointer: coarse) {
   .photo-touch-caption { opacity: 1; }
 }
+
+@keyframes photo-lightbox-reveal {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.photo-lightbox-reveal {
+  animation: photo-lightbox-reveal 180ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .photo-lightbox-reveal { animation: none; }
+}
