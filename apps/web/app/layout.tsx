@@ -3,8 +3,7 @@ import type { Metadata } from "next"
 
 import "./globals.css"
 import { AppProviders } from "@/components/app-providers"
-import { SiteFooter } from "@/components/layout/site-footer"
-import { SiteHeader } from "@/components/layout/site-header"
+import { SiteShell } from "@/components/layout/site-shell"
 import { Toaster } from "@/components/ui/sonner"
 import { absoluteUrl, getSite } from "@/lib/site"
 import { htmlLang } from "@/lib/i18n"
@@ -78,11 +77,7 @@ export default async function RootLayout({
     >
       <body>
         <AppProviders locale={locale}>
-          <div className="flex min-h-screen flex-col">
-            <SiteHeader />
-            <main className="flex-1">{children}</main>
-            <SiteFooter />
-          </div>
+          <SiteShell>{children}</SiteShell>
         </AppProviders>
         <Toaster richColors position="top-center" />
       </body>

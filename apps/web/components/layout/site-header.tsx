@@ -14,7 +14,7 @@ import { routes } from "@/lib/routes"
 import { site } from "@/lib/site"
 import { cn } from "@/lib/utils"
 import { useI18n } from "@/components/app-providers"
-import { localeCookie } from "@/lib/i18n"
+import { LanguageToggle } from "@/components/layout/language-toggle"
 
 function SearchBox() {
   const { t } = useI18n()
@@ -60,7 +60,7 @@ function SearchBox() {
 export function SiteHeader() {
   const pathname = usePathname()
   const darkroom = isPhotographyPath(pathname)
-  const { locale, t } = useI18n()
+  const { t } = useI18n()
   const navItems = [
     { href: routes.home, label: t.home },
     { href: routes.blog, label: t.posts },
@@ -69,14 +69,6 @@ export function SiteHeader() {
     { href: routes.about, label: t.about },
   ]
 
-  function switchLanguage() {
-    const next = locale === "zh" ? "en" : "zh"
-    document.cookie = `${localeCookie}=${next}; Path=/; Max-Age=31536000; SameSite=Lax${location.protocol === "https:" ? "; Secure" : ""}`
-    const url = new URL(window.location.href)
-    // An explicit article language must not override the new site preference.
-    url.searchParams.delete("lang")
-    window.location.assign(url.toString())
-  }
 
   return (
     <header
@@ -148,16 +140,7 @@ export function SiteHeader() {
             </a>
           </Button>
           <ThemeToggle className={darkroom ? "text-white/80 hover:bg-white/10 hover:text-white" : undefined} />
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={switchLanguage}
-            aria-label={t.switchLanguage}
-            title={t.switchLanguage}
-            className={darkroom ? "text-white/80 hover:bg-white/10 hover:text-white" : undefined}
-          >
-            {locale === "zh" ? "EN" : "中文"}
-          </Button>
+          <LanguageToggle className={darkroom ? "text-white/80 hover:bg-white/10 hover:text-white" : undefined} />
         </div>
       </div>
     </header>
