@@ -11,14 +11,14 @@ interface RowItem {
   aspect: number
 }
 
-/** Keep extreme frames from blowing a row into a strip or a tower. */
-function clampAspect(value: number) {
+/** Preserve the photograph's composition, including panoramas and tall frames. */
+function validAspect(value: number) {
   if (!Number.isFinite(value) || value <= 0) return 1.5
-  return Math.min(3.2, Math.max(0.45, value))
+  return value
 }
 
 export function photoAspect(width: number, height: number) {
-  if (width > 0 && height > 0) return clampAspect(width / height)
+  if (width > 0 && height > 0) return validAspect(width / height)
   return 1.5
 }
 
@@ -57,7 +57,7 @@ export function layoutJustified(
 
   function commit(items: RowItem[], fit: boolean) {
     if (items.length === 0) return
-    const height = fit ? fittedHeight(items) : targetHeight
+    const height = fit ? fittedHeight(items) : Math.min(targetHeight, fittedHeight(items))
     let x = 0
     items.forEach((item, index) => {
       const natural = item.aspect * height
@@ -70,12 +70,12 @@ export function layoutJustified(
   }
 
   for (let index = 0; index < aspects.length; index += 1) {
-    const candidate: RowItem[] = [...row, { index, aspect: clampAspect(aspects[index] ?? 0) }]
+    const candidate: RowItem[] = [...row, { index, aspect: validAspect(aspects[index] ?? 0) }]
     const height = fittedHeight(candidate)
     if (candidate.length > 1 && height < targetHeight * 0.9) {
       const previousHeight = fittedHeight(row)
       commit(row, previousHeight <= targetHeight * 1.4)
-      row = [{ index, aspect: clampAspect(aspects[index] ?? 0) }]
+      row = [{ index, aspect: validAspect(aspects[index] ?? 0) }]
       if (fittedHeight(row) <= targetHeight) {
         commit(row, true)
         row = []

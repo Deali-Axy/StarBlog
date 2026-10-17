@@ -1,26 +1,19 @@
 "use client"
 
-import { useI18n } from "@/components/app-providers"
-import { Camera } from "lucide-react"
+import { Award, Camera, Check, Grid2X2, LayoutGrid, LoaderCircle, Shuffle } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-  type CSSProperties,
-  type MouseEvent,
-  type ReactNode,
-} from "react"
+import { createContext, useCallback, useContext, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from "react"
+import { toast } from "sonner"
 
-import type { PageResult, PhotoResponse } from "@/lib/api/types"
+import { useI18n } from "@/components/app-providers"
+import { PhotoImage } from "@/components/photography/photo-image"
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { getRandomPhoto, listPhotos } from "@/lib/api/queries"
-import { photoThumbnail } from "@/lib/media"
+import type { PageResult, PhotoResponse } from "@/lib/api/types"
+import { photoThumbnail, photoThumbnailSet } from "@/lib/media"
 import { layoutJustified, photoAspect, targetRowHeight } from "@/lib/photography/justify"
+import { densityScale, layoutMasonry, photoColumns, type PhotoDensity, type PhotoView } from "@/lib/photography/layout"
 import { photoPageSize } from "@/lib/photography/page-size"
 import { routes } from "@/lib/routes"
 import { site } from "@/lib/site"
@@ -33,17 +26,44 @@ interface PhotoStudioContextValue {
   featured: PhotoResponse[]
   featuredIds: ReadonlySet<string>
   filter: PhotoFilter
+  view: PhotoView
+  density: PhotoDensity
+  setView: (view: PhotoView) => void
+  setDensity: (density: PhotoDensity) => void
   hasMore: boolean
   loadMore: () => Promise<PhotoResponse[]>
-  rememberWall: () => void
-  leavePhoto: (event: { preventDefault(): void }) => void
+  rememberWall: (id?: string) => void
+  closePhoto: () => void
+  restoreWallFocus: () => void
   lightbox: boolean
   setLightbox: (open: boolean) => void
   authorName: string
-  retainScroll: () => () => void
 }
 
 const PhotoStudioContext = createContext<PhotoStudioContextValue | null>(null)
+const preferenceEvent = "starblog:photography-preferences"
+let memoryPreferences = "masonry:standard"
+let storageUnavailable = false
+
+function subscribePreferences(callback: () => void) {
+  window.addEventListener("storage", callback)
+  window.addEventListener(preferenceEvent, callback)
+  return () => {
+    window.removeEventListener("storage", callback)
+    window.removeEventListener(preferenceEvent, callback)
+  }
+}
+
+function preferenceSnapshot() {
+  if (storageUnavailable) return memoryPreferences
+  try {
+    const view = localStorage.getItem("starblog.photography.view")
+    const density = localStorage.getItem("starblog.photography.density")
+    return `${view === "justified" ? view : "masonry"}:${density === "compact" || density === "comfortable" ? density : "standard"}`
+  } catch {
+    return memoryPreferences
+  }
+}
 
 export function usePhotoStudio() {
   const value = useContext(PhotoStudioContext)
@@ -60,42 +80,7 @@ function dedupePhotos(photos: PhotoResponse[]) {
   })
 }
 
-function useLockBody(locked: boolean) {
-  useLayoutEffect(() => {
-    if (!locked) return
-    const scrollY = window.scrollY
-    const body = document.body
-    const previous = {
-      position: body.style.position,
-      top: body.style.top,
-      left: body.style.left,
-      right: body.style.right,
-      width: body.style.width,
-      overflow: body.style.overflow,
-    }
-    body.style.position = "fixed"
-    body.style.top = `-${scrollY}px`
-    body.style.left = "0"
-    body.style.right = "0"
-    body.style.width = "100%"
-    body.style.overflow = "hidden"
-    return () => {
-      body.style.position = previous.position
-      body.style.top = previous.top
-      body.style.left = previous.left
-      body.style.right = previous.right
-      body.style.width = previous.width
-      body.style.overflow = previous.overflow
-      window.scrollTo(0, scrollY)
-    }
-  }, [locked])
-}
-
-export function PhotoStudio({
-  initialPage,
-  featured: featuredPhotos,
-  children,
-}: {
+export function PhotoStudio({ initialPage, featured: featuredPhotos, children }: {
   initialPage: PageResult<PhotoResponse>
   featured: PhotoResponse[]
   children: ReactNode
@@ -110,32 +95,37 @@ export function PhotoStudio({
   const [loadError, setLoadError] = useState(false)
   const [openingRandom, setOpeningRandom] = useState(false)
   const [lightbox, setLightbox] = useState(false)
-  const [scrollLocked, setScrollLocked] = useState(false)
+  const preferences = useSyncExternalStore(subscribePreferences, preferenceSnapshot, () => "masonry:standard")
+  const [view, density] = preferences.split(":") as [PhotoView, PhotoDensity]
   const paging = useRef({ page: initialPage.page, hasMore: initialPage.page < initialPage.totalPages })
   const loading = useRef(false)
   const fromWall = useRef(false)
-  const scrollHolders = useRef(0)
+  const wallPosition = useRef({ scrollY: 0, trigger: null as HTMLElement | null })
+  const anchor = useRef<{ id: string; top: number } | null>(null)
 
-  const featured = useMemo(
-    () => [...featuredPhotos].sort((a, b) => Date.parse(b.createTime) - Date.parse(a.createTime)),
-    [featuredPhotos],
-  )
+  const featured = useMemo(() => [...featuredPhotos].sort((a, b) => Date.parse(b.createTime) - Date.parse(a.createTime)), [featuredPhotos])
   const featuredIds = useMemo(() => new Set(featured.map((photo) => photo.id)), [featured])
 
-  useLockBody(scrollLocked)
+  const changePreferences = useCallback((nextView: PhotoView, nextDensity: PhotoDensity) => {
+    if (`${nextView}:${nextDensity}` === preferenceSnapshot()) return
+    const boundary = document.querySelector("[data-photo-toolbar]")?.getBoundingClientRect().bottom ?? 72
+    const visible = Array.from(document.querySelectorAll<HTMLElement>("[data-photo-id]")).find((node) => node.getBoundingClientRect().bottom > boundary)
+    if (visible) anchor.current = { id: visible.id, top: visible.getBoundingClientRect().top }
+    memoryPreferences = `${nextView}:${nextDensity}`
+    try {
+      localStorage.setItem("starblog.photography.view", nextView)
+      localStorage.setItem("starblog.photography.density", nextDensity)
+    } catch { storageUnavailable = true }
+    window.dispatchEvent(new Event(preferenceEvent))
+  }, [])
 
-  const retainScroll = useCallback(() => {
-    scrollHolders.current += 1
-    setScrollLocked(true)
-    return () => {
-      scrollHolders.current -= 1
-      // The next photo mounts in the same commit. Wait so a handoff does not unlock the page.
-      queueMicrotask(() => {
-        if (scrollHolders.current !== 0) return
-        setScrollLocked(false)
-        setLightbox(false)
-      })
-    }
+  const setView = useCallback((next: PhotoView) => changePreferences(next, density), [changePreferences, density])
+  const setDensity = useCallback((next: PhotoDensity) => changePreferences(view, next), [changePreferences, view])
+  const restoreAnchor = useCallback(() => {
+    if (!anchor.current) return
+    const node = document.getElementById(anchor.current.id)
+    if (node) window.scrollBy(0, node.getBoundingClientRect().top - anchor.current.top)
+    anchor.current = null
   }, [])
 
   const loadMore = useCallback(async () => {
@@ -159,337 +149,178 @@ export function PhotoStudio({
     }
   }, [])
 
-  const rememberWall = useCallback(() => {
+  const rememberWall = useCallback((id?: string) => {
     fromWall.current = true
+    wallPosition.current = {
+      scrollY: window.scrollY,
+      trigger: id ? document.getElementById(`photo-link-${id}`) : document.activeElement as HTMLElement | null,
+    }
   }, [])
 
-  const leavePhoto = useCallback(
-    (event: { preventDefault(): void }) => {
+  const closePhoto = useCallback(() => {
+    if (fromWall.current) router.back()
+    else router.replace(routes.photography, { scroll: false })
+  }, [router])
+
+  const restoreWallFocus = useCallback(() => {
+    requestAnimationFrame(() => {
+      // A route replacement unmounts the old dialog while the next mounts.
+      // Preserve the viewing session until the user actually leaves a photo.
+      if (window.location.pathname.startsWith(`${routes.photography}/`)) return
       setLightbox(false)
       if (!fromWall.current) return
-      event.preventDefault()
       fromWall.current = false
-      router.back()
-    },
-    [router],
-  )
+      if (window.location.pathname !== routes.photography) return
+      window.scrollTo(0, wallPosition.current.scrollY)
+      wallPosition.current.trigger?.focus({ preventScroll: true })
+    })
+  }, [])
 
   async function openRandom() {
     if (openingRandom) return
     setOpeningRandom(true)
+    rememberWall()
     try {
       const photo = await getRandomPhoto()
-      rememberWall()
       router.push(routes.photo(photo.id), { scroll: false })
     } catch {
-      // Stay on the wall. The random route still handles an empty library.
+      toast.error(t.randomPhotoFailed)
     } finally {
       setOpeningRandom(false)
     }
   }
 
-  const value = useMemo<PhotoStudioContextValue>(
-    () => ({
-      photos,
-      featured,
-      featuredIds,
-      filter,
-      hasMore,
-      loadMore,
-      rememberWall,
-      leavePhoto,
-      lightbox,
-      setLightbox,
-      authorName: site.authorName,
-      retainScroll,
-    }),
-    [photos, featured, featuredIds, filter, hasMore, loadMore, rememberWall, leavePhoto, lightbox, retainScroll],
-  )
+  const value = useMemo<PhotoStudioContextValue>(() => ({
+    photos, featured, featuredIds, filter, view, density, setView, setDensity, hasMore, loadMore,
+    rememberWall, closePhoto, restoreWallFocus, lightbox, setLightbox, authorName: site.authorName,
+  }), [photos, featured, featuredIds, filter, view, density, setView, setDensity, hasMore, loadMore, rememberWall, closePhoto, restoreWallFocus, lightbox])
 
   return (
     <PhotoStudioContext.Provider value={value}>
-      <div className="scheme-dark min-h-dvh bg-black text-white">
-        {children}
-        <div inert={scrollLocked || undefined}>
-          <div className="flex flex-wrap items-center justify-between gap-3 px-3 py-3 sm:px-4">
-            <div className="flex items-center gap-1.5">
-              <FilterPill active={filter === "all"} onClick={() => setFilter("all")}>
-                {t.all}
-              </FilterPill>
-              <FilterPill active={filter === "featured"} onClick={() => setFilter("featured")}>
-                {t.featured}
-              </FilterPill>
+      {children}
+      <div className="min-h-[calc(100dvh-12rem)] bg-background text-foreground">
+        <div data-photo-toolbar className="photo-inset sticky top-16 z-30 grid grid-cols-2 items-center gap-y-3 bg-background/95 py-4 backdrop-blur-md sm:top-[72px] lg:grid-cols-[1fr_auto_1fr] lg:py-5">
+          <span className="text-xs tabular-nums text-muted-foreground" aria-live="polite">{t.photoCount(filter === "featured" ? featured.length : totalCount)}</span>
+          <div className="flex items-center justify-end gap-1 lg:justify-center">
+            {(["all", "featured"] as const).map((item) => (
+              <button key={item} type="button" aria-pressed={filter === item} onClick={() => setFilter(item)} className={cn("min-h-11 rounded-xl px-5 text-sm font-medium transition", filter === item ? "bg-muted text-foreground" : "text-muted-foreground hover:text-foreground")}>
+                {item === "all" ? t.all : t.featured}
+              </button>
+            ))}
+          </div>
+          <div className="col-span-2 flex items-center justify-between gap-2 lg:col-span-1 lg:justify-end lg:gap-4">
+            <button type="button" onClick={() => void openRandom()} disabled={openingRandom || totalCount === 0} className="inline-flex min-h-11 items-center gap-2 rounded-xl px-2 text-xs text-muted-foreground transition hover:bg-muted hover:text-foreground disabled:opacity-40" aria-label={t.randomPhoto}>
+              {openingRandom ? <LoaderCircle className="size-4 animate-spin" /> : <Shuffle className="size-4" />}<span className="hidden min-[400px]:inline">{t.randomPhoto}</span>
+            </button>
+            <div role="group" aria-label={t.photoView} className="flex rounded-xl bg-muted p-1">
+              <ViewButton active={view === "masonry"} label={t.masonryView} onClick={() => setView("masonry")}><LayoutGrid className="size-4" /></ViewButton>
+              <ViewButton active={view === "justified"} label={t.justifiedView} onClick={() => setView("justified")}><Grid2X2 className="size-4" /></ViewButton>
             </div>
-            <div className="flex items-center gap-3 text-sm text-white/55">
-              <span>{t.photoCount(filter === "featured" ? featured.length : totalCount)}</span>
-              {totalCount > 0 ? (
-                <button
-                  type="button"
-                  onClick={() => void openRandom()}
-                  disabled={openingRandom}
-                  className="rounded-full px-3 py-1 text-white/80 transition hover:bg-white/10 hover:text-white disabled:opacity-50"
-                >
-                  {t.randomPhoto}
-                </button>
-              ) : null}
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <span className="hidden sm:inline">{t.photoDensity}</span>
+              <Select value={density} onValueChange={(value) => setDensity(value as PhotoDensity)}>
+                <SelectTrigger aria-label={t.photoDensity} className="min-w-20 rounded-xl bg-background px-3 text-xs text-foreground data-[size=default]:h-11 dark:bg-background dark:hover:bg-muted">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent position="popper" align="end" sideOffset={4} className="photography-theme rounded-xl">
+                  <SelectGroup>
+                    <SelectItem value="comfortable" className="min-h-11 rounded-lg text-xs">{t.comfortableDensity}</SelectItem>
+                    <SelectItem value="standard" className="min-h-11 rounded-lg text-xs">{t.standardDensity}</SelectItem>
+                    <SelectItem value="compact" className="min-h-11 rounded-lg text-xs">{t.compactDensity}</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </div>
           </div>
-          <PhotoWall
-            photos={filter === "featured" ? featured : photos}
-            featuredIds={featuredIds}
-            authorName={site.authorName}
-            onOpen={rememberWall}
-            empty={filter === "featured" ? t.noPhotos : t.noPhotos}
-          />
-          {filter === "all" && hasMore ? (
-            <LoadMore
-              loading={loadingMore}
-              failed={loadError}
-              onLoad={() => void loadMore()}
-              onVisible={() => void loadMore()}
-            />
-          ) : null}
         </div>
+        <PhotoWall photos={filter === "featured" ? featured : photos} view={view} density={density} featuredIds={featuredIds} authorName={site.authorName} onOpen={rememberWall} onLayout={restoreAnchor} empty={filter === "featured" ? t.noFeaturedPhotos : t.noPhotos} />
+        {filter === "all" && photos.length > 0 ? (
+          <div className="photo-inset flex flex-col items-center gap-3 py-10" aria-busy={loadingMore}>
+            {loadError ? <p role="alert" className="text-sm text-muted-foreground">{t.photosLoadFailed}</p> : null}
+            {hasMore ? <button type="button" onClick={() => void loadMore()} disabled={loadingMore} className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-border px-7 text-sm font-medium transition hover:bg-muted disabled:opacity-50">
+              {loadingMore ? <LoaderCircle className="size-4 animate-spin" /> : null}{loadingMore ? t.loadingMore : loadError ? t.retry : t.loadMore}
+            </button> : <p className="flex items-center gap-2 text-xs text-muted-foreground"><Check className="size-3.5" />{t.allPhotosLoaded}</p>}
+          </div>
+        ) : null}
       </div>
     </PhotoStudioContext.Provider>
   )
 }
 
-function FilterPill({
-  active,
-  onClick,
-  children,
-}: {
-  active: boolean
-  onClick: () => void
-  children: ReactNode
-}) {
-  return (
-    <button
-      type="button"
-      aria-pressed={active}
-      onClick={onClick}
-      className={cn(
-        "rounded-full px-3.5 py-1.5 text-sm transition",
-        active ? "bg-white text-black" : "text-white/70 hover:bg-white/10 hover:text-white",
-      )}
-    >
-      {children}
-    </button>
-  )
+function ViewButton({ active, label, onClick, children }: { active: boolean; label: string; onClick: () => void; children: ReactNode }) {
+  return <button type="button" aria-label={label} title={label} aria-pressed={active} onClick={onClick} className={cn("grid size-9 place-items-center rounded-lg transition", active ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground")}>{children}</button>
 }
 
-function PhotoWall({
-  photos,
-  featuredIds,
-  authorName,
-  onOpen,
-  empty,
-}: {
-  photos: PhotoResponse[]
-  featuredIds: ReadonlySet<string>
-  authorName: string
-  onOpen: () => void
-  empty: string
+function PhotoWall({ photos, view, density, featuredIds, authorName, onOpen, onLayout, empty }: {
+  photos: PhotoResponse[]; view: PhotoView; density: PhotoDensity; featuredIds: ReadonlySet<string>; authorName: string
+  onOpen: (id?: string) => void; onLayout: () => void; empty: string
 }) {
   const frameRef = useRef<HTMLDivElement>(null)
-  const [width, setWidth] = useState(0)
+  const [frame, setFrame] = useState({ width: 0, viewport: 0 })
+  const [naturalAspects, setNaturalAspects] = useState<Record<string, number>>({})
   const { t } = useI18n()
 
   useLayoutEffect(() => {
-    const frame = frameRef.current
-    if (!frame) return
-    const update = () => {
-      const next = frame.clientWidth
-      setWidth((current) => (current === next ? current : next))
-    }
+    const node = frameRef.current
+    if (!node) return
+    const update = () => setFrame((current) => current.width === node.clientWidth && current.viewport === window.innerWidth ? current : { width: node.clientWidth, viewport: window.innerWidth })
     update()
     const observer = new ResizeObserver(update)
-    observer.observe(frame)
-    return () => observer.disconnect()
-  }, [photos.length])
+    observer.observe(node)
+    window.addEventListener("resize", update)
+    return () => { observer.disconnect(); window.removeEventListener("resize", update) }
+  }, [])
 
-  if (photos.length === 0) {
-    return (
-      <div className="px-4 py-24 text-center text-sm text-white/55">
-        <Camera className="mx-auto mb-4 size-7 opacity-60" />
-        <p>{empty}</p>
-        <Link href={routes.home} className="mt-4 inline-block text-white/80 underline-offset-4 hover:underline">
-          {t.backHome}
-        </Link>
-      </div>
-    )
-  }
+  const rememberDimensions = useCallback((id: string, width: number, height: number) => {
+    if (width <= 0 || height <= 0) return
+    const aspect = width / height
+    setNaturalAspects((current) => current[id] === aspect ? current : { ...current, [id]: aspect })
+  }, [])
+  const aspects = useMemo(() => photos.map((photo) => naturalAspects[photo.id] ?? photoAspect(photo.width, photo.height)), [photos, naturalAspects])
+  const layout = useMemo(() => {
+    if (!frame.width) return null
+    const gap = frame.viewport < 640 ? 12 : 24
+    return view === "masonry" ? layoutMasonry(aspects, frame.width, photoColumns(frame.viewport, density), gap) : layoutJustified(aspects, frame.width, targetRowHeight(frame.width) * densityScale(density), gap)
+  }, [aspects, frame, view, density])
 
-  const aspects = photos.map((photo) => photoAspect(photo.width, photo.height))
-  const layout = width > 0 ? layoutJustified(aspects, width, targetRowHeight(width), 8) : null
+  useLayoutEffect(() => { if (layout) onLayout() }, [layout, onLayout])
 
   return (
-    <div className="px-2 pb-10 sm:px-3">
-      <div ref={frameRef}>
-        {layout ? (
+    <div className="photo-inset pb-4">
+      <div ref={frameRef} data-photo-wall data-view={view} data-density={density}>
+        {photos.length === 0 ? <div className="py-28 text-center text-sm text-muted-foreground"><Camera className="mx-auto mb-4 size-8 opacity-50" /><p>{empty}</p><Link href={routes.home} className="mt-5 inline-block underline underline-offset-4">{t.backHome}</Link></div> : layout ? (
           <div className="relative" style={{ height: layout.height }}>
-            {layout.boxes.map((box) => {
-              const photo = photos[box.index]
-              if (!photo) return null
-              return (
-                <PhotoTile
-                  key={photo.id}
-                  photo={photo}
-                  featured={featuredIds.has(photo.id)}
-                  authorName={authorName}
-                  priority={box.index < 8}
-                  onOpen={onOpen}
-                  className="absolute"
-                  style={{ left: box.x, top: box.y, width: box.width, height: box.height }}
-                />
-              )
-            })}
+            {layout.boxes.map((box) => <PhotoTile key={photos[box.index].id} photo={photos[box.index]} featured={featuredIds.has(photos[box.index].id)} authorName={authorName} priority={box.index < photoColumns(frame.viewport, density)} onOpen={onOpen} onDimensions={rememberDimensions} style={{ position: "absolute", left: box.x, top: box.y, width: box.width, height: box.height }} sizes={`${Math.ceil(box.width)}px`} />)}
           </div>
-        ) : (
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
-            {photos.map((photo, index) => (
-              <PhotoTile
-                key={photo.id}
-                photo={photo}
-                featured={featuredIds.has(photo.id)}
-                authorName={authorName}
-                priority={index < 8}
-                onOpen={onOpen}
-                style={{ aspectRatio: String(aspects[index]) }}
-              />
-            ))}
-          </div>
-        )}
+        ) : <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-6 lg:grid-cols-4 2xl:grid-cols-5">
+          {photos.map((photo, index) => <PhotoTile key={photo.id} photo={photo} featured={featuredIds.has(photo.id)} authorName={authorName} priority={index < 5} onOpen={onOpen} onDimensions={rememberDimensions} style={{ aspectRatio: String(aspects[index]) }} sizes="(min-width: 1536px) 20vw, (min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw" />)}
+        </div>}
       </div>
     </div>
   )
 }
 
-function PhotoTile({
-  photo,
-  featured,
-  authorName,
-  priority,
-  onOpen,
-  className,
-  style,
-}: {
-  photo: PhotoResponse
-  featured: boolean
-  authorName: string
-  priority: boolean
-  onOpen: () => void
-  className?: string
-  style?: CSSProperties
+function PhotoTile({ photo, featured, authorName, priority, onOpen, onDimensions, style, sizes }: {
+  photo: PhotoResponse; featured: boolean; authorName: string; priority: boolean; onOpen: (id?: string) => void; style: CSSProperties; sizes: string
+  onDimensions: (id: string, width: number, height: number) => void
 }) {
   const { t } = useI18n()
-
-  function onClick(event: MouseEvent<HTMLAnchorElement>) {
-    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return
-    onOpen()
-  }
-
+  const title = photo.title || t.photography
   return (
-    <Link
-      href={routes.photo(photo.id)}
-      scroll={false}
-      onClick={onClick}
-      style={style}
-      className={cn(
-        "group relative block overflow-hidden rounded-[10px] bg-neutral-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white",
-        className,
-      )}
-    >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={photoThumbnail(photo.id, 800)}
-        alt={photo.title || t.photography}
-        loading={priority ? "eager" : "lazy"}
-        className="absolute inset-0 h-full w-full object-cover"
-      />
-      <span
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100"
-      >
-        <span className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/15 to-black/25" />
-        {featured ? (
-          <span className="absolute top-2.5 left-2.5 grid size-8 place-items-center rounded-lg bg-black/80 text-white">
-            <AwardIcon />
+    <div id={`photo-${photo.id}`} data-photo-id={photo.id} className="group relative" style={style}>
+      <PhotoImage src={photoThumbnail(photo.id, 800)} srcSet={photoThumbnailSet(photo.id)} sizes={sizes} alt={title} width={photo.width || 1500} height={photo.height || 1000} priority={priority} onDimensions={photo.width > 0 && photo.height > 0 ? undefined : (width, height) => onDimensions(photo.id, width, height)} className="h-full w-full">
+        <Link id={`photo-link-${photo.id}`} href={routes.photo(photo.id)} scroll={false} aria-label={title} onClick={(event) => { if (!event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey && event.button === 0) onOpen(photo.id) }} className="absolute inset-0 block focus-visible:outline-offset-[-3px]">
+          {featured ? <span className="absolute top-3 left-3 grid size-7 place-items-center bg-black/55 text-white" title={t.featured} aria-label={t.featured}><Award className="size-4" /></span> : null}
+          <span className="photo-touch-caption pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent px-3 pt-10 pb-3 text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100">
+            <span className="block truncate text-sm font-medium">{title}</span>
+            <span className="mt-1 hidden items-center gap-1.5 text-xs text-white/80 sm:flex"><AuthorMark name={authorName} className="size-5 text-[10px]" />{authorName}</span>
           </span>
-        ) : null}
-        <span className="absolute inset-x-0 bottom-0 flex items-center gap-2 px-3 py-2.5">
-          <AuthorMark name={authorName} />
-          <span className="min-w-0 truncate text-sm font-medium text-white">{authorName}</span>
-          <span className="ml-auto max-w-[46%] truncate text-right text-xs text-white/75">{photo.title}</span>
-        </span>
-      </span>
-    </Link>
-  )
-}
-
-function LoadMore({
-  loading,
-  failed,
-  onLoad,
-  onVisible,
-}: {
-  loading: boolean
-  failed: boolean
-  onLoad: () => void
-  onVisible: () => void
-}) {
-  const { t } = useI18n()
-  const ref = useRef<HTMLDivElement>(null)
-
-  useLayoutEffect(() => {
-    if (failed) return
-    const el = ref.current
-    if (!el) return
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((entry) => entry.isIntersecting)) onVisible()
-      },
-      { rootMargin: "600px" },
-    )
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [failed, onVisible])
-
-  return (
-    <div ref={ref} className="flex justify-center px-4 pb-12">
-      <button
-        type="button"
-        onClick={onLoad}
-        disabled={loading}
-        className="rounded-full px-4 py-2 text-sm text-white/70 transition hover:bg-white/10 hover:text-white disabled:opacity-60"
-      >
-        {loading ? t.loadingMore : failed ? t.retry : t.loadMore}
-      </button>
+        </Link>
+      </PhotoImage>
     </div>
   )
 }
 
 export function AuthorMark({ name, className }: { name: string; className?: string }) {
-  const letter = Array.from(name.trim())[0] || "?"
-  return (
-    <span
-      aria-hidden
-      className={cn(
-        "grid size-7 shrink-0 place-items-center rounded-full bg-[#4a4036] text-xs font-medium text-white",
-        className,
-      )}
-    >
-      {letter}
-    </span>
-  )
-}
-
-function AwardIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
-      <circle cx="12" cy="9" r="5.25" />
-      <path d="M8.2 13.2 7 21l5-2.4L17 21l-1.2-7.8" strokeLinejoin="round" />
-    </svg>
-  )
+  return <span aria-hidden className={cn("grid size-7 shrink-0 place-items-center rounded-full bg-muted text-xs font-medium text-foreground", className)}>{Array.from(name.trim())[0] || "?"}</span>
 }
