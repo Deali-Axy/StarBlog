@@ -3,7 +3,7 @@ using static Microsoft.Playwright.Assertions;
 
 namespace StarBlog.E2ETests;
 
-public sealed class PhotographyNavigationTests {
+public sealed partial class PhotographyNavigationTests {
     private static Task<IBrowser> LaunchAsync(IPlaywright playwright) => playwright.Chromium.LaunchAsync(new() {
         Headless = true,
         ExecutablePath = Environment.GetEnvironmentVariable("E2E_CHROMIUM_EXECUTABLE_PATH")
@@ -15,18 +15,7 @@ public sealed class PhotographyNavigationTests {
             HasTouch = width < 640,
             IsMobile = width < 640
         });
-        // A production build's rewrites may point at the normal API. Tests can
-        // redirect browser requests to the same isolated API used by its server.
-        var apiUrl = Environment.GetEnvironmentVariable("E2E_API_BASE_URL");
-        if (!string.IsNullOrWhiteSpace(apiUrl)) {
-            async Task ProxyAsync(IRoute route) {
-                var path = new Uri(route.Request.Url).PathAndQuery;
-                var response = await route.FetchAsync(new() { Url = $"{apiUrl.TrimEnd('/')}{path}" });
-                await route.FulfillAsync(new() { Response = response });
-            }
-            await page.RouteAsync("**/api/**", ProxyAsync);
-            await page.RouteAsync("**/media/**", ProxyAsync);
-        }
+        await E2EBaseUrl.UseApiOverrideAsync(page);
         return page;
     }
 

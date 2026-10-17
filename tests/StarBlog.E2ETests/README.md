@@ -13,6 +13,11 @@ photography tests expect at least nine photos. The pagination case exercises
 failure/retry when more than 48 photos exist; smaller galleries exercise the
 completed state instead.
 
+Lightbox cases delay original-image responses and decoding to check progressive
+previews, stable black loading/error states, rapid navigation, reduced motion,
+and the bounded cache. These cases also verify that originals are not requested
+until the lightbox opens and that closing stops further adjacent-image preloads.
+
 For complete pagination and long-title coverage, make an isolated database copy:
 
 ```sh

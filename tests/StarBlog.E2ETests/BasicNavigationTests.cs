@@ -13,6 +13,7 @@ public sealed class BasicNavigationTests {
             Headless = true, ExecutablePath = Environment.GetEnvironmentVariable("E2E_CHROMIUM_EXECUTABLE_PATH")
         });
         var page = await browser.NewPageAsync();
+        await E2EBaseUrl.UseApiOverrideAsync(page);
 
         await page.GotoAsync($"{baseUrl}/", new PageGotoOptions { WaitUntil = WaitUntilState.DOMContentLoaded });
         var title = await page.TitleAsync();
@@ -30,6 +31,7 @@ public sealed class BasicNavigationTests {
             Headless = true, ExecutablePath = Environment.GetEnvironmentVariable("E2E_CHROMIUM_EXECUTABLE_PATH")
         });
         var page = await browser.NewPageAsync();
+        await E2EBaseUrl.UseApiOverrideAsync(page);
 
         await page.GotoAsync($"{baseUrl}/robots.txt", new PageGotoOptions { WaitUntil = WaitUntilState.DOMContentLoaded });
         var text = await page.EvaluateAsync<string>("() => document.body ? document.body.innerText : ''");
