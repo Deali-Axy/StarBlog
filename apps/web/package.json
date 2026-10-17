@@ -9,7 +9,8 @@
     "build": "next build",
     "start": "next start --port 3001",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:photography": "node tests/photography-layout.test.mjs"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.100.14",
