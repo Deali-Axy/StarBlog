@@ -5,10 +5,10 @@ import { useI18n } from "@/components/app-providers"
 import Link from "next/link"
 
 import { EnhancedPostCard } from "@/components/blog/enhanced-post-card"
+import { LatestPostRow } from "@/components/home/latest-post-row"
 import { Button } from "@/components/ui/button"
-import { formatDate } from "@/lib/format"
 import type { PostResponse, PublishedPostSummary } from "@/lib/api/types"
-import { postHref, routes } from "@/lib/routes"
+import { routes } from "@/lib/routes"
 
 export function LatestPosts({ posts }: { posts: PostResponse[] }) {
   const { t } = useI18n()
@@ -27,12 +27,7 @@ export function LatestPosts({ posts }: { posts: PostResponse[] }) {
       </div>
       <ul className="divide-y divide-border/70 border-y border-border/70">
         {posts.slice(0, 8).map((post) => (
-          <li key={post.id}>
-            <Link href={postHref(post)} className="group flex flex-col gap-1 py-4 sm:flex-row sm:items-baseline sm:gap-8">
-              <time className="w-28 shrink-0 text-sm text-muted-foreground">{formatDate(post.lastUpdateTime)}</time>
-              <h3 className="text-lg leading-snug group-hover:text-primary">{post.title}</h3>
-            </Link>
-          </li>
+          <LatestPostRow key={post.id} post={post} />
         ))}
       </ul>
     </section>
