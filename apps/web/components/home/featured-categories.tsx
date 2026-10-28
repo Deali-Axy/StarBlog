@@ -1,21 +1,25 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
 import {
   ArrowRight,
+  BookOpen,
   Braces,
   ChevronLeft,
   ChevronRight,
   Compass,
   Cpu,
+  HardDrive,
   Monitor,
+  Server,
   Smartphone,
   Star,
   Terminal,
   type LucideIcon,
 } from "lucide-react"
 import {
+  AnimatePresence,
   animate,
   motion,
   useMotionValue,
@@ -42,9 +46,18 @@ function resolveCategoryIcon(iconCssClass: string, name: string): LucideIcon {
   if (/(microsoft|asp|dotnet|\.net|csharp|c#)/.test(key)) return Monitor
   if (/(android|flutter|mobile|kotlin|ios)/.test(key)) return Smartphone
   if (/(react|vue|js|javascript|typescript|node|前端)/.test(key)) return Braces
-  if (/(ml|ai|llm|data|cpu|算法)/.test(key)) return Cpu
-  if (/(linux|shell|devops|docker)/.test(key)) return Terminal
+  if (/(hard-drive|backup|保全|zfs|数据)/.test(key)) return HardDrive
+  if (/(starblog|blog|笔记|book)/.test(key)) return BookOpen
+  if (/(server|devops|docker|linux|shell)/.test(key)) return Server
+  if (/(ml|ai|llm|cpu|算法)/.test(key)) return Cpu
   return Compass
+}
+
+function magazineSpanClass(index: number, count: number) {
+  if (count === 1) return "md:col-span-6"
+  if (count === 2) return index === 0 ? "md:col-span-4 md:row-span-2" : "md:col-span-2 md:row-span-2"
+  if (index === 0) return "md:col-span-4 md:row-span-2"
+  return "md:col-span-2"
 }
 
 function SectionHeader({
@@ -102,71 +115,94 @@ function SectionHeader({
 
 function MagazineVariant({ categories }: { categories: FeaturedCategoryResponse[] }) {
   const { t } = useI18n()
+  const reduceMotion = useReducedMotion()
+  const [hoveredId, setHoveredId] = useState<number | null>(null)
 
   return (
     <div className="grid grid-cols-1 gap-3 md:grid-cols-6 md:auto-rows-[minmax(9.5rem,auto)]">
       {categories.map((category, index) => {
         const Icon = resolveCategoryIcon(category.iconCssClass, category.name)
         const featured = index === 0
-        const spanClass =
-          categories.length === 1
-            ? "md:col-span-6"
-            : categories.length === 2
-              ? index === 0
-                ? "md:col-span-4 md:row-span-2"
-                : "md:col-span-2 md:row-span-2"
-              : featured
-                ? "md:col-span-4 md:row-span-2"
-                : "md:col-span-2"
+        const dimmed = hoveredId !== null && hoveredId !== category.id
+        const delay = reduceMotion ? 0 : index * 0.07
 
         return (
-          <Link
+          <motion.div
             key={category.id}
-            href={routes.blogList({ categoryId: category.categoryId })}
-            className={cn(
-              "group relative flex flex-col justify-between overflow-hidden border border-border/70 bg-card/40 p-5 transition-colors hover:border-primary/50 hover:bg-card/80 md:p-6",
-              spanClass,
-            )}
+            className={cn("min-h-0", magazineSpanClass(index, categories.length))}
+            initial={reduceMotion ? false : { opacity: 0, y: 24 }}
+            animate={{
+              opacity: dimmed ? 0.5 : 1,
+              y: 0,
+              scale: dimmed ? 0.985 : 1,
+            }}
+            whileHover={reduceMotion ? undefined : { y: -5, scale: 1.02, zIndex: 5 }}
+            whileTap={reduceMotion ? undefined : { scale: 0.985 }}
+            onHoverStart={() => setHoveredId(category.id)}
+            onHoverEnd={() => setHoveredId(null)}
+            transition={{
+              opacity: { duration: 0.25, delay: hoveredId === null ? delay : 0 },
+              y: { type: "spring", stiffness: 320, damping: 28, delay },
+              scale: { type: "spring", stiffness: 380, damping: 30 },
+            }}
           >
-            <div
-              className="pointer-events-none absolute -right-6 -top-6 size-28 rounded-full bg-[radial-gradient(circle,oklch(0.82_0.10_78/0.18),transparent_70%)] opacity-70 transition-opacity group-hover:opacity-100 dark:bg-[radial-gradient(circle,oklch(0.82_0.1_78/0.12),transparent_70%)]"
-              aria-hidden
-            />
-            <div className="relative flex items-start justify-between gap-3">
-              <p className="kicker">{featured ? t.featured : t.paths}</p>
-              <Icon
-                className={cn(
-                  "shrink-0 text-primary/70 transition-colors group-hover:text-primary",
-                  featured ? "size-6" : "size-5",
-                )}
+            <Link
+              href={routes.blogList({ categoryId: category.categoryId })}
+              className="group relative flex h-full min-h-[9.5rem] flex-col justify-between overflow-hidden border border-border/70 bg-card/40 p-5 transition-colors hover:border-primary/50 hover:bg-card/80 md:p-6"
+            >
+              <div
+                className="pointer-events-none absolute -right-6 -top-6 size-28 rounded-full bg-[radial-gradient(circle,oklch(0.82_0.10_78/0.18),transparent_70%)] opacity-70 transition-opacity group-hover:opacity-100 dark:bg-[radial-gradient(circle,oklch(0.82_0.1_78/0.12),transparent_70%)]"
                 aria-hidden
               />
-            </div>
-            <div className="relative mt-4">
-              <h3
-                className={cn(
-                  "font-heading leading-snug transition-colors group-hover:text-primary",
-                  featured ? "text-2xl md:text-3xl" : "text-lg md:text-xl",
-                )}
-              >
-                {category.name}
-              </h3>
-              {category.description ? (
-                <p
+              <div className="relative flex items-start justify-between gap-3">
+                <p className="kicker">{featured ? t.featured : t.paths}</p>
+                <motion.span
+                  className="inline-flex"
+                  animate={
+                    reduceMotion
+                      ? undefined
+                      : hoveredId === category.id
+                        ? { rotateY: 180 }
+                        : { rotateY: 0 }
+                  }
+                  transition={{ type: "spring", stiffness: 220, damping: 18 }}
+                  style={{ transformStyle: "preserve-3d" }}
+                >
+                  <Icon
+                    className={cn(
+                      "shrink-0 text-primary/70 transition-colors group-hover:text-primary",
+                      featured ? "size-6" : "size-5",
+                    )}
+                    aria-hidden
+                  />
+                </motion.span>
+              </div>
+              <div className="relative mt-4">
+                <h3
                   className={cn(
-                    "mt-2 text-sm leading-relaxed text-muted-foreground",
-                    featured ? "line-clamp-4 max-w-xl" : "line-clamp-3",
+                    "font-heading leading-snug transition-colors group-hover:text-primary",
+                    featured ? "text-2xl md:text-3xl" : "text-lg md:text-xl",
                   )}
                 >
-                  {category.description}
-                </p>
-              ) : null}
-              <span className="mt-4 inline-flex items-center gap-1 text-xs text-muted-foreground transition-colors group-hover:text-primary">
-                {t.enterPath}
-                <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
-              </span>
-            </div>
-          </Link>
+                  {category.name}
+                </h3>
+                {category.description ? (
+                  <p
+                    className={cn(
+                      "mt-2 text-sm leading-relaxed text-muted-foreground",
+                      featured ? "line-clamp-4 max-w-xl" : "line-clamp-3",
+                    )}
+                  >
+                    {category.description}
+                  </p>
+                ) : null}
+                <span className="mt-4 inline-flex items-center gap-1 text-xs text-muted-foreground transition-colors group-hover:text-primary">
+                  {t.enterPath}
+                  <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
+                </span>
+              </div>
+            </Link>
+          </motion.div>
         )
       })}
     </div>
@@ -206,37 +242,80 @@ const STAR_LAYOUTS: Record<number, { x: number; y: number }[]> = {
     { x: 52, y: 68 },
     { x: 24, y: 62 },
   ],
+  7: [
+    { x: 14, y: 30 },
+    { x: 36, y: 14 },
+    { x: 60, y: 16 },
+    { x: 84, y: 32 },
+    { x: 74, y: 60 },
+    { x: 44, y: 74 },
+    { x: 18, y: 58 },
+  ],
+  8: [
+    { x: 12, y: 34 },
+    { x: 30, y: 14 },
+    { x: 54, y: 12 },
+    { x: 78, y: 22 },
+    { x: 88, y: 48 },
+    { x: 70, y: 72 },
+    { x: 40, y: 76 },
+    { x: 16, y: 60 },
+  ],
 }
+
+const STAR_TOUR_MS = 4500
 
 function starPositions(count: number) {
   if (STAR_LAYOUTS[count]) return STAR_LAYOUTS[count]!
   return Array.from({ length: count }, (_, i) => {
     const angle = (Math.PI * 2 * i) / count - Math.PI / 2
     return {
-      x: 50 + Math.cos(angle) * 32,
-      y: 48 + Math.sin(angle) * 28,
+      x: 50 + Math.cos(angle) * 34,
+      y: 48 + Math.sin(angle) * 30,
     }
   })
 }
 
 function StarVariant({ categories }: { categories: FeaturedCategoryResponse[] }) {
   const { t } = useI18n()
+  const reduceMotion = useReducedMotion()
   const [activeId, setActiveId] = useState<number | null>(categories[0]?.id ?? null)
+  const [paused, setPaused] = useState(false)
   const positions = useMemo(() => starPositions(categories.length), [categories.length])
   const active = categories.find((c) => c.id === activeId) ?? categories[0]
 
   const edges = useMemo(() => {
     if (categories.length < 2) return [] as [number, number][]
-    return categories.slice(0, -1).map((_, i) => [i, i + 1] as [number, number])
+    // Ring edges keep denser maps readable.
+    return categories.map((_, i) => [i, (i + 1) % categories.length] as [number, number])
   }, [categories])
+
+  useEffect(() => {
+    if (reduceMotion || paused || categories.length < 2) return
+    const timer = window.setInterval(() => {
+      setActiveId((current) => {
+        const idx = Math.max(
+          0,
+          categories.findIndex((item) => item.id === current),
+        )
+        return categories[(idx + 1) % categories.length]!.id
+      })
+    }, STAR_TOUR_MS)
+    return () => window.clearInterval(timer)
+  }, [reduceMotion, paused, categories])
 
   return (
     <div className="space-y-6">
-      <ul className="space-y-4 md:hidden">
-        {categories.map((category) => {
+      <ul className="space-y-3 md:hidden">
+        {categories.map((category, index) => {
           const Icon = resolveCategoryIcon(category.iconCssClass, category.name)
           return (
-            <li key={category.id}>
+            <motion.li
+              key={category.id}
+              initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: reduceMotion ? 0 : index * 0.05, type: "spring", stiffness: 320, damping: 28 }}
+            >
               <Link
                 href={routes.blogList({ categoryId: category.categoryId })}
                 className="group flex gap-3 border-t border-border/70 pt-4"
@@ -254,32 +333,36 @@ function StarVariant({ categories }: { categories: FeaturedCategoryResponse[] })
                   ) : null}
                 </div>
               </Link>
-            </li>
+            </motion.li>
           )
         })}
       </ul>
 
       <div className="hidden md:grid md:grid-cols-[minmax(0,1.4fr)_minmax(16rem,0.9fr)] md:items-stretch md:gap-8">
         <div
-          className="relative min-h-[22rem] overflow-hidden border border-border/70 bg-[radial-gradient(ellipse_at_50%_40%,oklch(0.82_0.10_78/0.10),transparent_55%)] dark:bg-[radial-gradient(ellipse_at_50%_40%,oklch(0.82_0.1_78/0.08),transparent_55%)]"
-          onMouseLeave={() => setActiveId(categories[0]?.id ?? null)}
+          className="relative min-h-[24rem] overflow-hidden border border-border/70 bg-[radial-gradient(ellipse_at_50%_40%,oklch(0.82_0.10_78/0.10),transparent_55%)] dark:bg-[radial-gradient(ellipse_at_50%_40%,oklch(0.82_0.1_78/0.08),transparent_55%)]"
+          onMouseEnter={() => setPaused(true)}
+          onMouseLeave={() => setPaused(false)}
         >
           <svg className="absolute inset-0 size-full" aria-hidden>
-            {edges.map(([a, b]) => {
+            {edges.map(([a, b], edgeIndex) => {
               const from = positions[a]
               const to = positions[b]
               if (!from || !to) return null
               const lit = categories[a]?.id === activeId || categories[b]?.id === activeId
               return (
-                <line
+                <motion.line
                   key={`${a}-${b}`}
                   x1={`${from.x}%`}
                   y1={`${from.y}%`}
                   x2={`${to.x}%`}
                   y2={`${to.y}%`}
-                  className={cn("stroke-border transition-colors", lit ? "stroke-primary/60" : "stroke-border/80")}
-                  strokeWidth={lit ? 1.5 : 1}
+                  className={cn(lit ? "stroke-primary/70" : "stroke-border/70")}
+                  strokeWidth={lit ? 1.75 : 1}
                   strokeDasharray={lit ? undefined : "4 6"}
+                  initial={reduceMotion ? false : { pathLength: 0, opacity: 0 }}
+                  animate={{ pathLength: 1, opacity: 1 }}
+                  transition={{ duration: 0.7, delay: reduceMotion ? 0 : 0.08 * edgeIndex, ease: "easeOut" }}
                 />
               )
             })}
@@ -291,59 +374,94 @@ function StarVariant({ categories }: { categories: FeaturedCategoryResponse[] })
             const Icon = resolveCategoryIcon(category.iconCssClass, category.name)
             const isActive = category.id === activeId
             return (
-              <button
+              <motion.button
                 key={category.id}
                 type="button"
-                className={cn(
-                  "absolute -translate-x-1/2 -translate-y-1/2 text-left transition-transform",
-                  isActive && "z-10 scale-105",
-                )}
-                style={{ left: `${pos.x}%`, top: `${pos.y}%` }}
-                onMouseEnter={() => setActiveId(category.id)}
-                onFocus={() => setActiveId(category.id)}
+                className="absolute -translate-x-1/2 -translate-y-1/2 text-left"
+                initial={
+                  reduceMotion
+                    ? { left: `${pos.x}%`, top: `${pos.y}%`, opacity: 1, scale: 1 }
+                    : { opacity: 0, scale: 0.4, left: "50%", top: "48%" }
+                }
+                animate={{
+                  opacity: isActive ? 1 : 0.72,
+                  scale: isActive ? 1.08 : 1,
+                  left: `${pos.x}%`,
+                  top: `${pos.y}%`,
+                  zIndex: isActive ? 10 : 1,
+                }}
+                transition={{
+                  type: "spring",
+                  stiffness: 280,
+                  damping: 22,
+                  delay: reduceMotion ? 0 : 0.05 * index,
+                }}
+                onMouseEnter={() => {
+                  setPaused(true)
+                  setActiveId(category.id)
+                }}
+                onFocus={() => {
+                  setPaused(true)
+                  setActiveId(category.id)
+                }}
                 aria-pressed={isActive}
               >
                 <span
                   className={cn(
                     "flex items-center gap-2 rounded-full border bg-background/90 px-3 py-1.5 shadow-sm backdrop-blur-sm transition-colors",
                     isActive
-                      ? "border-primary text-foreground"
+                      ? "border-primary text-foreground shadow-[0_0_0_4px_color-mix(in_oklab,var(--primary)_18%,transparent)]"
                       : "border-border/80 text-muted-foreground hover:border-primary/50 hover:text-foreground",
                   )}
                 >
-                  <span
+                  <motion.span
                     className={cn(
                       "flex size-6 items-center justify-center rounded-full",
                       isActive ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground",
                     )}
+                    animate={!reduceMotion && isActive ? { scale: [1, 1.12, 1] } : { scale: 1 }}
+                    transition={
+                      !reduceMotion && isActive
+                        ? { repeat: Infinity, duration: 2.4, ease: "easeInOut" }
+                        : { duration: 0.2 }
+                    }
                   >
                     <Icon className="size-3.5" aria-hidden />
-                  </span>
+                  </motion.span>
                   <span className="font-heading whitespace-nowrap text-sm">{category.name}</span>
                 </span>
-              </button>
+              </motion.button>
             )
           })}
         </div>
 
-        <aside className="flex flex-col justify-between border border-border/70 bg-card/40 p-6">
-          {active ? (
-            <>
-              <div>
-                <p className="kicker">{t.observations}</p>
-                <h3 className="mt-3 font-heading text-2xl">{active.name}</h3>
-                {active.description ? (
-                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{active.description}</p>
-                ) : null}
-              </div>
-              <Button className="mt-8 w-fit" asChild>
-                <Link href={routes.blogList({ categoryId: active.categoryId })}>
-                  {t.enterPath}
-                  <ArrowRight />
-                </Link>
-              </Button>
-            </>
-          ) : null}
+        <aside className="relative overflow-hidden border border-border/70 bg-card/40 p-6">
+          <AnimatePresence mode="wait">
+            {active ? (
+              <motion.div
+                key={active.id}
+                className="flex h-full flex-col justify-between"
+                initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={reduceMotion ? undefined : { opacity: 0, y: -10 }}
+                transition={{ duration: 0.28, ease: "easeOut" }}
+              >
+                <div>
+                  <p className="kicker">{t.observations}</p>
+                  <h3 className="mt-3 font-heading text-2xl">{active.name}</h3>
+                  {active.description ? (
+                    <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{active.description}</p>
+                  ) : null}
+                </div>
+                <Button className="mt-8 w-fit" asChild>
+                  <Link href={routes.blogList({ categoryId: active.categoryId })}>
+                    {t.enterPath}
+                    <ArrowRight />
+                  </Link>
+                </Button>
+              </motion.div>
+            ) : null}
+          </AnimatePresence>
         </aside>
       </div>
     </div>
