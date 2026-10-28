@@ -3,14 +3,15 @@ import Link from "next/link"
 import type { Metadata } from "next"
 import { Camera, Rss, Shuffle } from "lucide-react"
 
-import { CategoryCard } from "@/components/blog/category-card"
 import { EnhancedPostCard } from "@/components/blog/enhanced-post-card"
+import { FeaturedCategories } from "@/components/home/featured-categories"
 import { FeaturedPosts, LatestPosts } from "@/components/home/featured-sections"
 import { HeroPhoto } from "@/components/home/hero-photo"
 import { CategoryWordCloud } from "@/components/home/category-word-cloud"
 import { JsonLd } from "@/components/seo/json-ld"
 import { Button } from "@/components/ui/button"
 import { getCategoryWordCloud, getHome, getOverview, listPosts } from "@/lib/api/queries"
+import { parseFeaturedCategoriesVariant } from "@/lib/featured-categories-variant"
 import { postHref, routes } from "@/lib/routes"
 import { absoluteUrl, getSite } from "@/lib/site"
 
@@ -26,9 +27,15 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
-export default async function HomePage() {
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ fc?: string }>
+}) {
   const { locale, t } = await getI18n()
   const site = getSite(locale)
+  const params = await searchParams
+  const featuredCategoriesVariant = parseFeaturedCategoriesVariant(params.fc) ?? undefined
   const [home, overview, latest, wordCloud] = await Promise.all([
     getHome(locale),
     getOverview().catch(() => null),
@@ -143,21 +150,10 @@ export default async function HomePage() {
 
         {home.chartVisible ? <CategoryWordCloud items={wordCloud} /> : null}
 
-        {home.featuredCategories.length > 0 ? (
-          <section className="mt-20">
-            <p className="kicker">{t.paths}</p>
-            <h2 className="mt-2 mb-6 text-2xl">{t.featuredCategories}</h2>
-            <div className="grid grid-cols-1 gap-x-8 md:grid-cols-2 lg:grid-cols-3">
-              {home.featuredCategories.map((category) => (
-                <CategoryCard
-                  key={category.id}
-                  name={category.name}
-                  categoryId={category.categoryId}
-                />
-              ))}
-            </div>
-          </section>
-        ) : null}
+        <FeaturedCategories
+          categories={home.featuredCategories}
+          initialVariant={featuredCategoriesVariant}
+        />
 
         {home.featuredPhotos.length > 0 ? (
           <section className="mt-20">
