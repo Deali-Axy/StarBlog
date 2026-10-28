@@ -11,6 +11,7 @@ import { CategoryWordCloud } from "@/components/home/category-word-cloud"
 import { JsonLd } from "@/components/seo/json-ld"
 import { Button } from "@/components/ui/button"
 import { getCategoryWordCloud, getHome, getOverview, listPosts } from "@/lib/api/queries"
+import { parseFeaturedCategoriesVariant } from "@/lib/featured-categories-variant"
 import { postHref, routes } from "@/lib/routes"
 import { absoluteUrl, getSite } from "@/lib/site"
 
@@ -26,9 +27,15 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
-export default async function HomePage() {
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ fc?: string }>
+}) {
   const { locale, t } = await getI18n()
   const site = getSite(locale)
+  const params = await searchParams
+  const featuredCategoriesVariant = parseFeaturedCategoriesVariant(params.fc) ?? undefined
   const [home, overview, latest, wordCloud] = await Promise.all([
     getHome(locale),
     getOverview().catch(() => null),
@@ -143,7 +150,10 @@ export default async function HomePage() {
 
         {home.chartVisible ? <CategoryWordCloud items={wordCloud} /> : null}
 
-        <FeaturedCategories categories={home.featuredCategories} />
+        <FeaturedCategories
+          categories={home.featuredCategories}
+          initialVariant={featuredCategoriesVariant}
+        />
 
         {home.featuredPhotos.length > 0 ? (
           <section className="mt-20">
