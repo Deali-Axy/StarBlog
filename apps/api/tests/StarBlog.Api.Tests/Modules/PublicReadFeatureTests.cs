@@ -79,6 +79,47 @@ public sealed class PublicReadFeatureTests : IClassFixture<StarBlogApiFactory> {
     }
 
     [Fact]
+    public async Task List_and_related_posts_omit_content_while_detail_keeps_it() {
+        var created = await _client.PostAsJsonAsync("/api/v1/posts", new {
+            title = "Slim List Body",
+            slug = "slim-list-body",
+            isPublish = true,
+            summary = "list summary",
+            content = "full markdown body that must not appear in list payloads",
+            categoryId = 1
+        });
+        Assert.Equal(HttpStatusCode.OK, created.StatusCode);
+        var createdPost = await created.Content.ReadFromJsonAsync<JsonElement>();
+        var id = createdPost.GetProperty("id").GetString();
+        Assert.False(string.IsNullOrEmpty(id));
+
+        var anon = _factory.CreateAnonymousClient();
+        var list = await anon.GetAsync("/api/v1/posts?page=1&pageSize=50&search=Slim%20List%20Body");
+        Assert.Equal(HttpStatusCode.OK, list.StatusCode);
+        var listPage = await list.Content.ReadFromJsonAsync<JsonElement>();
+        var listed = listPage.GetProperty("items").EnumerateArray()
+            .Single(item => item.GetProperty("id").GetString() == id);
+        Assert.Equal("list summary", listed.GetProperty("summary").GetString());
+        Assert.True(
+            !listed.TryGetProperty("content", out var listedContent) ||
+            listedContent.ValueKind is JsonValueKind.Null or JsonValueKind.Undefined);
+
+        var related = await anon.GetAsync("/api/v1/posts/testpost00000001/related?limit=12");
+        Assert.Equal(HttpStatusCode.OK, related.StatusCode);
+        var relatedItems = await related.Content.ReadFromJsonAsync<JsonElement>();
+        Assert.All(relatedItems.EnumerateArray(), item => Assert.True(
+            !item.TryGetProperty("content", out var relatedContent) ||
+            relatedContent.ValueKind is JsonValueKind.Null or JsonValueKind.Undefined));
+
+        var detail = await anon.GetAsync($"/api/v1/posts/{id}");
+        Assert.Equal(HttpStatusCode.OK, detail.StatusCode);
+        var detailPost = await detail.Content.ReadFromJsonAsync<JsonElement>();
+        Assert.Equal(
+            "full markdown body that must not appear in list payloads",
+            detailPost.GetProperty("content").GetString());
+    }
+
+    [Fact]
     public async Task List_posts_can_include_descendant_categories() {
         var parentId = 1;
         var childResponse = await _client.PostAsJsonAsync("/api/v1/categories", new {

@@ -67,8 +67,14 @@ public sealed class PostResponse {
     public string? Categories { get; init; }
     public List<TocNode>? Toc { get; init; }
 
-    public static PostResponse From(Post post, bool includeToc = false, string? language = null) {
+    /// <summary>从领域实体映射对外契约。</summary>
+    /// <param name="post">文章实体（可含 Category / Translations）。</param>
+    /// <param name="includeToc">是否从正文提取目录。</param>
+    /// <param name="language">译文语言；null 表示原文。</param>
+    /// <param name="includeContent">列表/相关文章等集合接口传 false，避免把全文塞进分页 payload；详情与单篇读取保持默认 true。</param>
+    public static PostResponse From(Post post, bool includeToc = false, string? language = null, bool includeContent = true) {
         var translation = post.Translations.FirstOrDefault(item => item.Language == language);
+        var body = translation == null ? post.Content : translation.Content;
         return new() {
             Id = post.Id,
             Title = translation?.Title ?? post.Title,
@@ -77,14 +83,14 @@ public sealed class PostResponse {
             Status = post.Status,
             IsPublish = post.IsPublish,
             Summary = translation == null ? post.Summary : translation.Summary,
-            Content = translation == null ? post.Content : translation.Content,
+            Content = includeContent ? body : null,
             Path = post.Path,
             CreationTime = post.CreationTime,
             LastUpdateTime = post.LastUpdateTime,
             CategoryId = post.CategoryId,
             CategoryName = post.Category?.Name,
             Categories = post.Categories,
-            Toc = includeToc ? TableOfContents.Extract(translation == null ? post.Content : translation.Content) : null
+            Toc = includeToc ? TableOfContents.Extract(body) : null
         };
     }
 }

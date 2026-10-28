@@ -66,7 +66,7 @@ public sealed class ContentOperations : IPublishedContentQueries {
         var total = await query.CountAsync(cancellationToken);
         var items = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync(cancellationToken);
         return new PageResult<PostResponse> {
-            Items = items.Select(post => PostResponse.From(post, language: language)).ToList(),
+            Items = items.Select(post => PostResponse.From(post, language: language, includeContent: false)).ToList(),
             Page = page,
             PageSize = pageSize,
             TotalCount = total
@@ -303,14 +303,16 @@ public sealed class ContentOperations : IPublishedContentQueries {
             .Where(post => post.IsPublish && post.Id != id && post.CategoryId == source.CategoryId)
             .ToListAsync(cancellationToken);
         var related = sameCategory.OrderBy(_ => Random.Shared.Next()).Take(limit).ToList();
-        if (related.Count >= limit) return related.Select(post => PostResponse.From(post, language: language)).ToList();
+        if (related.Count >= limit) {
+            return related.Select(post => PostResponse.From(post, language: language, includeContent: false)).ToList();
+        }
 
         var excluded = related.Select(post => post.Id).Append(id).ToHashSet();
         var fillers = await PostsForLanguage(language)
             .Where(post => post.IsPublish && !excluded.Contains(post.Id))
             .ToListAsync(cancellationToken);
         related.AddRange(fillers.OrderBy(_ => Random.Shared.Next()).Take(limit - related.Count));
-        return related.Select(post => PostResponse.From(post, language: language)).ToList();
+        return related.Select(post => PostResponse.From(post, language: language, includeContent: false)).ToList();
     }
 
     public async Task<IReadOnlyList<CategoryWordCloudItem>> GetWordCloudAsync(CancellationToken cancellationToken) {
