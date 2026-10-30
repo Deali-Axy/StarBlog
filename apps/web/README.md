@@ -29,6 +29,10 @@ Web 开发服务器：<http://localhost:3001>
 
 语言切换的浏览器回归测试位于 `tests/StarBlog.E2ETests/LanguageNavigationTests.cs`，启动 Web 后设置 `E2E_BASE_URL` 再运行。可用 `E2E_CHROMIUM_EXECUTABLE_PATH` 指定已安装的 Chromium；未设置时使用 Playwright 自带的浏览器。
 
+## 首页布局
+
+首页单独使用 `components/home/home-layout.tsx` 与局部 CSS Module：桌面端以固定在视口内的侧栏展示编号索引、搜索及主题和语言工具，小屏直接展开导航入口。独立的暖纸色 / 深色主题与页脚只作用于 `/`，保留现有首屏、推荐内容和分类展示；`links`、`about`、搜索和 RSS 等页面继续使用通用 `SiteHeader` / `SiteFooter`，博客与摄影仍使用各自布局。
+
 ## 博客列表风格预览
 
 `/blog` 提供活字索引、折页手记、档案工作台三套独立构图，分别使用 `?bv=library`、`?bv=editorial`、`?bv=studio` 直接预览。右下角悬浮按钮打开风格预览菜单，不占用页头空间；切换会保留查询、分页及显示设置，URL 支持刷新与前进后退。
