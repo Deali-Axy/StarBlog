@@ -48,7 +48,7 @@ export function FeaturedPosts({ posts }: { posts: PublishedPostSummary[] }) {
     <HomeSectionHeading id="home-featured-title" eyebrow={desk ? t.homeReadingNotes : t.homeTheEdit}
       title={desk ? t.homeDeskFeaturedTitle : t.homeFeaturedTitle} href={routes.blog} action={t.allPosts} />
     <div className={cn("grid", desk ? "gap-5 px-1.5 pt-2 pb-6 sm:grid-cols-3 sm:gap-6" : "gap-6 sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] sm:gap-y-7 min-[900px]:gap-x-10", single && "sm:grid-cols-1")}>
-      {posts.slice(0, 3).map((post, index) => {
+      {posts.map((post, index) => {
         const lead = index === 0
         return <article key={post.id} className={cn("min-w-0", desk
           ? "relative border border-border bg-card p-6 shadow-[4px_5px_0_var(--muted)] sm:p-5 min-[900px]:p-6"
