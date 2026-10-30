@@ -17,6 +17,7 @@ import { formatDate, formatRelativeTime } from "@/lib/format"
 import { photoThumbnail, photoThumbnailSet } from "@/lib/media"
 import { photoLocation } from "@/lib/photography/path"
 import { routes } from "@/lib/routes"
+import { headingClassName, photoIconClassName, photographyThemeClassName } from "@/lib/styles"
 import { cn } from "@/lib/utils"
 
 const roundIcon = "grid size-11 shrink-0 place-items-center rounded-full bg-black/65 text-white ring-1 ring-white/20 transition hover:bg-black/85 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:pointer-events-none disabled:opacity-30"
@@ -103,7 +104,7 @@ export function PhotoDetail({ photo }: { photo: PhotoResponse }) {
     <Dialog.Root open onOpenChange={(open) => { if (!open) closePhoto() }}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-50 bg-black/65" />
-        <Dialog.Content aria-describedby={undefined} onOpenAutoFocus={(event) => { event.preventDefault(); closeRef.current?.focus({ preventScroll: true }) }} onCloseAutoFocus={(event) => { event.preventDefault(); restoreWallFocus() }} onKeyDown={onKeyDown} className="photography-theme fixed inset-0 z-50 overflow-y-auto text-foreground outline-none">
+        <Dialog.Content aria-describedby={undefined} onOpenAutoFocus={(event) => { event.preventDefault(); closeRef.current?.focus({ preventScroll: true }) }} onCloseAutoFocus={(event) => { event.preventDefault(); restoreWallFocus() }} onKeyDown={onKeyDown} className={cn(photographyThemeClassName, "fixed inset-0 z-50 overflow-y-auto text-foreground outline-none")} data-photography-theme>
           <div className="flex min-h-full items-center justify-center sm:p-4 lg:px-16" onPointerDown={(event) => { if (event.target === event.currentTarget) closePhoto() }}>
             <div className="relative flex min-h-dvh w-full flex-col bg-background sm:min-h-0 sm:max-w-[1240px] sm:overflow-hidden sm:rounded-xl sm:shadow-2xl lg:grid lg:grid-cols-[minmax(0,1fr)_22rem]">
               <PhotoImage key={`preview-${photo.id}`} onReady={rememberPreview} src={photoThumbnail(photo.id, 1600)} srcSet={photoThumbnailSet(photo.id)} sizes="(min-width: 1400px) 888px, (min-width: 1024px) calc(100vw - 480px), 100vw" alt={photo.title || t.photography} width={photo.width || 1500} height={photo.height || 1000} priority className="flex min-h-[220px] items-center justify-center bg-muted/40" imageClassName="h-auto max-h-[44dvh] w-full object-contain lg:max-h-[82dvh]">
@@ -113,13 +114,13 @@ export function PhotoDetail({ photo }: { photo: PhotoResponse }) {
                 <div className="flex items-center gap-3">
                   <AuthorMark name={authorName} className="size-10 text-sm" />
                   <p className="min-w-0 flex-1 truncate text-sm font-medium">{authorName}</p>
-                  <button type="button" onClick={() => void share()} aria-label={t.share} className="photo-icon text-muted-foreground hover:text-foreground"><Share2 className="size-4" /></button>
+                  <button type="button" onClick={() => void share()} aria-label={t.share} className={cn(photoIconClassName, "text-muted-foreground hover:text-foreground")}><Share2 className="size-4" /></button>
                 </div>
-                <Dialog.Title asChild><h1 className="mt-7 break-words font-sans text-2xl leading-relaxed font-medium tracking-normal">{photo.title || t.photography}</h1></Dialog.Title>
+                <Dialog.Title asChild><h1 className={cn(headingClassName, "mt-7 break-words font-sans text-2xl leading-relaxed font-medium tracking-normal")}>{photo.title || t.photography}</h1></Dialog.Title>
                 {location && location !== photo.title ? <p className="mt-3 break-words text-sm leading-7 text-muted-foreground">{location}</p> : null}
                 <p className="mt-3 text-xs text-muted-foreground">{formatRelativeTime(photo.createTime, locale)}</p>
                 {featuredIds.has(photo.id) ? <p className="mt-5 inline-flex items-center gap-1.5 rounded-lg bg-muted px-2.5 py-1.5 text-xs"><Award className="size-3.5" />{t.featured}</p> : null}
-                <h2 className="mt-9 border-t border-border pt-6 font-sans text-sm font-medium tracking-normal">{t.photoDetails}</h2>
+                <h2 className={cn(headingClassName, "mt-9 border-t border-border pt-6 font-sans text-sm font-medium tracking-normal")}>{t.photoDetails}</h2>
                 <dl className="mt-5 space-y-4 text-sm">
                   {location ? <DetailRow label={t.locationLabel} value={location} /> : null}
                   {photo.width > 0 && photo.height > 0 ? <DetailRow label={t.dimensions} value={`${photo.width} × ${photo.height}`} /> : null}
@@ -134,7 +135,7 @@ export function PhotoDetail({ photo }: { photo: PhotoResponse }) {
           <Dialog.Root open={lightbox} onOpenChange={setLightbox}>
             <Dialog.Portal>
               <Dialog.Overlay className="fixed inset-0 z-[60] bg-black" />
-              <Dialog.Content aria-describedby={undefined} onKeyDown={onKeyDown} onOpenAutoFocus={(event) => { event.preventDefault(); lightboxCloseRef.current?.focus({ preventScroll: true }) }} onCloseAutoFocus={(event) => { event.preventDefault(); zoomRef.current?.focus({ preventScroll: true }) }} className="photography-theme fixed inset-0 z-[60] flex items-center justify-center bg-black p-3 text-white outline-none sm:px-16" onPointerDown={(event) => { if (event.target === event.currentTarget) setLightbox(false) }}>
+              <Dialog.Content aria-describedby={undefined} onKeyDown={onKeyDown} onOpenAutoFocus={(event) => { event.preventDefault(); lightboxCloseRef.current?.focus({ preventScroll: true }) }} onCloseAutoFocus={(event) => { event.preventDefault(); zoomRef.current?.focus({ preventScroll: true }) }} className={cn(photographyThemeClassName, "fixed inset-0 z-[60] flex items-center justify-center bg-black p-3 text-white outline-none sm:px-16")} onPointerDown={(event) => { if (event.target === event.currentTarget) setLightbox(false) }} data-photography-theme>
                 <Dialog.Title className="sr-only">{t.viewLargePhoto}: {photo.title || t.photography}</Dialog.Title>
                 <PhotoLightboxImage key={photo.id} photo={photo} previewSrc={preview?.id === photo.id ? preview.src : undefined} previous={previous} next={next} cache={lightboxImages} />
                 <Dialog.Close asChild><button ref={lightboxCloseRef} type="button" aria-label={t.closeLargePhoto} className={cn(roundIcon, "absolute top-3 right-3 z-20 sm:top-4 sm:right-4")}><X className="size-5" /></button></Dialog.Close>

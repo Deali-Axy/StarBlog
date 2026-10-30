@@ -18,6 +18,7 @@ import { photoPageSize } from "@/lib/photography/page-size"
 import { LightboxImageCache } from "@/lib/photography/image-cache"
 import { routes } from "@/lib/routes"
 import { site } from "@/lib/site"
+import { photoInsetClassName, photographyThemeClassName } from "@/lib/styles"
 import { cn } from "@/lib/utils"
 
 type PhotoFilter = "all" | "featured"
@@ -204,7 +205,7 @@ export function PhotoStudio({ initialPage, featured: featuredPhotos, children }:
     <PhotoStudioContext.Provider value={value}>
       {children}
       <div className="min-h-[calc(100dvh-12rem)] bg-background text-foreground">
-        <div data-photo-toolbar className="photo-inset sticky top-16 z-30 grid grid-cols-2 items-center gap-y-3 bg-background/95 py-4 backdrop-blur-md sm:top-[72px] lg:grid-cols-[1fr_auto_1fr] lg:py-5">
+        <div data-photo-toolbar className={cn(photoInsetClassName, "sticky top-16 z-30 grid grid-cols-2 items-center gap-y-3 bg-background/95 py-4 backdrop-blur-md sm:top-[72px] lg:grid-cols-[1fr_auto_1fr] lg:py-5")}>
           <span className="text-xs tabular-nums text-muted-foreground" aria-live="polite">{t.photoCount(filter === "featured" ? featured.length : totalCount)}</span>
           <div className="flex items-center justify-end gap-1 lg:justify-center">
             {(["all", "featured"] as const).map((item) => (
@@ -227,7 +228,7 @@ export function PhotoStudio({ initialPage, featured: featuredPhotos, children }:
                 <SelectTrigger aria-label={t.photoDensity} className="min-w-20 rounded-xl bg-background px-3 text-xs text-foreground data-[size=default]:h-11 dark:bg-background dark:hover:bg-muted">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent position="popper" align="end" sideOffset={4} className="photography-theme rounded-xl">
+                <SelectContent position="popper" align="end" sideOffset={4} className={cn(photographyThemeClassName, "rounded-xl")} data-photography-theme>
                   <SelectGroup>
                     <SelectItem value="comfortable" className="min-h-11 rounded-lg text-xs">{t.comfortableDensity}</SelectItem>
                     <SelectItem value="standard" className="min-h-11 rounded-lg text-xs">{t.standardDensity}</SelectItem>
@@ -240,7 +241,7 @@ export function PhotoStudio({ initialPage, featured: featuredPhotos, children }:
         </div>
         <PhotoWall photos={filter === "featured" ? featured : photos} view={view} density={density} featuredIds={featuredIds} authorName={site.authorName} onOpen={rememberWall} onLayout={restoreAnchor} empty={filter === "featured" ? t.noFeaturedPhotos : t.noPhotos} />
         {filter === "all" && photos.length > 0 ? (
-          <div className="photo-inset flex flex-col items-center gap-3 py-10" aria-busy={loadingMore}>
+          <div className={cn(photoInsetClassName, "flex flex-col items-center gap-3 py-10")} aria-busy={loadingMore}>
             {loadError ? <p role="alert" className="text-sm text-muted-foreground">{t.photosLoadFailed}</p> : null}
             {hasMore ? <button type="button" onClick={() => void loadMore()} disabled={loadingMore} className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-border px-7 text-sm font-medium transition hover:bg-muted disabled:opacity-50">
               {loadingMore ? <LoaderCircle className="size-4 animate-spin" /> : null}{loadingMore ? t.loadingMore : loadError ? t.retry : t.loadMore}
@@ -291,11 +292,11 @@ function PhotoWall({ photos, view, density, featuredIds, authorName, onOpen, onL
   useLayoutEffect(() => { if (layout) onLayout() }, [layout, onLayout])
 
   return (
-    <div className="photo-inset pb-4">
+    <div className={cn(photoInsetClassName, "pb-4")}>
       <div ref={frameRef} data-photo-wall data-view={view} data-density={density}>
         {photos.length === 0 ? <div className="py-28 text-center text-sm text-muted-foreground"><Camera className="mx-auto mb-4 size-8 opacity-50" /><p>{empty}</p><Link href={routes.home} className="mt-5 inline-block underline underline-offset-4">{t.backHome}</Link></div> : layout ? (
           <div className="relative" style={{ height: layout.height }}>
-            {layout.boxes.map((box) => <PhotoTile key={photos[box.index].id} photo={photos[box.index]} featured={featuredIds.has(photos[box.index].id)} authorName={authorName} priority={box.index < photoColumns(frame.viewport, density)} onOpen={onOpen} onDimensions={rememberDimensions} style={{ position: "absolute", left: box.x, top: box.y, width: box.width, height: box.height }} sizes={`${Math.ceil(box.width)}px`} />)}
+            {layout.boxes.map((box) => <PhotoTile key={photos[box.index].id} photo={photos[box.index]} featured={featuredIds.has(photos[box.index].id)} authorName={authorName} priority={box.index < photoColumns(frame.viewport, density)} onOpen={onOpen} onDimensions={rememberDimensions} className="absolute" style={{ left: box.x, top: box.y, width: box.width, height: box.height }} sizes={`${Math.ceil(box.width)}px`} />)}
           </div>
         ) : <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-6 lg:grid-cols-4 2xl:grid-cols-5">
           {photos.map((photo, index) => <PhotoTile key={photo.id} photo={photo} featured={featuredIds.has(photo.id)} authorName={authorName} priority={index < 5} onOpen={onOpen} onDimensions={rememberDimensions} style={{ aspectRatio: String(aspects[index]) }} sizes="(min-width: 1536px) 20vw, (min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw" />)}
@@ -305,18 +306,18 @@ function PhotoWall({ photos, view, density, featuredIds, authorName, onOpen, onL
   )
 }
 
-function PhotoTile({ photo, featured, authorName, priority, onOpen, onDimensions, style, sizes }: {
-  photo: PhotoResponse; featured: boolean; authorName: string; priority: boolean; onOpen: (id?: string) => void; style: CSSProperties; sizes: string
+function PhotoTile({ photo, featured, authorName, priority, onOpen, onDimensions, className, style, sizes }: {
+  photo: PhotoResponse; featured: boolean; authorName: string; priority: boolean; onOpen: (id?: string) => void; className?: string; style: CSSProperties; sizes: string
   onDimensions: (id: string, width: number, height: number) => void
 }) {
   const { t } = useI18n()
   const title = photo.title || t.photography
   return (
-    <div id={`photo-${photo.id}`} data-photo-id={photo.id} className="group relative" style={style}>
+    <div id={`photo-${photo.id}`} data-photo-id={photo.id} className={cn("group relative", className)} style={style}>
       <PhotoImage src={photoThumbnail(photo.id, 800)} srcSet={photoThumbnailSet(photo.id)} sizes={sizes} alt={title} width={photo.width || 1500} height={photo.height || 1000} priority={priority} onDimensions={photo.width > 0 && photo.height > 0 ? undefined : (width, height) => onDimensions(photo.id, width, height)} className="h-full w-full">
         <Link id={`photo-link-${photo.id}`} href={routes.photo(photo.id)} scroll={false} aria-label={title} onClick={(event) => { if (!event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey && event.button === 0) onOpen(photo.id) }} className="absolute inset-0 block focus-visible:outline-offset-[-3px]">
           {featured ? <span className="absolute top-3 left-3 grid size-7 place-items-center bg-black/55 text-white" title={t.featured} aria-label={t.featured}><Award className="size-4" /></span> : null}
-          <span className="photo-touch-caption pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent px-3 pt-10 pb-3 text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100">
+          <span data-photo-caption className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent px-3 pt-10 pb-3 text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100 max-sm:opacity-100 [@media(hover:none)]:opacity-100 [@media(pointer:coarse)]:opacity-100">
             <span className="block truncate text-sm font-medium">{title}</span>
             <span className="mt-1 hidden items-center gap-1.5 text-xs text-white/80 sm:flex"><AuthorMark name={authorName} className="size-5 text-[10px]" />{authorName}</span>
           </span>

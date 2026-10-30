@@ -152,7 +152,7 @@ function DecodedOriginal({ resource, title, animate }: {
     image.setAttribute("alt", title)
     image.setAttribute("draggable", "false")
     image.setAttribute("data-lightbox-original", "")
-    image.setAttribute("class", cn("absolute inset-0 h-full w-full object-contain", animate && "photo-lightbox-reveal"))
+    image.setAttribute("class", cn("absolute inset-0 h-full w-full object-contain", animate && "motion-safe:animate-in motion-safe:fade-in-0 motion-safe:duration-200 motion-safe:ease-out motion-safe:fill-mode-both"))
     // Reuse the actual decoded element: mounting a second img could refetch it.
     frame.appendChild(image)
     return () => {
