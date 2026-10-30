@@ -45,12 +45,13 @@ public sealed partial class PhotographyNavigationTests {
         await Expect(page.Locator("[data-photo-id]").First).ToBeVisibleAsync();
         Assert.False(await page.EvaluateAsync<bool>("document.documentElement.scrollWidth > innerWidth"));
         var expected = theme == "light" ? "rgb(255, 255, 255)" : "rgb(8, 8, 8)";
-        Assert.Equal(expected, await page.Locator(".photography-theme").First.EvaluateAsync<string>("el => getComputedStyle(el).backgroundColor"));
+        Assert.Equal(expected, await page.Locator("[data-photography-theme]").First.EvaluateAsync<string>("el => getComputedStyle(el).backgroundColor"));
         await Expect(page.GetByRole(AriaRole.Link, new() { Name = "搜索文章", Exact = true })).ToBeVisibleAsync();
         if (width < 640) {
-            await Expect(page.Locator(".photo-touch-caption").First).ToHaveCSSAsync("opacity", "1");
+            await Expect(page.Locator("[data-photo-caption]").First).ToHaveCSSAsync("opacity", "1");
             await page.GetByRole(AriaRole.Button, new() { Name = "站点导航", Exact = true }).ClickAsync();
             await Expect(page.GetByRole(AriaRole.Menu)).ToBeVisibleAsync();
+            await Expect(page.GetByRole(AriaRole.Menu)).ToHaveCSSAsync("background-color", expected);
             await page.Keyboard.PressAsync("Escape");
         }
         if (width >= 1024) await Expect(page.GetByRole(AriaRole.Button, new() { Name = "站点导航", Exact = true })).ToBeHiddenAsync();
@@ -66,12 +67,14 @@ public sealed partial class PhotographyNavigationTests {
         await page.Keyboard.PressAsync("Enter");
         await Expect(page.Locator("[data-photo-wall]")).ToHaveAttributeAsync("data-density", "compact");
         await Expect(density).ToBeFocusedAsync();
+        await Expect(density).ToHaveCSSAsync("outline-style", "solid");
+        await Expect(density).ToHaveCSSAsync("outline-color", theme == "light" ? "rgb(115, 115, 115)" : "rgb(163, 163, 163)");
         await page.GetByRole(AriaRole.Button, new() { Name = "切换昼夜", Exact = true }).ClickAsync();
         var next = theme == "light" ? "rgb(8, 8, 8)" : "rgb(255, 255, 255)";
-        await Expect(page.Locator(".photography-theme").First).ToHaveCSSAsync("background-color", next);
+        await Expect(page.Locator("[data-photography-theme]").First).ToHaveCSSAsync("background-color", next);
         await page.GotoAsync($"{baseUrl}/about");
-        await Expect(page.Locator("header .page-wrap")).ToBeVisibleAsync();
-        await Expect(page.Locator(".photography-theme")).ToHaveCountAsync(0);
+        await Expect(page.GetByRole(AriaRole.Banner)).ToBeVisibleAsync();
+        await Expect(page.Locator("[data-photography-theme]")).ToHaveCountAsync(0);
         Assert.Empty(errors);
     }
 
