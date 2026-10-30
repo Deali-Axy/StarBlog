@@ -1,6 +1,6 @@
 "use client"
 
-import Link from "next/link"
+import { BlogStyleLink as Link } from "@/components/blog/blog-layout-context"
 import { useEffect, useRef, useState, type KeyboardEvent } from "react"
 import { Dialog } from "radix-ui"
 import { Archive, ArrowUpRight, FileText, X } from "lucide-react"

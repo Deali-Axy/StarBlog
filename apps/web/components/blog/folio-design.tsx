@@ -1,6 +1,6 @@
 "use client"
 
-import Link from "next/link"
+import { BlogStyleLink as Link } from "@/components/blog/blog-layout-context"
 import { ArrowUpRight } from "lucide-react"
 import { useI18n } from "@/components/app-providers"
 import { useBlogNavigation } from "@/components/blog/blog-navigation"

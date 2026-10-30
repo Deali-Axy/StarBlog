@@ -1,6 +1,6 @@
 "use client"
 
-import Link from "next/link"
+import { BlogStyleLink as Link } from "@/components/blog/blog-layout-context"
 import { Share2 } from "lucide-react"
 import { toast } from "sonner"
 
@@ -47,8 +47,8 @@ export function BlogPostRenderer({
   }
 
   return (
-    <div className={cn(pageContainerClassName, "grid gap-12 py-12 lg:grid-cols-[minmax(0,1fr)_16rem] lg:py-16")}>
-      <article lang={lang ?? "zh-CN"}>
+    <div data-blog-article-detail className={cn(pageContainerClassName, "grid gap-12 py-12 lg:grid-cols-[minmax(0,1fr)_16rem] lg:py-16")}>
+      <article lang={lang ?? "zh-CN"} className="min-w-0 [overflow-wrap:anywhere]">
         <p className={eyebrowClassName}>{post.categoryName || t.posts}</p>
         <h1 className={cn(headingClassName, "mt-3 text-3xl leading-tight md:text-4xl")}>{post.title}</h1>
         {post.summary ? (
@@ -97,7 +97,7 @@ export function BlogPostRenderer({
         <CommentSection postId={post.id} />
       </article>
       <aside className="hidden lg:block">
-        <div className="sticky top-24">
+        <div className="sticky top-[calc(var(--blog-header-height,4.5rem)+1.5rem)]">
           {toc.length > 0 ? <SidebarTOC items={toc} className="max-h-[70vh] overflow-y-auto" /> : null}
         </div>
       </aside>

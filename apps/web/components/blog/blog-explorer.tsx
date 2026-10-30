@@ -1,11 +1,12 @@
 "use client"
 
-import { useSearchParams } from "next/navigation"
 import { useMemo, useState } from "react"
 import { useI18n } from "@/components/app-providers"
 import { BlogNavigationProvider, useBlogNavigation } from "@/components/blog/blog-navigation"
 import type { CategoryTreeState } from "@/components/blog/category-tree"
-import { BlogDesignSwitcher, type BlogDesignProps } from "@/components/blog/blog-design-shared"
+import type { BlogDesignProps } from "@/components/blog/blog-design-shared"
+import { BlogDesignSwitcher } from "@/components/blog/blog-variant-switcher"
+import { useBlogLayout } from "@/components/blog/blog-layout-context"
 import { IndexDesign } from "@/components/blog/index-design"
 import { FolioDesign } from "@/components/blog/folio-design"
 import { ArchiveDesign } from "@/components/blog/archive-design"
@@ -13,7 +14,7 @@ import type { CategoryNodeResponse, PageResult, PostResponse } from "@/lib/api/t
 import { categoryPath } from "@/lib/blog-categories"
 import type { BlogQuery } from "@/lib/blog-query"
 import { blogThemeClassName } from "@/lib/blog-theme"
-import { BLOG_PREVIEW, resolveBlogVariant } from "@/lib/blog-variant"
+import { BLOG_PREVIEW } from "@/lib/blog-variant"
 import { cn } from "@/lib/utils"
 import styles from "./blog-designs.module.css"
 
@@ -24,8 +25,7 @@ interface BlogExplorerProps {
 }
 
 export function BlogExplorer({ categories, posts, query }: BlogExplorerProps) {
-  const searchParams = useSearchParams()
-  const variant = resolveBlogVariant(searchParams.get("bv"))
+  const { variant } = useBlogLayout()
   const activeQuery = { ...query, bv: BLOG_PREVIEW ? variant : undefined }
   return <BlogNavigationProvider query={activeQuery} variant={variant}>
     <BlogExplorerContent categories={categories} posts={posts} query={activeQuery} />

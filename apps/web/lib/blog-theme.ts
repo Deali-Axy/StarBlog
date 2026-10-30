@@ -1,6 +1,6 @@
 import type { BlogVariant } from "@/lib/blog-variant"
 
-// The list and its portals share tokens; the global site theme stays independent.
+// Each blog layout, article page and portal shares tokens; other site sections stay independent.
 const themes: Record<BlogVariant, string> = {
   library: [
     "[--background:#f7f8f2] dark:[--background:#171914]",

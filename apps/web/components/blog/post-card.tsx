@@ -2,7 +2,7 @@
 
 import { useI18n } from "@/components/app-providers"
 
-import Link from "next/link"
+import { BlogStyleLink as Link } from "@/components/blog/blog-layout-context"
 
 import type { PostCardModel } from "@/components/blog/enhanced-post-card"
 import { formatDate, readingMinutes } from "@/lib/format"
