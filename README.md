@@ -1,6 +1,6 @@
 # StarBlog
 
-![](./docs/images/logo.jpg)
+[六套 Logo 方案、素材与使用规范](./docs/brand/README.md)
 
 
 <p align="center">
