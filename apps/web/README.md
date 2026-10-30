@@ -59,7 +59,7 @@ Web 开发服务器：<http://localhost:3001>
 
 ## 样式约定
 
-组件样式使用 Tailwind CSS v4，字号、间距和圆角优先使用标准工具类。博客三版的独立构图与响应式排版集中在 `components/blog/blog-designs.module.css`，样式通过 CSS Modules 限定作用域。复杂布局、流体字号和主题变量可使用任意值；条件样式通过 `cn()` 组合完整类名，不动态拼接工具类名称。
+组件样式使用 Tailwind CSS v4，字号、间距和圆角优先使用标准工具类。博客三版的独立构图与响应式排版集中在 `components/blog/blog-designs.module.css`，样式通过 CSS Modules 限定作用域。复杂布局、流体字号和主题变量可使用任意值；条件样式通过 `cn()` 组合完整类名，不动态拼接工具类名称。自定义响应式断点与 Tailwind 默认断点统一使用 `rem`，避免混用 `px` 导致生成顺序与预期不符；例如首页桌面断点使用 `min-[70rem]`。
 
 `app/globals.css` 仅保留 Tailwind/shadcn 导入、明暗主题变量、字体及圆角映射、基础层和 Marquee 动画注册。公共容器、标题、摄影主题等工具类组合集中在 `lib/styles.ts`；摄影主题必须同时应用于页面容器和 Portal 弹出层。Markdown 在组件入口引入 highlight.js 官方主题，其排版使用局部 Tailwind 类。
 
