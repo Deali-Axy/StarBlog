@@ -39,6 +39,8 @@ Web 开发服务器：<http://localhost:3001>
 
 内容组件复用真实文章、照片与友链数据，通过 `components/home/home-sections.module.css` 中的 `data-home-design` 区分构图。刊物版采用主次选文、年份索引、接触印样和往来簿；书桌版采用选题卡、撕页手记、相纸和地址卡。最新文章标题直接进入全文，旁边按钮独立展开摘要；摄影保留原图画幅并提供加载失败提示。分类布局组件独立注册于 `featured-categories/index.tsx`，内容风格切换不会重置当前分类布局。
 
+精选摄影展示 API 返回的全部推荐照片，前端不再截取前四张。两种风格均按可用宽度自动排列：刊物版卡片最小宽度约 160px，书桌版约 176px；宽屏增加列数，窄屏自然换行，单张照片保留较大的展示尺寸。缩略图使用懒加载与响应式尺寸选择。展示总数取决于后台设置的推荐照片数量。
+
 新增内容风格时，在 `lib/home-variant.ts` 的 `HOME_VARIANT_OPTIONS` 注册 ID 和中英文名称，并在局部 CSS Module 中增加对应构图；默认值由 `HOME_VARIANT` 控制，类型、菜单及 URL 解析会跟随注册表更新。若新风格需要不同的内容结构，可在现有 section 组件中按 `useHomeDesign().variant` 选择结构。`pnpm test:home` 检查偏好优先级、非法参数回退、独立分类选择、URL 保留和年份分组。
 
 ## 博客列表风格预览

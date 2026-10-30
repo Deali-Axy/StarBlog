@@ -12,7 +12,7 @@ import { photoThumbnail, photoThumbnailSet } from "@/lib/media"
 import { routes } from "@/lib/routes"
 import styles from "./home-sections.module.css"
 
-function PhotoPrint({ photo, index }: { photo: PhotoResponse; index: number }) {
+function PhotoPrint({ photo, index, single }: { photo: PhotoResponse; index: number; single: boolean }) {
   const { t } = useI18n()
   const [failed, setFailed] = useState(false)
   const location = photo.location?.trim()
@@ -21,7 +21,8 @@ function PhotoPrint({ photo, index }: { photo: PhotoResponse; index: number }) {
     <Link href={routes.photo(photo.id)} className={styles.photoLink} aria-label={`${t.viewLargePhoto}: ${photo.title}`}>
       {failed ? <span className={styles.photoFallback}><Camera size={24} aria-hidden="true" /><span>{t.photoLoadFailed}</span></span> : (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={photoThumbnail(photo.id, 800)} srcSet={photoThumbnailSet(photo.id)} sizes="(min-width: 1120px) 320px, (min-width: 640px) 30vw, 80vw"
+        <img src={photoThumbnail(photo.id, 480)} srcSet={photoThumbnailSet(photo.id)}
+          sizes={single ? "(min-width: 768px) 600px, 80vw" : "auto, (min-width: 640px) 220px, 80vw"}
           alt={photo.title} width={photo.width || undefined} height={photo.height || undefined} loading="lazy" onError={() => setFailed(true)} />
       )}
       <span className={styles.photoArrow}><ArrowUpRight size={18} aria-hidden="true" /></span>
@@ -40,7 +41,7 @@ export function FeaturedPhotos({ photos }: { photos: PhotoResponse[] }) {
     <div className={styles.photoSheet}>
       <div className={styles.sheetRunning}><span>{t.featuredPhotos}</span><Camera size={14} aria-hidden="true" /></div>
       <div className={styles.photoGrid} data-single={photos.length === 1 || undefined}>
-        {photos.slice(0, 4).map((photo, index) => <PhotoPrint key={photo.id} photo={photo} index={index} />)}
+        {photos.map((photo, index) => <PhotoPrint key={photo.id} photo={photo} index={index} single={photos.length === 1} />)}
       </div>
     </div>
   </section>

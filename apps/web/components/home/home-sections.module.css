@@ -52,7 +52,7 @@
 /* Contact sheet: preserve the original photograph, including portrait frames. */
 .photoSheet { padding: 1.5rem; background: var(--muted); }
 .sheetRunning { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 1.5rem; color: var(--muted-foreground); font-size: .6875rem; letter-spacing: .1em; }
-.photoGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr)); align-items: center; gap: 1.25rem; }
+.photoGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 10rem), 1fr)); align-items: center; gap: 1.25rem; }
 .photoPrint { min-width: 0; }
 .photoLink { position: relative; display: block; background: var(--card); }
 .photoLink img { display: block; width: 100%; height: auto; max-height: 23rem; object-fit: contain; }
@@ -101,7 +101,7 @@
 .sections[data-home-design=desk] .latestRow { border-bottom-style: dashed; }
 .sections[data-home-design=desk] .photoSheet { padding: .75rem .75rem 1.25rem; background: transparent; }
 .sections[data-home-design=desk] .sheetRunning { margin-bottom: 1.75rem; }
-.sections[data-home-design=desk] .photoGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2.5rem 2rem; padding-inline: .5rem; }
+.sections[data-home-design=desk] .photoGrid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 11rem), 1fr)); gap: 2rem 1.25rem; padding-inline: .5rem; }
 .sections[data-home-design=desk] .photoPrint { padding: .75rem .75rem 1.25rem; background: var(--card); box-shadow: 3px 5px 0 var(--muted); transform: rotate(-1.5deg); }
 .sections[data-home-design=desk] .photoPrint:nth-child(even) { transform: rotate(2deg); }
 .sections[data-home-design=desk] .photoPrint:nth-child(3n) { transform: rotate(.75deg); }
@@ -133,9 +133,8 @@
   .yearLabel strong { font-size: 1.75rem; }
   .latestRowHeading { grid-template-columns: 2.5rem minmax(0, 1fr) 2.75rem; gap: .5rem; }
   .articleSummary { padding-right: .25rem; padding-left: 3rem; }
-  .photoGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem 1rem; }
+  .photoGrid { gap: 1.5rem 1rem; }
   .photoSheet { padding: 1rem; }
-  .photoPrint:first-child { grid-column: 1 / -1; }
   .photoPrint figcaption { gap: .5rem; }
   .friendsGrid { grid-template-columns: minmax(0, 1fr); gap: 0; }
   .sections[data-home-design=desk] .featuredGrid { grid-template-columns: minmax(0, 1fr); gap: 1.25rem; }
@@ -143,7 +142,7 @@
   .sections[data-home-design=desk] .featuredArticle:nth-child(2) { transform: rotate(.75deg); }
   .sections[data-home-design=desk] .featuredArticle .folio { font-size: 3rem; margin-bottom: 1.25rem; }
   .sections[data-home-design=desk] .featuredArticle h3 { font-size: 1.5rem; }
-  .sections[data-home-design=desk] .photoGrid { grid-template-columns: minmax(0, 1fr); gap: 2rem; }
+  .sections[data-home-design=desk] .photoGrid { gap: 1.5rem; }
   .sections[data-home-design=desk] .photoPrint { padding: .75rem .75rem 1rem; }
   .sections[data-home-design=desk] .friendsGrid { gap: .75rem; }
 }
