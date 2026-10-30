@@ -1,0 +1,31 @@
+{
+  "id": "horizon",
+  "code": "E",
+  "name": "远岸",
+  "nameEn": "HORIZON",
+  "description": "清爽、远景、开放",
+  "status": "prepared",
+  "selected": false,
+  "palette": {
+    "primary": "#3455D9",
+    "accent": "#F49A55",
+    "paper": "#F7F8FC",
+    "ink": "#171918"
+  },
+  "iconBackground": "#3455D9",
+  "wordmarkOnly": false,
+  "minimumSize": {
+    "mark": 24,
+    "logo": 140
+  },
+  "origin": {
+    "tool": "built-in ImageGen",
+    "concept": "concept.png",
+    "prompt": "prompt.txt"
+  },
+  "source": {
+    "mark": "source/mark.svg",
+    "wordmark": "source/wordmark.svg"
+  },
+  "refinement": "基于已认可概念规整几何、平滑矢量轮廓与统一字标；统一实色、透明镂空、留白及输出尺寸。"
+}
