@@ -4,7 +4,6 @@ import { createContext, useContext, useSyncExternalStore, type ReactNode } from 
 import { useSearchParams } from "next/navigation"
 
 import { homeDesignHref, homePreferencesCookie, resolveHomePreferences, serializeHomePreferences, type HomePreferences } from "@/lib/home-variant"
-import styles from "./home-sections.module.css"
 
 const changeEvent = "starblog:home-design"
 
@@ -48,6 +47,6 @@ export function HomeDesignProvider({ savedPreferences, children }: { savedPrefer
   }
 
   return <HomeDesignContext.Provider value={{ ...preferences, update }}>
-    <div data-home-design={preferences.variant} className={styles.sections}>{children}</div>
+    <div data-home-design={preferences.variant} className="min-w-0">{children}</div>
   </HomeDesignContext.Provider>
 }

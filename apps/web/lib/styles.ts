@@ -27,3 +27,19 @@ export const photographyThemeClassName = [
   "[--ring:#737373] dark:[--ring:#a3a3a3]",
   "[&_:is(a,button,select):focus-visible]:outline-2 [&_:is(a,button,select):focus-visible]:outline-solid [&_:is(a,button,select):focus-visible]:outline-offset-3 [&_:is(a,button,select):focus-visible]:outline-ring",
 ].join(" ")
+
+// The homepage menu is portalled, so it shares the cover's theme tokens explicitly.
+export const homeThemeClassName = [
+  "[--background:#f6f3ec] dark:[--background:#191b1a]",
+  "[--foreground:#292720] dark:[--foreground:#eee9df]",
+  "[--card:#fbf9f4] dark:[--card:#222522] [--card-foreground:var(--foreground)]",
+  "[--muted:#eae6dc] dark:[--muted:#292c28]",
+  "[--muted-foreground:#726b60] dark:[--muted-foreground:#b0ab9f]",
+  "[--border:#dcd5c8] dark:[--border:#3b3e36]",
+  "[--primary:#a34e36] dark:[--primary:#e7a17e]",
+  "[--primary-foreground:#fffaf3] dark:[--primary-foreground:#241b15]",
+  "[--accent:#eae3d7] dark:[--accent:#32342c] [--accent-foreground:var(--foreground)]",
+  "[--ring:var(--primary)]",
+].join(" ")
+
+export const homeSectionClassName = "mt-16 first:mt-10 sm:mt-22"

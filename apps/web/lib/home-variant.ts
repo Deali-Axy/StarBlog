@@ -1,6 +1,6 @@
 import { FEATURED_CATEGORIES_VARIANT, parseFeaturedCategoriesVariant, type FeaturedCategoriesVariant } from "@/lib/featured-categories-variant"
 
-/** Add a named design here and its scoped styles in home-sections.module.css. */
+/** Register a named design here and choose its Tailwind compositions in the home sections. */
 export const HOME_VARIANT_OPTIONS = [
   { id: "editorial", labelZh: "刊物内页", labelEn: "The Publication" },
   { id: "desk", labelZh: "个人书桌", labelEn: "The Writing Desk" },
