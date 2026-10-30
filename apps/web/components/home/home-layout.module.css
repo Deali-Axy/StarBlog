@@ -1,4 +1,4 @@
-.layout {
+.layout, .theme {
   --background: #f6f3ec;
   --foreground: #292720;
   --card: #fbf9f4;
@@ -11,12 +11,13 @@
   --accent: #eae3d7;
   --accent-foreground: var(--foreground);
   --ring: var(--primary);
-  min-height: 100dvh;
   background: var(--background);
   color: var(--foreground);
 }
 
-:global(.dark) .layout {
+.layout { min-height: 100dvh; }
+
+:global(.dark) .layout, :global(.dark) .theme {
   --background: #191b1a;
   --foreground: #eee9df;
   --card: #222522;
