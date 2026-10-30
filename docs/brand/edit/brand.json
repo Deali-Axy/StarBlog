@@ -1,0 +1,31 @@
+{
+  "id": "edit",
+  "code": "D",
+  "name": "留白",
+  "nameEn": "EDIT",
+  "description": "字标、留白、编辑感",
+  "status": "prepared",
+  "selected": false,
+  "palette": {
+    "primary": "#242326",
+    "accent": "#8F3547",
+    "paper": "#F8F5F0",
+    "ink": "#171918"
+  },
+  "iconBackground": "#8F3547",
+  "wordmarkOnly": true,
+  "minimumSize": {
+    "mark": 24,
+    "logo": 140
+  },
+  "origin": {
+    "tool": "built-in ImageGen",
+    "concept": "concept.png",
+    "prompt": "prompt.txt"
+  },
+  "source": {
+    "mark": "source/mark.svg",
+    "wordmark": "source/wordmark.svg"
+  },
+  "refinement": "基于已认可概念规整几何、平滑矢量轮廓与统一字标；统一实色、透明镂空、留白及输出尺寸。"
+}
