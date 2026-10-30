@@ -9,6 +9,8 @@ import { LatestPostRow } from "@/components/home/latest-post-row"
 import { Button } from "@/components/ui/button"
 import type { PostResponse, PublishedPostSummary } from "@/lib/api/types"
 import { routes } from "@/lib/routes"
+import { eyebrowClassName, headingClassName } from "@/lib/styles"
+import { cn } from "@/lib/utils"
 
 export function LatestPosts({ posts }: { posts: PostResponse[] }) {
   const { t } = useI18n()
@@ -18,8 +20,8 @@ export function LatestPosts({ posts }: { posts: PostResponse[] }) {
     <section className="mt-20">
       <div className="mb-6 flex items-end justify-between gap-4">
         <div>
-          <p className="kicker">{t.latest}</p>
-          <h2 className="mt-2 text-2xl">{t.latestPosts}</h2>
+          <p className={eyebrowClassName}>{t.latest}</p>
+          <h2 className={cn(headingClassName, "mt-2 text-2xl")}>{t.latestPosts}</h2>
         </div>
         <Button variant="ghost" size="sm" asChild>
           <Link href={routes.blog}>{t.allPosts}</Link>
@@ -42,8 +44,8 @@ export function FeaturedPosts({ posts }: { posts: PublishedPostSummary[] }) {
     <section className="mt-8">
       <div className="mb-8 flex items-end justify-between gap-4">
         <div>
-          <p className="kicker">{t.featured}</p>
-          <h2 className="mt-2 text-2xl">{t.recommended}</h2>
+          <p className={eyebrowClassName}>{t.featured}</p>
+          <h2 className={cn(headingClassName, "mt-2 text-2xl")}>{t.recommended}</h2>
         </div>
         <Button variant="ghost" size="sm" asChild>
           <Link href={routes.blog}>{t.viewAll}</Link>

@@ -12,6 +12,8 @@ import { getCategoryWordCloud, getHome, getOverview, listPosts } from "@/lib/api
 import { parseFeaturedCategoriesVariant } from "@/lib/featured-categories-variant"
 import { postHref, routes } from "@/lib/routes"
 import { absoluteUrl, getSite } from "@/lib/site"
+import { eyebrowClassName, headingClassName, pageContainerClassName } from "@/lib/styles"
+import { cn } from "@/lib/utils"
 
 export const revalidate = 300
 
@@ -60,7 +62,7 @@ export default async function HomePage({
       />
       <HomeHero locale={locale} site={site} overview={overview} photo={photo} topPost={home.topPost} />
 
-      <div className="page-wrap relative pb-20">
+      <div className={cn(pageContainerClassName, "relative pb-20")}>
         <FeaturedPosts posts={home.featuredPosts} />
         <LatestPosts posts={latest.items} />
 
@@ -75,8 +77,8 @@ export default async function HomePage({
           <section className="mt-20">
             <div className="mb-6 flex items-end justify-between">
               <div>
-                <p className="kicker">{t.photoPaper}</p>
-                <h2 className="mt-2 text-2xl">{t.featuredPhotos}</h2>
+                <p className={eyebrowClassName}>{t.photoPaper}</p>
+                <h2 className={cn(headingClassName, "mt-2 text-2xl")}>{t.featuredPhotos}</h2>
               </div>
               <Button variant="ghost" size="sm" asChild>
                 <Link href={routes.photography}>{t.allPhotos}</Link>
@@ -100,8 +102,8 @@ export default async function HomePage({
         <section className="mt-20">
           <div className="mb-4 flex items-end justify-between gap-4">
             <div>
-              <p className="kicker">{t.exchange}</p>
-              <h2 className="mt-2 text-2xl">{t.friendLinks}</h2>
+              <p className={eyebrowClassName}>{t.exchange}</p>
+              <h2 className={cn(headingClassName, "mt-2 text-2xl")}>{t.friendLinks}</h2>
             </div>
             <Button variant="ghost" size="sm" asChild>
               <Link href={routes.links}>{t.applyLink}</Link>

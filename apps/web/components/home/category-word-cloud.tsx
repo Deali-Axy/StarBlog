@@ -6,6 +6,8 @@ import Link from "next/link"
 
 import type { CategoryWordCloudItem } from "@/lib/api/types"
 import { routes } from "@/lib/routes"
+import { eyebrowClassName, headingClassName } from "@/lib/styles"
+import { cn } from "@/lib/utils"
 
 export function CategoryWordCloud({ items }: { items: CategoryWordCloudItem[] }) {
   const { t } = useI18n()
@@ -14,8 +16,8 @@ export function CategoryWordCloud({ items }: { items: CategoryWordCloudItem[] })
 
   return (
     <section className="mt-20">
-      <p className="kicker">{t.index}</p>
-      <h2 className="mt-2 mb-6 text-2xl">{t.categories}</h2>
+      <p className={eyebrowClassName}>{t.index}</p>
+      <h2 className={cn(headingClassName, "mt-2 mb-6 text-2xl")}>{t.categories}</h2>
       <div className="flex flex-wrap items-baseline gap-x-5 gap-y-3">
         {items.map((item) => {
           const weight = item.count / max

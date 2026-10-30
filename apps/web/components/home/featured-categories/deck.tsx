@@ -10,6 +10,7 @@ import { resolveCategoryIcon } from "@/components/home/featured-categories/icons
 import { Button } from "@/components/ui/button"
 import type { FeaturedCategoryResponse } from "@/lib/api/types"
 import { routes } from "@/lib/routes"
+import { eyebrowClassName, headingClassName } from "@/lib/styles"
 import { cn } from "@/lib/utils"
 
 const DECK_SWIPE_OFFSET = 140
@@ -40,7 +41,7 @@ function DeckCardFace({
       />
       <div className="relative flex items-start justify-between gap-3">
         <div>
-          <p className="kicker">{t.paths}</p>
+          <p className={eyebrowClassName}>{t.paths}</p>
           <p className="mt-2 font-heading text-xs tracking-[0.18em] text-muted-foreground">
             {t.folioOf(index + 1, total)}
           </p>
@@ -51,7 +52,7 @@ function DeckCardFace({
       </div>
       <div className="relative mt-8">
         <p className="font-heading text-sm text-muted-foreground/80">{n}</p>
-        <h3 className="mt-1 font-heading text-3xl leading-tight md:text-4xl">{category.name}</h3>
+        <h3 className={cn(headingClassName, "mt-1 font-heading text-3xl leading-tight md:text-4xl")}>{category.name}</h3>
         {category.description ? (
           <p className="mt-4 line-clamp-4 max-w-lg text-sm leading-relaxed text-muted-foreground">
             {category.description}
@@ -129,7 +130,7 @@ export function DeckVariant({ categories }: { categories: FeaturedCategoryRespon
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
       <div className="relative mx-auto w-full max-w-xl">
-        <div className="relative h-[22rem] md:h-[24rem]" style={{ perspective: 1400 }}>
+        <div className="relative h-88 perspective-[1400px] md:h-96">
           {stackPreview.map(({ offset, category, absoluteIndex }) => {
             const isTop = offset === 0
             const depth = offset
@@ -137,7 +138,7 @@ export function DeckVariant({ categories }: { categories: FeaturedCategoryRespon
               return (
                 <motion.div
                   key={`stack-${category.id}-${absoluteIndex}`}
-                  className="pointer-events-none absolute inset-0"
+                  className="pointer-events-none absolute inset-0 origin-bottom"
                   aria-hidden
                   initial={false}
                   animate={
@@ -151,7 +152,7 @@ export function DeckVariant({ categories }: { categories: FeaturedCategoryRespon
                         }
                   }
                   transition={{ type: "spring", stiffness: 260, damping: 28 }}
-                  style={{ zIndex: 10 - depth, transformOrigin: "50% 100%" }}
+                  style={{ zIndex: 10 - depth }}
                 >
                   <DeckCardFace category={category} index={absoluteIndex} total={total} />
                 </motion.div>
@@ -160,8 +161,8 @@ export function DeckVariant({ categories }: { categories: FeaturedCategoryRespon
             return (
               <motion.div
                 key={`top-${category.id}-${index}`}
-                className="absolute inset-0 cursor-grab touch-pan-y active:cursor-grabbing"
-                style={{ x, rotate, opacity, zIndex: 30, transformOrigin: "50% 100%" }}
+                className="absolute inset-0 z-30 origin-bottom cursor-grab touch-pan-y active:cursor-grabbing"
+                style={{ x, rotate, opacity }}
                 drag={reduceMotion || busy ? false : "x"}
                 dragConstraints={{ left: 0, right: 0 }}
                 dragElastic={0.82}

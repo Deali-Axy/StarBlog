@@ -10,6 +10,7 @@ import { resolveCategoryIcon } from "@/components/home/featured-categories/icons
 import { Button } from "@/components/ui/button"
 import type { FeaturedCategoryResponse } from "@/lib/api/types"
 import { routes } from "@/lib/routes"
+import { eyebrowClassName, headingClassName } from "@/lib/styles"
 import { cn } from "@/lib/utils"
 
 export function CatalogVariant({ categories }: { categories: FeaturedCategoryResponse[] }) {
@@ -47,10 +48,9 @@ export function CatalogVariant({ categories }: { categories: FeaturedCategoryRes
                   </span>
                 </span>
                 <motion.span
-                  className="h-px flex-1 bg-border/80"
+                  className="h-px origin-left flex-1 bg-border/80"
                   initial={false}
                   animate={{ opacity: selected ? 1 : 0.35, scaleX: selected ? 1 : 0.7 }}
-                  style={{ transformOrigin: "left center" }}
                 />
               </button>
             </li>
@@ -71,12 +71,12 @@ export function CatalogVariant({ categories }: { categories: FeaturedCategoryRes
           >
             <div>
               <div className="flex items-start justify-between gap-4">
-                <p className="kicker">{t.paths}</p>
+                <p className={eyebrowClassName}>{t.paths}</p>
                 <span className="flex size-12 items-center justify-center rounded-full border border-primary/30 bg-primary/10 text-primary">
                   <ActiveIcon className="size-5" aria-hidden />
                 </span>
               </div>
-              <h3 className="mt-6 font-heading text-3xl md:text-4xl">{active.name}</h3>
+              <h3 className={cn(headingClassName, "mt-6 font-heading text-3xl md:text-4xl")}>{active.name}</h3>
               {active.description ? (
                 <p className="mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground md:text-[0.95rem]">
                   {active.description}

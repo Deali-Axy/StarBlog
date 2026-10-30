@@ -4,6 +4,8 @@ import type { Metadata } from "next"
 import { Button } from "@/components/ui/button"
 import { routes } from "@/lib/routes"
 import { absoluteUrl, site } from "@/lib/site"
+import { eyebrowClassName, headingClassName } from "@/lib/styles"
+import { cn } from "@/lib/utils"
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getI18n()
@@ -16,8 +18,8 @@ export default async function RssPage() {
 
   return (
     <div className="mx-auto w-full max-w-3xl px-4 py-16">
-      <p className="kicker">{t.subscribe}</p>
-      <h1 className="mt-2 text-3xl">RSS</h1>
+      <p className={eyebrowClassName}>{t.subscribe}</p>
+      <h1 className={cn(headingClassName, "mt-2 text-3xl")}>RSS</h1>
       <p className="mt-8 leading-relaxed text-muted-foreground">
         {t.rssHint}
       </p>

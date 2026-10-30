@@ -10,10 +10,11 @@ import { resolveCategoryIcon } from "@/components/home/featured-categories/icons
 import { Button } from "@/components/ui/button"
 import type { FeaturedCategoryResponse } from "@/lib/api/types"
 import { routes } from "@/lib/routes"
+import { eyebrowClassName, headingClassName } from "@/lib/styles"
 import { cn } from "@/lib/utils"
 
-const CARD_WIDTH = 280
-const CARD_GAP = 20
+const CARD_WIDTH = 280 // w-70
+const CARD_GAP = 20 // gap-5
 const STEP = CARD_WIDTH + CARD_GAP
 
 export function RailVariant({ categories }: { categories: FeaturedCategoryResponse[] }) {
@@ -58,8 +59,8 @@ export function RailVariant({ categories }: { categories: FeaturedCategoryRespon
     <div className="space-y-5">
       <div ref={trackRef} className="relative overflow-hidden py-4">
         <motion.div
-          className="flex touch-pan-y"
-          style={{ x, gap: CARD_GAP, width: categories.length * STEP }}
+          className="flex touch-pan-y gap-5"
+          style={{ x, width: categories.length * STEP }}
           drag={reduceMotion ? false : "x"}
           dragConstraints={{
             left: offsetFor(categories.length - 1),
@@ -81,8 +82,7 @@ export function RailVariant({ categories }: { categories: FeaturedCategoryRespon
             return (
               <motion.div
                 key={category.id}
-                className="shrink-0"
-                style={{ width: CARD_WIDTH }}
+                className="w-70 shrink-0"
                 animate={
                   reduceMotion
                     ? { scale: 1, opacity: 1 }
@@ -99,11 +99,11 @@ export function RailVariant({ categories }: { categories: FeaturedCategoryRespon
                   onFocus={() => setIndex(i)}
                 >
                   <div className="flex items-start justify-between gap-3">
-                    <p className="kicker">{String(i + 1).padStart(2, "0")}</p>
+                    <p className={eyebrowClassName}>{String(i + 1).padStart(2, "0")}</p>
                     <Icon className="size-5 text-primary/80" aria-hidden />
                   </div>
                   <div>
-                    <h3 className="font-heading text-2xl leading-snug group-hover:text-primary">{category.name}</h3>
+                    <h3 className={cn(headingClassName, "font-heading text-2xl leading-snug group-hover:text-primary")}>{category.name}</h3>
                     {category.description ? (
                       <p className="mt-3 line-clamp-4 text-sm leading-relaxed text-muted-foreground">
                         {category.description}

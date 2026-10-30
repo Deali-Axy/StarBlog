@@ -3,6 +3,8 @@ import type { Metadata } from "next"
 
 import { LinkApplyForm } from "@/components/links/link-apply-form"
 import { listVisibleLinks } from "@/lib/api/queries"
+import { eyebrowClassName, headingClassName, pageContainerClassName } from "@/lib/styles"
+import { cn } from "@/lib/utils"
 
 export const revalidate = 300
 
@@ -11,16 +13,15 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t.friendLinks, description: t.linksDescription }
 }
 
-
 export default async function LinksPage() {
   const { t } = await getI18n()
   const links = await listVisibleLinks()
 
   return (
-    <div className="page-wrap space-y-14 py-16">
+    <div className={cn(pageContainerClassName, "space-y-14 py-16")}>
       <div>
-        <p className="kicker">{t.exchange}</p>
-        <h1 className="mt-2 text-3xl">{t.friendLinks}</h1>
+        <p className={eyebrowClassName}>{t.exchange}</p>
+        <h1 className={cn(headingClassName, "mt-2 text-3xl")}>{t.friendLinks}</h1>
       </div>
 
       {links.length > 0 ? (
@@ -43,13 +44,13 @@ export default async function LinksPage() {
 
       <div className="grid gap-12 lg:grid-cols-2">
         <section>
-          <h2 className="text-xl">{t.applyLink}</h2>
+          <h2 className={cn(headingClassName, "text-xl")}>{t.applyLink}</h2>
           <div className="mt-6">
             <LinkApplyForm />
           </div>
         </section>
         <section>
-          <h2 className="text-xl">{t.requirements}</h2>
+          <h2 className={cn(headingClassName, "text-xl")}>{t.requirements}</h2>
           <ol className="mt-6 space-y-4 text-sm">
             {t.linkRequirements.map((item, index) => (
               <li key={item.title}>

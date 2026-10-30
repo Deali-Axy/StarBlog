@@ -7,6 +7,7 @@ import Link from "next/link"
 import { BookOpen, ChevronRight } from "lucide-react"
 
 import type { TocNode } from "@/lib/api/types"
+import { headingClassName } from "@/lib/styles"
 import { cn } from "@/lib/utils"
 
 export interface FlatTocItem {
@@ -71,7 +72,7 @@ export function SidebarTOC({
     <nav className={cn("space-y-1", className)}>
       <div className="mb-3 flex items-center gap-2">
         <BookOpen className="size-4 text-primary" />
-        <h3 className="text-sm font-semibold">{title ?? t.toc}</h3>
+        <h3 className={cn(headingClassName, "text-sm font-semibold")}>{title ?? t.toc}</h3>
       </div>
       <div className="space-y-1">
         {filtered.map((item, index) => {

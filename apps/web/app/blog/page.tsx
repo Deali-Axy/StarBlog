@@ -11,6 +11,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { getCategoryTree, listPosts } from "@/lib/api/queries"
 import { routes } from "@/lib/routes"
+import { eyebrowClassName, headingClassName, pageContainerClassName } from "@/lib/styles"
+import { cn } from "@/lib/utils"
 
 export const revalidate = 300
 
@@ -59,7 +61,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   const items = posts.items
 
   return (
-    <div className="page-wrap grid gap-12 py-12 lg:grid-cols-[14rem_minmax(0,1fr)]">
+    <div className={cn(pageContainerClassName, "grid gap-12 py-12 lg:grid-cols-[14rem_minmax(0,1fr)]")}>
       <aside className="lg:sticky lg:top-24 lg:self-start">
         <CategoryTree
           categoryNodes={tree}
@@ -69,8 +71,8 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
       </aside>
       <div className="space-y-6">
         <div>
-          <p className="kicker">{t.observations}</p>
-          <h1 className="mt-2 text-3xl">{t.posts}</h1>
+          <p className={eyebrowClassName}>{t.observations}</p>
+          <h1 className={cn(headingClassName, "mt-2 text-3xl")}>{t.posts}</h1>
         </div>
         <form className="flex gap-2" action={routes.blog} method="get">
           {categoryId ? <input type="hidden" name="categoryId" value={categoryId} /> : null}

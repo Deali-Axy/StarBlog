@@ -6,6 +6,7 @@ import Link from "next/link"
 
 import { formatDate } from "@/lib/format"
 import { postHref } from "@/lib/routes"
+import { eyebrowClassName, headingClassName } from "@/lib/styles"
 import { cn } from "@/lib/utils"
 
 export interface PostCardModel {
@@ -32,8 +33,8 @@ export function EnhancedPostCard({ post, variant = "default" }: EnhancedPostCard
   return (
     <article className={cn("group border-t border-border/80 pt-5", featured && "pt-0 border-t-0")}>
       <Link href={href} className="block">
-        <p className="kicker">{post.categoryName || (featured ? t.pinned : t.posts)}</p>
-        <h3 className={cn("mt-2 group-hover:text-primary", featured ? "text-2xl leading-snug" : "text-lg")}>
+        <p className={eyebrowClassName}>{post.categoryName || (featured ? t.pinned : t.posts)}</p>
+        <h3 className={cn(headingClassName, "mt-2 group-hover:text-primary", featured ? "text-2xl leading-snug" : "text-lg")}>
           {post.title}
         </h3>
         {post.summary ? (

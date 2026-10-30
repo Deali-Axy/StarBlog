@@ -7,6 +7,8 @@ import { getSite } from "@/lib/site"
 
 import { PostCard } from "@/components/blog/post-card"
 import type { PostResponse } from "@/lib/api/types"
+import { headingClassName } from "@/lib/styles"
+import { cn } from "@/lib/utils"
 
 export function RelatedPosts({ posts }: { posts: PostResponse[] }) {
   const { t } = useI18n()
@@ -14,7 +16,7 @@ export function RelatedPosts({ posts }: { posts: PostResponse[] }) {
 
   return (
     <section className="mt-10">
-      <h2 className="mb-4 text-xl font-semibold">{t.relatedPosts}</h2>
+      <h2 className={cn(headingClassName, "mb-4 text-xl font-semibold")}>{t.relatedPosts}</h2>
       <div className="grid gap-4 md:grid-cols-2">
         {posts.map((post) => (
           <PostCard
@@ -46,7 +48,7 @@ export function PostCopyright({
   return (
     <section className="mt-16 border-t border-border/70 pt-8">
       <p className="mb-4 font-mono text-sm text-muted-foreground">_EOF_</p>
-      <h2 className="text-lg">{title}</h2>
+      <h2 className={cn(headingClassName, "text-lg")}>{title}</h2>
       <dl className="mt-4 space-y-2 text-sm">
         <div>
           <dt className="inline font-medium">{t.author}</dt>

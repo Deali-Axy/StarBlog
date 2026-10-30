@@ -15,6 +15,8 @@ import { site } from "@/lib/site"
 import { formatDate, readingMinutes } from "@/lib/format"
 import { useI18n } from "@/components/app-providers"
 import { languageName } from "@/lib/i18n"
+import { eyebrowClassName, headingClassName, pageContainerClassName } from "@/lib/styles"
+import { cn } from "@/lib/utils"
 
 export function BlogPostRenderer({
   post,
@@ -45,10 +47,10 @@ export function BlogPostRenderer({
   }
 
   return (
-    <div className="page-wrap grid gap-12 py-12 lg:grid-cols-[minmax(0,1fr)_16rem] lg:py-16">
+    <div className={cn(pageContainerClassName, "grid gap-12 py-12 lg:grid-cols-[minmax(0,1fr)_16rem] lg:py-16")}>
       <article lang={lang ?? "zh-CN"}>
-        <p className="kicker">{post.categoryName || t.posts}</p>
-        <h1 className="mt-3 text-3xl leading-tight md:text-4xl">{post.title}</h1>
+        <p className={eyebrowClassName}>{post.categoryName || t.posts}</p>
+        <h1 className={cn(headingClassName, "mt-3 text-3xl leading-tight md:text-4xl")}>{post.title}</h1>
         {post.summary ? (
           <p className="mt-4 max-w-2xl text-lg leading-relaxed text-muted-foreground">{post.summary}</p>
         ) : null}

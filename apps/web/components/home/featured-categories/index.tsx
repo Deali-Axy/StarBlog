@@ -18,6 +18,7 @@ import {
   type FeaturedCategoriesVariant,
 } from "@/lib/featured-categories-variant"
 import { routes } from "@/lib/routes"
+import { eyebrowClassName, headingClassName } from "@/lib/styles"
 import { cn } from "@/lib/utils"
 
 export function FeaturedCategories({
@@ -46,8 +47,8 @@ export function FeaturedCategories({
     <section className="mt-20">
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="kicker">{t.paths}</p>
-          <h2 className="mt-2 text-2xl">{t.featuredCategories}</h2>
+          <p className={eyebrowClassName}>{t.paths}</p>
+          <h2 className={cn(headingClassName, "mt-2 text-2xl")}>{t.featuredCategories}</h2>
         </div>
         {preview ? (
           <div

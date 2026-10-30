@@ -15,6 +15,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { ApiError, type CommentResponse } from "@/lib/api/types"
 import { formatDate } from "@/lib/format"
 import { getAuthorInitials } from "@/lib/site"
+import { headingClassName } from "@/lib/styles"
+import { cn } from "@/lib/utils"
 
 const PROFILE_KEY = "starblog.comment.profile"
 
@@ -178,7 +180,7 @@ export function CommentSection({ postId }: { postId: string }) {
   return (
     <section className="mt-16 border-t border-border/70 pt-10">
       <div className="mb-8 flex items-end justify-between">
-        <h2 className="text-xl">{t.discussion}</h2>
+        <h2 className={cn(headingClassName, "text-xl")}>{t.discussion}</h2>
         <span className="text-sm text-muted-foreground">{t.commentCount(total)}</span>
       </div>
       <div className="space-y-8">

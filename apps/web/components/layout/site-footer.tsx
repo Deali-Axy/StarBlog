@@ -10,6 +10,7 @@ import type { LinkResponse } from "@/lib/api/types"
 import { isPhotographyPath } from "@/lib/photography/path"
 import { routes } from "@/lib/routes"
 import { site } from "@/lib/site"
+import { eyebrowClassName, pageContainerClassName } from "@/lib/styles"
 import { cn } from "@/lib/utils"
 
 export function SiteFooter({ links = [] }: { links?: LinkResponse[] }) {
@@ -18,7 +19,7 @@ export function SiteFooter({ links = [] }: { links?: LinkResponse[] }) {
   const muted = darkroom ? "text-white/55 hover:text-white" : "text-muted-foreground hover:text-foreground"
   return (
     <footer className={cn("border-t", darkroom ? "border-white/10 bg-black text-white" : "border-border/70")}>
-      <div className="page-wrap flex flex-col gap-8 py-12 sm:flex-row sm:items-start sm:justify-between">
+      <div className={cn(pageContainerClassName, "flex flex-col gap-8 py-12 sm:flex-row sm:items-start sm:justify-between")}>
         <div>
           <p className="flex items-center gap-2 font-heading">
             <StarMark className="size-3.5 text-primary" />
@@ -45,7 +46,7 @@ export function SiteFooter({ links = [] }: { links?: LinkResponse[] }) {
         </div>
         {links.length > 0 ? (
           <div className="max-w-sm">
-            <p className="kicker">{t.links}</p>
+            <p className={eyebrowClassName}>{t.links}</p>
             <ul className={cn("mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm", darkroom ? "text-white/55" : "text-muted-foreground")}>
               {links.map((link) => (
                 <li key={link.id}>

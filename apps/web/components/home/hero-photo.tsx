@@ -51,12 +51,12 @@ export function HeroPhoto({ photo }: { photo: PhotoResponse }) {
   }
 
   return (
-    <figure className="home-hero-photo">
-      <div className="home-hero-photo-heading">
-        <span className="home-hero-photo-label"><span aria-hidden="true">↳</span> {t.photoNotebook}</span>
-        <span className="home-hero-photo-note">{t.photography}</span>
+    <figure className="min-w-0 self-stretch md:mt-6">
+      <div className="mb-3 flex items-baseline justify-between gap-4">
+        <span className="text-xs tracking-widest"><span aria-hidden="true" className="pr-1.5 text-(--hero-ink)">↳</span> {t.photoNotebook}</span>
+        <span className="text-xs text-muted-foreground">{t.photography}</span>
       </div>
-      <Link href={routes.photo(current.id)} className="home-hero-photo-frame group" aria-label={`${t.viewLargePhoto}: ${current.title}`}>
+      <Link href={routes.photo(current.id)} className="group/photo relative block overflow-hidden bg-muted" aria-label={`${t.viewLargePhoto}: ${current.title}`}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={photoThumbnail(current.id, 1200)}
@@ -66,18 +66,18 @@ export function HeroPhoto({ photo }: { photo: PhotoResponse }) {
           width={current.width}
           height={current.height}
           fetchPriority="high"
-          className={cn("home-hero-photo-image", pending && "opacity-70")}
+          className={cn("block aspect-5/4 h-auto w-full object-cover transition-[opacity,transform] duration-300 ease-in-out group-hover/photo:scale-105 md:aspect-3/2", pending && "opacity-70")}
         />
-        <span className="home-hero-photo-open"><ArrowUpRight aria-hidden="true" className="size-5" /></span>
+        <span className="absolute right-0 bottom-0 grid size-11 place-items-center bg-background text-foreground"><ArrowUpRight aria-hidden="true" className="size-5" /></span>
       </Link>
-      <figcaption className="home-hero-photo-caption">
+      <figcaption className="flex items-baseline justify-between gap-4 border-b border-border py-3">
         <div aria-live="polite" aria-atomic="true" className="flex min-w-0 flex-wrap items-baseline gap-x-3 gap-y-1 text-xs">
           <span className="break-words">{current.title}</span>
           {hasLocation ? <span className="text-muted-foreground">/ {location}</span> : null}
         </div>
         <button
           type="button"
-          className="home-hero-photo-swap"
+          className="inline-flex min-h-8 shrink-0 cursor-pointer items-center justify-center gap-2 text-xs hover:text-(--hero-ink) disabled:cursor-wait disabled:opacity-50"
           disabled={pending}
           aria-busy={pending}
           onClick={() => void swap()}

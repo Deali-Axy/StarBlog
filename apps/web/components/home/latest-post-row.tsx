@@ -3,6 +3,8 @@ import Link from "next/link"
 import { formatDate } from "@/lib/format"
 import type { PostResponse } from "@/lib/api/types"
 import { postHref } from "@/lib/routes"
+import { headingClassName } from "@/lib/styles"
+import { cn } from "@/lib/utils"
 
 type LatestPostRowModel = Pick<
   PostResponse,
@@ -20,7 +22,7 @@ export function LatestPostRow({ post }: { post: LatestPostRowModel }) {
           {formatDate(post.lastUpdateTime)}
         </time>
         <div className="min-w-0 flex-1">
-          <h3 className="text-lg leading-snug group-hover:text-primary">{post.title}</h3>
+          <h3 className={cn(headingClassName, "text-lg leading-snug group-hover:text-primary")}>{post.title}</h3>
           {post.categoryName ? (
             <p className="mt-1 text-xs text-muted-foreground">{post.categoryName}</p>
           ) : null}

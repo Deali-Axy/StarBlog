@@ -12,9 +12,10 @@ import { Input } from "@/components/ui/input"
 import { isPhotographyPath } from "@/lib/photography/path"
 import { routes } from "@/lib/routes"
 import { site } from "@/lib/site"
-import { cn } from "@/lib/utils"
 import { useI18n } from "@/components/app-providers"
 import { LanguageToggle } from "@/components/layout/language-toggle"
+import { pageContainerClassName } from "@/lib/styles"
+import { cn } from "@/lib/utils"
 
 function SearchBox() {
   const { t } = useI18n()
@@ -77,7 +78,7 @@ export function SiteHeader() {
         darkroom ? "border-white/10 bg-black/90 text-white" : "border-border/70 bg-background/85",
       )}
     >
-      <div className="page-wrap flex flex-wrap items-center gap-x-4 gap-y-3 py-3 lg:flex-nowrap">
+      <div className={cn(pageContainerClassName, "flex flex-wrap items-center gap-x-4 gap-y-3 py-3 lg:flex-nowrap")}>
         <Link href={routes.home} className="flex items-center gap-2 font-heading text-base tracking-tight">
           <StarMark className="size-3.5 text-primary" />
           {site.name}

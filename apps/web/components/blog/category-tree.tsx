@@ -8,6 +8,7 @@ import { ChevronDown, ChevronRight } from "lucide-react"
 
 import type { CategoryNodeResponse } from "@/lib/api/types"
 import { routes } from "@/lib/routes"
+import { eyebrowClassName } from "@/lib/styles"
 import { cn } from "@/lib/utils"
 
 interface CategoryTreeProps {
@@ -87,7 +88,7 @@ export function CategoryTree({
   const { t } = useI18n()
   return (
     <nav className={cn(className)} aria-label={t.categoryTree}>
-      <p className="kicker mb-4">{t.categories}</p>
+      <p className={cn(eyebrowClassName, "mb-4")}>{t.categories}</p>
       <Link
         href={routes.blogList({ search: searchQuery })}
         className={cn(

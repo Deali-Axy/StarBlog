@@ -16,6 +16,7 @@ import { useI18n } from "@/components/app-providers"
 import { resolveCategoryIcon } from "@/components/home/featured-categories/icons"
 import type { FeaturedCategoryResponse } from "@/lib/api/types"
 import { routes } from "@/lib/routes"
+import { eyebrowClassName, headingClassName } from "@/lib/styles"
 import { cn } from "@/lib/utils"
 
 function TiltCard({
@@ -57,10 +58,9 @@ function TiltCard({
   return (
     <motion.div
       className={cn(
-        "min-h-0",
+        "min-h-0 perspective-[1000px]",
         featured ? "md:col-span-2 md:row-span-2" : "md:col-span-1",
       )}
-      style={{ perspective: 1000 }}
       initial={reduceMotion ? false : { opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: reduceMotion ? 0 : index * 0.05, type: "spring", stiffness: 300, damping: 28 }}
@@ -72,10 +72,9 @@ function TiltCard({
             : {
                 rotateX,
                 rotateY,
-                transformStyle: "preserve-3d",
               }
         }
-        className="h-full"
+        className={cn("h-full", !reduceMotion && "transform-3d")}
       >
         <Link
           ref={ref}
@@ -93,12 +92,13 @@ function TiltCard({
             aria-hidden
           />
           <div className="relative flex items-start justify-between gap-3">
-            <p className="kicker">{featured ? t.featured : t.paths}</p>
+            <p className={eyebrowClassName}>{featured ? t.featured : t.paths}</p>
             <Icon className={cn("text-primary/80", featured ? "size-6" : "size-4")} aria-hidden />
           </div>
-          <div className="relative mt-4" style={{ transform: "translateZ(24px)" }}>
+          <div className="relative mt-4 translate-z-6">
             <h3
               className={cn(
+                headingClassName,
                 "font-heading leading-snug group-hover:text-primary",
                 featured ? "text-2xl md:text-3xl" : "text-lg",
               )}

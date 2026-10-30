@@ -10,6 +10,7 @@ import { resolveCategoryIcon } from "@/components/home/featured-categories/icons
 import { Button } from "@/components/ui/button"
 import type { FeaturedCategoryResponse } from "@/lib/api/types"
 import { routes } from "@/lib/routes"
+import { eyebrowClassName, headingClassName } from "@/lib/styles"
 import { cn } from "@/lib/utils"
 
 export function AccordionVariant({ categories }: { categories: FeaturedCategoryResponse[] }) {
@@ -49,17 +50,17 @@ export function AccordionVariant({ categories }: { categories: FeaturedCategoryR
               />
               <div className={cn("relative flex h-full flex-col p-5", open ? "justify-between" : "justify-end")}>
                 <div className={cn("flex items-start justify-between gap-2", !open && "flex-col-reverse items-start gap-4")}>
-                  <p className="kicker">{String(index + 1).padStart(2, "0")}</p>
+                  <p className={eyebrowClassName}>{String(index + 1).padStart(2, "0")}</p>
                   <Icon className={cn("text-primary/80", open ? "size-5" : "size-4")} aria-hidden />
                 </div>
 
                 <div className="relative z-20 pointer-events-none">
                   <h3
                     className={cn(
+                      headingClassName,
                       "font-heading leading-snug",
-                      open ? "text-2xl md:text-3xl" : "text-sm writing-mode-vertical",
+                      open ? "text-2xl md:text-3xl" : "rotate-180 text-sm [writing-mode:vertical-rl]",
                     )}
-                    style={!open ? { writingMode: "vertical-rl", transform: "rotate(180deg)" } : undefined}
                   >
                     {category.name}
                   </h3>
