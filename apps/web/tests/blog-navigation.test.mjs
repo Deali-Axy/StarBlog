@@ -16,7 +16,7 @@ async function moduleUrl(name) {
   return url
 }
 const { parseBlogQuery, updateBlogQuery, blogQueryHref } = await import(await moduleUrl("blog-query"))
-const { resolveBlogVariant, BLOG_VARIANT } = await import(await moduleUrl("blog-variant"))
+const { resolveBlogVariant, BLOG_VARIANT, isBlogPath, blogStyleHref } = await import(await moduleUrl("blog-variant"))
 const { categoryPath, filterCategories } = await import(await moduleUrl("blog-categories"))
 
 test("preview can be fixed to the configured style, regardless of URL override", () => {
@@ -72,4 +72,16 @@ test("deep category lookup includes every ancestor, and name search keeps only m
   assert.deepEqual(filterCategories(tree, "no match"), [])
   assert.equal(filterCategories(tree, ""), tree)
   assert.equal(tree[0].nodes.length, 2, "the source tree remains available when search is cleared")
+})
+
+
+test("blog layouts cover exact section paths and links carry only the active blog style", () => {
+  for (const path of ["/blog", "/blog/a-post", "/blog/random", "/p/legacy-post"]) assert.equal(isBlogPath(path), true)
+  for (const path of ["/", "/blogging", "/photography", "/search", "/p"]) assert.equal(isBlogPath(path), false)
+  assert.equal(blogStyleHref("/blog/a-post?lang=en#part-two", "studio"), "/blog/a-post?lang=en&bv=studio#part-two")
+  assert.equal(blogStyleHref("/blog?page=2&bv=library", "editorial"), "/blog?page=2&bv=editorial")
+  assert.equal(blogStyleHref("/blog?bv=studio&page=2", "library", false), "/blog?page=2")
+  for (const href of ["/photography", "/search?keyword=React", "#contents", "https://example.com/blog", "//example.com/blog"]) {
+    assert.equal(blogStyleHref(href, "studio"), href)
+  }
 })

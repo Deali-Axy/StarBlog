@@ -253,7 +253,7 @@ public sealed class BlogNavigationTests {
     }
 
     [Fact]
-    public async Task Blog_theme_does_not_leak_into_post_home_or_photography() {
+    public async Task Blog_layout_follows_articles_but_does_not_leak_into_home_or_photography() {
         if (!E2EBaseUrl.TryGet(out var baseUrl)) return;
         using var playwright = await Playwright.CreateAsync();
         await using var browser = await LaunchAsync(playwright);
@@ -262,13 +262,16 @@ public sealed class BlogNavigationTests {
         await page.GotoAsync($"{baseUrl}/blog?bv=studio");
         await page.Locator("[data-blog-article] a").First.ClickAsync();
         await Expect(page.Locator("main h1").First).ToBeVisibleAsync();
+        await Expect(page.Locator("[data-blog-chrome]")).ToHaveAttributeAsync("data-blog-chrome", "studio");
         await Expect(page.Locator("[data-blog-variant]")).ToHaveCountAsync(0);
         await page.GetByRole(AriaRole.Banner).GetByRole(AriaRole.Link, new() { Name = "首页", Exact = true }).ClickAsync();
         await page.WaitForURLAsync($"{baseUrl}/");
+        await Expect(page.Locator("[data-blog-chrome]")).ToHaveCountAsync(0);
         await Expect(page.Locator("main h1")).ToBeVisibleAsync();
         await Expect(page.Locator("[data-blog-variant]")).ToHaveCountAsync(0);
         await page.GetByRole(AriaRole.Banner).GetByRole(AriaRole.Link, new() { Name = "摄影", Exact = true }).ClickAsync();
         await Expect(page.Locator("[data-photography-theme]").First).ToHaveCSSAsync("background-color", "rgb(255, 255, 255)");
+        await Expect(page.Locator("[data-blog-chrome]")).ToHaveCountAsync(0);
         await Expect(page.Locator("[data-blog-variant]")).ToHaveCountAsync(0);
     }
 
