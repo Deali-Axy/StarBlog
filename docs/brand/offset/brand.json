@@ -1,0 +1,31 @@
+{
+  "id": "offset",
+  "code": "B",
+  "name": "错位",
+  "nameEn": "OFFSET",
+  "description": "几何、秩序、硬朗",
+  "status": "prepared",
+  "selected": false,
+  "palette": {
+    "primary": "#171918",
+    "accent": "#D9F245",
+    "paper": "#FCFCF9",
+    "ink": "#171918"
+  },
+  "iconBackground": "#171918",
+  "wordmarkOnly": false,
+  "minimumSize": {
+    "mark": 24,
+    "logo": 140
+  },
+  "origin": {
+    "tool": "built-in ImageGen",
+    "concept": "concept.png",
+    "prompt": "prompt.txt"
+  },
+  "source": {
+    "mark": "source/mark.svg",
+    "wordmark": "source/wordmark.svg"
+  },
+  "refinement": "基于已认可概念规整几何、平滑矢量轮廓与统一字标；统一实色、透明镂空、留白及输出尺寸。"
+}
