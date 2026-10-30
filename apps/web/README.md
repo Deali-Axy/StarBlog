@@ -33,6 +33,14 @@ Web 开发服务器：<http://localhost:3001>
 
 首页单独使用 `components/home/home-layout.tsx` 与局部 CSS Module：桌面端以固定在视口内的侧栏展示编号索引、搜索及主题和语言工具，小屏直接展开导航入口。独立的暖纸色 / 深色主题与页脚只作用于 `/`，保留现有首屏、推荐内容和分类展示；`links`、`about`、搜索和 RSS 等页面继续使用通用 `SiteHeader` / `SiteFooter`，博客与摄影仍使用各自布局。
 
+右下角「自定义首页」菜单独立管理两组选项：内容区的「刊物内页 / 个人书桌」，以及精选分类的五种布局。分类区内不再展示切换条；默认分类继续读取 `FEATURED_CATEGORIES_VARIANT`（当前为 `accordion`），旧 `FEATURED_CATEGORIES_PREVIEW` 开关不影响新的自定义菜单。Hero、侧栏和 footer 不随内容风格切换。
+
+`?hv=editorial` 与 `?hv=desk` 直接指定内容风格，`?fc=deck|rail|catalog|accordion|tilt` 指定分类风格；有效 URL 参数优先于已保存偏好，非法值回退到偏好或配置默认值。用户通过菜单选择后，两个值一起写入 URL，并保存到 `starblog.home-design` Cookie 一年；刷新、离开首页再返回、切换语言均保留偏好。切换使用原生 history，不重新请求首页数据，保留其他查询参数、锚点与已展开的文章摘要，支持浏览器前进后退。
+
+内容组件复用真实文章、照片与友链数据，通过 `components/home/home-sections.module.css` 中的 `data-home-design` 区分构图。刊物版采用主次选文、年份索引、接触印样和往来簿；书桌版采用选题卡、撕页手记、相纸和地址卡。最新文章标题直接进入全文，旁边按钮独立展开摘要；摄影保留原图画幅并提供加载失败提示。分类布局组件独立注册于 `featured-categories/index.tsx`，内容风格切换不会重置当前分类布局。
+
+新增内容风格时，在 `lib/home-variant.ts` 的 `HOME_VARIANT_OPTIONS` 注册 ID 和中英文名称，并在局部 CSS Module 中增加对应构图；默认值由 `HOME_VARIANT` 控制，类型、菜单及 URL 解析会跟随注册表更新。若新风格需要不同的内容结构，可在现有 section 组件中按 `useHomeDesign().variant` 选择结构。`pnpm test:home` 检查偏好优先级、非法参数回退、独立分类选择、URL 保留和年份分组。
+
 ## 博客列表风格预览
 
 `/blog` 提供活字索引、折页手记、档案工作台三套独立构图，分别使用 `?bv=library`、`?bv=editorial`、`?bv=studio` 直接预览。右下角悬浮按钮打开风格预览菜单，不占用页头空间；切换会保留查询、分页及显示设置，URL 支持刷新与前进后退。
