@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Homepage「精选分类」布局开关。
  *
  * - deck: 堆叠翻阅
@@ -11,9 +11,9 @@
  */
 export type FeaturedCategoriesVariant = "deck" | "rail" | "catalog" | "accordion" | "tilt"
 
-export const FEATURED_CATEGORIES_VARIANT: FeaturedCategoriesVariant = "deck"
+export const FEATURED_CATEGORIES_VARIANT: FeaturedCategoriesVariant = "accordion"
 
-export const FEATURED_CATEGORIES_PREVIEW = true
+export const FEATURED_CATEGORIES_PREVIEW = false
 
 export const FEATURED_CATEGORIES_VARIANT_OPTIONS: {
   id: FeaturedCategoriesVariant
