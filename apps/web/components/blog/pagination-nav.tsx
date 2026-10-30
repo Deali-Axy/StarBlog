@@ -1,126 +1,48 @@
 "use client"
 
-import { useI18n } from "@/components/app-providers"
-
-import Link from "next/link"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-
+import { useI18n } from "@/components/app-providers"
+import { BlogLink, useBlogNavigation } from "@/components/blog/blog-navigation"
 import { Button } from "@/components/ui/button"
-import { routes } from "@/lib/routes"
-
-interface PaginationNavProps {
-  currentPage: number
-  totalPages: number
-  searchQuery?: string
-  categoryId?: number
-  sortBy?: string
-  sortType?: "asc" | "desc"
-  pageSize?: number
-  viewMode?: "grid" | "list"
-}
+import { cn } from "@/lib/utils"
 
 function pageNumbers(current: number, total: number) {
-  const pages: Array<number | "ellipsis"> = []
-  if (total <= 7) {
-    for (let page = 1; page <= total; page += 1) pages.push(page)
-    return pages
-  }
-  pages.push(1)
-  if (current > 4) pages.push("ellipsis")
-  const start = Math.max(2, current - 1)
-  const end = Math.min(total - 1, current + 1)
-  for (let page = start; page <= end; page += 1) pages.push(page)
-  if (current < total - 3) pages.push("ellipsis")
-  pages.push(total)
+  if (total <= 5) return Array.from({ length: total }, (_, index) => index + 1)
+  const numbers = [...new Set([1, Math.max(2, current - 1), current, Math.min(total - 1, current + 1), total])]
+    .filter((page) => page >= 1 && page <= total).sort((a, b) => a - b)
+  const pages: Array<number | string> = []
+  numbers.forEach((page, index) => {
+    if (index && page - numbers[index - 1] > 1) pages.push(`gap-${page}`)
+    pages.push(page)
+  })
   return pages
 }
 
-export function PaginationNav({
-  currentPage,
-  totalPages,
-  searchQuery,
-  categoryId,
-  sortBy,
-  sortType,
-  pageSize = 12,
-  viewMode = "grid",
-}: PaginationNavProps) {
+export function PaginationNav({ totalPages, totalCount, itemCount }: { totalPages: number; totalCount: number; itemCount: number }) {
   const { t } = useI18n()
-  const shared = {
-    search: searchQuery,
-    categoryId,
-    sortBy,
-    sortType,
-    pageSize,
-    view: viewMode,
-  }
-
-  if (totalPages <= 0) return null
-
+  const { query, variant, href } = useBlogNavigation()
+  const { page, pageSize } = query
+  const start = itemCount ? (page - 1) * pageSize + 1 : 0
+  if (totalPages < 1 || page > totalPages) return null
   return (
-    <nav aria-label={t.perPage} className="flex flex-wrap items-center justify-between gap-4 border-t border-border/70 pt-6">
-      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <span>
-          {currentPage} / {totalPages}
-        </span>
-        <span className="text-xs">{t.perPage}</span>
-        {[6, 12, 24].map((size) => (
-          <Button
-            key={size}
-            variant={pageSize === size ? "default" : "ghost"}
-            size="sm"
-            className="h-6 w-8 p-0 text-xs"
-            asChild
-          >
-            <Link href={routes.blogList({ ...shared, page: 1, pageSize: size })}>{size}</Link>
-          </Button>
-        ))}
+    <nav aria-label={t.articlePagination} className={cn("mt-8 flex flex-wrap items-center justify-between gap-5 border-t border-border pt-6", variant === "studio" && "font-mono")}>
+      <div className="space-y-2">
+        <p className="text-xs text-muted-foreground">{t.resultRange(start, start + Math.max(0, itemCount - 1), totalCount)}</p>
+        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+          <span className="mr-1">{t.perPage}</span>
+          {[6, 12, 24].map((size) => <BlogLink key={size} href={href({ pageSize: size })} aria-label={`${t.perPage} ${size}`}
+            aria-current={pageSize === size ? "true" : undefined}
+            className={cn("flex h-8 min-w-8 items-center justify-center rounded-md px-1.5", pageSize === size ? "bg-accent font-medium text-primary" : "hover:bg-muted")}>{size}</BlogLink>)}
+        </div>
       </div>
-      <div className="flex items-center gap-1">
-        <Button variant="ghost" size="icon-sm" disabled={currentPage <= 1} asChild={currentPage > 1}>
-          {currentPage > 1 ? (
-            <Link href={routes.blogList({ ...shared, page: currentPage - 1 })} aria-label={t.previousPage}>
-              <ChevronLeft />
-            </Link>
-          ) : (
-            <span>
-              <ChevronLeft />
-            </span>
-          )}
-        </Button>
-        {pageNumbers(currentPage, totalPages).map((page, index) =>
-          page === "ellipsis" ? (
-            <span key={`e-${index}`} className="px-2 text-muted-foreground">
-              ...
-            </span>
-          ) : (
-            <Button
-              key={page}
-              variant={currentPage === page ? "default" : "ghost"}
-              size="sm"
-              className="h-8 w-8 p-0"
-              asChild
-            >
-              <Link href={routes.blogList({ ...shared, page })}>{page}</Link>
-            </Button>
-          ),
-        )}
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          disabled={currentPage >= totalPages}
-          asChild={currentPage < totalPages}
-        >
-          {currentPage < totalPages ? (
-            <Link href={routes.blogList({ ...shared, page: currentPage + 1 })} aria-label={t.nextPage}>
-              <ChevronRight />
-            </Link>
-          ) : (
-            <span>
-              <ChevronRight />
-            </span>
-          )}
-        </Button>
+      <div className="flex max-w-full flex-wrap items-center gap-1">
+        {page > 1 ? <Button variant="outline" size="icon" asChild><BlogLink href={href({ page: page - 1 })} aria-label={t.previousPage}><ChevronLeft /></BlogLink></Button>
+          : <Button variant="outline" size="icon" disabled aria-label={t.previousPage}><ChevronLeft /></Button>}
+        {pageNumbers(page, totalPages).map((number) => typeof number === "string" ? <span key={number} className="px-1 text-muted-foreground" aria-hidden="true">…</span>
+          : <BlogLink key={number} href={href({ page: number })} aria-label={t.pageOf(number, totalPages)} aria-current={page === number ? "page" : undefined}
+            className={cn("flex size-9 items-center justify-center rounded-lg text-sm tabular-nums", page === number ? "bg-primary font-medium text-primary-foreground" : "text-muted-foreground hover:bg-muted")}>{number}</BlogLink>)}
+        {page < totalPages ? <Button variant="outline" size="icon" asChild><BlogLink href={href({ page: page + 1 })} aria-label={t.nextPage}><ChevronRight /></BlogLink></Button>
+          : <Button variant="outline" size="icon" disabled aria-label={t.nextPage}><ChevronRight /></Button>}
       </div>
     </nav>
   )

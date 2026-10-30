@@ -1,3 +1,5 @@
+import type { BlogVariant } from "@/lib/blog-variant"
+
 export const routes = {
   home: "/",
   blog: "/blog",
@@ -27,6 +29,7 @@ export const routes = {
       sortBy?: string
       sortType?: "asc" | "desc"
       view?: "grid" | "list"
+      bv?: BlogVariant
     } = {},
   ) {
     const query = new URLSearchParams()
@@ -37,6 +40,7 @@ export const routes = {
     if (params.sortBy && params.sortBy !== "lastUpdateTime") query.set("sortBy", params.sortBy)
     if (params.sortType && params.sortType !== "desc") query.set("sortType", params.sortType)
     if (params.view && params.view !== "grid") query.set("view", params.view)
+    if (params.bv) query.set("bv", params.bv)
     const suffix = query.toString()
     return suffix ? `/blog?${suffix}` : "/blog"
   },
