@@ -1,6 +1,6 @@
 "use client"
 
-import { usePathname, useSearchParams } from "next/navigation"
+import { useSearchParams } from "next/navigation"
 import type { ReactNode } from "react"
 import { BlogLayoutContext } from "@/components/blog/blog-layout-context"
 import { BlogDesignSwitcher } from "@/components/blog/blog-variant-switcher"
@@ -20,17 +20,16 @@ const chrome = {
 
 export function BlogLayout({ children }: { children: ReactNode }) {
   const variant = resolveBlogVariant(useSearchParams().get("bv"))
-  const pathname = usePathname()
   const { Header, Footer } = chrome[variant]
   // Keep the main subtree stable when styles switch, preserving category/search UI state.
   return <BlogLayoutContext.Provider value={{ variant }}>
     <div data-blog-chrome={variant} className={cn(blogThemeClassName(variant), styles.layout)}>
       <Header />
       <main className={styles.main}>
-        {pathname !== "/blog" ? <div className={styles.detailSwitcher}><BlogDesignSwitcher /></div> : null}
         {children}
       </main>
       <Footer />
+      <BlogDesignSwitcher />
     </div>
   </BlogLayoutContext.Provider>
 }

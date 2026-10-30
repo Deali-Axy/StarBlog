@@ -39,6 +39,20 @@ public sealed class BlogChromeTests {
         await Expect(footer).ToHaveAttributeAsync("data-blog-footer", variant);
         await Expect(header).ToHaveCountAsync(1);
         await Expect(footer).ToHaveCountAsync(1);
+        var preview = page.GetByRole(AriaRole.Button, new() { Name = "风格预览", Exact = true });
+        await Expect(preview).ToHaveCountAsync(1);
+        await Expect(preview).ToHaveCSSAsync("position", "fixed");
+        Assert.True(await preview.EvaluateAsync<bool>("el => { const r = el.getBoundingClientRect(); return r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight; }"));
+        await preview.ClickAsync();
+        var previewMenu = page.GetByRole(AriaRole.Menu, new() { Name = "风格预览", Exact = true });
+        await Expect(previewMenu).ToBeVisibleAsync();
+        Assert.True(await previewMenu.EvaluateAsync<bool>("el => { const r = el.getBoundingClientRect(); return r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight; }"));
+        Assert.Equal(await chrome.EvaluateAsync<string>("el => getComputedStyle(el).getPropertyValue('--card')"),
+            await previewMenu.EvaluateAsync<string>("el => getComputedStyle(el).getPropertyValue('--card')"));
+        await SaveAsync(page, $"chrome-{variant}-{width}-{theme}-preview");
+        await page.Keyboard.PressAsync("Escape");
+        await Expect(previewMenu).ToBeHiddenAsync();
+        await Expect(preview).ToBeFocusedAsync();
         Assert.False(await page.EvaluateAsync<bool>("document.documentElement.scrollWidth > innerWidth"));
         var menu = header.GetByRole(AriaRole.Button, new() { Name = "站点导航", Exact = true });
         if (width < 1024 && variant != "editorial") {
@@ -94,6 +108,39 @@ public sealed class BlogChromeTests {
         Assert.Empty(errors);
     }
 
+    [Fact]
+    public async Task Floating_preview_keyboard_selection_preserves_all_url_state_and_history() {
+        if (!E2EBaseUrl.TryGet(out var baseUrl)) return;
+        using var playwright = await Playwright.CreateAsync();
+        await using var browser = await LaunchAsync(playwright);
+        var page = await browser.NewPageAsync(new() { ViewportSize = new() { Width = 375, Height = 768 } });
+        await E2EBaseUrl.UseApiOverrideAsync(page);
+        await page.GotoAsync($"{baseUrl}/blog?bv=library&page=2&pageSize=12&sortBy=title&sortType=asc&view=list#preview");
+        var originalUrl = new Uri(page.Url);
+        var articles = await page.Locator("[data-blog-article] h2").AllTextContentsAsync();
+        var trigger = page.Locator("[data-blog-preview-trigger]");
+        await trigger.FocusAsync();
+        await page.Keyboard.PressAsync("Enter");
+        await page.Keyboard.PressAsync("Home");
+        await Expect(page.GetByRole(AriaRole.Menuitemradio, new() { Name = "活字索引", Exact = true })).ToHaveAttributeAsync("aria-checked", "true");
+        await page.Keyboard.PressAsync("ArrowDown");
+        await Expect(page.GetByRole(AriaRole.Menuitemradio, new() { Name = "折页手记", Exact = true })).ToBeFocusedAsync();
+        await page.Keyboard.PressAsync("Enter");
+        await Expect(page.Locator("[data-blog-chrome]")).ToHaveAttributeAsync("data-blog-chrome", "editorial");
+        await Expect(page.Locator("[data-blog-preview-menu]")).ToBeHiddenAsync();
+        await Expect(trigger).ToBeFocusedAsync();
+        Assert.Equal(originalUrl.Query.Replace("bv=library", "bv=editorial"), new Uri(page.Url).Query);
+        Assert.Equal(originalUrl.Fragment, new Uri(page.Url).Fragment);
+        Assert.Equal(articles, await page.Locator("[data-blog-article] h2").AllTextContentsAsync());
+        await page.GoBackAsync();
+        await Expect(page.Locator("[data-blog-chrome]")).ToHaveAttributeAsync("data-blog-chrome", "library");
+        await page.GoForwardAsync();
+        await Expect(page.Locator("[data-blog-chrome]")).ToHaveAttributeAsync("data-blog-chrome", "editorial");
+        await page.ReloadAsync();
+        await Expect(page.Locator("[data-blog-chrome]")).ToHaveAttributeAsync("data-blog-chrome", "editorial");
+        Assert.Equal(originalUrl.Fragment, new Uri(page.Url).Fragment);
+    }
+
     [Theory]
     [InlineData("library", "The Index")]
     [InlineData("editorial", "Field Notes")]
@@ -114,7 +161,7 @@ public sealed class BlogChromeTests {
         var originalUrl = page.Url;
         var next = variant == "studio" ? "library" : "studio";
         var nextLabel = next == "studio" ? "档案工作台" : "活字索引";
-        await page.GetByRole(AriaRole.Button, new() { Name = nextLabel, Exact = true }).ClickAsync();
+        await BlogPreview.SelectAsync(page, nextLabel);
         await Expect(page.Locator("[data-blog-chrome]")).ToHaveAttributeAsync("data-blog-chrome", next);
         Assert.Equal(new Uri(originalUrl).AbsolutePath, new Uri(page.Url).AbsolutePath);
         Assert.Contains("lang=original", page.Url);
@@ -124,7 +171,7 @@ public sealed class BlogChromeTests {
         await Expect(page.Locator("html")).ToHaveAttributeAsync("lang", "en");
         Assert.Contains($"bv={variant}", page.Url);
         Assert.DoesNotContain("lang=", page.Url);
-        await Expect(page.GetByRole(AriaRole.Group, new() { Name = "Design preview", Exact = true })).ToBeVisibleAsync();
+        await Expect(page.GetByRole(AriaRole.Button, new() { Name = "Design preview", Exact = true })).ToBeVisibleAsync();
         await page.GetByRole(AriaRole.Contentinfo).GetByRole(AriaRole.Link, new() { Name = "Articles", Exact = true }).ClickAsync();
         await Expect(page.GetByRole(AriaRole.Heading, new() { Name = englishTitle, Exact = true })).ToBeVisibleAsync();
         Assert.False(await page.EvaluateAsync<bool>("document.documentElement.scrollWidth > innerWidth"));

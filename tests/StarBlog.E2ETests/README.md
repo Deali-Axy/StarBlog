@@ -65,3 +65,5 @@ dotnet test tests/StarBlog.E2ETests/StarBlog.E2ETests.csproj \
 ```
 
 The fixture-specific edge-case test runs when the `Blog E2E root` category is present. Pure URL normalization, page resets, category paths/search, and the disabled-preview setting are covered by `pnpm test:blog` in `apps/web`.
+
+The floating design-preview menu is checked for keyboard selection, Escape/focus return, scoped portal themes, viewport placement and URL/history preservation. It appears on both lists and article pages without taking up header space.

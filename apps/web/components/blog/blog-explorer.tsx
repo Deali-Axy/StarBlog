@@ -5,7 +5,6 @@ import { useI18n } from "@/components/app-providers"
 import { BlogNavigationProvider, useBlogNavigation } from "@/components/blog/blog-navigation"
 import type { CategoryTreeState } from "@/components/blog/category-tree"
 import type { BlogDesignProps } from "@/components/blog/blog-design-shared"
-import { BlogDesignSwitcher } from "@/components/blog/blog-variant-switcher"
 import { useBlogLayout } from "@/components/blog/blog-layout-context"
 import { IndexDesign } from "@/components/blog/index-design"
 import { FolioDesign } from "@/components/blog/folio-design"
@@ -54,7 +53,6 @@ function BlogExplorerContent({ categories, posts, query }: BlogExplorerProps) {
   const design = variant === "library" ? "index" : variant === "editorial" ? "folio" : "archive"
   return <div data-blog-variant={variant} data-blog-design={design} className={cn(blogThemeClassName(variant), styles.design)}>
     <div className={cn(styles.container, variant === "editorial" && styles.folio, variant === "studio" && styles.archive)}>
-      <BlogDesignSwitcher />
       {variant === "library" ? <IndexDesign {...props} /> : variant === "editorial" ? <FolioDesign {...props} /> : <ArchiveDesign {...props} />}
     </div>
   </div>

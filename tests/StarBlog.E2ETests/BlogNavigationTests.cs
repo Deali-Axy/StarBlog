@@ -113,7 +113,7 @@ public sealed class BlogNavigationTests {
         await Expect(parentNode).ToHaveAttributeAsync("data-state", "closed");
         await Expect(tree.Locator($"[data-category-id='{other.Id}']")).ToHaveAttributeAsync("data-state", "open");
         await page.Keyboard.PressAsync("Escape");
-        await page.GetByRole(AriaRole.Button, new() { Name = "档案工作台", Exact = true }).ClickAsync();
+        await BlogPreview.SelectAsync(page, "档案工作台");
         await Expect(tree.Locator($"[data-category-id='{other.Id}']")).ToHaveAttributeAsync("data-state", "open");
         await page.GotoAsync($"{baseUrl}/blog?categoryId={child.Id}&bv=editorial");
         await Expect(page.GetByRole(AriaRole.Heading, new() { Name = child.Text, Exact = true })).ToBeVisibleAsync();
@@ -137,7 +137,7 @@ public sealed class BlogNavigationTests {
         var page = await NewPageAsync(browser);
         await page.GotoAsync($"{baseUrl}/blog?page=2&pageSize=6&view=list&sortBy=title&sortType=asc&bv=library");
         var articles = await page.Locator("[data-blog-article]").EvaluateAllAsync<string[]>("els => els.map(el => el.dataset.blogArticle)");
-        await page.GetByRole(AriaRole.Button, new() { Name = "折页手记", Exact = true }).ClickAsync();
+        await BlogPreview.SelectAsync(page, "折页手记");
         await Expect(page.Locator("[data-blog-variant]")).ToHaveAttributeAsync("data-blog-variant", "editorial");
         Assert.Contains("page=2", page.Url);
         Assert.Equal(articles, await page.Locator("[data-blog-article]").EvaluateAllAsync<string[]>("els => els.map(el => el.dataset.blogArticle)"));
@@ -186,7 +186,7 @@ public sealed class BlogNavigationTests {
         await tree.GetByRole(AriaRole.Link, new() { Name = "全部文章", Exact = true }).ClickAsync();
         Assert.Contains("pageSize=24", page.Url);
         await page.GetByRole(AriaRole.Button, new() { Name = "Switch to English", Exact = true }).ClickAsync();
-        await Expect(page.GetByRole(AriaRole.Group, new() { Name = "Design preview", Exact = true })).ToBeVisibleAsync();
+        await Expect(page.GetByRole(AriaRole.Button, new() { Name = "Design preview", Exact = true })).ToBeVisibleAsync();
         await Expect(page.GetByRole(AriaRole.Heading, new() { Name = "Field Notes", Exact = true })).ToBeVisibleAsync();
         Assert.Contains("bv=editorial", page.Url);
     }
@@ -283,7 +283,7 @@ public sealed class BlogNavigationTests {
         var page = await NewPageAsync(browser, 375);
         await page.GotoAsync($"{baseUrl}/blog?bv=invalid&view=list&pageSize=6");
         await Expect(page.Locator("[data-blog-variant]")).ToHaveAttributeAsync("data-blog-variant", "library");
-        await page.GetByRole(AriaRole.Button, new() { Name = "档案工作台", Exact = true }).ClickAsync();
+        await BlogPreview.SelectAsync(page, "档案工作台");
         var open = page.GetByRole(AriaRole.Button, new() { Name = "打开分类目录", Exact = true });
         await open.ClickAsync();
         var dialog = page.GetByRole(AriaRole.Dialog);
@@ -310,11 +310,11 @@ public sealed class BlogNavigationTests {
         var first = (await articles.Nth(0).BoundingBoxAsync())!;
         var second = (await articles.Nth(1).BoundingBoxAsync())!;
         Assert.True(first.Width > 1100 && second.Y >= first.Y + first.Height - 1);
-        await page.GetByRole(AriaRole.Button, new() { Name = "折页手记", Exact = true }).ClickAsync();
+        await BlogPreview.SelectAsync(page, "折页手记");
         first = (await articles.Nth(0).BoundingBoxAsync())!;
         second = (await articles.Nth(1).BoundingBoxAsync())!;
         Assert.True(Math.Abs(first.Y - second.Y) < 2 && first.Width > second.Width * 1.2);
-        await page.GetByRole(AriaRole.Button, new() { Name = "档案工作台", Exact = true }).ClickAsync();
+        await BlogPreview.SelectAsync(page, "档案工作台");
         var preview = page.GetByRole(AriaRole.Complementary, new() { Name = "文章预览", Exact = true });
         await Expect(preview).ToBeVisibleAsync();
         var title = await articles.Nth(1).GetByRole(AriaRole.Heading).InnerTextAsync();

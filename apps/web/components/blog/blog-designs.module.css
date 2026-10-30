@@ -1,11 +1,5 @@
 .design { min-height: calc(100dvh - 8rem); border-block: 1px solid var(--border); }
 .container { width: min(100% - 64px, 1280px); margin-inline: auto; padding-bottom: 48px; }
-.previewBar { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding-block: 20px; border-bottom: 1px solid var(--border); }
-.previewLabel { font-size: 10px; letter-spacing: .12em; color: var(--muted-foreground); }
-.previewOptions { display: flex; flex-wrap: wrap; gap: 20px; }
-.previewOption { display: flex; align-items: center; gap: 8px; padding-block: 6px; font-size: 12px; color: var(--muted-foreground); cursor: pointer; border-bottom: 2px solid transparent; }
-.previewOption[aria-pressed=true] { color: var(--foreground); border-color: currentColor; }
-.previewOption small { font: 10px ui-monospace, monospace; opacity: .65; }
 .breadcrumb { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; font-size: 11px; color: var(--muted-foreground); }
 .breadcrumb a:hover { color: var(--foreground); }
 .directoryButton { display: inline-flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 44px; max-width: 100%; padding: 10px 16px; border: 1px solid var(--foreground); font-size: 12px; cursor: pointer; }
@@ -114,7 +108,7 @@
 .archiveTitle small { display: block; margin-top: 5px; font: 9px ui-monospace, monospace; letter-spacing: .12em; color: var(--muted-foreground); }
 .archiveCount { text-align: right; font: 10px ui-monospace, monospace; color: var(--muted-foreground); }
 .archiveCount strong { display: block; font-size: 25px; font-weight: 400; color: var(--foreground); margin-bottom: 3px; }
-.archiveWorkbench { display: grid; grid-template-columns: 210px minmax(0, 1fr) minmax(270px, 31%); border: 1px solid var(--border); height: clamp(440px, calc(100dvh - 245px), 1000px); background: var(--card); }
+.archiveWorkbench { display: grid; grid-template-columns: 210px minmax(0, 1fr) minmax(270px, 31%); border: 1px solid var(--border); height: clamp(440px, calc(100dvh - 172px), 1000px); background: var(--card); }
 .archiveDirectory { display: flex; min-height: 0; flex-direction: column; border-right: 1px solid var(--border); background: var(--background); }
 .archiveDirectoryLabel { display: flex; justify-content: space-between; padding: 18px 16px; border-bottom: 1px solid var(--border); font-size: 11px; }
 .archiveDirectory .directoryFooter { margin-inline: 8px; padding: 16px 4px; }
@@ -192,11 +186,6 @@
 }
 @media (max-width: 639px) {
   .container, .folio, .archive { width: calc(100% - 32px); padding-bottom: 32px; }
-  .previewBar { align-items: start; gap: 8px; padding-block: 14px; }
-  .previewLabel { font-size: 9px; white-space: nowrap; letter-spacing: 0; line-height: 1.8; }
-  .previewOptions { gap: 12px; }
-  .previewOption { font-size: 11px; gap: 4px; }
-  .previewOption small { display: none; }
   .indexMasthead { display: block; position: relative; padding-block: 32px; padding-right: 60px; }
   .indexTitle, .indexTitle:lang(en) { font-size: 55px; }
   .indexEyebrow { font-size: 9px; margin-bottom: 16px; }
