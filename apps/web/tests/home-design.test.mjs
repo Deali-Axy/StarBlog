@@ -2,6 +2,10 @@ import assert from "node:assert/strict"
 import { readFile } from "node:fs/promises"
 import test from "node:test"
 import ts from "typescript"
+import { createRequire } from "node:module"
+import { readFileSync, existsSync } from "node:fs"
+import { fileURLToPath } from "node:url"
+import { runInNewContext } from "node:vm"
 
 const modules = new Map()
 async function moduleUrl(name) {
@@ -18,6 +22,51 @@ async function moduleUrl(name) {
 
 const { HOME_VARIANT, parseHomeVariant, resolveHomePreferences, serializeHomePreferences, homeDesignHref, groupHomePostsByYear } = await import(await moduleUrl("home-variant"))
 const { FEATURED_CATEGORIES_VARIANT } = await import(await moduleUrl("featured-categories-variant"))
+
+// Render real sections, replacing only the browser providers and Next's link.
+const require = createRequire(import.meta.url)
+const React = require("react")
+const { renderToStaticMarkup } = require("react-dom/server")
+
+function homeRenderer(variant) {
+  const cache = new Map()
+  const translations = new Proxy({}, { get: (_, key) => String(key) })
+  function load(name) {
+    if (name === "@/components/app-providers") return { useI18n: () => ({ t: translations, locale: "zh" }) }
+    if (name === "@/components/home/home-design-context") return { useHomeDesign: () => ({ variant }) }
+    if (name === "next/link") return { __esModule: true, default: ({ children, ...props }) => React.createElement("a", props, children) }
+    if (!name.startsWith("@/")) return require(name)
+    if (cache.has(name)) return cache.get(name)
+    const base = fileURLToPath(new URL(`../${name.slice(2)}`, import.meta.url))
+    const path = [base + ".tsx", base + ".ts"].find(existsSync)
+    assert.ok(path, `module exists: ${name}`)
+    const { outputText } = ts.transpileModule(readFileSync(path, "utf8"), {
+      compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX, esModuleInterop: true },
+    })
+    const compiledModule = { exports: {} }
+    runInNewContext(outputText, { module: compiledModule, exports: compiledModule.exports, require: load, process }, { filename: path })
+    cache.set(name, compiledModule.exports)
+    return compiledModule.exports
+  }
+  return (file, component, props) => renderToStaticMarkup(React.createElement(load(`@/components/home/${file}`)[component], props))
+}
+
+for (const variant of ["editorial", "desk"]) {
+  test(`${variant} renders every recommended article and photo beyond the old limits`, () => {
+    const render = homeRenderer(variant)
+    const posts = Array.from({ length: 6 }, (_, index) => ({ id: `post-${index}`, title: `Story ${index}`, summary: "A summary", lastUpdateTime: "2026-10-30T12:00:00Z" }))
+    const photos = Array.from({ length: 15 }, (_, index) => ({ id: `photo-${index}`, title: `Frame ${index}`, width: index % 2 ? 1000 : 1500, height: index % 2 ? 1500 : 1000 }))
+    const articles = render("featured-sections", "FeaturedPosts", { posts })
+    const prints = render("featured-photos", "FeaturedPhotos", { photos })
+    assert.equal((articles.match(/<article\b/g) || []).length, posts.length)
+    assert.equal((prints.match(/<figure\b/g) || []).length, photos.length)
+    for (const post of posts) assert.ok(articles.includes(post.title))
+    for (const photo of photos) assert.ok(prints.includes(`alt="${photo.title}"`))
+    assert.equal(render("featured-sections", "FeaturedPosts", { posts: [] }), "")
+    assert.equal(render("featured-photos", "FeaturedPhotos", { photos: [] }), "")
+    assert.equal((render("featured-photos", "FeaturedPhotos", { photos: photos.slice(0, 1) }).match(/<figure\b/g) || []).length, 1)
+  })
+}
 
 test("explicit links override saved choices independently; absent or invalid values fall back safely", () => {
   assert.deepEqual(resolveHomePreferences({}, "desk.tilt"), { variant: "desk", categories: "tilt" })
