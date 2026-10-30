@@ -33,9 +33,11 @@ Web 开发服务器：<http://localhost:3001>
 
 `/blog` 提供活字索引、折页手记、档案工作台三套独立构图，分别使用 `?bv=library`、`?bv=editorial`、`?bv=studio` 直接预览。顶部切换器会保留查询、分页及显示设置，URL 支持刷新与前进后退。
 
-默认风格与预览开关集中在 `lib/blog-variant.ts`。选定后修改 `BLOG_VARIANT` 并将 `BLOG_PREVIEW` 设为 `false`；此时隐藏切换器，固定使用配置值并忽略 URL 中的 `bv`。主题只应用于博客列表及它的弹层。
+默认风格与预览开关集中在 `lib/blog-variant.ts`。选定后修改 `BLOG_VARIANT` 并将 `BLOG_PREVIEW` 设为 `false`；此时隐藏切换器，固定使用配置值并忽略 URL 中的 `bv`。三版拥有各自的导航与页脚，覆盖 `/blog` 列表、文章详情与 `/p` 旧链接；详情正文排版保持原有结构。主题仅应用于博客外壳及其弹层，离开博客后恢复对应站点区域的布局。
 
 活字索引采用全宽文字条目和展开式分栏目录；折页手记采用不对称跨栏排版和独立目录页；档案工作台采用目录、文章索引和摘要预览三栏，小屏选择文章后打开预览对话框。档案索引支持 ↑ / ↓ / Home / End 键选择，预览不会改变 URL 或文章顺序。
+
+`SiteShell` 按路由接入 `BlogLayout`，三套 Header/Footer 分别位于 `index-chrome.tsx`、`folio-chrome.tsx`、`archive-chrome.tsx`。风格上下文与主内容保持稳定，切换外壳不会重置分类展开状态。博客内部文章、相关文章、语言链接和随机文章导航会保留当前 `bv`，canonical 与文章永久链接仍使用原始地址。
 
 保留既有 `bv` 标识以兼容已保存的地址。`view=grid` 表示各设计的展开阅读布局，`view=list` 表示紧凑索引；不强制三版使用同一种卡片网格。
 
