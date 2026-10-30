@@ -28,3 +28,11 @@ Web 开发服务器：<http://localhost:3001>
 自定义站点介绍可配置 `NEXT_PUBLIC_SITE_DESCRIPTION_EN`、`NEXT_PUBLIC_AUTHOR_TITLE_EN`、`NEXT_PUBLIC_AUTHOR_BIO_EN`、`NEXT_PUBLIC_LAB_NAME_EN` 和 `NEXT_PUBLIC_LAB_DESCRIPTION_EN`。未配置英文时保留对应的自定义原文；没有自定义值时使用内置中英文介绍。
 
 语言切换的浏览器回归测试位于 `tests/StarBlog.E2ETests/LanguageNavigationTests.cs`，启动 Web 后设置 `E2E_BASE_URL` 再运行。可用 `E2E_CHROMIUM_EXECUTABLE_PATH` 指定已安装的 Chromium；未设置时使用 Playwright 自带的浏览器。
+
+## 样式
+
+组件样式使用 Tailwind CSS v4，字号、间距和圆角优先使用标准工具类。复杂布局、流体字号和主题变量可使用任意值；条件样式通过 `cn()` 组合完整类名，不动态拼接工具类名称。
+
+`app/globals.css` 仅保留 Tailwind/shadcn 导入、明暗主题变量、字体及圆角映射、基础层和 Marquee 动画注册。公共容器、标题、摄影主题等工具类组合集中在 `lib/styles.ts`；摄影主题必须同时应用于页面容器和 Portal 弹出层。Markdown 在组件入口引入 highlight.js 官方主题，其排版使用局部 Tailwind 类。
+
+内联 `style` 仅用于运行时值，例如摄影布局坐标、Motion 动画、分类权重字号及层级缩进。Markdown 表格的对齐由正文数据决定，也保留为运行时样式。浏览器测试使用语义或 `data-*` 定位，不依赖样式类。
