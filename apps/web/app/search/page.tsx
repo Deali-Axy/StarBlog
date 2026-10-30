@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input"
 import { searchPosts } from "@/lib/api/queries"
 import { formatDate } from "@/lib/format"
 import { postHref, routes } from "@/lib/routes"
+import { eyebrowClassName, headingClassName, searchHighlightClassName } from "@/lib/styles"
+import { cn } from "@/lib/utils"
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getI18n()
@@ -27,8 +29,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
   return (
     <div className="mx-auto w-full max-w-3xl px-4 py-16">
-      <p className="kicker">{t.retrieval}</p>
-      <h1 className="mt-2 text-3xl">{t.search}</h1>
+      <p className={eyebrowClassName}>{t.retrieval}</p>
+      <h1 className={cn(headingClassName, "mt-2 text-3xl")}>{t.search}</h1>
       <form className="mt-8 flex gap-2" action={routes.search} method="get">
         <Input name="keyword" defaultValue={keyword} placeholder={t.keyword} />
         <Button type="submit">
@@ -47,13 +49,13 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             <li key={item.id} className="py-5">
               <Link href={postHref(item)} className="text-lg hover:text-primary">
                 <span
-                  className="search-hit"
+                  className={searchHighlightClassName}
                   dangerouslySetInnerHTML={{ __html: item.highlightedTitle }}
                 />
               </Link>
               <p className="mt-1 text-xs text-muted-foreground">{formatDate(item.lastUpdateTime)}</p>
               <p
-                className="search-hit mt-3 text-sm leading-relaxed text-muted-foreground"
+                className={cn(searchHighlightClassName, "mt-3 text-sm leading-relaxed text-muted-foreground")}
                 dangerouslySetInnerHTML={{ __html: item.highlightedSnippet }}
               />
             </li>
