@@ -42,7 +42,7 @@ pnpm test:photography
 
 ## Blog design regression
 
-`BlogNavigationTests` checks all three designs at 375, 768 and 1440 pixels in both themes, plus category expansion/search, mobile drawer focus, URL history, filtering, sorting and pagination. It expects a populated API with at least two categories that contain children and enough articles for pagination. Set `E2E_SCREENSHOT_DIR` to an absolute directory to save the 18 design screenshots.
+`BlogNavigationTests` checks all three designs at 375, 768 and 1440 pixels in both themes, plus category expansion/search, directory-dialog focus, URL history, filtering, sorting and pagination. It also checks the distinct full-width/asymmetric/workbench compositions, desktop archive keyboard selection, mobile article-preview focus return and all three English designs. It expects a populated API with at least two categories that contain children and enough articles for pagination. Set `E2E_SCREENSHOT_DIR` to an absolute directory to save the 18 design screenshots.
 
 For long titles, missing summaries, three category levels and empty-category coverage, create another isolated database:
 
