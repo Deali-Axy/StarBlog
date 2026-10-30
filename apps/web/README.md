@@ -29,7 +29,15 @@ Web 开发服务器：<http://localhost:3001>
 
 语言切换的浏览器回归测试位于 `tests/StarBlog.E2ETests/LanguageNavigationTests.cs`，启动 Web 后设置 `E2E_BASE_URL` 再运行。可用 `E2E_CHROMIUM_EXECUTABLE_PATH` 指定已安装的 Chromium；未设置时使用 Playwright 自带的浏览器。
 
-## 样式
+## 博客列表风格预览
+
+`/blog` 提供现代知识库、编辑杂志、科技面板三套设计，分别使用 `?bv=library`、`?bv=editorial`、`?bv=studio` 直接预览。顶部切换器会保留查询、分页及显示设置，URL 支持刷新与前进后退。
+
+默认风格与预览开关集中在 `lib/blog-variant.ts`。选定后修改 `BLOG_VARIANT` 并将 `BLOG_PREVIEW` 设为 `false`；此时隐藏切换器，固定使用配置值并忽略 URL 中的 `bv`。主题只应用于博客列表及它的弹层。
+
+分类默认折叠，直达子分类会展开祖先路径。分类名称搜索临时展示匹配路径，清空后恢复原来的展开状态；小屏通过分类抽屉访问同一套导航。纯查询与分类逻辑检查使用 `pnpm test:blog`，浏览器回归说明见仓库 `tests/StarBlog.E2ETests/README.md`。
+
+## 样式约定
 
 组件样式使用 Tailwind CSS v4，字号、间距和圆角优先使用标准工具类。复杂布局、流体字号和主题变量可使用任意值；条件样式通过 `cn()` 组合完整类名，不动态拼接工具类名称。
 

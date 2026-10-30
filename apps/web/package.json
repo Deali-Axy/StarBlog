@@ -10,7 +10,8 @@
     "start": "next start --port 3001",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "test:photography": "node tests/photography-layout.test.mjs && node tests/photography-image-cache.test.mjs"
+    "test:photography": "node tests/photography-layout.test.mjs && node tests/photography-image-cache.test.mjs",
+    "test:blog": "node tests/blog-navigation.test.mjs"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.100.14",

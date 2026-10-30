@@ -39,3 +39,26 @@ Pure photo-layout checks use the Web app's existing TypeScript dependency:
 cd apps/web
 pnpm test:photography
 ```
+
+## Blog design regression
+
+`BlogNavigationTests` checks all three designs at 375, 768 and 1440 pixels in both themes, plus category expansion/search, mobile drawer focus, URL history, filtering, sorting and pagination. It expects a populated API with at least two categories that contain children and enough articles for pagination. Set `E2E_SCREENSHOT_DIR` to an absolute directory to save the 18 design screenshots.
+
+For long titles, missing summaries, three category levels and empty-category coverage, create another isolated database:
+
+```sh
+python3 tests/StarBlog.E2ETests/prepare_blog_fixture.py \
+  apps/api/src/StarBlog.Api/app.db /tmp/starblog-blog-e2e.db
+```
+
+Start API and Web against this copy using the isolated-instance configuration above, then run:
+
+```sh
+E2E_BASE_URL=http://127.0.0.1:3001 \
+E2E_API_BASE_URL=http://127.0.0.1:15039 \
+E2E_CHROMIUM_EXECUTABLE_PATH=/usr/bin/google-chrome \
+dotnet test tests/StarBlog.E2ETests/StarBlog.E2ETests.csproj \
+  --filter FullyQualifiedName~BlogNavigationTests
+```
+
+The fixture-specific edge-case test runs when the `Blog E2E root` category is present. Pure URL normalization, page resets, category paths/search, and the disabled-preview setting are covered by `pnpm test:blog` in `apps/web`.
