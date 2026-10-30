@@ -28,7 +28,9 @@ export function ThemeToggle({ className, iconOnly = false }: { className?: strin
         setTheme(dark ? "light" : "dark")
       }}
     >
-      {iconOnly ? <><Sun className="hidden size-5 dark:block" /><Moon className="size-5 dark:hidden" /></> : mounted ? (resolvedTheme === "dark" ? t.night : t.day) : null}
+      <Sun className={iconOnly ? "hidden size-5 dark:block" : "size-4 dark:hidden"} aria-hidden="true" />
+      <Moon className={iconOnly ? "size-5 dark:hidden" : "hidden size-4 dark:block"} aria-hidden="true" />
+      {!iconOnly && mounted ? (resolvedTheme === "dark" ? t.night : t.day) : null}
     </Button>
   )
 }

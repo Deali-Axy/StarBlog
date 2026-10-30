@@ -1,5 +1,7 @@
 "use client"
 
+import { Languages } from "lucide-react"
+
 import { useI18n } from "@/components/app-providers"
 import { Button } from "@/components/ui/button"
 import { localeCookie } from "@/lib/i18n"
@@ -17,6 +19,7 @@ export function LanguageToggle({ className }: { className?: string }) {
 
   return (
     <Button variant="ghost" size="sm" onClick={switchLanguage} aria-label={t.switchLanguage} title={t.switchLanguage} className={className}>
+      <Languages className="size-4" aria-hidden="true" />
       {locale === "zh" ? "EN" : "中文"}
     </Button>
   )
