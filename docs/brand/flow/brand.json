@@ -1,0 +1,31 @@
+{
+  "id": "flow",
+  "code": "A",
+  "name": "回游",
+  "nameEn": "FLOW",
+  "description": "流动、温暖、轻盈",
+  "status": "prepared",
+  "selected": false,
+  "palette": {
+    "primary": "#EE513F",
+    "accent": "#EE513F",
+    "paper": "#FAF8F4",
+    "ink": "#171918"
+  },
+  "iconBackground": "#EE513F",
+  "wordmarkOnly": false,
+  "minimumSize": {
+    "mark": 24,
+    "logo": 140
+  },
+  "origin": {
+    "tool": "built-in ImageGen",
+    "concept": "concept.png",
+    "prompt": "prompt.txt"
+  },
+  "source": {
+    "mark": "source/mark.svg",
+    "wordmark": "source/wordmark.svg"
+  },
+  "refinement": "基于已认可概念规整几何、平滑矢量轮廓与统一字标；统一实色、透明镂空、留白及输出尺寸。"
+}
