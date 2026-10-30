@@ -5,9 +5,9 @@ export const BLOG_VARIANT: BlogVariant = "library"
 export const BLOG_PREVIEW = true
 
 export const BLOG_VARIANT_OPTIONS: { id: BlogVariant; labelZh: string; labelEn: string }[] = [
-  { id: "library", labelZh: "现代知识库", labelEn: "Library" },
-  { id: "editorial", labelZh: "编辑杂志", labelEn: "Editorial" },
-  { id: "studio", labelZh: "科技面板", labelEn: "Studio" },
+  { id: "library", labelZh: "活字索引", labelEn: "The Index" },
+  { id: "editorial", labelZh: "折页手记", labelEn: "Field Notes" },
+  { id: "studio", labelZh: "档案工作台", labelEn: "The Archive" },
 ]
 
 export function parseBlogVariant(value?: string | null): BlogVariant | null {

@@ -75,12 +75,12 @@ export function CategoryTree({ categoryNodes, state, onSelect, className }: Cate
         </div>
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 pb-3 [scrollbar-width:thin]">
-        <BlogLink href={href({ categoryId: undefined })} onClick={onSelect} aria-current={!query.categoryId ? "page" : undefined}
+        <BlogLink data-category-all href={href({ categoryId: undefined })} onClick={onSelect} aria-current={!query.categoryId ? "page" : undefined}
           className={cn("mb-3 flex min-h-11 items-center gap-2.5 rounded-lg px-3 text-sm font-medium", variant === "editorial" && "rounded-none border-b border-border",
             !query.categoryId ? "bg-accent text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground")}>
           <Library className="size-4" />{t.allPosts}
         </BlogLink>
-        {filtered.length ? filtered.map((node) => nodeView(node)) : <p className="px-3 py-8 text-sm text-muted-foreground">{searching ? t.noMatchingCategories : t.noCategories}</p>}
+        <div data-category-roots>{filtered.length ? filtered.map((node) => nodeView(node)) : <p className="px-3 py-8 text-sm text-muted-foreground">{searching ? t.noMatchingCategories : t.noCategories}</p>}</div>
       </div>
     </nav>
   )
