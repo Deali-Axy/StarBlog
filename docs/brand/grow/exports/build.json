@@ -1,0 +1,27 @@
+{
+  "generator": "0eebdabf8072016d18df0b6dbe7c538ac02dc74d0badea345e98d74aa9e50283",
+  "inputs": {
+    "brand.json": "0388ff75326ebd336f0b08465c898343a0cf79c013f9de0dc323ecbb827b9c3b",
+    "source/mark.svg": "c06f999aad8071bdd4d2598ce5e2f06e0c2e3e09901706064a0a0b8cce814d1a",
+    "source/wordmark.svg": "644c64f07eca134e197d2e28e0836f70bf8dd5841a6939b9be256a75e9e264b0"
+  },
+  "outputs": {
+    "app-icon.png": "25cba64e915bec092c99f49ce70b6c960c7a8e80ba35055e92a476327f048b1b",
+    "app-icon.svg": "c1b22a718444dcdc8f6be92cbf5abf2647ef1f6e97a8eab81fc77cb1b59ecd55",
+    "apple-touch-icon.png": "ba74ab9a851a991bfcbaf0cec7b2751019168feae6da24ea41a609f1addaea5b",
+    "favicon.ico": "eaa5b8e6076d9529827c83c8b939c519289fc415350dd6aeb716149037e309c3",
+    "logo-mono.svg": "94048b25509f19d15c5d5019581f5f93904be32135a2639195ccfe6887b8018a",
+    "logo-reversed.svg": "8ba57014d047abcf81a59f926f789e1c7fd2e3af9b6cf6d1e470288f6ba065da",
+    "logo-stacked.svg": "e03194d569a11e4cdcc8a206aeaf73e9b73381a3bad259f1e2fd3253a424034b",
+    "logo.png": "4a4b541b7be864c0857b62d5cf1470012b6680cb9d7da330f09a6a59d50a5f81",
+    "logo.svg": "8e80bc73d96922a4c901cde1c5c63b6786019e9a4faccb7626af9a76b16bc2a9",
+    "mark-current.svg": "98b77a71fcb31ef045c646b2e004351b71a95168d2df63c6f6ad5ca62b69a8a1",
+    "mark-mono.svg": "7a1bb9243421d54d81677e9aba052e2aa08bfcecc6681cda2c6246adbd2df0b5",
+    "mark-reversed.svg": "62fff402988c1e64bc6f3714d33ea321bf80da84966eee2206d27753cde05530",
+    "mark.png": "32a1662f21de86c02dfb097104c031673c220acd28d16c1806bbe07f6f5e21b0",
+    "mark.svg": "486f88541e9a55d652c6b46c628a88b1a8ec612e309a86ebe19fc76d2c3e1a78",
+    "preview.png": "7071ddbbe57439a8941f15979913df6760524a9a0db8030f0a6e1a8b6813571d",
+    "preview.svg": "e556a175dafceaa8dce2e0639fe75ab5caf5fba861ee48ede3f56c478826cbf7",
+    "wordmark.svg": "ce07aa2cfc2dbe227d2a898f774dfb9ba4c499b8dabb7ef27aae33c8635d65d0"
+  }
+}
