@@ -22,6 +22,9 @@ export function languageName(code: string, locale: Locale) {
 
 const zh = {
   home: "首页",
+  homeCoverLabel: "个人手记 · 封面",
+  homeFooterHeadline: "保持好奇，继续记录。",
+  skipToContent: "跳到正文",
   posts: "文章",
   photography: "摄影",
   siteNavigation: "站点导航",
@@ -265,6 +268,9 @@ const zh = {
 
 const en: typeof zh = {
   home: "Home",
+  homeCoverLabel: "A PERSONAL JOURNAL",
+  homeFooterHeadline: "Stay curious. Keep a record.",
+  skipToContent: "Skip to content",
   posts: "Articles",
   photography: "Photography",
   siteNavigation: "Site navigation",
