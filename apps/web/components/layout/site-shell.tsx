@@ -5,7 +5,6 @@ import type { ReactNode } from "react"
 
 import { PhotographyFooter, PhotographyHeader } from "@/components/photography/photography-chrome"
 import { BlogLayout } from "@/components/blog/blog-layout"
-import { HomeLayout } from "@/components/home/home-layout"
 import { SiteFooter } from "@/components/layout/site-footer"
 import { SiteHeader } from "@/components/layout/site-header"
 import { isPhotographyPath } from "@/lib/photography/path"
@@ -15,7 +14,7 @@ import { cn } from "@/lib/utils"
 
 export function SiteShell({ children }: { children: ReactNode }) {
   const pathname = usePathname()
-  if (pathname === "/") return <HomeLayout>{children}</HomeLayout>
+  if (pathname === "/") return <>{children}</>
   const photography = isPhotographyPath(pathname)
   if (isBlogPath(pathname)) return <BlogLayout>{children}</BlogLayout>
   return (

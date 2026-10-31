@@ -1,4 +1,9 @@
-﻿import Link from "next/link"
+"use client"
+
+import { useState } from "react"
+import { useHomeDesign } from "@/components/home/home-design-context"
+import styles from "./home-design.module.css"
+import Link from "next/link"
 import { ArrowDownRight, ArrowUpRight, Camera, Rss, Shuffle } from "lucide-react"
 
 import { StarMark } from "@/components/brand/star-mark"
@@ -6,12 +11,12 @@ import { EnhancedPostCard } from "@/components/blog/enhanced-post-card"
 import { HeroPhoto } from "@/components/home/hero-photo"
 import type { PhotoResponse, PublishedPostSummary, SiteOverviewResponse } from "@/lib/api/types"
 import { messages, type Locale } from "@/lib/i18n"
-import { routes } from "@/lib/routes"
+import { postHref, routes } from "@/lib/routes"
 import type { getSite } from "@/lib/site"
-import { headingClassName, pageContainerClassName } from "@/lib/styles"
+import { headingClassName } from "@/lib/styles"
 import { cn } from "@/lib/utils"
 
-type HomeHeroProps = {
+export type HomeHeroProps = {
     locale: Locale
     site: ReturnType<typeof getSite>
     overview: SiteOverviewResponse | null
@@ -19,7 +24,7 @@ type HomeHeroProps = {
     topPost?: PublishedPostSummary | null
 }
 
-export function HomeHero({ locale, site, overview, photo, topPost }: HomeHeroProps) {
+function CoverHero({ locale, site, overview, photo, topPost }: HomeHeroProps) {
     const t = messages[locale]
     const identity = site.authorName.match(/^(.+?)\s*[(（]([^()（）]+)[)）]\s*$/u)
     const name = identity?.[1]?.trim() || site.authorName
@@ -27,10 +32,10 @@ export function HomeHero({ locale, site, overview, photo, topPost }: HomeHeroPro
     const hasVisual = Boolean(photo || topPost)
 
     return (
-        <section
+        <section data-home-hero="cover"
             className={cn(
-                pageContainerClassName,
-                "pt-8 pb-10 [--hero-ink:oklch(0.53_0.17_32)] dark:[--hero-ink:oklch(0.76_0.14_38)]",
+                styles.container,
+                "pt-8 pb-10",
                 "[&_:is(a,button)]:[-webkit-tap-highlight-color:transparent] [&_:is(a,button):focus-visible]:outline-2 [&_:is(a,button):focus-visible]:outline-solid [&_:is(a,button):focus-visible]:outline-offset-4 [&_:is(a,button):focus-visible]:outline-(--hero-ink)",
                 "motion-reduce:[&_*]:transition-none! motion-reduce:[&_*]:animate-none! motion-reduce:[&_*::before]:transition-none! motion-reduce:[&_*::before]:animate-none! motion-reduce:[&_*::after]:transition-none! motion-reduce:[&_*::after]:animate-none!",
             )}
@@ -66,7 +71,7 @@ export function HomeHero({ locale, site, overview, photo, topPost }: HomeHeroPro
 
                     <div className="mt-7 flex flex-wrap items-center gap-6">
                         <Link href={routes.blogRandom} className="group/random inline-flex items-center gap-2.5 text-sm">
-                            <span className="grid size-11 place-items-center rounded-full bg-(--hero-ink) text-background transition-transform duration-200 ease-in-out group-hover/random:-rotate-12"><Shuffle aria-hidden="true" className="size-5" /></span>
+                            <span className="grid size-11 place-items-center rounded-full bg-(--hero-ink) text-primary-foreground transition-transform duration-200 ease-in-out group-hover/random:-rotate-12"><Shuffle aria-hidden="true" className="size-5" /></span>
                             <span>{t.randomPost}</span>
                             <ArrowUpRight aria-hidden="true" className="size-4" />
                         </Link>
@@ -122,4 +127,36 @@ export function HomeHero({ locale, site, overview, photo, topPost }: HomeHeroPro
             </div>
         </section>
     )
+}
+
+function SignatureHero({ locale, site, overview, topPost, children }: HomeHeroProps & { children?: React.ReactNode }) {
+    const t = messages[locale]
+    const name = site.authorName.replace(/\s*[(（].*?[)）]\s*$/u, "")
+    return <section data-home-hero={children ? "photograph" : "signature"} aria-labelledby="home-hero-name" className={cn(styles.container, "pt-8 pb-10")}>
+        {children}
+        <div className={cn("border-b border-foreground py-10 sm:py-14", children && "bg-background")}>
+            <p className="mb-5 text-xs tracking-[.2em] text-primary">{t.personalJournal} / {t.hero}</p>
+            <h1 id="home-hero-name" className="font-heading text-[clamp(3rem,9vw,6rem)] leading-tight tracking-[-.055em] wrap-anywhere">{name}<span className="ml-4 text-primary" aria-hidden="true">＊</span></h1>
+            <p className="mt-5 font-heading text-xl">{t.tagline}</p>
+            <p className="mt-4 max-w-xl text-sm leading-7 text-muted-foreground">{site.authorTitle} / {site.authorBio}</p>
+            <div className="mt-6 flex flex-wrap items-center gap-x-7 gap-y-2 text-sm [&_a]:inline-flex [&_a]:min-h-11 [&_a]:items-center [&_a]:gap-2 [&_a]:hover:text-primary">
+                <Link href={routes.blogRandom}><Shuffle size={16} aria-hidden="true" />{t.randomPost}</Link>
+                <Link href={routes.photographyRandom}><Camera size={16} aria-hidden="true" />{t.randomPhoto}</Link>
+                <Link href={routes.about}>{t.aboutMe}<ArrowUpRight size={16} aria-hidden="true" /></Link>
+            </div>
+            {overview ? <p className="mt-5 text-xs text-muted-foreground">{t.posts} {overview.postsCount.toLocaleString(locale === "zh" ? "zh-CN" : "en-US")} / {t.categories} {overview.categoriesCount.toLocaleString(locale === "zh" ? "zh-CN" : "en-US")} / {t.photography} {overview.photosCount.toLocaleString(locale === "zh" ? "zh-CN" : "en-US")}</p> : null}
+            {topPost ? <p className="mt-5 border-t border-border pt-5 text-sm"><span className="mr-3 text-xs text-primary">{t.pinned}</span><Link href={postHref(topPost)} className="hover:text-primary">{topPost.title}</Link></p> : null}
+        </div>
+    </section>
+}
+export function HomeHero(props: HomeHeroProps) {
+    const { config } = useHomeDesign()
+    const [failedPhoto, setFailedPhoto] = useState<string | null>(null)
+    if (config.hero === "cover") return <CoverHero {...props} />
+    if (config.hero === "signature") return <SignatureHero {...props} />
+    if (!props.photo || failedPhoto === props.photo.id) return <>
+        <SignatureHero {...props} />
+        <p role="status" className={cn(styles.container, "pb-4 text-xs text-muted-foreground")}>{messages[props.locale].homePhotoFallback}</p>
+    </>
+    return <SignatureHero {...props}><HeroPhoto photo={props.photo} fullWidth onFailure={() => setFailedPhoto(props.photo!.id)} /></SignatureHero>
 }

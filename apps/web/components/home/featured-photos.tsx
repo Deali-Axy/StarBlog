@@ -15,12 +15,12 @@ import { cn } from "@/lib/utils"
 
 function PhotoPrint({ photo, index, single }: { photo: PhotoResponse; index: number; single: boolean }) {
   const { t } = useI18n()
-  const { variant } = useHomeDesign()
-  const desk = variant === "desk"
+  const { config } = useHomeDesign()
+  const desk = config.sections.photos === "prints"
   const [failed, setFailed] = useState(false)
   const location = photo.location?.trim()
   const hasLocation = location && !/^(unknown|未知|未知地点)$/i.test(location)
-  return <figure className={cn("min-w-0", desk && "-rotate-[1.5deg] bg-card px-3 pt-3 pb-4 shadow-[3px_5px_0_var(--muted)] even:rotate-2 nth-[3n]:rotate-[.75deg] sm:pb-5", single && "mx-auto w-full max-w-[38rem]")}>
+  return <figure data-home-surface={desk ? "" : undefined} className={cn("min-w-0", desk && "-rotate-[1.5deg] bg-card px-3 pt-3 pb-4 even:rotate-2 nth-[3n]:rotate-[.75deg] sm:pb-5", single && "mx-auto w-full max-w-[38rem]")}>
     <Link href={routes.photo(photo.id)} className="group relative block bg-card" aria-label={`${t.viewLargePhoto}: ${photo.title}`}>
       {failed ? <span className="flex min-h-40 flex-col items-center justify-center gap-3 p-4 text-xs text-muted-foreground"><Camera size={24} aria-hidden="true" /><span>{t.photoLoadFailed}</span></span> : (
         // eslint-disable-next-line @next/next/no-img-element
@@ -36,14 +36,14 @@ function PhotoPrint({ photo, index, single }: { photo: PhotoResponse; index: num
 
 export function FeaturedPhotos({ photos }: { photos: PhotoResponse[] }) {
   const { t } = useI18n()
-  const { variant } = useHomeDesign()
+  const { config } = useHomeDesign()
   if (!photos.length) return null
-  return <section className={homeSectionClassName} aria-labelledby="home-photos-title">
-    <HomeSectionHeading id="home-photos-title" eyebrow={variant === "desk" ? t.homeOffScreen : t.homeContactSheet}
-      title={variant === "desk" ? t.homeDeskPhotosTitle : t.homePhotosTitle} href={routes.photography} action={t.allPhotos} />
-    <div className={variant === "desk" ? "px-3 pt-3 pb-5" : "bg-muted p-4 sm:p-6"}>
-      <div className={cn("flex items-center justify-between gap-4 text-[11px] tracking-[.1em] text-muted-foreground", variant === "desk" ? "mb-7" : "mb-6")}><span>{t.featuredPhotos}</span><Camera size={14} aria-hidden="true" /></div>
-      <div className={cn("grid items-center", variant === "desk" ? "grid-cols-[repeat(auto-fill,minmax(min(100%,11rem),1fr))] gap-6 px-2 sm:gap-x-5 sm:gap-y-8" : "grid-cols-[repeat(auto-fill,minmax(min(100%,10rem),1fr))] gap-x-4 gap-y-6 sm:gap-5", photos.length === 1 && "grid-cols-1")}>
+  return <section data-home-section="photos" data-home-variant={config.sections.photos} className={homeSectionClassName} aria-labelledby="home-photos-title">
+    <HomeSectionHeading id="home-photos-title" eyebrow={config.sections.photos === "prints" ? t.homeOffScreen : t.homeContactSheet}
+      title={config.sections.photos === "prints" ? t.homeDeskPhotosTitle : t.homePhotosTitle} href={routes.photography} action={t.allPhotos} />
+    <div className={config.sections.photos === "prints" ? "px-3 pt-3 pb-5" : "bg-muted p-4 sm:p-6"}>
+      <div className={cn("flex items-center justify-between gap-4 text-[11px] tracking-[.1em] text-muted-foreground", config.sections.photos === "prints" ? "mb-7" : "mb-6")}><span>{t.featuredPhotos}</span><Camera size={14} aria-hidden="true" /></div>
+      <div className={cn("grid items-center", config.sections.photos === "prints" ? "grid-cols-[repeat(auto-fill,minmax(min(100%,11rem),1fr))] gap-6 px-2 sm:gap-x-5 sm:gap-y-8" : "grid-cols-[repeat(auto-fill,minmax(min(100%,10rem),1fr))] gap-x-4 gap-y-6 sm:gap-5", photos.length === 1 && "grid-cols-1")}>
         {photos.map((photo, index) => <PhotoPrint key={photo.id} photo={photo} index={index} single={photos.length === 1} />)}
       </div>
     </div>

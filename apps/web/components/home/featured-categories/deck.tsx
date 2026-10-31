@@ -30,13 +30,13 @@ function DeckCardFace({
   const n = String(index + 1).padStart(2, "0")
 
   return (
-    <div className="relative flex h-full flex-col justify-between overflow-hidden border border-border/80 bg-card p-6 shadow-[0_18px_40px_-28px_rgba(40,30,10,0.45)] md:p-8">
+    <div data-home-surface className="relative flex h-full flex-col justify-between overflow-hidden border border-border/80 bg-card p-6 md:p-8">
       <div
         className="pointer-events-none absolute inset-y-0 left-0 w-2 bg-gradient-to-r from-foreground/8 to-transparent"
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute -right-10 -top-12 size-40 rounded-full bg-[radial-gradient(circle,oklch(0.82_0.10_78/0.22),transparent_68%)] dark:bg-[radial-gradient(circle,oklch(0.82_0.1_78/0.14),transparent_68%)]"
+        className="pointer-events-none absolute -right-10 -top-12 size-40 rounded-full bg-[radial-gradient(circle,var(--accent),transparent_68%)]"
         aria-hidden
       />
       <div className="relative flex items-start justify-between gap-3">

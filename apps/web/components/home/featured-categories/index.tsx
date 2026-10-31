@@ -25,11 +25,12 @@ const layouts = {
 
 export function FeaturedCategories({ categories }: { categories: FeaturedCategoryResponse[] }) {
   const { t } = useI18n()
-  const { categories: variant } = useHomeDesign()
+  const { config } = useHomeDesign()
+  const variant = config.sections.categories
   if (categories.length === 0) return null
   const Layout = layouts[variant]
   return (
-    <section className="mt-20" data-home-categories={variant} aria-labelledby="home-categories-title">
+    <section data-home-section="categories" className="mt-20" data-home-categories={variant} aria-labelledby="home-categories-title">
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className={eyebrowClassName}>{t.paths}</p>

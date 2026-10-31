@@ -17,10 +17,10 @@ type LatestPostRowModel = Pick<PostResponse, "id" | "title" | "slug" | "summary"
 
 export function LatestPostRow({ post }: { post: LatestPostRowModel }) {
   const { t } = useI18n()
-  const { variant } = useHomeDesign()
+  const { config } = useHomeDesign()
   const [expanded, setExpanded] = useState(false)
   const summaryId = useId()
-  return <li className={cn("group border-b border-border py-4 first:pt-0", variant === "desk" && "border-dashed")} data-expanded={expanded || undefined}>
+  return <li data-home-row className={cn("group border-b border-border py-4 first:pt-0", config.sections.latestPosts === "ledger" && "border-dashed")} data-expanded={expanded || undefined}>
     <div className="grid grid-cols-[2.5rem_minmax(0,1fr)_2.75rem] items-start gap-2 sm:grid-cols-[3rem_minmax(0,1fr)_2.75rem] sm:gap-3">
       <time dateTime={post.lastUpdateTime} className="pt-2 font-mono text-[11px] text-muted-foreground group-hover:text-primary group-focus-within:text-primary">{formatDate(post.lastUpdateTime, "MM.DD")}</time>
       <div className="min-w-0 pt-1">

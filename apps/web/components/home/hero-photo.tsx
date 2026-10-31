@@ -21,9 +21,10 @@ function preloadThumbnail(id: string) {
   })
 }
 
-export function HeroPhoto({ photo }: { photo: PhotoResponse }) {
+export function HeroPhoto({ photo, fullWidth = false, onFailure }: { photo: PhotoResponse; fullWidth?: boolean; onFailure?: () => void }) {
   const { t } = useI18n()
   const [current, setCurrent] = useState(photo)
+  const [failed, setFailed] = useState(false)
   const [pending, setPending] = useState(false)
   const location = current.location?.trim()
   const hasLocation = location && !/^(unknown|未知|未知地点)$/i.test(location)
@@ -42,6 +43,7 @@ export function HeroPhoto({ photo }: { photo: PhotoResponse }) {
       }
       if (next.id === current.id) return
       await preloadThumbnail(next.id)
+      setFailed(false)
       setCurrent(next)
     } catch {
       // Keep the current photo so a failed request can be retried.
@@ -61,13 +63,15 @@ export function HeroPhoto({ photo }: { photo: PhotoResponse }) {
         <img
           src={photoThumbnail(current.id, 1200)}
           srcSet={photoThumbnailSet(current.id)}
-          sizes="(min-width: 1152px) 600px, (min-width: 768px) 52vw, calc(100vw - 32px)"
+          sizes={fullWidth ? "(min-width: 1440px) 1200px, 90vw" : "(min-width: 1152px) 600px, (min-width: 768px) 52vw, calc(100vw - 32px)"}
           alt={current.title}
           width={current.width}
           height={current.height}
           fetchPriority="high"
-          className={cn("block aspect-5/4 h-auto w-full object-cover transition-[opacity,transform] duration-300 ease-in-out group-hover/photo:scale-105 md:aspect-3/2", pending && "opacity-70")}
+          onError={() => { setFailed(true); onFailure?.() }}
+          className={cn("block aspect-5/4 h-auto w-full object-cover transition-[opacity,transform] duration-300 ease-in-out group-hover/photo:scale-105 md:aspect-3/2", fullWidth && "aspect-video! max-h-[65dvh]", failed && "hidden", pending && "opacity-70")}
         />
+        {failed ? <span className="flex min-h-48 items-center justify-center p-6 text-sm text-muted-foreground">{t.photoLoadFailed}</span> : null}
         <span className="absolute right-0 bottom-0 grid size-11 place-items-center bg-background text-foreground"><ArrowUpRight aria-hidden="true" className="size-5" /></span>
       </Link>
       <figcaption className="flex items-baseline justify-between gap-4 border-b border-border py-3">
@@ -77,7 +81,7 @@ export function HeroPhoto({ photo }: { photo: PhotoResponse }) {
         </div>
         <button
           type="button"
-          className="inline-flex min-h-8 shrink-0 cursor-pointer items-center justify-center gap-2 text-xs hover:text-(--hero-ink) disabled:cursor-wait disabled:opacity-50"
+          className="inline-flex min-h-11 shrink-0 cursor-pointer items-center justify-center gap-2 text-xs hover:text-(--hero-ink) disabled:cursor-wait disabled:opacity-50"
           disabled={pending}
           aria-busy={pending}
           onClick={() => void swap()}

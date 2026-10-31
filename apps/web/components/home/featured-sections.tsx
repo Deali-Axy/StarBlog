@@ -16,12 +16,12 @@ import { cn } from "@/lib/utils"
 
 export function LatestPosts({ posts }: { posts: PostResponse[] }) {
   const { t } = useI18n()
-  const { variant } = useHomeDesign()
+  const { config } = useHomeDesign()
   if (posts.length === 0) return null
   const groups = groupHomePostsByYear(posts.slice(0, 8))
-  const desk = variant === "desk"
+  const desk = config.sections.latestPosts === "ledger"
 
-  return <section className={homeSectionClassName} aria-labelledby="home-latest-title">
+  return <section data-home-section="latestPosts" data-home-variant={config.sections.latestPosts} className={homeSectionClassName} aria-labelledby="home-latest-title">
     <HomeSectionHeading id="home-latest-title" eyebrow={desk ? t.homeLooseLeaves : t.homeInProgress}
       title={desk ? t.homeDeskLatestTitle : t.homeLatestTitle} href={routes.blog} action={t.allPosts} />
     <div className="border-t border-foreground">
@@ -39,19 +39,19 @@ export function LatestPosts({ posts }: { posts: PostResponse[] }) {
 
 export function FeaturedPosts({ posts }: { posts: PublishedPostSummary[] }) {
   const { t } = useI18n()
-  const { variant } = useHomeDesign()
+  const { config } = useHomeDesign()
   if (posts.length === 0) return null
-  const desk = variant === "desk"
+  const desk = config.sections.featuredPosts === "notes"
   const single = posts.length === 1
 
-  return <section className={homeSectionClassName} aria-labelledby="home-featured-title">
+  return <section data-home-section="featuredPosts" data-home-variant={config.sections.featuredPosts} className={homeSectionClassName} aria-labelledby="home-featured-title">
     <HomeSectionHeading id="home-featured-title" eyebrow={desk ? t.homeReadingNotes : t.homeTheEdit}
       title={desk ? t.homeDeskFeaturedTitle : t.homeFeaturedTitle} href={routes.blog} action={t.allPosts} />
     <div className={cn("grid", desk ? "gap-5 px-1.5 pt-2 pb-6 sm:grid-cols-3 sm:gap-6" : "gap-6 sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] sm:gap-y-7 min-[56.25rem]:gap-x-10", single && "sm:grid-cols-1")}>
       {posts.map((post, index) => {
         const lead = index === 0
-        return <article key={post.id} className={cn("min-w-0", desk
-          ? "relative border border-border bg-card p-6 shadow-[4px_5px_0_var(--muted)] sm:p-5 min-[56.25rem]:p-6"
+        return <article data-home-surface={desk ? "" : undefined} data-home-padding={desk ? "" : undefined} key={post.id} className={cn("min-w-0", desk
+          ? "relative border border-border bg-card p-6 sm:p-5 min-[56.25rem]:p-6"
           : lead ? "border-b border-border pb-7 sm:row-span-2 sm:border-r sm:border-b-0 sm:pr-6 sm:pb-0 min-[56.25rem]:pr-10" : index > 1 && "border-t border-border pt-6 sm:pt-7",
           desk && index % 3 === 1 && "rotate-[.75deg] sm:translate-y-3 sm:rotate-[1.2deg]",
           desk && index % 3 === 2 && "-rotate-1",

@@ -5,6 +5,7 @@ import { cookies } from "next/headers"
 
 import { FeaturedCategories } from "@/components/home/featured-categories"
 import { FeaturedPosts, LatestPosts } from "@/components/home/featured-sections"
+import { HomeLayout } from "@/components/home/home-layout"
 import { HomeHero } from "@/components/home/home-hero"
 import { CategoryWordCloud } from "@/components/home/category-word-cloud"
 import { JsonLd } from "@/components/seo/json-ld"
@@ -16,8 +17,7 @@ import { getCategoryWordCloud, getHome, getOverview, listPosts } from "@/lib/api
 import { homePreferencesCookie } from "@/lib/home-variant"
 import { postHref } from "@/lib/routes"
 import { absoluteUrl, getSite } from "@/lib/site"
-import { pageContainerClassName } from "@/lib/styles"
-import { cn } from "@/lib/utils"
+import styles from "@/components/home/home-design.module.css"
 
 export const revalidate = 300
 
@@ -45,7 +45,8 @@ export default async function HomePage() {
   const photo = home.randomPhotoVisible ? home.randomPhoto : null
 
   return (
-    <div className="relative overflow-hidden">
+    <HomeDesignProvider savedPreferences={savedPreferences}>
+      <HomeLayout>
       <JsonLd
         data={{
           "@context": "https://schema.org",
@@ -61,8 +62,7 @@ export default async function HomePage() {
       />
       <HomeHero locale={locale} site={site} overview={overview} photo={photo} topPost={home.topPost} />
 
-      <HomeDesignProvider savedPreferences={savedPreferences}>
-        <div className={cn(pageContainerClassName, "relative pb-20")}>
+        <div className={styles.container}>
           <FeaturedPosts posts={home.featuredPosts} />
           <LatestPosts posts={latest.items} />
 
@@ -80,7 +80,7 @@ export default async function HomePage() {
           ) : null}
         </div>
         <HomeDesignSwitcher />
-      </HomeDesignProvider>
-    </div>
+      </HomeLayout>
+    </HomeDesignProvider>
   )
 }
