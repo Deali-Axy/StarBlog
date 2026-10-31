@@ -67,3 +67,23 @@ dotnet test tests/StarBlog.E2ETests/StarBlog.E2ETests.csproj \
 The fixture-specific edge-case test runs when the `Blog E2E root` category is present. Pure URL normalization, page resets, category paths/search, and the disabled-preview setting are covered by `pnpm test:blog` in `apps/web`.
 
 The floating design-preview menu is checked for keyboard selection, Escape/focus return, scoped portal themes, viewport placement and URL/history preservation. It appears on both lists and article pages without taking up header space.
+
+## Homepage customization
+
+`HomeCustomizationTests` checks staged preview/apply/cancel/undo, scoped theme
+portals, site-wide color mode, independent custom colors, typography resets,
+sharing and persistence, URL history, language navigation, and photography error
+fallback. The viewport matrix covers both presets and all three heroes at 375,
+768, and 1440 pixels in light and dark modes, including narrow content and larger
+text. Set `E2E_HOME_SCREENSHOT_DIR` to save the matrix screenshots.
+
+Point Web's `INTERNAL_API_BASE_URL` at the intended API before starting/building
+Web. These tests use that same-origin server, including server-rendered data;
+use the isolated-database setup above when needed. Then run:
+
+```sh
+E2E_BASE_URL=http://127.0.0.1:3001 \
+E2E_CHROMIUM_EXECUTABLE_PATH=/usr/bin/google-chrome \
+dotnet test tests/StarBlog.E2ETests/StarBlog.E2ETests.csproj \
+  --filter FullyQualifiedName~HomeCustomizationTests
+```
