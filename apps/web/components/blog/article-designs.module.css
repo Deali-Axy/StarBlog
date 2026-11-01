@@ -53,8 +53,8 @@
 .page[data-article-layout=library] .body :global([data-markdown]) h2 { padding-bottom: .5em; border-bottom: 1px solid var(--border); }
 
 /* Field Notes: a continuous reading column with contents set in the page margin. */
-.page[data-article-layout=editorial] { width: min(100% - 96px, 1120px); }
-.page[data-article-layout=editorial] .article { grid-template-columns: minmax(0, 740px) 220px; column-gap: 72px; justify-content: center; }
+.page[data-article-layout=editorial] { width: min(100% - 96px, 1200px); }
+.page[data-article-layout=editorial] .article { grid-template-columns: minmax(0, 1fr) 220px; column-gap: 72px; }
 .page[data-article-layout=editorial] .trail { min-height: 64px; border-bottom: 1px solid var(--border); }
 .page[data-article-layout=editorial] .hero { grid-column: 1; padding: 36px 0 28px; }
 .page[data-article-layout=editorial] .runningHead { display: none; }
@@ -132,9 +132,8 @@
   .mobileToc .toc { padding-bottom: 16px; }
   .mobileToc .tocHeading, .mobileToc .readingProgress, .mobileToc .tocTop { display: none; }
   .mobileToc .tocList { max-height: 45dvh; margin: 0; }
-  .page[data-article-layout=editorial] .hero { width: min(100%, 700px); margin-inline: auto; padding-inline: 0; }
-  .page[data-article-layout=editorial] .readingColumn { width: min(100%, 700px); margin-inline: auto; }
-  .page[data-article-layout=editorial] .mobileToc { width: min(100%, 700px); margin: 0 auto; }
+  .page[data-article-layout=editorial] .hero { padding-inline: 0; }
+  .page[data-article-layout=editorial] .mobileToc { margin: 0; }
   .page[data-article-layout=editorial] .mobileToc .tocList { max-height: 45dvh; }
   .page[data-article-layout=editorial] .mobileToc + .readingColumn { border-top: 0; }
   .page[data-article-layout=studio] .hero { border: 1px solid var(--border); }
