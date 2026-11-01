@@ -1,42 +1,20 @@
 "use client"
-
-import { useI18n } from "@/components/app-providers"
-import { useBlogLayout } from "@/components/blog/blog-layout-context"
-import { Check, Palette } from "lucide-react"
-import { DropdownMenu } from "radix-ui"
-import { BLOG_PREVIEW, BLOG_VARIANT_OPTIONS, type BlogVariant } from "@/lib/blog-variant"
-import { blogThemeClassName } from "@/lib/blog-theme"
-import { cn } from "@/lib/utils"
-import styles from "./blog-preview.module.css"
-
+import { DropdownMenu } from "@/components/ui/dropdown-menu"
+import { BLOG_PREVIEW, type BlogVariant } from "@/lib/blog-variant"
+import { useState, type ComponentType } from "react"
+import { useBlogLayout } from "./blog-layout-context"
+import type { BlogPreviewProps } from "./blog-preview-props"
+import { ArchivePreview } from "./views/archive-preview"
+import { FolioPreview } from "./views/folio-preview"
+import { IndexPreview } from "./views/index-preview"
+const previews = { library: IndexPreview, editorial: FolioPreview, studio: ArchivePreview } satisfies Record<BlogVariant, ComponentType<BlogPreviewProps>>
 export function BlogDesignSwitcher() {
-  const { t, locale } = useI18n()
-  const { variant } = useBlogLayout()
-  if (!BLOG_PREVIEW) return null
+  const { variant } = useBlogLayout(); const [open, setOpen] = useState(false)
+  if(!BLOG_PREVIEW) return null
+  const Preview = previews[variant]
   function switchVariant(next: BlogVariant) {
-    const url = new URL(window.location.href)
-    url.searchParams.set("bv", next)
-    window.history.pushState(null, "", `${url.pathname}${url.search}${url.hash}`)
+    const url = new URL(window.location.href); url.searchParams.set("bv", next)
+    window.history.pushState(null, "", `${url.pathname}${url.search}${url.hash}`); setOpen(false)
   }
-  return <DropdownMenu.Root modal={false}>
-    <DropdownMenu.Trigger asChild>
-      <button type="button" aria-label={t.designPreview} title={t.designPreview}
-        data-blog-preview-trigger data-variant={variant} className={styles.trigger}>
-        <Palette size={20} aria-hidden="true" />
-      </button>
-    </DropdownMenu.Trigger>
-    <DropdownMenu.Portal>
-      <DropdownMenu.Content aria-label={t.designPreview} side="top" align="end" sideOffset={12} collisionPadding={16}
-        data-blog-preview-menu data-variant={variant} className={cn(blogThemeClassName(variant), styles.menu)}>
-        <DropdownMenu.Label className={styles.label}>{t.designPreview}</DropdownMenu.Label>
-        <DropdownMenu.RadioGroup value={variant} onValueChange={(value) => switchVariant(value as BlogVariant)}>
-          {BLOG_VARIANT_OPTIONS.map((option, index) => <DropdownMenu.RadioItem key={option.id} value={option.id} className={styles.option}>
-            <small aria-hidden="true">0{index + 1}</small>
-            <span>{locale === "zh" ? option.labelZh : option.labelEn}</span>
-            <DropdownMenu.ItemIndicator className={styles.indicator}><Check size={16} aria-hidden="true" /></DropdownMenu.ItemIndicator>
-          </DropdownMenu.RadioItem>)}
-        </DropdownMenu.RadioGroup>
-      </DropdownMenu.Content>
-    </DropdownMenu.Portal>
-  </DropdownMenu.Root>
+  return <DropdownMenu modal={false} open={open} onOpenChange={setOpen}><Preview value={variant} onValueChange={switchVariant} onCloseAutoFocus={event => { event.preventDefault(); requestAnimationFrame(() => document.querySelector<HTMLButtonElement>("[data-blog-preview-trigger]")?.focus()) }} /></DropdownMenu>
 }
