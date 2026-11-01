@@ -69,9 +69,10 @@ test("GFM tables, task lists and footnotes work while raw HTML and unsafe URLs s
     "## Read safely", "| A | B |\n| :- | -: |\n| One | Two |", "- [x] Task", "A note[^1].\n\n[^1]: Footnote text.",
     '<script>alert("xss")</script>', "[unsafe](javascript:alert(1))", '<h2 id="injected">Raw heading</h2>',
   ].join("\n\n"))
-  assert.ok(html.includes("<table>"))
+  assert.match(html, /<table\b[^>]*>/)
   assert.ok(html.includes('type="checkbox"'))
   assert.ok(html.includes("Footnote text."))
+  assert.ok(html.includes('id="user-content-fnref-1"'), "footnotes retain their return targets")
   assert.ok(!html.includes("<script>"))
   assert.ok(!html.includes('href="javascript:'))
   assert.deepEqual(headings.map(item => item.text), ["Read safely"])
