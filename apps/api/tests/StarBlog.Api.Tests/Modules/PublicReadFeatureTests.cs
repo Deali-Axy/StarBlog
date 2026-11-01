@@ -19,6 +19,28 @@ public sealed class PublicReadFeatureTests : IClassFixture<StarBlogApiFactory> {
     }
 
     [Fact]
+    public async Task Detail_can_skip_backend_toc_without_changing_markdown_or_legacy_defaults() {
+        var response = await _client.PostAsJsonAsync("/api/v1/posts", new {
+            title = "Frontend Markdown",
+            slug = "frontend-markdown",
+            isPublish = true,
+            content = "## 中文 `code`\n\nBody\n\n## 中文 `code`",
+            categoryId = 1
+        });
+        response.EnsureSuccessStatusCode();
+        var created = await response.Content.ReadFromJsonAsync<JsonElement>();
+        var id = created.GetProperty("id").GetString();
+        var client = _factory.CreateAnonymousClient();
+        foreach (var path in new[] { $"/api/v1/posts/{id}", "/api/v1/posts/by-slug/frontend-markdown" }) {
+            var legacy = await client.GetFromJsonAsync<JsonElement>(path);
+            var frontend = await client.GetFromJsonAsync<JsonElement>($"{path}?includeToc=false");
+            Assert.Equal(JsonValueKind.Array, legacy.GetProperty("toc").ValueKind);
+            Assert.Equal(JsonValueKind.Null, frontend.GetProperty("toc").ValueKind);
+            Assert.Equal(legacy.GetProperty("content").GetString(), frontend.GetProperty("content").GetString());
+        }
+    }
+
+    [Fact]
     public async Task Related_posts_exclude_self_and_only_return_published() {
         var created = await _client.PostAsJsonAsync("/api/v1/posts", new {
             title = "Related Sibling",

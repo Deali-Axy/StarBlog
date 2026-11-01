@@ -73,18 +73,18 @@ public sealed class ContentOperations : IPublishedContentQueries {
         };
     }
 
-    public async Task<PostResponse?> GetPostAsync(string id, CancellationToken cancellationToken, string? language = null) {
+    public async Task<PostResponse?> GetPostAsync(string id, CancellationToken cancellationToken, string? language = null, bool includeToc = true) {
         var post = await PostsForLanguage(language)
             .FirstOrDefaultAsync(item => item.Id == id, cancellationToken);
-        return post == null ? null : PostResponse.From(post, includeToc: true, language: post.IsPublish ? language : null);
+        return post == null ? null : PostResponse.From(post, includeToc: includeToc, language: post.IsPublish ? language : null);
     }
 
     /// <summary>按 slug 读取已发布文章；草稿与未知 slug 返回 null。</summary>
-    public async Task<PostResponse?> GetPublishedPostBySlugAsync(string slug, CancellationToken cancellationToken) {
+    public async Task<PostResponse?> GetPublishedPostBySlugAsync(string slug, CancellationToken cancellationToken, bool includeToc = true) {
         if (string.IsNullOrWhiteSpace(slug)) return null;
         var post = await _db.Posts.AsNoTracking().Include(item => item.Category)
             .FirstOrDefaultAsync(item => item.Slug == slug && item.IsPublish, cancellationToken);
-        return post == null ? null : PostResponse.From(post, includeToc: true);
+        return post == null ? null : PostResponse.From(post, includeToc: includeToc);
     }
 
     /// <summary>创建文章。Slug 冲突时返回错误。</summary>

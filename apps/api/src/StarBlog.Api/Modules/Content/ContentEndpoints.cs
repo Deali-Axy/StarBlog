@@ -119,8 +119,9 @@ public static class ContentEndpoints {
         ContentOperations operations,
         HttpContext context,
         [FromQuery] string? lang = null,
+        [FromQuery] bool includeToc = true,
         CancellationToken cancellationToken = default) {
-        var post = await operations.GetPostAsync(id, cancellationToken, lang);
+        var post = await operations.GetPostAsync(id, cancellationToken, lang, includeToc);
         if (post == null || HideFromAnonymous(post.IsPublish, context)) {
             return HttpErrors.NotFound($"文章 {id} 不存在");
         }
@@ -136,8 +137,8 @@ public static class ContentEndpoints {
     private static bool HideFromAnonymous(bool isPublish, HttpContext context) =>
         !isPublish && context.User.Identity?.IsAuthenticated != true;
 
-    private static async Task<IResult> GetPostBySlug(string slug, ContentOperations operations, CancellationToken cancellationToken) {
-        var post = await operations.GetPublishedPostBySlugAsync(slug, cancellationToken);
+    private static async Task<IResult> GetPostBySlug(string slug, ContentOperations operations, [FromQuery] bool includeToc = true, CancellationToken cancellationToken = default) {
+        var post = await operations.GetPublishedPostBySlugAsync(slug, cancellationToken, includeToc);
         return post == null ? HttpErrors.NotFound($"文章 {slug} 不存在") : Results.Ok(post);
     }
 
