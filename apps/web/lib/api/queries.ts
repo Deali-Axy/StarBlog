@@ -53,7 +53,7 @@ export function listPosts(query: ListPostsQuery = {}, locale: Locale = "zh") {
 export function getPost(id: string, lang?: string) {
   return apiGet<PostResponse>(
     `/api/v1/posts/${encodeURIComponent(id)}`,
-    lang ? { lang } : undefined,
+    { lang, includeToc: false },
     revalidate,
   )
 }
@@ -61,7 +61,7 @@ export function getPost(id: string, lang?: string) {
 export function getPostBySlug(slug: string) {
   return apiGet<PostResponse>(
     `/api/v1/posts/by-slug/${encodeURIComponent(slug)}`,
-    undefined,
+    { includeToc: false },
     revalidate,
   )
 }

@@ -1,104 +1,97 @@
 "use client"
 
+import { useEffect, useId, useRef, useState, type MouseEvent } from "react"
+import { ArrowUp, ChevronDown, List } from "lucide-react"
 import { useI18n } from "@/components/app-providers"
+import { currentHeadingIndex, headingIdFromHash, type ArticleHeading } from "@/lib/markdown"
+import styles from "./article-designs.module.css"
 
-import { useEffect, useMemo, useState } from "react"
-import Link from "next/link"
-import { BookOpen, ChevronRight } from "lucide-react"
-
-import type { TocNode } from "@/lib/api/types"
-import { headingClassName } from "@/lib/styles"
-import { cn } from "@/lib/utils"
-
-export interface FlatTocItem {
-  text: string
-  href: string
-  depth: number
-}
-
-export function flattenToc(nodes: TocNode[] | null | undefined, depth = 2): FlatTocItem[] {
-  if (!nodes?.length) return []
-  return nodes.flatMap((node) => {
-    const current: FlatTocItem[] = node.href
-      ? [{ text: node.text ?? "", href: node.href, depth }]
-      : []
-    return [...current, ...flattenToc(node.nodes, depth + 1)]
-  })
-}
-
-export function SidebarTOC({
-  items,
-  className,
-  title,
-  maxDepth = 4,
-}: {
-  items: FlatTocItem[]
-  className?: string
-  title?: string
-  maxDepth?: number
-}) {
+export function SidebarTOC({ items, mobile = false }: { items: ArticleHeading[]; mobile?: boolean }) {
   const { t } = useI18n()
-  const filtered = useMemo(
-    () => items.filter((item) => item.depth <= maxDepth && item.href),
-    [items, maxDepth],
-  )
+  const navRef = useRef<HTMLElement>(null)
   const [activeId, setActiveId] = useState("")
+  const [progress, setProgress] = useState(0)
+  const listId = useId()
+  const baseline = Math.min(...items.map(item => item.depth))
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries.filter((entry) => entry.isIntersecting)
-        if (visible.length === 0) return
-        const top = visible.reduce((prev, current) =>
-          prev.boundingClientRect.top < current.boundingClientRect.top ? prev : current,
-        )
-        setActiveId(top.target.id)
-      },
-      { rootMargin: "-20% 0% -35% 0%", threshold: [0, 0.25, 0.5, 1] },
-    )
+    const article = navRef.current?.closest("[data-blog-article-detail]")
+    const body = article?.querySelector<HTMLElement>("[data-article-body]")
+    const headings = items.map(item => document.getElementById(item.id)).filter((node): node is HTMLElement => Boolean(node))
+    if (!body || !headings.length) return
+    let frame = 0
+    function update() {
+      frame = 0
+      const headerHeight = parseFloat(getComputedStyle(body!).getPropertyValue("--blog-header-height")) || 80
+      const offset = headerHeight + 96
+      const rect = body!.getBoundingClientRect()
+      const atEnd = rect.bottom <= window.innerHeight
+      const index = currentHeadingIndex(headings.map(heading => heading.getBoundingClientRect().top), offset, atEnd)
+      setActiveId(headings[index]?.id ?? "")
+      const distance = Math.max(1, rect.height - window.innerHeight + offset)
+      setProgress(Math.round(Math.min(1, Math.max(0, (offset - rect.top) / distance)) * 100))
+    }
+    function schedule() { if (!frame) frame = requestAnimationFrame(update) }
+    function restoreHash() {
+      const id = headingIdFromHash(window.location.hash)
+      const heading = headings.find(node => node.id === id)
+      if (heading) heading.scrollIntoView({ block: "start", behavior: "instant" })
+      schedule()
+    }
+    const observer = new ResizeObserver(schedule)
+    observer.observe(body)
+    window.addEventListener("scroll", schedule, { passive: true })
+    window.addEventListener("resize", schedule)
+    window.addEventListener("hashchange", restoreHash)
+    // Covers direct hash links on first load, including percent-encoded Chinese IDs.
+    if (window.location.hash) restoreHash()
+    else schedule()
+    return () => {
+      cancelAnimationFrame(frame)
+      observer.disconnect()
+      window.removeEventListener("scroll", schedule)
+      window.removeEventListener("resize", schedule)
+      window.removeEventListener("hashchange", restoreHash)
+    }
+  }, [items])
 
-    filtered.forEach((item) => {
-      const id = item.href.replace("#", "")
-      const element = document.getElementById(id)
-      if (element) observer.observe(element)
-    })
+  function navigate(event: MouseEvent<HTMLAnchorElement>, id: string) {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
+    const heading = document.getElementById(id)
+    if (!heading) return
+    event.preventDefault()
+    // Close the mobile contents before measuring the destination's position.
+    const details = navRef.current?.closest("details")
+    if (details) details.open = false
+    const url = new URL(window.location.href)
+    url.hash = encodeURIComponent(id)
+    if (window.location.hash !== url.hash) window.history.pushState(null, "", url)
+    heading.focus({ preventScroll: true })
+    heading.scrollIntoView({ block: "start", behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" })
+    setActiveId(id)
+  }
 
-    return () => observer.disconnect()
-  }, [filtered])
+  if (!items.length) return null
+  const nav = <nav ref={navRef} aria-label={t.toc} data-article-toc className={styles.toc}>
+    <div className={styles.tocHeading}><span>{t.toc}</span><small>{String(items.length).padStart(2, "0")}</small></div>
+    <ol id={listId} className={styles.tocList}>
+      {items.map((item, index) => <li key={item.id}>
+        <a href={`#${encodeURIComponent(item.id)}`} onClick={event => navigate(event, item.id)}
+          aria-current={activeId === item.id ? "location" : undefined}
+          style={{ paddingLeft: `${Math.max(0, item.depth - baseline) * 12 + 10}px` }}>
+          <small aria-hidden="true">{String(index + 1).padStart(2, "0")}</small><span>{item.text || t.untitledSection}</span>
+        </a>
+      </li>)}
+    </ol>
+    <div className={styles.readingProgress}>
+      <div><span>{t.readingProgress}</span><span>{progress}%</span></div>
+      <progress aria-label={t.readingProgress} max={100} value={progress} />
+    </div>
+    <button type="button" className={styles.tocTop} onClick={() => window.scrollTo({ top: 0, behavior: "instant" })}><ArrowUp size={13} aria-hidden="true" />{t.backToTop}</button>
+  </nav>
 
-  if (filtered.length === 0) return null
-
-  return (
-    <nav className={cn("space-y-1", className)}>
-      <div className="mb-3 flex items-center gap-2">
-        <BookOpen className="size-4 text-primary" />
-        <h3 className={cn(headingClassName, "text-sm font-semibold")}>{title ?? t.toc}</h3>
-      </div>
-      <div className="space-y-1">
-        {filtered.map((item, index) => {
-          const id = item.href.replace("#", "")
-          const isActive = activeId === id
-          const indent = Math.max(0, item.depth - 2)
-          return (
-            <Link
-              key={`${id}-${index}`}
-              href={item.href}
-              className={cn(
-                "flex items-start gap-2 rounded-md border-l-2 border-transparent px-2 py-1.5 text-sm transition-colors hover:bg-accent/50",
-                isActive && "border-l-primary bg-accent font-medium text-primary",
-                !isActive && "text-muted-foreground hover:text-foreground",
-              )}
-              style={{ paddingLeft: `${8 + indent * 12}px` }}
-            >
-              {indent > 0 ? <ChevronRight className="mt-0.5 size-3 shrink-0" /> : null}
-              <span className="leading-relaxed">{item.text}</span>
-            </Link>
-          )
-        })}
-      </div>
-      <p className="mt-4 border-t border-border/50 pt-3 text-center text-xs text-muted-foreground">
-        {t.sectionCount(filtered.length)}
-      </p>
-    </nav>
-  )
+  return mobile ? <details className={styles.mobileToc}>
+    <summary><List size={15} aria-hidden="true" /><span>{t.toc}</span><small>{t.sectionCount(items.length)}</small><ChevronDown size={14} aria-hidden="true" /></summary>
+    {nav}
+  </details> : nav
 }

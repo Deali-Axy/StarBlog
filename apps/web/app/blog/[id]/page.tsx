@@ -2,19 +2,28 @@ import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 
 import { BlogPostRenderer } from "@/components/blog/blog-post-renderer"
+import { renderArticleMarkdown } from "@/components/blog/markdown"
 import { JsonLd } from "@/components/seo/json-ld"
-import { ApiError } from "@/lib/api/types"
+import { ApiError, type PostResponse } from "@/lib/api/types"
 import { getPostTranslations, getPublishedPost, getRelatedPosts } from "@/lib/api/queries"
 import { postHref, routes } from "@/lib/routes"
 import { absoluteUrl, getSite } from "@/lib/site"
 import { articleLanguage } from "@/lib/i18n"
 import { getI18n } from "@/lib/i18n-server"
+import { readingMinutes } from "@/lib/format"
 
 export const revalidate = 300
 
 interface PostPageProps {
   params: Promise<{ id: string }>
   searchParams: Promise<{ lang?: string }>
+}
+
+function postMetadata(post: PostResponse): Omit<PostResponse, "content" | "toc"> {
+  const metadata = { ...post }
+  delete metadata.content
+  delete metadata.toc
+  return metadata
 }
 
 export async function generateMetadata({ params, searchParams }: PostPageProps): Promise<Metadata> {
@@ -74,6 +83,10 @@ export default async function PostPage({ params, searchParams }: PostPageProps) 
   ])
   const activeLanguage = post.language ?? undefined
   const permalink = absoluteUrl(postHref(post))
+  const markdown = renderArticleMarkdown(post.content ?? "")
+  // Only metadata and rendered nodes cross the client boundary, not Markdown or
+  // unused backend TOC/translation bodies and their parsing dependencies.
+  const article = postMetadata(post)
 
   return (
     <>
@@ -105,13 +118,17 @@ export default async function PostPage({ params, searchParams }: PostPageProps) 
         }}
       />
       <BlogPostRenderer
-        post={post}
-        related={related}
+        post={article}
+        headings={markdown.headings}
+        minutes={readingMinutes(post.content)}
+        related={related.map(postMetadata)}
         permalink={permalink}
-        translations={translations}
+        translations={translations.map(({ language }) => ({ language }))}
         lang={activeLanguage}
         translationMissing={Boolean(requestedLanguage && !activeLanguage)}
-      />
+      >
+        {markdown.content}
+      </BlogPostRenderer>
     </>
   )
 }
