@@ -37,7 +37,7 @@ Web 开发服务器：<http://localhost:3001>
 
 四套首页配色为暖纸、冷灰、森林、墨色，各有浅深版本。字体、密度、字号、内容宽度、纹理、边框与阴影均可调整；高级调色分别保存浅深模式的主色、背景色、文字色，并派生其余语义颜色。切换配色清除手动颜色覆盖。首页主题仅作用于 `/` 及其面板 Portal；昼夜模式沿用 `next-themes` 的全站共享设置，面板中先局部预览，应用后才更新全站模式。预设和分享不改变接收者的昼夜模式。
 
-偏好采用 `{ version: 2, preset, overrides }`，只保存不同于方案默认值的覆盖。`lib/home-variant.ts` 管理类型、注册表、预设、白名单解析、关联调整和序列化；`lib/home-theme.ts` 管理配色与运行时变量，首页 CSS Module 管理作用域与框架。新增变体时注册中英文名称、默认值与兼容关系，再接入组件映射或共享 JSX。主题模式不重复存入首页配置。
+偏好采用 `{ version: 2, preset, overrides }`，只保存不同于方案默认值的覆盖。`lib/home-variant.ts` 管理类型、注册表、预设、白名单解析、关联调整和序列化；`lib/home-theme.ts` 管理配色与运行时变量，首页 CSS Module 只管理主题 token、纹理与焦点等效果。新增变体时注册中英文名称、默认值与兼容关系，再增加独立展示组件并接入类型化映射。主题模式不重复存入首页配置。
 
 新的 `?hc=v2.<Base64URL JSON>` 携带独立配置，优先于本机偏好且不混入接收者 Cookie。旧 `?hv=editorial|desk`、`?fc=deck|rail|catalog|accordion|tilt` 和旧 Cookie 继续可读；旧 desk 迁移到升级后的完整书桌方案。损坏、未知版本、非法字段与颜色安全回退。应用后保存到 `starblog.home-design` Cookie 一年；每次首页配置应用最多新增一条原生 history 记录，保留其他查询参数、锚点与文章摘要状态，不重新获取首页数据。刷新、跨页面返回和切换语言均保留已应用的配置。
 
@@ -49,7 +49,7 @@ Web 开发服务器：<http://localhost:3001>
 
 `/blog` 提供活字索引、折页手记、档案工作台三套独立构图，分别使用 `?bv=library`、`?bv=editorial`、`?bv=studio` 直接预览。右下角悬浮按钮打开风格预览菜单，不占用页头空间；切换会保留查询、分页及显示设置，URL 支持刷新与前进后退。
 
-默认风格与预览开关集中在 `lib/blog-variant.ts`。选定后修改 `BLOG_VARIANT` 并将 `BLOG_PREVIEW` 设为 `false`；此时隐藏切换器，固定使用配置值并忽略 URL 中的 `bv`。三版拥有各自的列表、页头与页脚；文章详情仍复用同一组件结构，通过 classes 配置切换构图。覆盖 `/blog` 列表、文章详情与 `/p` 旧链接。主题仅应用于博客外壳及其弹层，离开博客后恢复对应站点区域的布局。
+默认风格与预览开关集中在 `lib/blog-variant.ts`。选定后修改 `BLOG_VARIANT` 并将 `BLOG_PREVIEW` 设为 `false`；此时隐藏切换器，固定使用配置值并忽略 URL 中的 `bv`。三版拥有各自的列表、页头与页脚；文章详情使用三套独立布局，各自组合标题、阅读列和目录展示。覆盖 `/blog` 列表、文章详情与 `/p` 旧链接。主题仅应用于博客外壳及其弹层，离开博客后恢复对应站点区域的布局。
 
 活字索引采用全宽文字条目和展开式分栏目录；折页手记采用不对称跨栏排版和独立目录页；档案工作台采用目录、文章索引和摘要预览三栏，小屏选择文章后打开预览对话框。档案索引支持 ↑ / ↓ / Home / End 键选择，预览不会改变 URL 或文章顺序。
 
@@ -65,7 +65,7 @@ Web 开发服务器：<http://localhost:3001>
 
 Web 读取文章时携带 `includeToc=false`，API 返回原始 Markdown 并跳过 Markdig 目录生成。API 的开关默认仍为 `true`，兼容其他客户端；后端发布渠道使用的 HTML 渲染继续保留。译文目录直接来自最终选中的译文正文。
 
-详情页构图通过 `components/blog/article-designs.ts` 的 Tailwind 工具类组合：活字索引使用全宽大标题、左侧编号目录和右侧正文；折页手记使用左对齐的连续阅读列，衬线标题使用标准 `text-3xl` / `sm:text-4xl`，摘要和正文采用常规无衬线字体，右侧页边目录从标题区域开始；档案工作台使用左侧章节树、中间文档纸面和右侧文档信息。折页手记的标题、摘要、署名与正文共用一条对齐线，长标题自然换行，容器宽度与文章列表一致。小屏改为可展开的目录，选择章节后自动收起。共享文章树保持稳定，预览风格切换不重置评论草稿。
+详情页由 `BlogPostRenderer` 选择 `IndexArticle`、`FolioArticle`、`ArchiveArticle`，三套组件及各自的桌面、移动目录位于 `components/blog/views`。每套拥有固定的 JSX 和 Tailwind 编排。服务端正文、分享逻辑和阅读定位继续共享，`ArticleReadingProvider` 在布局替换后重新绑定标题与正文。`CommentSessionProvider` 按文章 ID 管理会话，布局切换保留身份输入、验证码、正文、回复对象、倒计时和待审核评论。
 
 目录使用真实标题 ID 的原生锚点链接，支持中文编码、直接打开锚点、刷新与浏览器前进后退。点击后滚动并移动焦点至标题，偏移跟随各风格固定页头的高度。滚动高亮涵盖标题间的长段落和最后一节；图片载入或窗口尺寸改变后重新计算。目录同时显示正文阅读进度，尊重减少动态效果偏好。代码和表格在局部横向滚动，避免撑破手机页面。
 
@@ -79,8 +79,14 @@ Web 读取文章时携带 `includeToc=false`，API 返回原始 Markdown 并跳�
 
 ## 样式约定
 
-组件样式使用 Tailwind CSS v4，字号、间距和圆角优先使用标准工具类。博客列表三版的独立构图与响应式排版集中在 `components/blog/blog-designs.module.css`；文章详情使用 `article-designs.ts` 的工具类组合、标准十二列栅格和响应式断点。与列表共用的容器宽度在 `@theme` 中命名，固定页头参与的滚动偏移和目录可用高度保留 `calc()`。条件样式通过 `cn()` 组合完整类名，不动态拼接工具类名称。自定义响应式断点与 Tailwind 默认断点统一使用 `rem`，避免混用 `px` 导致生成顺序与预期不符；例如首页桌面断点使用 `min-[70rem]`。
+组件样式使用 Tailwind CSS v4，字号、间距和圆角优先使用标准工具类。可切换方案各自拥有独立组件文件、JSX 和固定布局类；首页、博客与摄影的展示位于各功能的 `views` 目录，首页选择器单独位于 `slots`。禁止通过条件 class、集中 classes 配置、父级风格选择器或条件内联样式，让共享结构切换构图。响应式、交互状态、基础控件 variants 和主题 token 可以共享。内联样式保留运行时摄影坐标、权重字号、文本缩放和 Motion 动画。
 
-`app/globals.css` 仅保留 Tailwind/shadcn 导入、明暗主题变量、字体、圆角及容器映射、基础层和 Marquee 动画注册。公共容器、标题、摄影主题等工具类组合集中在 `lib/styles.ts`；摄影主题必须同时应用于页面容器和 Portal 弹出层。Markdown 在服务端入口引入 highlight.js 官方主题，正文节点、目录和各阅读方案使用 Tailwind 排版。文章原生 CSS 仅在 `article-native.module.css` 中处理进度条的浏览器伪元素与 WebKit 原生折叠标记。
+基础交互统一从 `components/ui` 导入，沿用 `radix-vega`。Dialog、Sheet、DropdownMenu、Collapsible、Tabs 和 Pagination 均为本地可组合源码；业务组件不直接依赖 Radix。原语保留 Portal、触发器、内容、标题等组合边界，目录、抽屉及设置工具由各方案自行组合。触发器在 hydration 完成后启用，避免语言刷新后首次点击丢失。
+
+首页 `HomeInteractionProvider` 位于替换框架外，按功能与业务 ID 保存摘要展开、分类选择和摄影状态；自定义面板也独立挂载，预览框架不会重建编辑器。博客 `BlogInteractionProvider` 保存未提交搜索与工作台选择，分类展开和搜索由列表控制层保存。列表的展开与紧凑模式是六个独立组件。摄影两种墙面分别调用各自算法，共享上层尺寸缓存、分页、灯箱和滚动恢复。
+
+`pnpm test:architecture` 检查展示层不能读取布局选择上下文、业务层不能直接导入 Radix、样式表达式不能读取风格标识，以及残留 CSS 不得包含布局规则。`UiCompositionTests` 通过真实浏览器验证替换组件后的草稿、选择与数据保留。架构清理记录见仓库 `docs/changes/web-ui-style-architecture-cleanup.md`。
+
+`app/globals.css` 仅保留 Tailwind/shadcn 导入、明暗主题变量、字体、圆角及容器映射、基础层和 Marquee 动画注册。不随布局方案变化的基础容器、标题、摄影主题等工具类组合集中在 `lib/styles.ts`；摄影主题必须同时应用于页面容器和 Portal 弹出层。Markdown 在服务端入口引入 highlight.js 官方主题，正文节点、目录和各阅读方案使用 Tailwind 排版。文章原生 CSS 仅在 `article-native.module.css` 中处理进度条的浏览器伪元素与 WebKit 原生折叠标记。
 
 内联 `style` 仅用于运行时值，例如摄影布局坐标、Motion 动画、分类权重字号及层级缩进。Markdown 表格的对齐由正文数据决定，也保留为运行时样式。浏览器测试使用语义或 `data-*` 定位，不依赖样式类。

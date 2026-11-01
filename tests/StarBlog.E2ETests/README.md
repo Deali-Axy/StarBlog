@@ -87,3 +87,12 @@ E2E_CHROMIUM_EXECUTABLE_PATH=/usr/bin/google-chrome \
 dotnet test tests/StarBlog.E2ETests/StarBlog.E2ETests.csproj \
   --filter FullyQualifiedName~HomeCustomizationTests
 ```
+
+## Replaceable UI composition
+
+`UiCompositionTests` checks comment fields and heading targets across all article
+layouts, unsubmitted search and archive selection across collection modes, every
+homepage slot and frame while the editor stays mounted, and both photo layouts
+at all three densities and 375/768/1440 widths. Use the combined blog and photo
+fixtures when running these cases. The blog fixture includes 25 index records
+plus one long-form reading record in its leaf category.
