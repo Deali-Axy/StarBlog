@@ -11,7 +11,7 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test:photography": "node tests/photography-layout.test.mjs && node tests/photography-image-cache.test.mjs",
-    "test:blog": "node tests/blog-navigation.test.mjs",
+    "test:blog": "node tests/blog-navigation.test.mjs && node tests/article-reading.test.mjs",
     "test:home": "node tests/home-design.test.mjs"
   },
   "dependencies": {
