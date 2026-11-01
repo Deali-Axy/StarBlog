@@ -1,0 +1,5 @@
+/* Native controls expose browser-specific pseudo-elements outside the utility layout. */
+.progress::-webkit-progress-bar { background: var(--border); }
+.progress::-webkit-progress-value { background: var(--primary); }
+.progress::-moz-progress-bar { background: var(--primary); }
+.mobileContents > summary::-webkit-details-marker { display: none; }

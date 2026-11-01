@@ -5,6 +5,9 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  /* Preserve the content widths shared with the blog list and its navigation. */
+  --container-blog-folio: 75rem;
+  --container-blog-studio: 85rem;
   --font-heading: var(--font-newsreader), var(--font-serif-sc), "Songti SC", "Noto Serif CJK SC", serif;
   --font-sans: var(--font-sans), "PingFang SC", "Noto Sans CJK SC", "Source Han Sans SC", sans-serif;
   --color-background: var(--background);
@@ -21,6 +24,7 @@
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-highlight: var(--highlight);
   --color-destructive: var(--destructive);
   --color-border: var(--border);
   --color-input: var(--input);
