@@ -1,25 +1,27 @@
 "use client"
 
-import { Award, Camera, Check, Grid2X2, LayoutGrid, LoaderCircle, Shuffle } from "lucide-react"
-import Link from "next/link"
+import { Check, Grid2X2, LayoutGrid, LoaderCircle, Shuffle } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from "react"
+import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from "react"
 import { toast } from "sonner"
 
 import { useI18n } from "@/components/app-providers"
-import { PhotoImage } from "@/components/photography/photo-image"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { getRandomPhoto, listPhotos } from "@/lib/api/queries"
 import type { PageResult, PhotoResponse } from "@/lib/api/types"
-import { photoThumbnail, photoThumbnailSet } from "@/lib/media"
-import { layoutJustified, photoAspect, targetRowHeight } from "@/lib/photography/justify"
-import { densityScale, layoutMasonry, photoColumns, type PhotoDensity, type PhotoView } from "@/lib/photography/layout"
-import { photoPageSize } from "@/lib/photography/page-size"
 import { LightboxImageCache } from "@/lib/photography/image-cache"
+import { photoAspect } from "@/lib/photography/justify"
+import { type PhotoDensity, type PhotoView } from "@/lib/photography/layout"
+import { photoPageSize } from "@/lib/photography/page-size"
 import { routes } from "@/lib/routes"
 import { site } from "@/lib/site"
 import { photoInsetClassName, photographyThemeClassName } from "@/lib/styles"
 import { cn } from "@/lib/utils"
+import type { ComponentType } from "react"
+import type { PhotoWallProps } from "./photo-wall-props"
+import { JustifiedWall } from "./views/justified-wall"
+import { MasonryWall } from "./views/masonry-wall"
+const walls = { masonry: MasonryWall, justified: JustifiedWall } satisfies Record<PhotoView, ComponentType<PhotoWallProps>>
 
 type PhotoFilter = "all" | "featured"
 
@@ -58,7 +60,7 @@ function subscribePreferences(callback: () => void) {
 }
 
 function preferenceSnapshot() {
-  if (storageUnavailable) return memoryPreferences
+  if(storageUnavailable) return memoryPreferences
   try {
     const view = localStorage.getItem("starblog.photography.view")
     const density = localStorage.getItem("starblog.photography.density")
@@ -70,14 +72,14 @@ function preferenceSnapshot() {
 
 export function usePhotoStudio() {
   const value = useContext(PhotoStudioContext)
-  if (!value) throw new Error("usePhotoStudio must be used inside PhotoStudio")
+  if(!value) throw new Error("usePhotoStudio must be used inside PhotoStudio")
   return value
 }
 
 function dedupePhotos(photos: PhotoResponse[]) {
   const seen = new Set<string>()
   return photos.filter((photo) => {
-    if (seen.has(photo.id)) return false
+    if(seen.has(photo.id)) return false
     seen.add(photo.id)
     return true
   })
@@ -113,10 +115,10 @@ export function PhotoStudio({ initialPage, featured: featuredPhotos, children }:
   const featuredIds = useMemo(() => new Set(featured.map((photo) => photo.id)), [featured])
 
   const changePreferences = useCallback((nextView: PhotoView, nextDensity: PhotoDensity) => {
-    if (`${nextView}:${nextDensity}` === preferenceSnapshot()) return
+    if(`${nextView}:${nextDensity}` === preferenceSnapshot()) return
     const boundary = document.querySelector("[data-photo-toolbar]")?.getBoundingClientRect().bottom ?? 72
     const visible = Array.from(document.querySelectorAll<HTMLElement>("[data-photo-id]")).find((node) => node.getBoundingClientRect().bottom > boundary)
-    if (visible) anchor.current = { id: visible.id, top: visible.getBoundingClientRect().top }
+    if(visible) anchor.current = { id: visible.id, top: visible.getBoundingClientRect().top }
     memoryPreferences = `${nextView}:${nextDensity}`
     try {
       localStorage.setItem("starblog.photography.view", nextView)
@@ -128,14 +130,14 @@ export function PhotoStudio({ initialPage, featured: featuredPhotos, children }:
   const setView = useCallback((next: PhotoView) => changePreferences(next, density), [changePreferences, density])
   const setDensity = useCallback((next: PhotoDensity) => changePreferences(view, next), [changePreferences, view])
   const restoreAnchor = useCallback(() => {
-    if (!anchor.current) return
+    if(!anchor.current) return
     const node = document.getElementById(anchor.current.id)
-    if (node) window.scrollBy(0, node.getBoundingClientRect().top - anchor.current.top)
+    if(node) window.scrollBy(0, node.getBoundingClientRect().top - anchor.current.top)
     anchor.current = null
   }, [])
 
   const loadMore = useCallback(async () => {
-    if (loading.current || !paging.current.hasMore) return []
+    if(loading.current || !paging.current.hasMore) return []
     loading.current = true
     setLoadingMore(true)
     setLoadError(false)
@@ -164,7 +166,7 @@ export function PhotoStudio({ initialPage, featured: featuredPhotos, children }:
   }, [])
 
   const closePhoto = useCallback(() => {
-    if (fromWall.current) router.back()
+    if(fromWall.current) router.back()
     else router.replace(routes.photography, { scroll: false })
   }, [router])
 
@@ -172,18 +174,18 @@ export function PhotoStudio({ initialPage, featured: featuredPhotos, children }:
     requestAnimationFrame(() => {
       // A route replacement unmounts the old dialog while the next mounts.
       // Preserve the viewing session until the user actually leaves a photo.
-      if (window.location.pathname.startsWith(`${routes.photography}/`)) return
+      if(window.location.pathname.startsWith(`${routes.photography}/`)) return
       setLightbox(false)
-      if (!fromWall.current) return
+      if(!fromWall.current) return
       fromWall.current = false
-      if (window.location.pathname !== routes.photography) return
+      if(window.location.pathname !== routes.photography) return
       window.scrollTo(0, wallPosition.current.scrollY)
       wallPosition.current.trigger?.focus({ preventScroll: true })
     })
   }, [])
 
   async function openRandom() {
-    if (openingRandom) return
+    if(openingRandom) return
     setOpeningRandom(true)
     rememberWall()
     try {
@@ -264,11 +266,10 @@ function PhotoWall({ photos, view, density, featuredIds, authorName, onOpen, onL
   const frameRef = useRef<HTMLDivElement>(null)
   const [frame, setFrame] = useState({ width: 0, viewport: 0 })
   const [naturalAspects, setNaturalAspects] = useState<Record<string, number>>({})
-  const { t } = useI18n()
 
   useLayoutEffect(() => {
     const node = frameRef.current
-    if (!node) return
+    if(!node) return
     const update = () => setFrame((current) => current.width === node.clientWidth && current.viewport === window.innerWidth ? current : { width: node.clientWidth, viewport: window.innerWidth })
     update()
     const observer = new ResizeObserver(update)
@@ -278,55 +279,12 @@ function PhotoWall({ photos, view, density, featuredIds, authorName, onOpen, onL
   }, [])
 
   const rememberDimensions = useCallback((id: string, width: number, height: number) => {
-    if (width <= 0 || height <= 0) return
+    if(width <= 0 || height <= 0) return
     const aspect = width / height
     setNaturalAspects((current) => current[id] === aspect ? current : { ...current, [id]: aspect })
   }, [])
   const aspects = useMemo(() => photos.map((photo) => naturalAspects[photo.id] ?? photoAspect(photo.width, photo.height)), [photos, naturalAspects])
-  const layout = useMemo(() => {
-    if (!frame.width) return null
-    const gap = frame.viewport < 640 ? 12 : 24
-    return view === "masonry" ? layoutMasonry(aspects, frame.width, photoColumns(frame.viewport, density), gap) : layoutJustified(aspects, frame.width, targetRowHeight(frame.width) * densityScale(density), gap)
-  }, [aspects, frame, view, density])
-
-  useLayoutEffect(() => { if (layout) onLayout() }, [layout, onLayout])
-
-  return (
-    <div className={cn(photoInsetClassName, "pb-4")}>
-      <div ref={frameRef} data-photo-wall data-view={view} data-density={density}>
-        {photos.length === 0 ? <div className="py-28 text-center text-sm text-muted-foreground"><Camera className="mx-auto mb-4 size-8 opacity-50" /><p>{empty}</p><Link href={routes.home} className="mt-5 inline-block underline underline-offset-4">{t.backHome}</Link></div> : layout ? (
-          <div className="relative" style={{ height: layout.height }}>
-            {layout.boxes.map((box) => <PhotoTile key={photos[box.index].id} photo={photos[box.index]} featured={featuredIds.has(photos[box.index].id)} authorName={authorName} priority={box.index < photoColumns(frame.viewport, density)} onOpen={onOpen} onDimensions={rememberDimensions} className="absolute" style={{ left: box.x, top: box.y, width: box.width, height: box.height }} sizes={`${Math.ceil(box.width)}px`} />)}
-          </div>
-        ) : <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-6 lg:grid-cols-4 2xl:grid-cols-5">
-          {photos.map((photo, index) => <PhotoTile key={photo.id} photo={photo} featured={featuredIds.has(photo.id)} authorName={authorName} priority={index < 5} onOpen={onOpen} onDimensions={rememberDimensions} style={{ aspectRatio: String(aspects[index]) }} sizes="(min-width: 1536px) 20vw, (min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw" />)}
-        </div>}
-      </div>
-    </div>
-  )
+  const Wall = walls[view]
+  return <div className={cn(photoInsetClassName, "pb-4")}><div ref={frameRef} data-photo-wall data-view={view} data-density={density}><Wall photos={photos} aspects={aspects} frame={frame} density={density} featuredIds={featuredIds} authorName={authorName} onOpen={onOpen} onLayout={onLayout} onDimensions={rememberDimensions} empty={empty} /></div></div>
 }
-
-function PhotoTile({ photo, featured, authorName, priority, onOpen, onDimensions, className, style, sizes }: {
-  photo: PhotoResponse; featured: boolean; authorName: string; priority: boolean; onOpen: (id?: string) => void; className?: string; style: CSSProperties; sizes: string
-  onDimensions: (id: string, width: number, height: number) => void
-}) {
-  const { t } = useI18n()
-  const title = photo.title || t.photography
-  return (
-    <div id={`photo-${photo.id}`} data-photo-id={photo.id} className={cn("group relative", className)} style={style}>
-      <PhotoImage src={photoThumbnail(photo.id, 800)} srcSet={photoThumbnailSet(photo.id)} sizes={sizes} alt={title} width={photo.width || 1500} height={photo.height || 1000} priority={priority} onDimensions={photo.width > 0 && photo.height > 0 ? undefined : (width, height) => onDimensions(photo.id, width, height)} className="h-full w-full">
-        <Link id={`photo-link-${photo.id}`} href={routes.photo(photo.id)} scroll={false} aria-label={title} onClick={(event) => { if (!event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey && event.button === 0) onOpen(photo.id) }} className="absolute inset-0 block focus-visible:outline-offset-[-3px]">
-          {featured ? <span className="absolute top-3 left-3 grid size-7 place-items-center bg-black/55 text-white" title={t.featured} aria-label={t.featured}><Award className="size-4" /></span> : null}
-          <span data-photo-caption className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent px-3 pt-10 pb-3 text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-focus-within:opacity-100 max-sm:opacity-100 [@media(hover:none)]:opacity-100 [@media(pointer:coarse)]:opacity-100">
-            <span className="block truncate text-sm font-medium">{title}</span>
-            <span className="mt-1 hidden items-center gap-1.5 text-xs text-white/80 sm:flex"><AuthorMark name={authorName} className="size-5 text-[10px]" />{authorName}</span>
-          </span>
-        </Link>
-      </PhotoImage>
-    </div>
-  )
-}
-
-export function AuthorMark({ name, className }: { name: string; className?: string }) {
-  return <span aria-hidden className={cn("grid size-7 shrink-0 place-items-center rounded-full bg-muted text-xs font-medium text-foreground", className)}>{Array.from(name.trim())[0] || "?"}</span>
-}
+export { AuthorMark } from "./photo-author-mark"

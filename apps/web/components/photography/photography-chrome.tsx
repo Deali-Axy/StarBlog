@@ -1,8 +1,8 @@
 "use client"
 
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuPortal, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Menu, Search } from "lucide-react"
 import Link from "next/link"
-import { DropdownMenu } from "radix-ui"
 
 import { useI18n } from "@/components/app-providers"
 import { StarMark } from "@/components/brand/star-mark"
@@ -43,22 +43,22 @@ export function PhotographyHeader() {
           </Link>
           <ThemeToggle iconOnly className="size-11 rounded-xl" />
           <LanguageToggle className="h-11 min-w-11 rounded-xl px-2 text-xs" />
-          <DropdownMenu.Root>
-            <DropdownMenu.Trigger className={cn(photoIconClassName, "lg:hidden")} aria-label={t.siteNavigation}>
+          <DropdownMenu>
+            <DropdownMenuTrigger className={cn(photoIconClassName, "lg:hidden")} aria-label={t.siteNavigation}>
               <Menu className="size-5" />
-            </DropdownMenu.Trigger>
-            <DropdownMenu.Portal>
-              <DropdownMenu.Content align="end" sideOffset={8} className={cn(photographyThemeClassName, "z-50 min-w-44 rounded-xl border border-border bg-background p-1.5 text-foreground shadow-lg")} data-photography-theme>
+            </DropdownMenuTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuContent align="end" sideOffset={8} className={cn(photographyThemeClassName, "z-50 min-w-44 rounded-xl border border-border bg-background p-1.5 text-foreground shadow-lg")} data-photography-theme>
                 {links.map(({ href, label }) => (
-                  <DropdownMenu.Item key={href} asChild>
+                  <DropdownMenuItem key={href} asChild>
                     <Link href={href} aria-current={href === routes.photography ? "page" : undefined} className="block rounded-lg px-4 py-3 text-sm outline-none data-highlighted:bg-muted aria-[current=page]:font-semibold">
                       {label}
                     </Link>
-                  </DropdownMenu.Item>
+                  </DropdownMenuItem>
                 ))}
-              </DropdownMenu.Content>
-            </DropdownMenu.Portal>
-          </DropdownMenu.Root>
+              </DropdownMenuContent>
+            </DropdownMenuPortal>
+          </DropdownMenu>
         </div>
       </div>
     </header>
