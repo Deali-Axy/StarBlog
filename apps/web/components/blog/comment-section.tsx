@@ -2,16 +2,16 @@
 
 import { useI18n } from "@/components/app-providers"
 
-import { FormEvent, useEffect, useMemo, useState, useSyncExternalStore } from "react"
 import { RefreshCw, Reply } from "lucide-react"
+import { FormEvent, createContext, useContext, useEffect, useMemo, useState, useSyncExternalStore, type ReactNode } from "react"
 import { toast } from "sonner"
 
-import { useCreateComment, useComments, useSendCommentOtp } from "@/features/comments/api"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { useComments, useCreateComment, useSendCommentOtp } from "@/features/comments/api"
 import { ApiError, type CommentResponse } from "@/lib/api/types"
 import { formatDate } from "@/lib/format"
 import { getAuthorInitials } from "@/lib/site"
@@ -29,10 +29,10 @@ interface StoredProfile {
 const emptyProfile: StoredProfile = { userName: "", email: "", url: "" }
 
 function readProfile(): StoredProfile {
-  if (typeof window === "undefined") return emptyProfile
+  if(typeof window === "undefined") return emptyProfile
   try {
     const raw = localStorage.getItem(PROFILE_KEY)
-    if (!raw) return emptyProfile
+    if(!raw) return emptyProfile
     const parsed = JSON.parse(raw) as Partial<StoredProfile>
     return {
       userName: parsed.userName ?? "",
@@ -104,7 +104,7 @@ function CommentItem({
   )
 }
 
-export function CommentSection({ postId }: { postId: string }) {
+function useCommentSession({ postId }: { postId: string }) {
   const { locale, t } = useI18n()
   const commentsQuery = useComments(postId)
   const sendOtp = useSendCommentOtp()
@@ -122,7 +122,7 @@ export function CommentSection({ postId }: { postId: string }) {
   const [cooldown, setCooldown] = useState(0)
 
   useEffect(() => {
-    if (cooldown <= 0) return
+    if(cooldown <= 0) return
     const timer = window.setTimeout(() => setCooldown((value) => value - 1), 1000)
     return () => window.clearTimeout(timer)
   }, [cooldown])
@@ -132,7 +132,7 @@ export function CommentSection({ postId }: { postId: string }) {
 
   async function handleOtp() {
     const email = profile.email.trim()
-    if (!email) {
+    if(!email) {
       toast.error(t.emailRequired)
       return
     }
@@ -140,14 +140,14 @@ export function CommentSection({ postId }: { postId: string }) {
       await sendOtp.mutateAsync(email)
       toast.success(t.otpSent)
       setCooldown(60)
-    } catch (error) {
+    } catch(error) {
       toast.error(locale === "zh" && error instanceof ApiError ? error.message : t.otpFailed)
     }
   }
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault()
-    if (!profile.email.trim() || !profile.userName.trim() || !content.trim() || !otp.trim()) {
+    if(!profile.email.trim() || !profile.userName.trim() || !content.trim() || !otp.trim()) {
       toast.error(t.commentRequired)
       return
     }
@@ -166,16 +166,28 @@ export function CommentSection({ postId }: { postId: string }) {
       setOtp("")
       setContent("")
       setReplyTo(null)
-      if (!result.comment.visible || result.comment.isNeedAudit) {
+      if(!result.comment.visible || result.comment.isNeedAudit) {
         setPending((items) => [result.comment, ...items])
         toast.message(t.pending, { description: t.commentPending })
       } else {
         toast.success(t.commentPublished)
       }
-    } catch (error) {
+    } catch(error) {
       toast.error(locale === "zh" && error instanceof ApiError ? error.message : t.publishFailed)
     }
   }
+
+  return { t, commentsQuery, sendOtp, createComment, profile, setProfile, otp, setOtp, content, setContent, replyTo, setReplyTo, tree, total, cooldown, handleOtp, handleSubmit }
+}
+const CommentSessionContext = createContext<ReturnType<typeof useCommentSession> | null>(null)
+export function CommentSessionProvider({ postId, children }: { postId: string; children: ReactNode }) {
+  const session = useCommentSession({ postId })
+  return <CommentSessionContext.Provider value={session}>{children}</CommentSessionContext.Provider>
+}
+export function CommentSection() {
+  const session = useContext(CommentSessionContext)
+  if(!session) throw new Error("Comment session is required")
+  const { t, commentsQuery, sendOtp, createComment, profile, setProfile, otp, setOtp, content, setContent, replyTo, setReplyTo, tree, total, cooldown, handleOtp, handleSubmit } = session
 
   return (
     <section className="mt-16 border-t border-border/70 pt-10">
