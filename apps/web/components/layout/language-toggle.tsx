@@ -4,10 +4,12 @@ import { Languages } from "lucide-react"
 
 import { useI18n } from "@/components/app-providers"
 import { Button } from "@/components/ui/button"
+import { useHydrated } from "@/components/ui/use-hydrated"
 import { localeCookie } from "@/lib/i18n"
 
 export function LanguageToggle({ className }: { className?: string }) {
   const { locale, t } = useI18n()
+  const hydrated = useHydrated()
 
   function switchLanguage() {
     const next = locale === "zh" ? "en" : "zh"
@@ -18,7 +20,7 @@ export function LanguageToggle({ className }: { className?: string }) {
   }
 
   return (
-    <Button variant="ghost" size="sm" onClick={switchLanguage} aria-label={t.switchLanguage} title={t.switchLanguage} className={className}>
+    <Button disabled={!hydrated} variant="ghost" size="sm" onClick={switchLanguage} aria-label={t.switchLanguage} title={t.switchLanguage} className={className}>
       <Languages className="size-4" aria-hidden="true" />
       {locale === "zh" ? "EN" : "中文"}
     </Button>
