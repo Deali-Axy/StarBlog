@@ -1,3 +1,4 @@
+import { dirname, relative, resolve } from "node:path"
 import assert from "node:assert/strict"
 import { readFile } from "node:fs/promises"
 import test from "node:test"
@@ -35,7 +36,8 @@ function homeRenderer(variant, overrides = {}) {
   const config = resolveHomeConfig(preferences)
   const cache = new Map()
   const translations = new Proxy({}, { get: (_, key) => String(key) })
-  function load(name) {
+  function load(name, importer) {
+    if (name.startsWith(".")) name = "@/" + relative(fileURLToPath(new URL("../", import.meta.url)), resolve(dirname(importer), name)).replaceAll("\\", "/")
     if (name === "@/components/app-providers") return { useI18n: () => ({ t: translations, locale: "zh" }) }
     if (name === "@/components/home/home-design-context") return { useHomeDesign: () => ({ config, preferences }) }
     if (name === "next/link") return { __esModule: true, default: ({ children, ...props }) => React.createElement("a", props, children) }
@@ -50,7 +52,7 @@ function homeRenderer(variant, overrides = {}) {
       compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX, esModuleInterop: true },
     })
     const compiledModule = { exports: {} }
-    runInNewContext(outputText, { module: compiledModule, exports: compiledModule.exports, require: load, process }, { filename: path })
+    runInNewContext(outputText, { module: compiledModule, exports: compiledModule.exports, require: name => load(name, path), process }, { filename: path })
     cache.set(name, compiledModule.exports)
     return compiledModule.exports
   }

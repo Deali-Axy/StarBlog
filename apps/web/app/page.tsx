@@ -1,23 +1,22 @@
 import { getI18n } from "@/lib/i18n-server"
-import Link from "next/link"
 import type { Metadata } from "next"
 import { cookies } from "next/headers"
+import Link from "next/link"
 
-import { FeaturedCategories } from "@/components/home/featured-categories"
-import { FeaturedPosts, LatestPosts } from "@/components/home/featured-sections"
-import { HomeLayout } from "@/components/home/home-layout"
-import { HomeHero } from "@/components/home/home-hero"
 import { CategoryWordCloud } from "@/components/home/category-word-cloud"
-import { JsonLd } from "@/components/seo/json-ld"
+import { FeaturedCategories } from "@/components/home/featured-categories"
+import { FeaturedPhotos } from "@/components/home/featured-photos"
+import { FeaturedPosts, LatestPosts } from "@/components/home/featured-sections"
+import { FriendLinks } from "@/components/home/friend-links"
 import { HomeDesignProvider } from "@/components/home/home-design-context"
 import { HomeDesignSwitcher } from "@/components/home/home-design-switcher"
-import { FeaturedPhotos } from "@/components/home/featured-photos"
-import { FriendLinks } from "@/components/home/friend-links"
+import { HomeHero } from "@/components/home/home-hero"
+import { HomeLayout } from "@/components/home/home-layout"
+import { JsonLd } from "@/components/seo/json-ld"
 import { getCategoryWordCloud, getHome, getOverview, listPosts } from "@/lib/api/queries"
 import { homePreferencesCookie } from "@/lib/home-variant"
 import { postHref } from "@/lib/routes"
 import { absoluteUrl, getSite } from "@/lib/site"
-import styles from "@/components/home/home-design.module.css"
 
 export const revalidate = 300
 
@@ -47,22 +46,22 @@ export default async function HomePage() {
   return (
     <HomeDesignProvider savedPreferences={savedPreferences}>
       <HomeLayout>
-      <JsonLd
-        data={{
-          "@context": "https://schema.org",
-          "@type": "WebSite",
-          name: site.name,
-          url: site.url,
-          potentialAction: {
-            "@type": "SearchAction",
-            target: `${site.url}/search?keyword={search_term_string}`,
-            "query-input": "required name=search_term_string",
-          },
-        }}
-      />
-      <HomeHero locale={locale} site={site} overview={overview} photo={photo} topPost={home.topPost} />
+        <JsonLd
+          data={{
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            name: site.name,
+            url: site.url,
+            potentialAction: {
+              "@type": "SearchAction",
+              target: `${site.url}/search?keyword={search_term_string}`,
+              "query-input": "required name=search_term_string",
+            },
+          }}
+        />
+        <HomeHero locale={locale} site={site} overview={overview} photo={photo} topPost={home.topPost} />
 
-        <div className={styles.container}>
+        <div className={"w-full max-w-[var(--home-width)] mx-auto px-[1rem]"}>
           <FeaturedPosts posts={home.featuredPosts} />
           <LatestPosts posts={latest.items} />
 
@@ -79,8 +78,8 @@ export default async function HomePage() {
             </p>
           ) : null}
         </div>
-        <HomeDesignSwitcher />
       </HomeLayout>
+      <HomeDesignSwitcher />
     </HomeDesignProvider>
   )
 }

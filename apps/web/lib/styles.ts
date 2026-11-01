@@ -28,4 +28,4 @@ export const photographyThemeClassName = [
   "[&_:is(a,button,select):focus-visible]:outline-2 [&_:is(a,button,select):focus-visible]:outline-solid [&_:is(a,button,select):focus-visible]:outline-offset-3 [&_:is(a,button,select):focus-visible]:outline-ring",
 ].join(" ")
 
-export const homeSectionClassName = "mt-16 first:mt-10 sm:mt-22"
+export const homeSectionClassName = "mt-[calc(4rem*var(--home-density))] first:mt-[calc(2.5rem*var(--home-density))] sm:mt-[calc(5.5rem*var(--home-density))]"

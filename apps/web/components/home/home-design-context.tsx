@@ -1,12 +1,11 @@
 "use client"
-
-import { createContext, useContext, useEffect, useState, useSyncExternalStore, type ReactNode } from "react"
-import { useSearchParams } from "next/navigation"
-import { useTheme } from "next-themes"
-import { homeDesignHref, homePreferencesCookie, normalizeHomePreferences, resolveHomeConfig, resolveHomePreferences, serializeHomePreferences, setHomeSetting, type HomeMode, type HomePreferences, type HomeSettingPath } from "@/lib/home-variant"
 import { homeThemeStyle } from "@/lib/home-theme"
+import { homeDesignHref, homePreferencesCookie, normalizeHomePreferences, resolveHomeConfig, resolveHomePreferences, serializeHomePreferences, setHomeSetting, type HomeMode, type HomePreferences, type HomeSettingPath } from "@/lib/home-variant"
+import { useTheme } from "next-themes"
+import { useSearchParams } from "next/navigation"
+import { createContext, useContext, useEffect, useState, useSyncExternalStore, type ReactNode } from "react"
 import styles from "./home-design.module.css"
-
+import { HomeInteractionProvider } from "./home-interaction-state"
 const changeEvent = "starblog:home-design"
 function subscribe(callback: () => void) {
   window.addEventListener(changeEvent, callback)
@@ -16,7 +15,12 @@ function subscribe(callback: () => void) {
 function readSavedPreferences() {
   return document.cookie.split("; ").find(cookie => cookie.startsWith(`${homePreferencesCookie}=`))?.slice(homePreferencesCookie.length + 1) ?? ""
 }
-type Session = { base: HomePreferences; draft: HomePreferences; mode: HomeMode; originalMode: HomeMode }
+type Session = {
+  base: HomePreferences
+  draft: HomePreferences
+  mode: HomeMode
+  originalMode: HomeMode
+}
 function useDesignState(savedPreferences: string) {
   const params = useSearchParams()
   const saved = useSyncExternalStore(subscribe, readSavedPreferences, () => savedPreferences)
@@ -46,19 +50,23 @@ function useDesignState(savedPreferences: string) {
   function resetAll() { selectPreset(preferences.preset) }
   function undo() { setSession(current => current ? { ...current, draft: current.base, mode: current.originalMode } : current) }
   function changeMode(value: HomeMode) {
-    if (session) setSession({ ...session, mode: value })
-    else setTheme(value)
+    if(session)
+      setSession({ ...session, mode: value })
+    else
+      setTheme(value)
   }
   function apply() {
-    if (!session) return
+    if(!session)
+      return
     const next = serializeHomePreferences(preferences)
-    if (next !== serializeHomePreferences(committed)) {
+    if(next !== serializeHomePreferences(committed)) {
       const url = window.location.href
       window.history.replaceState(window.history.state, "", homeDesignHref(url, committed))
       window.history.pushState(window.history.state, "", homeDesignHref(url, preferences))
     }
     document.cookie = `${homePreferencesCookie}=${next}; Path=/; Max-Age=31536000; SameSite=Lax${location.protocol === "https:" ? "; Secure" : ""}`
-    if (session.mode !== globalMode) setTheme(session.mode)
+    if(session.mode !== globalMode)
+      setTheme(session.mode)
     setSession(null)
     window.dispatchEvent(new Event(changeEvent))
   }
@@ -67,15 +75,18 @@ function useDesignState(savedPreferences: string) {
 const HomeDesignContext = createContext<ReturnType<typeof useDesignState> | null>(null)
 export function useHomeDesign() {
   const context = useContext(HomeDesignContext)
-  if (!context) throw new Error("Home design provider is required")
+  if(!context)
+    throw new Error("Home design provider is required")
   return context
 }
-export function HomeDesignProvider({ savedPreferences, children }: { savedPreferences: string; children: ReactNode }) {
+export function HomeDesignProvider({ savedPreferences, children }: {
+  savedPreferences: string
+  children: ReactNode
+}) {
   const state = useDesignState(savedPreferences)
   return <HomeDesignContext.Provider value={state}>
-    <div className={`${styles.theme} ${styles.page}`} style={homeThemeStyle(state.config)} data-home-design={state.preferences.preset}
-      data-home-mode={state.previewMode} data-home-texture={state.config.theme.texture} data-home-border={state.config.theme.border} data-home-shadow={state.config.theme.shadow}>
-      {children}
+    <div className={`${styles.theme} min-h-dvh overflow-x-clip ${styles.page}`} style={homeThemeStyle(state.config)} data-home-design={state.preferences.preset} data-home-mode={state.previewMode} data-home-texture={state.config.theme.texture} data-home-border={state.config.theme.border} data-home-shadow={state.config.theme.shadow}>
+      <HomeInteractionProvider>{children}</HomeInteractionProvider>
     </div>
   </HomeDesignContext.Provider>
 }
