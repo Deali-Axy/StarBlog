@@ -49,7 +49,7 @@ Web 开发服务器：<http://localhost:3001>
 
 `/blog` 提供活字索引、折页手记、档案工作台三套独立构图，分别使用 `?bv=library`、`?bv=editorial`、`?bv=studio` 直接预览。右下角悬浮按钮打开风格预览菜单，不占用页头空间；切换会保留查询、分页及显示设置，URL 支持刷新与前进后退。
 
-默认风格与预览开关集中在 `lib/blog-variant.ts`。选定后修改 `BLOG_VARIANT` 并将 `BLOG_PREVIEW` 设为 `false`；此时隐藏切换器，固定使用配置值并忽略 URL 中的 `bv`。三版拥有各自的导航与页脚，覆盖 `/blog` 列表、文章详情与 `/p` 旧链接；详情正文排版保持原有结构。主题仅应用于博客外壳及其弹层，离开博客后恢复对应站点区域的布局。
+默认风格与预览开关集中在 `lib/blog-variant.ts`。选定后修改 `BLOG_VARIANT` 并将 `BLOG_PREVIEW` 设为 `false`；此时隐藏切换器，固定使用配置值并忽略 URL 中的 `bv`。三版拥有各自的导航、详情页与页脚，覆盖 `/blog` 列表、文章详情与 `/p` 旧链接。主题仅应用于博客外壳及其弹层，离开博客后恢复对应站点区域的布局。
 
 活字索引采用全宽文字条目和展开式分栏目录；折页手记采用不对称跨栏排版和独立目录页；档案工作台采用目录、文章索引和摘要预览三栏，小屏选择文章后打开预览对话框。档案索引支持 ↑ / ↓ / Home / End 键选择，预览不会改变 URL 或文章顺序。
 
@@ -58,6 +58,18 @@ Web 开发服务器：<http://localhost:3001>
 保留既有 `bv` 标识以兼容已保存的地址。`view=grid` 表示各设计的展开阅读布局，`view=list` 表示紧凑索引；不强制三版使用同一种卡片网格。
 
 分类默认折叠，直达子分类会展开祖先路径。分类名称搜索临时展示匹配路径，清空后恢复原来的展开状态；前两版在所有尺寸通过目录弹层访问，工作台仅在桌面常驻目录。纯查询与分类逻辑检查使用 `pnpm test:blog`，浏览器回归说明见仓库 `tests/StarBlog.E2ETests/README.md`。
+
+## 文章阅读页
+
+正文 Markdown 由 Next.js 服务端的 `renderArticleMarkdown()` 解析，使用现有 `react-markdown`、`remark-gfm`、`rehype-slug` 和 `rehype-highlight`。同一次 rehype 处理在生成标题 ID 后提取目录，包含实际标题层级、中文、行内代码和重复标题的唯一 ID；纯标点标题补充无冲突的 ID。正文 React 节点和目录数据传入客户端布局，原始 Markdown、高亮和解析器不进入文章页客户端包。模块用 `server-only` 防止意外跨入客户端。
+
+Web 读取文章时携带 `includeToc=false`，API 返回原始 Markdown 并跳过 Markdig 目录生成。API 的开关默认仍为 `true`，兼容其他客户端；后端发布渠道使用的 HTML 渲染继续保留。译文目录直接来自最终选中的译文正文。
+
+详情页构图集中在 `components/blog/article-designs.module.css`：活字索引使用全宽大标题、左侧编号目录和右侧正文；折页手记使用居中刊物封面、衬线正文与右侧页边目录；档案工作台使用左侧章节树、中间文档纸面和右侧文档信息。小屏改为可展开的目录，选择章节后自动收起。共享文章树保持稳定，预览风格切换不重置评论草稿。
+
+目录使用真实标题 ID 的原生锚点链接，支持中文编码、直接打开锚点、刷新与浏览器前进后退。点击后滚动并移动焦点至标题，偏移跟随各风格固定页头的高度。滚动高亮涵盖标题间的长段落和最后一节；图片载入或窗口尺寸改变后重新计算。目录同时显示正文阅读进度，尊重减少动态效果偏好。代码和表格在局部横向滚动，避免撑破手机页面。
+
+`pnpm test:blog` 还会执行 `tests/article-reading.test.mjs`，覆盖实际 Markdown 渲染后的目录与标题 ID 一致性、重复和空 ID、标题层级、译文、GFM、脚注、代码高亮、安全链接及滚动定位逻辑。浏览器用的 `prepare_blog_fixture.py` 另提供 `/blog/article-reading-fixture`，包含十一种标题、长正文和英文译文，供检查布局、目录跳转与语言切换。
 
 ## 搜索页
 
@@ -69,6 +81,6 @@ Web 开发服务器：<http://localhost:3001>
 
 组件样式使用 Tailwind CSS v4，字号、间距和圆角优先使用标准工具类。博客三版的独立构图与响应式排版集中在 `components/blog/blog-designs.module.css`，样式通过 CSS Modules 限定作用域。复杂布局、流体字号和主题变量可使用任意值；条件样式通过 `cn()` 组合完整类名，不动态拼接工具类名称。自定义响应式断点与 Tailwind 默认断点统一使用 `rem`，避免混用 `px` 导致生成顺序与预期不符；例如首页桌面断点使用 `min-[70rem]`。
 
-`app/globals.css` 仅保留 Tailwind/shadcn 导入、明暗主题变量、字体及圆角映射、基础层和 Marquee 动画注册。公共容器、标题、摄影主题等工具类组合集中在 `lib/styles.ts`；摄影主题必须同时应用于页面容器和 Portal 弹出层。Markdown 在组件入口引入 highlight.js 官方主题，其排版使用局部 Tailwind 类。
+`app/globals.css` 仅保留 Tailwind/shadcn 导入、明暗主题变量、字体及圆角映射、基础层和 Marquee 动画注册。公共容器、标题、摄影主题等工具类组合集中在 `lib/styles.ts`；摄影主题必须同时应用于页面容器和 Portal 弹出层。Markdown 在服务端入口引入 highlight.js 官方主题，正文排版使用 `markdown.module.css`，各阅读方案通过局部 CSS Module 调整字体与版式。
 
 内联 `style` 仅用于运行时值，例如摄影布局坐标、Motion 动画、分类权重字号及层级缩进。Markdown 表格的对齐由正文数据决定，也保留为运行时样式。浏览器测试使用语义或 `data-*` 定位，不依赖样式类。
