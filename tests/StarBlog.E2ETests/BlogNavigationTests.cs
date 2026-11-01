@@ -240,7 +240,8 @@ public sealed class BlogNavigationTests {
             await Expect(dialog.Locator($"[data-category-id='{leaf.Id}'] a")).ToHaveAttributeAsync("aria-current", "page");
             await page.Keyboard.PressAsync("Escape");
             await page.GetByRole(AriaRole.Link, new() { Name = "第 5 / 5 页", Exact = true }).ClickAsync();
-            await Expect(page.Locator("[data-blog-article]")).ToHaveCountAsync(1);
+            // 25 index records plus the long-form reading fixture share this category.
+            await Expect(page.Locator("[data-blog-article]")).ToHaveCountAsync(2);
             await Expect(page.GetByRole(AriaRole.Button, new() { Name = "下一页", Exact = true })).ToBeDisabledAsync();
             await page.GotoAsync($"{baseUrl}/blog?categoryId={leaf.Id}&bv={variant}&pageSize=6&page=6");
             await Expect(page.GetByRole(AriaRole.Heading, new() { Name = "这一页还没有文章", Exact = true })).ToBeVisibleAsync();

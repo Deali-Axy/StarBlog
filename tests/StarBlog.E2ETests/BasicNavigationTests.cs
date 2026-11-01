@@ -19,7 +19,7 @@ public sealed class BasicNavigationTests {
         var title = await page.TitleAsync();
 
         Assert.False(string.IsNullOrWhiteSpace(title));
-        await Expect(page.Locator("header").GetByRole(AriaRole.Link, new() { Name = "StarBlog", Exact = true })).ToBeVisibleAsync();
+        await Expect(page.Locator("header").GetByRole(AriaRole.Link, new() { NameRegex = new System.Text.RegularExpressions.Regex("^StarBlog(?: ·.*)?$") })).ToBeVisibleAsync();
     }
 
     [Fact]

@@ -203,6 +203,8 @@ public sealed class HomeCustomizationTests {
         await using var session = await Session.Start();
         var page = session.Page;
         await page.GotoAsync(DesignUrl(baseUrl, overrides: new { hero = "photograph" }), new() { WaitUntil = WaitUntilState.DOMContentLoaded });
+        // Wait until the synthetic event can reach the hydrated image handler.
+        await Expect(page.Locator("[data-home-design-trigger]")).ToBeEnabledAsync();
         var image = page.Locator("[data-home-hero='photograph'] img");
         if (await image.CountAsync() > 0) await image.EvaluateAsync("el => el.dispatchEvent(new Event('error'))");
         await Expect(page.Locator("[data-home-hero='signature']")).ToBeVisibleAsync();
