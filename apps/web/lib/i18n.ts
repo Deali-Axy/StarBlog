@@ -21,6 +21,7 @@ export function languageName(code: string, locale: Locale) {
 }
 
 const zh = {
+  utilityDesign: { label: "页面风格", flat: "简洁", editorial: "刊物" },
   homeGroupPreset: "整体方案",
   homeGroupAppearance: "外观",
   homeGroupLayout: "页面布局",
@@ -283,6 +284,8 @@ const zh = {
   requirements: "注意事项",
   linksDescription: "申请友链并查看已展示的站点。",
   linksPage: {
+    flatIntro: "一些值得访问的站点。欢迎浏览，也欢迎交换友链。",
+    flatApplyIntro: "请先添加本站链接，再填写申请信息。审核结果将通过邮件通知。",
     eyebrow: "LINKS / 互联网里的邻居",
     headline: "让好奇心，串个门。",
     intro: "独立的站点，有趣的灵魂。收藏一些值得停留的地方，也期待在这里遇见你。",
@@ -409,6 +412,8 @@ const zh = {
   rssHint: "把地址放进阅读器即可，不必经过任何平台。",
   openFeed: "打开 Atom 源",
   rssPage: {
+    flatIntro: "通过 RSS / Atom 阅读器订阅本站文章更新。",
+    flatGuideTitle: "如何订阅",
     eyebrow: "RSS / 保持联系的另一种方式",
     headline: "新的记录，\n在阅读器里见。",
     intro: "把更新放进自己的阅读清单。用你喜欢的节奏，继续读技术、生活和一路上的新发现。",
@@ -464,6 +469,7 @@ const zh = {
 }
 
 const en: typeof zh = {
+  utilityDesign: { label: "Page style", flat: "Simple", editorial: "Editorial" },
   homeGroupPreset: "Presets",
   homeGroupAppearance: "Appearance",
   homeGroupLayout: "Layout",
@@ -726,6 +732,8 @@ const en: typeof zh = {
   requirements: "Guidelines",
   linksDescription: "Explore other websites and request a link exchange.",
   linksPage: {
+    flatIntro: "A few websites worth visiting. Browse the directory or request a link exchange.",
+    flatApplyIntro: "Add a link to this site, then fill out the form. You’ll receive the review result by email.",
     eyebrow: "LINKS / NEIGHBORS ON THE WEB",
     headline: "Let curiosity lead the way.",
     intro: "Independent websites, interesting people. A collection of places worth a visit, with room for your corner of the web, too.",
@@ -852,6 +860,8 @@ const en: typeof zh = {
   rssHint: "Add this address to your feed reader and read directly.",
   openFeed: "Open Atom feed",
   rssPage: {
+    flatIntro: "Subscribe to new articles with an RSS / Atom feed reader.",
+    flatGuideTitle: "How to subscribe",
     eyebrow: "RSS / ANOTHER WAY TO KEEP IN TOUCH",
     headline: "New notes.\nIn your reader.",
     intro: "Make a little room in your reading list. Follow notes on technology, life, and discoveries along the way, at your own pace.",

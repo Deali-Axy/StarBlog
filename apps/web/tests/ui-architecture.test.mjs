@@ -18,6 +18,7 @@ test("business components compose local primitives and presentations cannot read
         if (file.includes("/views/")) {
           assert.ok(!node.moduleSpecifier.text.endsWith("home-design-context"), file)
           assert.ok(!/\buseBlogLayout\b/.test(node.importClause?.getText(ast) ?? ""), file)
+          assert.ok(!/\buseUtilityDesign\b/.test(node.importClause?.getText(ast) ?? ""), file)
         }
       }
       if (file.includes("/views/") && ts.isJsxAttribute(node) && ["className", "style"].includes(node.name.text)) {
