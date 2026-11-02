@@ -18,7 +18,7 @@ export function RssDesign({ feedUrl }: { feedUrl: string }) {
 
   return (
     <>
-      <UtilityDesignSwitcher value={variant} onChange={switchVariant} className={variant === "flat" ? "max-w-3xl" : undefined} />
+      <UtilityDesignSwitcher value={variant} onChange={switchVariant} />
       <View t={t} feedAddress={<FeedAddress url={feedUrl} />} />
     </>
   )

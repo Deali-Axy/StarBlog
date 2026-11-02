@@ -1,6 +1,6 @@
 # Links 与 RSS 的两套 UI
 
-`/links`、`/rss` 默认使用简洁 flat 布局。页面右上角的“页面风格”可以切换为此前的刊物布局，对应 `?uv=editorial`。切回简洁会删除 `uv`；未知值回退到简洁。地址可分享、刷新，也支持浏览器前进和后退，canonical 仍是原始页面地址。
+`/links`、`/rss` 默认使用简洁 flat 布局。与 blog 页一致，右下角的调色板浮动按钮打开“页面风格”菜单，可以切换为此前的刊物布局，对应 `?uv=editorial`。切回简洁会删除 `uv`；未知值回退到简洁。地址可分享、刷新，也支持浏览器前进和后退，canonical 仍是原始页面地址。菜单支持键盘选择、Escape 关闭和关闭后焦点返回按钮，并避开屏幕安全区域。
 
 两套展示分别位于 `components/links/views`、`components/rss/views`，由 `LinksDesign`、`RssDesign` 的类型化组件映射选择。展示只接收内容和插槽，不读取布局选择状态。后续增加方案时，扩展 `UtilityVariant` 和组件映射即可。
 
