@@ -18,15 +18,19 @@ os.umask(0o077)
 backup_dir = ROOT / "backups/production-releases" / version
 backup_dir.mkdir(parents=True, exist_ok=True)
 snapshot = backup_dir / "local.db"
-if snapshot.exists():
-    raise SystemExit("Local snapshot already exists; reuse the prepared input or choose a new release version")
 local = ROOT / "apps/api/src/StarBlog.Api/app.db"
-with closing(sqlite3.connect(local.as_uri() + "?mode=ro", uri=True)) as original, closing(sqlite3.connect(snapshot)) as backup:
-    original.backup(backup)
+if not snapshot.exists():
+    temporary = snapshot.with_suffix(".partial")
+    with closing(sqlite3.connect(local.as_uri() + "?mode=ro", uri=True)) as original, closing(sqlite3.connect(temporary)) as backup:
+        original.backup(backup)
+        if backup.execute('PRAGMA quick_check').fetchall() != [('ok',)]:
+            raise SystemExit("Local snapshot failed integrity check")
+    temporary.replace(snapshot)
 
 inputs = ROOT / ".ship/inputs" / version
 inputs.mkdir(parents=True, exist_ok=True)
 translations = inputs / "translations.db"
+translations.unlink(missing_ok=True)
 with closing(sqlite3.connect(snapshot.as_uri() + "?mode=ro", uri=True)) as source, closing(sqlite3.connect(translations)) as target:
     target.executescript('''CREATE TABLE __EFMigrationsHistory (migration_id TEXT PRIMARY KEY, product_version TEXT NOT NULL);
         CREATE TABLE post (id TEXT PRIMARY KEY, title TEXT NOT NULL, content TEXT);''')
@@ -41,9 +45,11 @@ with closing(sqlite3.connect(snapshot.as_uri() + "?mode=ro", uri=True)) as sourc
     (inputs / "identity.json").write_text(json.dumps(users))
     count = target.execute('SELECT COUNT(*) FROM post_translation').fetchone()[0]
 archive = inputs / "migration-inputs.tar.gz"
-with tarfile.open(archive, "w:gz") as output:
+temporary_archive = archive.with_suffix(".partial")
+with tarfile.open(temporary_archive, "w:gz") as output:
     output.add(translations, arcname="translations.db")
     output.add(inputs / "identity.json", arcname="identity.json")
+temporary_archive.replace(archive)
 subprocess.run(["ssh", "deali.cn", "umask 077; mkdir -p /home/deali/projects/starblog-v2/migration"], check=True)
 subprocess.run(["scp", str(archive), "deali.cn:/home/deali/projects/starblog-v2/migration/inputs.tar.gz"], check=True)
 print(f"Preserved {count} translations and {len(users)} existing EF administrator(s); credentials were not printed.")

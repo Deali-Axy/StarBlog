@@ -14,6 +14,9 @@ ROOT = Path(__file__).resolve().parents[1]
 version = sys.argv[1]
 if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]+", version):
     raise SystemExit("Invalid release version")
+for name in ("compose.server.yaml", "gateway.conf.template", "install-release.py"):
+    if not (ROOT / "deploy" / name).is_file():
+        raise SystemExit(f"Missing deployment input: {name}")
 release = ROOT / "artifacts/releases" / version
 if release.exists():
     shutil.rmtree(release)
@@ -33,7 +36,7 @@ for name in ("appsettings.Development.json", "appsettings-email.json", "appsetti
 env = os.environ.copy()
 env.update({"INTERNAL_API_BASE_URL": "http://api:8080", "NEXT_PUBLIC_API_BASE_URL": "",
             "NEXT_PUBLIC_SITE_URL": "https://blog.deali.cn", "NEXT_TELEMETRY_DISABLED": "1"})
-run(["pnpm", "build"], ROOT / "apps/web", env)
+run(["node", "node_modules/next/dist/bin/next", "build"], ROOT / "apps/web", env)
 standalone = ROOT / "apps/web/.next/standalone"
 if not (standalone / "server.js").is_file():
     raise SystemExit("Expected standalone/server.js")

@@ -7,6 +7,7 @@ server {
     listen 8080;
     server_name _;
     server_tokens off;
+    absolute_redirect off;
     client_max_body_size 256m;
     set_real_ip_from __SWAG_IP__;
     real_ip_header X-Forwarded-For;
@@ -37,6 +38,9 @@ server {
     location ~* ^/Blog/(?:List|Index)/?$ { return 301 /blog$is_args$args; }
     location ~* ^/Blog/RandomPost/?$ { return 301 /blog/random$is_args$args; }
     location ~* ^/Rss/Feed/?$ { return 301 /feed$is_args$args; }
-    location ~* ^/Rss(?:/Index)?/?$ { return 301 /rss$is_args$args; }
+    location ~ ^/Rss(?:/Index)?/?$ { return 301 /rss$is_args$args; }
+    location ~ ^/Blog/?$ { return 301 /blog$is_args$args; }
+    location ~* ^/Photography/Photo/([^/]+)/?$ { return 301 /photography/$1$is_args$args; }
+    location ~ ^/Photography(?:/Index)?/?$ { return 301 /photography$is_args$args; }
     location / { proxy_pass http://web:3000; }
 }
