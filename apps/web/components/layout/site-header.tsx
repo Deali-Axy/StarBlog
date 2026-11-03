@@ -107,7 +107,7 @@ export function SiteHeader() {
           })}
         </nav>
         <div className="ml-auto flex items-center gap-1">
-          <Suspense
+          {pathname !== routes.search && <Suspense
             fallback={
               <form className="relative hidden md:block">
                 <Search
@@ -129,7 +129,7 @@ export function SiteHeader() {
             }
           >
             <SearchBox />
-          </Suspense>
+          </Suspense>}
           <Button
             variant="ghost"
             size="icon-sm"
