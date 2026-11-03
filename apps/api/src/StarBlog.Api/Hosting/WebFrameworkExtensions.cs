@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.HttpOverrides;
+using System.Net;
 using SixLabors.ImageSharp.Web.DependencyInjection;
 using StarBlog.Api.Hosting.Authentication;
 using StarBlog.Api.Hosting.HealthChecks;
@@ -16,6 +17,12 @@ public static class WebFrameworkExtensions {
         services.AddMemoryCache();
         services.AddHttpContextAccessor();
         services.AddHttpClient();
+        services.Configure<ForwardedHeadersOptions>(options => {
+            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            foreach (var proxy in configuration.GetSection("ReverseProxy:KnownProxies").Get<string[]>() ?? []) {
+                options.KnownProxies.Add(IPAddress.Parse(proxy));
+            }
+        });
         services.AddResponseCompression(options => {
             options.EnableForHttps = true;
             options.Providers.Add<Microsoft.AspNetCore.ResponseCompression.BrotliCompressionProvider>();
@@ -53,9 +60,7 @@ public static class WebFrameworkExtensions {
             app.UseHsts();
         }
 
-        app.UseForwardedHeaders(new ForwardedHeadersOptions {
-            ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-        });
+        app.UseForwardedHeaders();
         app.UseImageSharp();
         app.UseResponseCompression();
         app.UseStaticFiles();

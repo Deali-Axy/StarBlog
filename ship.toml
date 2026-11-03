@@ -2,68 +2,57 @@ schema = 2
 
 [project]
 name = "starblog"
-description = "StarBlog 博客系统"
+description = "StarBlog API, Next.js and administration release"
 
+# Release the reviewed working tree, including deployment fixes, without moving Git tags.
 [version]
-source = "git-tag"
-fallback = "dev"
+source = "env"
 override_env = "SHIP_VERSION"
+fallback = "error"
 
 [features]
 publish = true
 deploy = true
-rollback = true
-verify = false
+verify = true
+rollback = false
 
-[vars]
-registry = "ccr.ccs.tencentyun.com"
-namespace = "deali"
-image = "starblog"
-
-# ── 构建阶段 ──────────────────────────────────────────────────────
 [build]
-driver = "docker"
+driver = "command"
 
-[build.docker]
-image = "{{ vars.namespace }}/{{ vars.image }}"
-context = "."
-dockerfile = "apps/web-legacy/Dockerfile"
-platforms = ["linux/amd64"]
-load = true
+[build.command]
+run = "python3 deploy/build-release.py {{ version }}"
+cwd = "."
+outputs = ["artifacts/starblog-{{ version }}.tar.gz"]
 
-# ── 发布阶段 ──────────────────────────────────────────────────────
 [publish]
-driver = "registry"
+driver = "scp"
 
-[publish.registry]
-push = true
-tag_latest_on_default_profile = true
-
-[[publish.registry.targets]]
-type = "private"
-url = "{{ vars.registry }}"
-namespace = "{{ vars.namespace }}"
-image = "{{ vars.image }}"
-
-# ── 模板生成 ──────────────────────────────────────────────────────
-[[templates]]
-path = "./deploy/.env"
-content = """
-IMAGE_NAME={{ vars.registry }}/{{ vars.namespace }}/{{ vars.image }}
-IMAGE_TAG={{ version }}
-"""
-
-# ── 部署阶段 ──────────────────────────────────────────────────────
-[deploy]
-driver = "compose"
-
-[deploy.compose]
+[publish.scp]
+local = "artifacts/starblog-{{ version }}.tar.gz"
 host = "deali.cn"
-path = "/home/deali/projects/starblog2"
-local_file = "./deploy/compose.prod.yaml"
-remote_file = "compose.yaml"
-local_env_file = "./deploy/.env"
-env_file = ".env"
-auto_env_file = true
-tag_key = "IMAGE_TAG"
-up = "docker compose up -d --remove-orphans"
+remote = "/home/deali/projects/starblog-v2/incoming/starblog-{{ version }}.tar.gz"
+
+[[steps.pre_publish]]
+name = "prepare-release-directory"
+run = "ssh deali.cn 'mkdir -p /home/deali/projects/starblog-v2/incoming && chmod 700 /home/deali/projects/starblog-v2 /home/deali/projects/starblog-v2/incoming'"
+
+[[steps.pre_deploy]]
+name = "snapshot-local-translations-and-admin"
+run = "python3 deploy/prepare-migration.py {{ version }}"
+
+[deploy]
+driver = "ssh"
+
+[deploy.ssh]
+host = "deali.cn"
+commands = ["python3 -c 'import tarfile; t=tarfile.open(\"/home/deali/projects/starblog-v2/incoming/starblog-{{ version }}.tar.gz\"); exec(compile(t.extractfile(\"deploy/install-release.py\").read(), \"install-release.py\", \"exec\"))' {{ version }}"]
+
+[verify]
+driver = "http"
+
+[verify.http]
+url = "https://blog.deali.cn/health/ready"
+expected_status = 200
+attempts = 20
+interval_seconds = 3
+timeout_seconds = 10

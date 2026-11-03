@@ -23,3 +23,14 @@
 **/values.dev.yaml
 LICENSE
 README.md
+**/app*.db*
+backups
+artifacts
+**/wwwroot/media
+**/wwwroot/is-cache
+**/.env.*
+**/appsettings-email.json
+**/appsettings-monitoring.json
+**/words.json
+**/.next
+.ship

@@ -26,7 +26,8 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.11" />
         <PackageReference Include="Microsoft.Extensions.AI" Version="9.8.0" />
         <PackageReference Include="Microsoft.Extensions.AI.OpenAI" Version="9.8.0-preview.1.25412.6" />
-        <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
+        <PackageReference Include="SixLabors.ImageSharp" Version="3.2.0" />
+        <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.13" />
         <PackageReference Include="SixLabors.ImageSharp.Web" Version="3.2.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.2" />
         <PackageReference Include="UAParser" Version="3.1.47" />
@@ -37,6 +38,8 @@
         <!-- Media assets do not trigger hot reload. Watching them creates one inotify
              instance per directory and exceeds the Linux default of 256. -->
         <Content Update="wwwroot/media/**" Watch="false" />
+        <Content Update="wwwroot/media/**" CopyToPublishDirectory="Never" />
+        <Content Update="appsettings-email.json;appsettings-monitoring.json;words.json" CopyToPublishDirectory="Never" />
     </ItemGroup>
 
 </Project>

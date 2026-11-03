@@ -12,6 +12,7 @@ export default defineConfig(({ mode }) => {
   const apiProxyTarget = env.VITE_API_PROXY_TARGET || "http://localhost:5039";
 
   return {
+    base: env.VITE_BASE_PATH || "/",
     plugins: [react()],
     server: {
       port: 5173,

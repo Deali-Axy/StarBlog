@@ -1,0 +1,42 @@
+map $realip_remote_addr $original_scheme {
+    default $scheme;
+    __SWAG_IP__ $http_x_forwarded_proto;
+}
+
+server {
+    listen 8080;
+    server_name _;
+    server_tokens off;
+    client_max_body_size 256m;
+    set_real_ip_from __SWAG_IP__;
+    real_ip_header X-Forwarded-For;
+    real_ip_recursive on;
+
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-For $remote_addr;
+    proxy_set_header X-Forwarded-Proto $original_scheme;
+    proxy_set_header Connection "";
+    proxy_read_timeout 120s;
+    proxy_buffering off;
+
+    location = /admin { return 301 /admin/; }
+    location /admin/ {
+        root /usr/share/nginx/html;
+        try_files $uri $uri/ /admin/index.html;
+        add_header Cache-Control "no-cache";
+    }
+    location /api/ { proxy_pass http://api:8080; }
+    location /media/ { proxy_pass http://api:8080; }
+    location /health/ { proxy_pass http://api:8080; }
+    location = /feed { proxy_pass http://api:8080; }
+    location = /robots.txt { proxy_pass http://api:8080; }
+    location ~ ^/sitemap(?:-index|-images)?\.xml$ { proxy_pass http://api:8080; }
+
+    location ~* ^/Blog/Post/([^/]+)/?$ { return 301 /blog/$1$is_args$args; }
+    location ~* ^/Blog/(?:List|Index)/?$ { return 301 /blog$is_args$args; }
+    location ~* ^/Blog/RandomPost/?$ { return 301 /blog/random$is_args$args; }
+    location ~* ^/Rss/Feed/?$ { return 301 /feed$is_args$args; }
+    location ~* ^/Rss(?:/Index)?/?$ { return 301 /rss$is_args$args; }
+    location / { proxy_pass http://web:3000; }
+}
