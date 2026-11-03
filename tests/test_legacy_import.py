@@ -135,6 +135,100 @@ class LegacyImportTests(unittest.TestCase):
             self.assertEqual(db.execute('SELECT COUNT(*) FROM post').fetchone(), (0,))
             self.assertEqual(db.execute('SELECT name FROM category').fetchone(), ('未分类',))
 
+    def test_database_only_import_works_without_media_and_reports_skipped_checks(self):
+        self.source_media.unlink()
+        report = legacy_import.migrate(self.source, self.target, self.backups, database_only=True)
+        self.assertTrue(report['database_only'])
+        self.assertEqual(report['media_to_copy'], 0)
+        self.assertFalse(self.target_media.exists())
+        with database(self.target) as db:
+            self.assertEqual(db.execute('SELECT COUNT(*) FROM photo').fetchone(), (1,))
+            self.assertEqual(db.execute('PRAGMA foreign_key_check').fetchall(), [])
+
+    def test_explicit_media_directories_support_separate_database_volume(self):
+        source_root = self.source_media.parents[1]
+        target_root = self.target.parent / 'persistent-media'
+        report = legacy_import.migrate(
+            self.source, self.target, self.backups,
+            source_media=source_root, target_media=target_root,
+        )
+        self.assertFalse(report['database_only'])
+        self.assertEqual((target_root / 'photography/photo.jpg').read_bytes(), b'legacy-photo')
+        self.assertFalse(self.target_media.exists())
+
+    def test_database_only_rejects_media_arguments_before_writing(self):
+        before = self.target.read_bytes()
+        with self.assertRaisesRegex(ValueError, '不能与媒体目录参数'):
+            legacy_import.migrate(self.source, self.target, self.backups,
+                                  database_only=True, source_media=self.source_media.parent)
+        self.assertEqual(self.target.read_bytes(), before)
+        self.assertFalse(self.backups.exists())
+
+    def translation_source(self):
+        schema = '''CREATE TABLE post_translation (
+            id TEXT PRIMARY KEY, post_id TEXT REFERENCES post(id), language TEXT,
+            title TEXT, summary TEXT, content TEXT, creation_time TEXT, last_update_time TEXT,
+            UNIQUE(post_id, language));'''
+        for path in (self.source, self.target):
+            with database(path) as db:
+                db.execute('ALTER TABLE post ADD COLUMN content TEXT')
+                db.execute("UPDATE post SET content='original'")
+        with database(self.target) as db:
+            db.executescript(schema)
+        path = self.source.parent / 'local-translations.db'
+        with database(path) as db:
+            db.executescript('''CREATE TABLE __EFMigrationsHistory (migration_id TEXT);
+                CREATE TABLE post (id TEXT PRIMARY KEY, title TEXT, content TEXT);
+                INSERT INTO post VALUES ('published', 'Article', 'original'), ('draft', 'Draft', 'older original');''')
+            db.executescript(schema)
+            db.executemany('INSERT INTO post_translation VALUES (?, ?, ?, ?, ?, ?, ?, ?)', [
+                ('tr1', 'published', 'en', 'English article', None, 'Translated body', '2026-01-01', '2026-01-02'),
+                ('tr2', 'draft', 'en', 'English draft', None, 'Translated draft', '2026-01-01', '2026-01-02'),
+            ])
+        return path, schema
+
+    def test_two_source_import_preserves_translations_and_flags_changed_original(self):
+        local, _ = self.translation_source()
+        before = local.read_bytes()
+        options = dict(database_only=True, translations_from=local)
+        dry = legacy_import.migrate(self.source, self.target, self.backups, True, **options)
+        self.assertFalse(self.backups.exists())
+        report = legacy_import.migrate(self.source, self.target, self.backups, **options)
+        self.assertEqual(report['translations'], dry['translations'])
+        self.assertEqual(report['translations'], {'inserted': 2, 'existing': 0, 'original_changed': ['draft']})
+        self.assertEqual(local.read_bytes(), before)
+        with database(self.target) as db:
+            self.assertEqual(db.execute('SELECT id, content FROM post_translation ORDER BY id').fetchall(),
+                             [('tr1', 'Translated body'), ('tr2', 'Translated draft')])
+            self.assertEqual(db.execute('PRAGMA foreign_key_check').fetchall(), [])
+            with db:
+                same = legacy_import.merge_translations(legacy_import.read_translations(local), db)
+            self.assertEqual(same['existing'], 2)
+
+    def test_translation_conflict_rolls_back_the_entire_import(self):
+        local, schema = self.translation_source()
+        with database(self.source) as db:
+            db.executescript(schema)
+            db.execute("INSERT INTO post_translation VALUES ('other-id', 'published', 'en', 'Conflict', NULL, NULL, '2026-01-01', '2026-01-02')")
+        before = self.target.read_bytes()
+        with self.assertRaisesRegex(ValueError, '译文冲突'):
+            legacy_import.migrate(self.source, self.target, self.backups, translations_from=local)
+        self.assertEqual(self.target.read_bytes(), before)
+        self.assertFalse(self.target_media.exists())
+        self.assertFalse(self.backups.exists())
+
+    def test_missing_translation_parent_fails_without_dropping_translation(self):
+        local, _ = self.translation_source()
+        with database(local) as db:
+            db.execute("UPDATE post_translation SET post_id='local-only' WHERE id='tr2'")
+            db.execute("INSERT INTO post VALUES ('local-only', 'Local only', 'Original')")
+        before = self.target.read_bytes()
+        with self.assertRaisesRegex(ValueError, '原文不存在'):
+            legacy_import.migrate(self.source, self.target, self.backups,
+                                  database_only=True, translations_from=local)
+        self.assertEqual(self.target.read_bytes(), before)
+        self.assertFalse(self.backups.exists())
+
 
 if __name__ == '__main__':
     unittest.main()
