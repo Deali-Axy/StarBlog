@@ -11,7 +11,7 @@ const eslintConfig = defineConfig([
     rules: { "no-restricted-imports": ["error", { paths: [{ name: "radix-ui", message: "Compose source-owned primitives from @/components/ui." }] }] },
   },
   {
-    files: ["components/{home,blog,photography,links,rss}/views/**/*.tsx"],
+    files: ["components/{home,blog,photography,links,rss,search}/views/**/*.tsx"],
     rules: { "no-restricted-imports": ["error", {
       paths: [{ name: "radix-ui", message: "Import local UI primitives." }],
       patterns: [

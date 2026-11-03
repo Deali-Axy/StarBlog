@@ -7,7 +7,7 @@ const source = await readFile(new URL("../lib/utility-variant.ts", import.meta.u
 const { outputText } = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.ESNext } })
 const { resolveUtilityVariant, utilityStyleHref } = await import(`data:text/javascript;base64,${Buffer.from(outputText).toString("base64")}`)
 
-test("both utility pages default to flat and reject unsupported URL styles", () => {
+test("utility pages default to flat and reject unsupported URL styles", () => {
   for (const value of [undefined, null, "", "flat", "studio", "EDITORIAL", "<script>"]) {
     assert.equal(resolveUtilityVariant(value), "flat")
   }
@@ -15,7 +15,7 @@ test("both utility pages default to flat and reject unsupported URL styles", () 
 })
 
 test("style switching preserves the page, other query values and anchor, and removes the default override", () => {
-  for (const path of ["/links", "/rss"]) {
+  for (const path of ["/links", "/rss", "/search"]) {
     const href = `${path}?keyword=A%26B&preview=1#link-apply`
     const editorial = utilityStyleHref(href, "editorial")
     const parsed = new URL(editorial, "https://blog.invalid")
