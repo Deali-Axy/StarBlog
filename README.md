@@ -291,7 +291,7 @@ dotnet publish -r linux-x64 -c Release -p:PublishSingleFile=true -p:PublishTrimm
 
 发布之后将 `publish` 目录下的文件上传到服务器，运行 **StarBlog.Api** 即可。完整站点还需要部署 `apps/web` 与 `apps/admin`。
 
-新版 StarBlog 已于 2026-11-03 通过 ship 完成首次迁移部署，实际拓扑、版本、验收与回退位置见 [首次上线记录](docs/deployment-2026-11-03.md)。本次发布包与目录挂载方式仅用于首次迁移，后续将按 [部署演进待办](docs/todo.md#部署方式演进) 改为专用 Docker 镜像 push registry / pull image。`deploy/compose.prod.yaml` 是历史单 API 示例，不能直接替代当前完整站点配置。
+新版 StarBlog 已于 2026-11-03 完成首次迁移，记录见 [首次上线记录](docs/deployment-2026-11-03.md)。日常发布使用 ship 构建 API、Next.js 和网关三个专用镜像，push 腾讯云 registry 后由服务器按摘要 pull 并更新 Compose，操作与回退见 [镜像发布指南](docs/image-deployment.md)。数据库、媒体和私密配置独立保存在服务器上。`deploy/compose.prod.yaml` 是历史单 API 示例。
 
 关于部署的更多方式可以参考: [StarBlog - (31) 发布和部署](https://blog.deali.cn/p/starblog-31)
 
