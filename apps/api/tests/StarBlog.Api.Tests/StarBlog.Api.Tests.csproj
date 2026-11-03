@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <Using Include="Xunit" />
+    <None Update="Fixtures/Media/**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>
