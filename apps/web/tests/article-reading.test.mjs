@@ -21,11 +21,22 @@ async function moduleUrl(path) {
   return url
 }
 const { renderArticleMarkdown } = await import(await moduleUrl("components/blog/markdown.tsx"))
-const { currentHeadingIndex, headingIdFromHash } = await import(await moduleUrl("lib/markdown.ts"))
+const { articleImageUrl, currentHeadingIndex, headingIdFromHash } = await import(await moduleUrl("lib/markdown.ts"))
 function render(source) {
   const result = renderArticleMarkdown(source)
   return { ...result, html: renderToStaticMarkup(result.content) }
 }
+
+test("legacy article and translation images resolve within the original post media directory", () => {
+  assert.equal(articleImageUrl("image.jpg", "abc"), "/media/blog/abc/image.jpg")
+  assert.equal(articleImageUrl("./文章.assets\\image.jpg", "abc"), "/media/blog/abc/文章.assets/image.jpg")
+  for (const src of ["https://example.com/a.jpg", "//cdn.example.com/a.jpg", "/media/a.jpg", "#image"]) {
+    assert.equal(articleImageUrl(src, "abc"), src)
+  }
+  assert.equal(articleImageUrl("../../private", "abc"), "")
+  const result = renderArticleMarkdown("![图](image.jpg)", "abc")
+  assert.match(renderToStaticMarkup(result.content), /src="\/media\/blog\/abc\/image.jpg"/)
+})
 
 test("TOC targets equal rendered IDs for Chinese, punctuation, duplicates, inline code and all heading levels", () => {
   const { headings, html } = render([

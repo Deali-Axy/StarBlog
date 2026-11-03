@@ -5,6 +5,14 @@ export interface ArticleHeading {
   depth: number
 }
 
+/** Legacy posts and translations store image names relative to their post media directory. */
+export function articleImageUrl(src: string, postId?: string) {
+  if (!postId || !src || /^(?:[a-z][a-z\d+.-]*:|\/|#)/i.test(src)) return src
+  const normalized = src.replaceAll("\\", "/").replace(/^(?:\.\/)+/, "")
+  if (normalized.split("/").some(segment => segment === "..")) return ""
+  return `/media/blog/${encodeURIComponent(postId)}/${normalized}`
+}
+
 // The subset of HAST used by this rehype plugin.
 interface MarkdownNode {
   type: string

@@ -1,4 +1,5 @@
 import "server-only"
+import type { ImgHTMLAttributes } from "react"
 
 import renderReactMarkdown, { type Components } from "react-markdown"
 import remarkGfm from "remark-gfm"
@@ -7,7 +8,7 @@ import rehypeSlug from "rehype-slug"
 
 import "highlight.js/styles/github-dark.min.css"
 
-import { rehypeArticleHeadings, type ArticleHeading } from "@/lib/markdown"
+import { articleImageUrl, rehypeArticleHeadings, type ArticleHeading } from "@/lib/markdown"
 import { cn } from "@/lib/utils"
 
 const headingClassName = "mt-10 mb-4 scroll-mt-[calc(var(--blog-header-height)+5rem)] font-semibold leading-snug tracking-tight focus:outline-none target:underline target:decoration-primary target:decoration-1 target:underline-offset-4"
@@ -33,18 +34,20 @@ const markdownComponents: Components = {
   th: ({ children, style }) => <th style={style} className="min-w-28 border border-border bg-muted px-4 py-3 text-left font-semibold">{children}</th>,
   td: ({ children, style }) => <td style={style} className="min-w-28 border border-border px-4 py-3 text-left">{children}</td>,
   input: ({ type, checked, disabled }) => <input type={type} checked={checked} disabled={disabled} className="me-2 accent-primary" />,
-  img: ({ src, alt, title }) => {
+  img: MarkdownImage,
+}
+
+function MarkdownImage({ src, alt, title }: ImgHTMLAttributes<HTMLImageElement>) {
     if (!src || typeof src !== "string") return null
     return (
       // Markdown images may use API media URLs (served through Next rewrites).
       // eslint-disable-next-line @next/next/no-img-element
       <img src={src} alt={alt ?? ""} title={title} loading="lazy" decoding="async" className="mx-auto my-8 block h-auto max-w-full" />
     )
-  },
 }
 
 /** Server entry point: parse once, then pass rendered React nodes to the client layout. */
-export function renderArticleMarkdown(content: string) {
+export function renderArticleMarkdown(content: string, postId?: string) {
   const headings: ArticleHeading[] = []
   // The library exposes a synchronous, hook-free renderer. Run the pipeline here
   // so the TOC is ready before it crosses the server/client boundary.
@@ -52,7 +55,10 @@ export function renderArticleMarkdown(content: string) {
     children: content,
     remarkPlugins: [remarkGfm],
     rehypePlugins: [rehypeSlug, [rehypeArticleHeadings, { headings }], [rehypeHighlight, { detect: false }]],
-    components: markdownComponents,
+    components: {
+      ...markdownComponents,
+      img: props => <MarkdownImage {...props} src={typeof props.src === "string" ? articleImageUrl(props.src, postId) : props.src} />,
+    },
   })
   return { headings, content: <div data-markdown className={cn(
     "wrap-anywhere leading-loose text-foreground [&>:first-child]:mt-0 [&>:last-child]:mb-0",

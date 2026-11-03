@@ -83,7 +83,7 @@ export default async function PostPage({ params, searchParams }: PostPageProps) 
   ])
   const activeLanguage = post.language ?? undefined
   const permalink = absoluteUrl(postHref(post))
-  const markdown = renderArticleMarkdown(post.content ?? "")
+  const markdown = renderArticleMarkdown(post.content ?? "", post.id)
   // Only metadata and rendered nodes cross the client boundary, not Markdown or
   // unused backend TOC/translation bodies and their parsing dependencies.
   const article = postMetadata(post)
