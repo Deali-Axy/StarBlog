@@ -55,6 +55,7 @@ class ContainerUpdateTests(unittest.TestCase):
         spec.loader.exec_module(deploy)
         with tempfile.TemporaryDirectory() as temp:
             base = Path(temp)
+            (base / "backups").mkdir()
             old = {'.env': 'JWT_KEY=existing-test-key\nAPI_IMAGE=previous\n', 'compose.yaml': 'previous compose',
                    'active-release.json': '{"version":"previous"}', 'gateway.conf': 'previous gateway'}
             for name, content in old.items():
