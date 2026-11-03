@@ -1,11 +1,12 @@
 import { FEATURED_CATEGORIES_VARIANT, FEATURED_CATEGORIES_VARIANT_OPTIONS, parseFeaturedCategoriesVariant, type FeaturedCategoriesVariant } from "@/lib/featured-categories-variant"
 
 export const HOME_VARIANT_OPTIONS = [
+  { id: "journal", labelZh: "点阵手记", labelEn: "Dotted Journal" },
   { id: "editorial", labelZh: "刊物内页", labelEn: "The Publication" },
   { id: "desk", labelZh: "个人书桌", labelEn: "The Writing Desk" },
 ] as const
 export type HomeVariant = (typeof HOME_VARIANT_OPTIONS)[number]["id"]
-export const HOME_VARIANT: HomeVariant = "editorial"
+export const HOME_VARIANT: HomeVariant = "journal"
 export const homePreferencesCookie = "starblog.home-design"
 export const HOME_PALETTES = [
   { id: "paper", labelZh: "暖纸", labelEn: "Warm paper" },
@@ -76,6 +77,7 @@ const paths: HomeSettingPath[] = [...Object.keys(homeSettingOptions) as (keyof t
 const baseTheme: HomeThemeSettings = { palette: "paper", typography: "literary", density: "standard", fontScale: 100, texture: "none", border: "solid", shadow: "none", colors: { light: {}, dark: {} } }
 export const HOME_PRESETS: Record<HomeVariant, HomeResolvedConfig> = {
   editorial: { theme: baseTheme, frame: "sidebar", navigation: "numbered", contentWidth: "standard", hero: "cover", footer: "colophon", sections: { featuredPosts: "editorial", latestPosts: "timeline", interests: "cloud", categories: FEATURED_CATEGORIES_VARIANT, photos: "contactSheet", links: "directory" } },
+  journal: { theme: { ...baseTheme, texture: "dots", border: "dashed" }, frame: "sidebar", navigation: "numbered", contentWidth: "standard", hero: "cover", footer: "colophon", sections: { featuredPosts: "notes", latestPosts: "timeline", interests: "cloud", categories: FEATURED_CATEGORIES_VARIANT, photos: "prints", links: "cards" } },
   desk: { theme: { ...baseTheme, border: "dashed", shadow: "offset" }, frame: "topbar", navigation: "compact", contentWidth: "standard", hero: "signature", footer: "contact", sections: { featuredPosts: "notes", latestPosts: "ledger", interests: "tags", categories: FEATURED_CATEGORIES_VARIANT, photos: "prints", links: "cards" } },
 }
 function record(value: unknown): Record<string, unknown> {

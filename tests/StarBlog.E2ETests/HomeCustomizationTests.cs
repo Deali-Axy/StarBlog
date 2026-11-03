@@ -52,14 +52,14 @@ public sealed class HomeCustomizationTests {
         var original = page.Url;
         await Open(page);
         await Panel(page).GetByRole(AriaRole.Tab, new() { Name = "内容模块", Exact = true }).ClickAsync();
-        await Choose(page, "sections.photos", "prints");
-        await Expect(page.Locator("[data-home-section='photos']")).ToHaveAttributeAsync("data-home-variant", "prints");
+        await Choose(page, "sections.photos", "contactSheet");
+        await Expect(page.Locator("[data-home-section='photos']")).ToHaveAttributeAsync("data-home-variant", "contactSheet");
         Assert.Equal(original, page.Url);
         Assert.DoesNotContain(await page.Context.CookiesAsync(), cookie => cookie.Name == "starblog.home-design");
         await page.Keyboard.PressAsync("Escape");
         await Expect(Panel(page)).ToHaveCountAsync(0);
         await Expect(page.Locator("[data-home-design-trigger]")).ToBeFocusedAsync();
-        await Expect(page.Locator("[data-home-section='photos']")).ToHaveAttributeAsync("data-home-variant", "contactSheet");
+        await Expect(page.Locator("[data-home-section='photos']")).ToHaveAttributeAsync("data-home-variant", "prints");
         await Open(page);
         await Panel(page).GetByRole(AriaRole.Tab, new() { Name = "页面布局", Exact = true }).ClickAsync();
         await Choose(page, "navigation", "compact");
@@ -176,7 +176,7 @@ public sealed class HomeCustomizationTests {
         var errors = new List<string>();
         page.PageError += (_, error) => errors.Add(error);
         var index = 0;
-        foreach (var preset in new[] { "editorial", "desk" }) {
+        foreach (var preset in new[] { "journal", "editorial", "desk" }) {
             foreach (var hero in new[] { "cover", "signature", "photograph" }) {
                 var palette = new[] { "paper", "slate", "forest", "ink" }[index++ % 4];
                 await page.GotoAsync(DesignUrl(baseUrl, preset, new { hero, theme = new { palette, fontScale = 115, density = "compact" }, contentWidth = "narrow" }), new() { WaitUntil = WaitUntilState.DOMContentLoaded });

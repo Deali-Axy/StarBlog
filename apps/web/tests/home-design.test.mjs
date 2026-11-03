@@ -59,7 +59,7 @@ function homeRenderer(variant, overrides = {}) {
   return (file, component, props) => renderToStaticMarkup(React.createElement(load(`@/components/home/${file}`)[component], props))
 }
 
-for (const variant of ["editorial", "desk"]) {
+for (const variant of ["journal", "editorial", "desk"]) {
   test(`${variant} renders every recommended article and photo beyond the old limits`, () => {
     const render = homeRenderer(variant)
     const posts = Array.from({ length: 6 }, (_, index) => ({ id: `post-${index}`, title: `Story ${index}`, summary: "A summary", lastUpdateTime: "2026-10-30T12:00:00Z" }))
@@ -75,6 +75,16 @@ for (const variant of ["editorial", "desk"]) {
     assert.equal((render("featured-photos", "FeaturedPhotos", { photos: photos.slice(0, 1) }).match(/<figure\b/g) || []).length, 1)
   })
 }
+
+test("the default journal matches the chosen shared design and preserves saved designs", () => {
+  const shared = "v2.eyJ2ZXJzaW9uIjoyLCJwcmVzZXQiOiJlZGl0b3JpYWwiLCJvdmVycmlkZXMiOnsidGhlbWUiOnsidGV4dHVyZSI6ImRvdHMiLCJib3JkZXIiOiJkYXNoZWQifSwic2VjdGlvbnMiOnsiZmVhdHVyZWRQb3N0cyI6Im5vdGVzIiwicGhvdG9zIjoicHJpbnRzIiwibGlua3MiOiJjYXJkcyJ9fX0"
+  const defaults = resolveHomePreferences({})
+  assert.equal(defaults.preset, "journal")
+  assert.deepEqual(defaults.overrides, {})
+  assert.deepEqual(resolveHomeConfig(defaults), resolveHomeConfig(resolveHomePreferences({ hc: shared })))
+  assert.equal(resolveHomeConfig(resolveHomePreferences({}, "editorial.tilt")).sections.photos, "contactSheet")
+  assert.equal(resolveHomePreferences({}, serializeHomePreferences(defaults)).preset, "journal")
+})
 
 test("legacy cookies and links migrate to complete presets with independent categories", () => {
   const migrated = resolveHomePreferences({}, "desk.tilt")
@@ -97,7 +107,7 @@ test("every registered choice round-trips and independent overrides reset sparse
   }
   let value = setHomeSetting(normalizeHomePreferences({}), "sections.photos", "prints")
   value = setHomeSetting(value, "sections.categories", "rail")
-  assert.equal(resolveHomeConfig(value).sections.featuredPosts, "editorial")
+  assert.equal(resolveHomeConfig(value).sections.featuredPosts, "notes")
   assert.equal(resolveHomeConfig(value).sections.photos, "prints")
   assert.deepEqual(setHomeSetting(setHomeSetting(value, "sections.photos"), "sections.categories"), normalizeHomePreferences({}))
 })
