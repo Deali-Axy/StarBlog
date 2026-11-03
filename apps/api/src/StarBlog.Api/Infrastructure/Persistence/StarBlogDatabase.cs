@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 namespace StarBlog.Api.Infrastructure.Persistence;
 
 /// <summary>
-/// 应用 EF Core migrations。遇到重构前遗留的 FreeSql 数据库时给出明确错误。
+/// 应用 EF Core migrations。遇到重构前遗留的数据库时给出明确错误。
 /// </summary>
 public static class StarBlogDatabase {
     /// <summary>
@@ -19,7 +19,7 @@ public static class StarBlogDatabase {
             && await TableExistsAsync(db, "anonymous_user", cancellationToken)) {
             throw new InvalidOperationException(
                 "当前 SQLite 数据库已有表，但尚未应用基线 migration InitialCreate。" +
-                "本次重构不升级旧的 FreeSql 数据库。本地开发请运行 `task api:db:reset`，然后重新初始化管理员。");
+                "本次重构不升级旧版数据库。本地开发请运行 `task api:db:reset`，然后重新初始化管理员。");
         }
 
         await db.Database.MigrateAsync(cancellationToken);
