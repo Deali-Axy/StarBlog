@@ -87,7 +87,7 @@ StarBlog 不仅仅是一个博客系统，它正在发展成为一个完整的�
 
 ##### 内容处理
 - **Markdown引擎**：[Markdig](https://github.com/xoofx/markdig) - 高性能 Markdown 处理器
-- **图像处理**：ImageSharp - 跨平台图像处理库
+- **图像处理**：EasyImageSharp - 纯托管跨平台图像处理库（API）；旧离线优化工具仍使用 ImageSharp
 - **分页**：项目内 `PageResult<T>`
 - **RSS**：Atom feed 由 Site 模块直接生成
 

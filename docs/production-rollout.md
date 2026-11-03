@@ -6,7 +6,7 @@
 
 用户已接受停机更新，并要求使用 `/home/deali/code/ship`；云端交接已取消，继续本地准备。尚未执行停机或发布。下一步优先完成以下事项：
 
-1. 解决 ImageSharp 3.2.0 的正式构建许可要求：本次 Debug 构建通过，但 Release 构建已实际失败，错误为 `No Six Labors license found`。不能将这次依赖升级视为可发布状态。
+1. 图片库许可构建阻塞已解除：API 已替换为 EasyImageSharp 1.2.0，并移除 ImageSharp.Web，Release build/publish 均通过。媒体回归 15 项通过；完整 API 测试 78 项通过、1 项现有架构检查因旧数据库提示中的 `FreeSql` 文案失败，尚需修正该检查。正式切流前仍需最终容器和真实摄影样本验收。旧离线优化工具的 ImageSharp 依赖不随本次 API 迁移处理。
 2. 补齐 `deploy/install-release.py`，并让迁移输入准备支持失败重试；目前 ship 配置与构建脚本引用了不存在的安装脚本，不能执行正式发布。
 3. 完成三个应用的正式构建、图片/旧链接/Feed 兼容验证，再执行 ship doctor 与产物检查。当前 Web TypeScript 检查和 ship plan 已通过；部署方案采用 command → SCP → SSH。
 4. 恢复 SSH 连通性：最新只读检查仍返回 `Connection closed`。发布前重新确认线上状态、网络、目录权限和最终数据快照；资源余量不再作为拒绝停机部署的理由。
@@ -106,7 +106,7 @@ Docker 报告镜像可回收约 6.36 GB、构建缓存约 2.26 GB。这只是容
   backups/                     # 新库快照；另安排异机备份
 ```
 
-媒体无需经本地中转。正式迁移让导入脚本直接从旧服务器目录复制到新目录，保留 `/media/blog/{id}/...` 与 `/media/photography/...` 的结构。预览可只读挂载旧媒体目录；正式运行使用独立副本，不让新旧应用共写媒体，也不使用硬链接。图片原件完整保留，ImageSharp 缓存可重建。
+媒体无需经本地中转。正式迁移让导入脚本直接从旧服务器目录复制到新目录，保留 `/media/blog/{id}/...` 与 `/media/photography/...` 的结构。预览可只读挂载旧媒体目录；正式运行使用独立副本，不让新旧应用共写媒体，也不使用硬链接。现有图片文件完整保留，无需复制旧 ImageSharp.Web 缓存；新 API 的摄影缩略图由 EasyImageSharp 生成。
 
 ## 切流前必须补齐
 
@@ -117,7 +117,7 @@ Docker 报告镜像可回收约 6.36 GB、构建缓存约 2.26 GB。这只是容
 5. **旧链接与 SEO。** 明确实现 `/Blog/Post/{id}` → `/blog/{id}`、`/Blog/List` → `/blog`（保留分类/分页参数）、`/Rss/Feed` → `/feed` 的永久跳转；盘点其他旧入口。新版 `/p/{slug}` 已有跳转，但仍需验收 slug、查询参数、语言参数、canonical 和 Sitemap 的最终地址。
 6. **生产配置。** 覆盖仓库内默认 JWT 密钥；先隔离初始化管理员再开放公网；将 `host` 设为 `https://blog.deali.cn`。邮件配置、翻译服务、敏感词文件分别迁移/核验。管理端保持同源 API，若改成跨域则补准确 CORS origin。
 7. **代理链。** 当前 API 仅启用转发头类型，未配置 Docker 上游信任范围。配置准确的代理 IP/专用网络与跳数，验证 HTTPS scheme 和真实访问 IP，不能直接信任全网转发头。SWAG → API 与 Next SSR → API 的链路分别验收。
-8. **构建时环境与依赖。** Next 的 rewrite 目的地址与公开环境变量在构建时确定，需与运行时 `INTERNAL_API_BASE_URL` 一致；后台 `VITE_API_URL` 同样是构建参数。本次 API 构建成功，但 NuGet 报告 ImageSharp 3.1.12、System.Security.Cryptography.Pkcs 10.0.0 的已知漏洞警告，上线构建前升级并验证。
+8. **构建时环境与依赖。** Next 的 rewrite 目的地址与公开环境变量在构建时确定，需与运行时 `INTERNAL_API_BASE_URL` 一致；后台 `VITE_API_URL` 同样是构建参数。API 当前使用 EasyImageSharp 1.2.0、显式 Pkcs 10.0.13，Release build/publish 已通过；发布依赖清单不再包含 SixLabors 或 SkiaSharp。上线前仍需对最终依赖清单执行漏洞审计，不能把本地编译成功等同于审计通过。
 
 ## 执行顺序
 
