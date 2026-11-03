@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats.Jpeg;
-using SixLabors.ImageSharp.Processing;
+using EasyImageSharp;
+using EasyImageSharp.Formats;
+using EasyImageSharp.Formats.Jpeg;
+using EasyImageSharp.PixelFormats;
+using EasyImageSharp.Processing;
 using StarBlog.Api.Infrastructure.Persistence;
 using StarBlog.Api.Infrastructure.Storage;
 using StarBlog.Api.Infrastructure.Time;
@@ -15,6 +17,12 @@ namespace StarBlog.Api.Modules.Media;
 /// </summary>
 public sealed class MediaOperations : IPhotoCatalog {
     private const string MediaDirectory = "media/photography";
+    // Bound decoded allocations, including animated inputs, before allocating pixel buffers.
+    private static readonly DecoderOptions PhotoDecoderOptions = new() {
+        MaxEncodedBytes = 32 * 1024 * 1024,
+        MaxPixels = 50_000_000,
+        MaxTotalPixels = 100_000_000
+    };
     private readonly StarBlogDbContext _db;
     private readonly IFileStorage _storage;
     private readonly IAppPathProvider _paths;
@@ -60,17 +68,13 @@ public sealed class MediaOperations : IPhotoCatalog {
             CreateTime = _clock.Now
         };
 
-        await using var buffered = new MemoryStream();
-        await photoStream.CopyToAsync(buffered, cancellationToken);
-        buffered.Position = 0;
         await using var encoded = new MemoryStream();
-        await EncodeAsJpegAsync(buffered, encoded);
+        (photo.Width, photo.Height) = await EncodeAsJpegAsync(photoStream, encoded, cancellationToken);
         encoded.Position = 0;
 
         await _storage.EnsureDirectoryAsync(MediaDirectory, cancellationToken);
         try {
             await _storage.SaveAsync(relativePath, encoded, cancellationToken: cancellationToken);
-            await FillDimensionsAsync(photo);
             _db.Photos.Add(photo);
             await _db.SaveChangesAsync(cancellationToken);
             return PhotoResponse.From(photo);
@@ -109,10 +113,11 @@ public sealed class MediaOperations : IPhotoCatalog {
         if (photo == null) return null;
         var path = PhysicalPath(photo);
         if (!File.Exists(path)) return null;
-        using var image = await Image.LoadAsync(path, cancellationToken);
+        using var image = await Image.LoadAsync<Rgba32>(path, PhotoDecoderOptions, cancellationToken);
+        image.Mutate(context => context.AutoOrient().BackgroundColor(Color.White));
         if (width > 0) image.Mutate(context => context.Resize(width, 0));
         await using var memory = new MemoryStream();
-        await image.SaveAsync(memory, new JpegEncoder { Quality = quality }, cancellationToken);
+        await image.SaveAsJpegAsync(memory, CreateJpegEncoder(quality), cancellationToken);
         return memory.ToArray();
     }
 
@@ -188,24 +193,24 @@ public sealed class MediaOperations : IPhotoCatalog {
 
     private string PhysicalPath(Photo photo) => Path.Combine(_paths.WebRootPath, "media", "photography", photo.FilePath);
 
-    private async Task FillDimensionsAsync(Photo photo) {
-        var info = await Image.IdentifyAsync(PhysicalPath(photo));
-        photo.Width = info.Width;
-        photo.Height = info.Height;
-    }
-
-    /// <summary>把任意可解码图片转成边长不超过 1500 的 JPEG，写入完成后再落盘。</summary>
-    private static async Task EncodeAsJpegAsync(Stream stream, Stream output) {
+    /// <summary>将支持的图片转成最长边不超过 1500 的白底 JPEG，返回最终像素尺寸。</summary>
+    private static async Task<(int Width, int Height)> EncodeAsJpegAsync(Stream stream, Stream output, CancellationToken cancellationToken) {
         const int max = 1500;
-        using var image = await Image.LoadAsync(stream);
-        if (image.Width > max) {
-            image.Mutate(context => context.Resize(max, 0));
+        using var image = await Image.LoadAsync<Rgba32>(stream, PhotoDecoderOptions, cancellationToken);
+        image.Mutate(context => context.AutoOrient().BackgroundColor(Color.White));
+        if (image.Width > max || image.Height > max) {
+            var scale = Math.Min((double)max / image.Width, (double)max / image.Height);
+            var width = Math.Max(1, (int)Math.Round(image.Width * scale));
+            var height = Math.Max(1, (int)Math.Round(image.Height * scale));
+            image.Mutate(context => context.Resize(width, height));
         }
 
-        if (image.Height > max) {
-            image.Mutate(context => context.Resize(0, max));
-        }
-
-        await image.SaveAsJpegAsync(output);
+        await image.SaveAsJpegAsync(output, CreateJpegEncoder(75), cancellationToken);
+        return (image.Width, image.Height);
     }
+
+    private static JpegEncoder CreateJpegEncoder(int quality) => new() {
+        Quality = quality,
+        ColorType = JpegEncodingColor.YCbCrRatio420
+    };
 }

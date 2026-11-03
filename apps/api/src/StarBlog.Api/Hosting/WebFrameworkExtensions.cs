@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.HttpOverrides;
 using System.Net;
-using SixLabors.ImageSharp.Web.DependencyInjection;
 using StarBlog.Api.Hosting.Authentication;
 using StarBlog.Api.Hosting.HealthChecks;
 using StarBlog.Api.Hosting.OpenApi;
@@ -46,7 +45,6 @@ public static class WebFrameworkExtensions {
         services.AddStarBlogAuthentication(configuration);
         services.AddStarBlogOpenApi();
         services.AddStarBlogHealthChecks();
-        services.AddImageSharp();
         return services;
     }
 
@@ -61,7 +59,6 @@ public static class WebFrameworkExtensions {
         }
 
         app.UseForwardedHeaders();
-        app.UseImageSharp();
         app.UseResponseCompression();
         app.UseStaticFiles();
         app.UseRouting();

@@ -1,3 +1,4 @@
+using EasyImageSharp;
 using Microsoft.AspNetCore.Mvc;
 using StarBlog.Api.Shared;
 
@@ -59,8 +60,16 @@ public static class MediaEndpoints {
         var title = form["title"].ToString();
         var location = form["location"].ToString();
         await using var stream = file.OpenReadStream();
-        var photo = await operations.AddAsync(title, location, stream, cancellationToken);
-        return Results.Ok(photo);
+        try {
+            var photo = await operations.AddAsync(title, location, stream, cancellationToken);
+            return Results.Ok(photo);
+        }
+        catch (ImageSizeLimitExceededException) {
+            return HttpErrors.BadRequest("图片超过处理上限：文件 32 MiB、单帧 5000 万像素、全部帧合计 1 亿像素");
+        }
+        catch (ImageFormatException) {
+            return HttpErrors.BadRequest("图片格式不支持或内容已损坏");
+        }
     }
 
     private static async Task<IResult> UpdateAsync(
