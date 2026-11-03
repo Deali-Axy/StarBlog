@@ -12,7 +12,6 @@ services:
     container_name: starblog-api-v2
     restart: unless-stopped
     working_dir: /app
-    command: ["dotnet", "StarBlog.Api.dll"]
     user: "1654:1654"
     environment:
       ASPNETCORE_ENVIRONMENT: Production
@@ -22,7 +21,6 @@ services:
       ReverseProxy__KnownProxies__0: 172.30.84.2
       TZ: Asia/Hong_Kong
     volumes:
-      - ${RELEASE_DIR}/api:/app:ro
       - ./data:/app/data
       - ./media:/app/wwwroot/media
       - ./cache/images:/app/wwwroot/is-cache
@@ -48,8 +46,6 @@ services:
       NEXT_TELEMETRY_DISABLED: "1"
       NODE_OPTIONS: --max-old-space-size=384
       TZ: Asia/Hong_Kong
-    volumes:
-      - ${RELEASE_DIR}/web:/app
     networks:
       backend:
         ipv4_address: 172.30.84.4
@@ -70,7 +66,6 @@ services:
       - "127.0.0.1:15080:8080"
     volumes:
       - ./gateway.conf:/etc/nginx/conf.d/default.conf:ro
-      - ${RELEASE_DIR}/admin:/usr/share/nginx/html/admin:ro
     networks:
       backend:
         ipv4_address: 172.30.84.2

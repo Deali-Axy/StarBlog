@@ -2,9 +2,8 @@ schema = 2
 
 [project]
 name = "starblog"
-description = "StarBlog API, Next.js and administration release"
+description = "StarBlog API, Next.js and administration images"
 
-# Release the reviewed working tree, including deployment fixes, without moving Git tags.
 [version]
 source = "env"
 override_env = "SHIP_VERSION"
@@ -16,36 +15,57 @@ deploy = true
 verify = true
 rollback = false
 
-[build]
-driver = "command"
+[[matrix]]
+name = "api"
 
-[build.command]
-run = "python3 deploy/build-release.py {{ version }}"
-cwd = "."
-outputs = ["artifacts/starblog-{{ version }}.tar.gz"]
+[[matrix]]
+name = "web"
+
+[[matrix]]
+name = "gateway"
+
+[[steps.prepare]]
+name = "build-runtime-contexts"
+run = "python3 deploy/build-image-context.py {{ version }}"
+profiles = ["api"]
+
+[build]
+driver = "docker"
+
+[build.docker]
+image = "starblog"
+context = "artifacts/image-context"
+dockerfile = "deploy/images/{{ profile.name }}.Dockerfile"
+platforms = ["linux/amd64"]
+env_file = "deploy/build.env"
+load = true
+pull = true
+build_args_from_env = false
+provenance = false
+sbom = false
 
 [publish]
-driver = "scp"
+driver = "registry"
 
-[publish.scp]
-local = "artifacts/starblog-{{ version }}.tar.gz"
-host = "deali.cn"
-remote = "/home/deali/projects/starblog-v2/incoming/starblog-{{ version }}.tar.gz"
+[publish.registry]
+tag_latest_on_default_profile = false
 
-[[steps.pre_publish]]
-name = "prepare-release-directory"
-run = "ssh deali.cn 'mkdir -p /home/deali/projects/starblog-v2/incoming && chmod 700 /home/deali/projects/starblog-v2 /home/deali/projects/starblog-v2/incoming'"
+[[publish.registry.targets]]
+type = "private"
+url = "ccr.ccs.tencentyun.com"
+namespace = "deali"
+image = "starblog"
 
 [[steps.pre_deploy]]
-name = "snapshot-local-translations-and-admin"
-run = "python3 deploy/prepare-migration.py {{ version }}"
+name = "prepare-digest-pinned-release"
+run = "python3 deploy/publish-deployment.py {{ version }}"
 
 [deploy]
 driver = "ssh"
 
 [deploy.ssh]
 host = "deali.cn"
-commands = ["python3 -c 'import tarfile; t=tarfile.open(\"/home/deali/projects/starblog-v2/incoming/starblog-{{ version }}.tar.gz\"); exec(compile(t.extractfile(\"deploy/install-release.py\").read(), \"install-release.py\", \"exec\"))' {{ version }}"]
+commands = ["python3 /home/deali/projects/starblog-v2/image-releases/{{ version }}/deploy-images.py {{ version }}"]
 
 [verify]
 driver = "http"

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build a runtime-only release archive for ship's command/SCP driver."""
+"""Prepare runtime-only build contexts for ship's three application images."""
 import hashlib
 import json
 import os
@@ -8,16 +8,12 @@ import re
 import shutil
 import subprocess
 import sys
-import tarfile
 
 ROOT = Path(__file__).resolve().parents[1]
 version = sys.argv[1]
 if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]+", version):
     raise SystemExit("Invalid release version")
-for name in ("compose.server.yaml", "gateway.conf.template", "install-release.py"):
-    if not (ROOT / "deploy" / name).is_file():
-        raise SystemExit(f"Missing deployment input: {name}")
-release = ROOT / "artifacts/releases" / version
+release = ROOT / "artifacts/image-context"
 if release.exists():
     shutil.rmtree(release)
 release.mkdir(parents=True)
@@ -32,6 +28,15 @@ run(["dotnet", "publish", "apps/api/src/StarBlog.Api/StarBlog.Api.csproj", "-c",
 (release / "api/wwwroot/media").mkdir(parents=True, exist_ok=True)
 for name in ("appsettings.Development.json", "appsettings-email.json", "appsettings-monitoring.json", "words.json"):
     (release / "api" / name).unlink(missing_ok=True)
+
+settings_path = release / "api/appsettings.json"
+settings = json.loads(settings_path.read_text())
+settings["Auth"]["Jwt"]["Key"] = ""
+settings_path.write_text(json.dumps(settings, ensure_ascii=False, indent=2))
+for directory in ("data", "wwwroot/media", "wwwroot/is-cache"):
+    (release / "api" / directory).mkdir(parents=True, exist_ok=True)
+for filename in ("appsettings-email.json", "words.json"):
+    (release / "api" / filename).touch()
 
 env = os.environ.copy()
 env.update({"INTERNAL_API_BASE_URL": "http://api:8080", "NEXT_PUBLIC_API_BASE_URL": "",
@@ -52,11 +57,6 @@ admin_env = os.environ.copy()
 admin_env.update({"VITE_BASE_PATH": "/admin/", "VITE_API_URL": ""})
 run(["npm", "run", "build"], ROOT / "apps/admin", admin_env)
 shutil.copytree(ROOT / "apps/admin/dist", release / "admin")
-deployment = release / "deploy"
-deployment.mkdir()
-for name in ("compose.server.yaml", "gateway.conf.template", "install-release.py"):
-    shutil.copy2(ROOT / "deploy" / name, deployment / name)
-shutil.copy2(ROOT / "scripts/Import-LegacyBlog.py", deployment / "Import-LegacyBlog.py")
 metadata = {
     "version": version,
     "commit": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
@@ -66,8 +66,4 @@ metadata = {
 for path in release.rglob("*"):
     if path.is_file() and (path.name.endswith((".db", ".db-wal", ".db-shm")) or path.name.startswith(".env")):
         raise SystemExit(f"Private data unexpectedly present in runtime archive: {path.relative_to(release)}")
-archive = ROOT / "artifacts" / f"starblog-{version}.tar.gz"
-with tarfile.open(archive, "w:gz") as output:
-    for path in sorted(release.iterdir()):
-        output.add(path, arcname=path.name)
-print(f"Release ready: {archive.name}, {archive.stat().st_size:,} bytes", flush=True)
+print(f"Image build contexts ready: {version}", flush=True)
