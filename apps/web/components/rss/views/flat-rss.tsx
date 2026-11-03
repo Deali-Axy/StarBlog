@@ -2,12 +2,14 @@ import Link from "next/link"
 
 import type { RssViewProps } from "@/components/rss/rss-view-props"
 import { routes } from "@/lib/routes"
+import { pageContainerClassName } from "@/lib/styles"
+import { cn } from "@/lib/utils"
 
 export function FlatRss({ t, feedAddress }: RssViewProps) {
   const copy = t.rssPage
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 pt-8 pb-16 sm:pt-10 [&_a:focus-visible]:outline-2 [&_a:focus-visible]:outline-offset-4 [&_a:focus-visible]:outline-ring">
+    <div className={cn(pageContainerClassName, "pt-8 pb-16 sm:pt-10 [&_a:focus-visible]:outline-2 [&_a:focus-visible]:outline-offset-4 [&_a:focus-visible]:outline-ring")}>
       <header className="border-b border-border pb-7">
         <h1 className="text-3xl font-semibold tracking-tight">RSS</h1>
         <p className="mt-3 text-sm leading-7 text-muted-foreground">{copy.flatIntro}</p>
