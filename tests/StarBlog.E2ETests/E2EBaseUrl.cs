@@ -8,13 +8,13 @@ internal static class E2EBaseUrl {
         if (string.IsNullOrWhiteSpace(apiUrl)) return;
 
         // Production rewrites are compiled at build time. Keep every public API
-        // resource on the isolated fixture instance, including robots and feeds.
+        // resource on the isolated fixture instance. Web owns robots and sitemaps.
         async Task ProxyAsync(IRoute route) {
             var path = new Uri(route.Request.Url).PathAndQuery;
             var response = await route.FetchAsync(new() { Url = $"{apiUrl.TrimEnd('/')}{path}" });
             await route.FulfillAsync(new() { Response = response });
         }
-        foreach (var pattern in new[] { "**/api/**", "**/media/**", "**/robots.txt", "**/feed", "**/sitemap*.xml" }) {
+        foreach (var pattern in new[] { "**/api/**", "**/media/**", "**/feed" }) {
             await page.RouteAsync(pattern, ProxyAsync);
         }
     }

@@ -14,7 +14,8 @@
     "test:blog": "node tests/blog-navigation.test.mjs && node tests/article-reading.test.mjs",
     "test:home": "node tests/home-design.test.mjs",
     "test:architecture": "node tests/ui-architecture.test.mjs",
-    "test:utility": "node tests/utility-design.test.mjs && node tests/search-design.test.mjs"
+    "test:utility": "node tests/utility-design.test.mjs && node tests/search-design.test.mjs",
+    "test:seo": "node tests/seo.test.mjs"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.100.14",

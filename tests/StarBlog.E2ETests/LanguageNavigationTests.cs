@@ -15,15 +15,15 @@ public sealed class LanguageNavigationTests {
             Headless = true, ExecutablePath = Environment.GetEnvironmentVariable("E2E_CHROMIUM_EXECUTABLE_PATH")
         });
         var page = await browser.NewPageAsync(new() { ViewportSize = new() { Width = width, Height = 900 } });
-        await page.GotoAsync($"{baseUrl}/about?section=skills&lang=original#skills");
+        await page.GotoAsync($"{baseUrl}/about?section=toolkit&lang=original#about-toolkit");
         await Expect(page.Locator("html")).ToHaveAttributeAsync("lang", "zh-CN");
 
         var switchButton = page.GetByRole(AriaRole.Button, new() { Name = "Switch to English", Exact = true });
         await Expect(switchButton).ToBeInViewportAsync();
         await switchButton.ClickAsync();
         await Expect(page.Locator("html")).ToHaveAttributeAsync("lang", "en");
-        Assert.EndsWith("/about?section=skills#skills", page.Url);
-        await Expect(page.GetByRole(AriaRole.Heading, new() { Name = "Skills", Exact = true })).ToBeVisibleAsync();
+        Assert.EndsWith("/about?section=toolkit#about-toolkit", page.Url);
+        await Expect(page.GetByRole(AriaRole.Heading, new() { Name = "Let the problem choose the tools.", Exact = true })).ToBeVisibleAsync();
 
         await page.ReloadAsync();
         await Expect(page.Locator("html")).ToHaveAttributeAsync("lang", "en");
@@ -47,6 +47,6 @@ public sealed class LanguageNavigationTests {
         await page.Context.AddCookiesAsync([new Cookie { Name = "starblog.locale", Value = "invalid", Url = baseUrl }]);
         await page.GotoAsync($"{baseUrl}/about");
         await Expect(page.Locator("html")).ToHaveAttributeAsync("lang", "zh-CN");
-        await Expect(page.GetByRole(AriaRole.Heading, new() { Name = "技能", Exact = true })).ToBeVisibleAsync();
+        await Expect(page.GetByRole(AriaRole.Heading, new() { Name = "工具随问题而变。", Exact = true })).ToBeVisibleAsync();
     }
 }
