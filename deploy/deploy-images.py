@@ -10,6 +10,7 @@ import shutil
 import subprocess
 import sys
 import time
+from html.parser import HTMLParser
 from urllib.request import Request, urlopen
 
 BASE = Path("/home/deali/projects/starblog-v2")
@@ -34,6 +35,50 @@ def featured_state():
             "photos": sorted(p["id"] for p in home["featuredPhotos"])}
 
 
+class PageMetadata(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.canonical = None
+        self.title = ""
+        self.in_title = False
+
+    def handle_starttag(self, tag, attrs):
+        attrs = dict(attrs)
+        if tag == "link" and attrs.get("rel") == "canonical":
+            self.canonical = attrs.get("href")
+        if tag == "title":
+            self.in_title = True
+
+    def handle_endtag(self, tag):
+        if tag == "title":
+            self.in_title = False
+
+    def handle_data(self, data):
+        if self.in_title:
+            self.title += data
+
+
+def verify_seo(home_html):
+    home = PageMetadata()
+    home.feed(home_html)
+    if not home.title.strip() or home.title.strip() in ("首页", "主页", "Home"):
+        raise ValueError("Homepage title is missing its site identity")
+    if not home.canonical or home.canonical.rstrip("/") != "https://blog.deali.cn":
+        raise ValueError("Homepage canonical mismatch")
+    for route in ("/blog", "/photography"):
+        metadata = PageMetadata()
+        metadata.feed(read_url(route).decode())
+        if metadata.canonical != "https://blog.deali.cn" + route:
+            raise ValueError("Page canonical mismatch: " + route)
+    if "Sitemap: https://blog.deali.cn/sitemap.xml" not in read_url("/robots.txt").decode():
+        raise ValueError("Robots sitemap discovery failed")
+    sitemap = read_url("/sitemap.xml").decode()
+    if "<sitemapindex" not in sitemap or "/sitemaps/pages/1.xml" not in sitemap:
+        raise ValueError("Gateway is not serving the Web sitemap index")
+    if "<urlset" not in read_url("/sitemaps/pages/1.xml").decode():
+        raise ValueError("Web sitemap page chunk failed")
+
+
 def verify(expected):
     health = json.loads(read_url("/health/ready"))
     if health["status"] != "Healthy":
@@ -52,6 +97,7 @@ def verify(expected):
             raise ValueError("Featured photo missing from homepage")
     if "<html" not in read_url("/admin/").decode().lower():
         raise ValueError("Admin entry failed")
+    verify_seo(html)
 
 
 def private_write(filename, data):

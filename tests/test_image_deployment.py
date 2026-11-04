@@ -94,5 +94,41 @@ class ContainerUpdateTests(unittest.TestCase):
                 deploy.os.umask(original_umask)
 
 
+class SeoVerificationTests(unittest.TestCase):
+    def setUp(self):
+        spec = importlib.util.spec_from_file_location('deploy_images', ROOT / 'deploy/deploy-images.py')
+        self.deploy = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(self.deploy)
+        self.home = '<title>技术、摄影与生活手记 · StarBlog</title><link rel="canonical" href="https://blog.deali.cn/">'
+        self.responses = {
+            '/blog': b'<link rel="canonical" href="https://blog.deali.cn/blog">',
+            '/photography': b'<link rel="canonical" href="https://blog.deali.cn/photography">',
+            '/robots.txt': b'Sitemap: https://blog.deali.cn/sitemap.xml',
+            '/sitemap.xml': b'<sitemapindex><sitemap><loc>https://blog.deali.cn/sitemaps/pages/1.xml</loc></sitemap></sitemapindex>',
+            '/sitemaps/pages/1.xml': b'<urlset><url><loc>https://blog.deali.cn/</loc></url></urlset>',
+        }
+
+    def verify(self, home=None):
+        with patch.object(self.deploy, 'read_url', side_effect=self.responses.__getitem__):
+            self.deploy.verify_seo(self.home if home is None else home)
+
+    def test_web_metadata_and_sitemap_chunks_pass(self):
+        self.verify()
+
+    def test_stale_api_sitemap_routing_is_rejected(self):
+        self.responses['/sitemap.xml'] = b'<urlset><url><loc>https://blog.deali.cn/</loc></url></urlset>'
+        with self.assertRaisesRegex(ValueError, 'Web sitemap index'):
+            self.verify()
+
+    def test_homepage_canonical_inherited_by_a_section_is_rejected(self):
+        self.responses['/photography'] = b'<link rel="canonical" href="https://blog.deali.cn/">'
+        with self.assertRaisesRegex(ValueError, 'canonical mismatch: /photography'):
+            self.verify()
+
+    def test_generic_home_title_is_rejected(self):
+        with self.assertRaisesRegex(ValueError, 'site identity'):
+            self.verify(self.home.replace('技术、摄影与生活手记 · StarBlog', '首页'))
+
+
 if __name__ == '__main__':
     unittest.main()

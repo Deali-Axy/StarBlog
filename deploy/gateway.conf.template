@@ -31,8 +31,8 @@ server {
     location /media/ { proxy_pass http://api:8080; }
     location /health/ { proxy_pass http://api:8080; }
     location = /feed { proxy_pass http://api:8080; }
-    location = /robots.txt { proxy_pass http://api:8080; }
-    location ~ ^/sitemap(?:-index|-images)?\.xml$ { proxy_pass http://api:8080; }
+    location = /robots.txt { proxy_pass http://web:3000; }
+    location ~ ^/sitemap(?:-index|-images)?\.xml$ { proxy_pass http://web:3000; }
 
     location ~* ^/Blog/Post/([^/]+)/?$ { return 301 /blog/$1$is_args$args; }
     location ~* ^/Blog/(?:List|Index)/?$ { return 301 /blog$is_args$args; }
