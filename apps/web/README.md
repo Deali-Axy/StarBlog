@@ -15,7 +15,7 @@ task web:dev
 
 Web 开发服务器：<http://localhost:3001>
 
-复制 [`.env.example`](.env.example) 为 `.env.local` 可覆盖站点名和后端地址。Next 会把 `/api`、`/media`、`/feed` 代理到 API。
+复制 [`.env.example`](.env.example) 为 `.env.local` 可覆盖站点名和后端地址。Next 会把 `/api`、`/media`、`/feed` 代理到 API；robots 和 sitemap 由 Web 生成。
 
 ## 语言
 
@@ -90,3 +90,16 @@ Web 读取文章时携带 `includeToc=false`，API 返回原始 Markdown 并跳�
 `app/globals.css` 仅保留 Tailwind/shadcn 导入、明暗主题变量、字体、圆角及容器映射、基础层和 Marquee 动画注册。不随布局方案变化的基础容器、标题、摄影主题等工具类组合集中在 `lib/styles.ts`；摄影主题必须同时应用于页面容器和 Portal 弹出层。Markdown 在服务端入口引入 highlight.js 官方主题，正文节点、目录和各阅读方案使用 Tailwind 排版。文章原生 CSS 仅在 `article-native.module.css` 中处理进度条的浏览器伪元素与 WebKit 原生折叠标记。
 
 内联 `style` 仅用于运行时值，例如摄影布局坐标、Motion 动画、分类权重字号及层级缩进。Markdown 表格的对齐由正文数据决定，也保留为运行时样式。浏览器测试使用语义或 `data-*` 定位，不依赖样式类。
+
+## SEO 与分享
+
+所有可索引页面通过 `lib/seo.ts` 生成独立的标题、描述、canonical、Open Graph 和 Twitter 卡片。首页显示「技术、摄影与生活手记 · 站名」，默认介绍面向博客读者；站名、介绍与作者信息可通过 `.env.example` 中的 `NEXT_PUBLIC_*` 配置。公开配置在构建时写入产物，修改后需要重新构建。
+
+- 分类保留 `categoryId`，分页保留 `page` 与非默认 `pageSize`，页面风格参数不会进入 canonical。搜索、非默认排序、无效分类和空结果不参与收录；排序会改变分页内容，因此它保留自己的 canonical，而不是指向内容不同的默认页。
+- 文章原文 canonical 使用 `/blog/{slug或id}`；已有译文使用 `?lang=语言代码`。缺少译文时 canonical 回到实际展示的原文。原文与已有译文通过双向 `hreflang` 关联，永久链接、分享信息和结构化数据使用同一个地址。界面语言仍是 Cookie 偏好，不另建界面语言路由；原文目前默认 `zh-CN`。
+- 摄影目录 `/photography/catalog` 提供有真实链接的服务端分页，可从照片墙底部进入。照片详情在首屏 HTML 中包含标题、图片和返回链接，浏览器挂载后继续使用原有弹窗。
+- 默认分享封面为 `public/og-default.png`，可配置 `NEXT_PUBLIC_OG_IMAGE` 替换。默认封面由品牌 SVG 生成，运行 `node scripts/generate-og.mjs` 可重新生成；照片使用自身缩略图。
+- `/robots.txt`、`/sitemap.xml`、`/sitemap-index.xml` 和 `/sitemap-images.xml` 均由 Web 提供，统一使用 `NEXT_PUBLIC_SITE_URL`，不依赖后端的 `host` 配置。主索引包含页面、文章和图片分片；每个内容分片最多 1000 条，API 每页最多读取 100 条。文章使用真实更新时间，栏目不伪造更新时间。站点地图按需生成，数据与边缘响应缓存 5 分钟；数据源异常时返回错误，不发布空的成功结果。Atom 源仍由 API 提供，其站点地址需同步配置后端 `host`。
+- `/p/{slug}` 使用 308 永久跳转，保留文章语言和页面风格。不存在的页面由 Next 的 `notFound()` 输出 `noindex`；后端服务异常显示可重试的错误页面，不伪装成文章不存在。
+
+验证命令：`pnpm typecheck`、`pnpm lint`、`pnpm test:seo`、`pnpm build`。新增浏览器测试位于 `tests/StarBlog.E2ETests/SeoTests.cs`，在启动 API/Web 后按该目录 README 的环境配置运行 `--filter FullyQualifiedName~SeoTests`，检查爬虫 HTML、无 JavaScript 的照片页面、译文关系、404、308、分享封面和 XML 分片。

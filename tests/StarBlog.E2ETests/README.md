@@ -96,3 +96,18 @@ homepage slot and frame while the editor stays mounted, and both photo layouts
 at all three densities and 375/768/1440 widths. Use the combined blog and photo
 fixtures when running these cases. The blog fixture includes 25 index records
 plus one long-form reading record in its leaf category.
+
+## SEO and crawler HTML
+
+`SeoTests` checks independent page metadata, filtered and paginated canonical URLs,
+translated articles and structured data, missing pages, 308 legacy redirects,
+public-origin sitemap indexes/chunks, and the default PNG share cover. It also
+checks photo catalog and detail content with JavaScript disabled, plus hydrated
+catalog navigation at mobile and desktop widths. Set `E2E_SEO_SCREENSHOT_DIR` to
+save the photo-detail screenshots.
+
+These cases require the `article-reading-fixture` article and more than 48 photos.
+Create the blog fixture, then use that database as the source for the photography
+fixture script. Start API/Web against the resulting temporary copy as described
+above and run with `--filter FullyQualifiedName~SeoTests`. Robots and sitemap
+requests must reach Web; `E2E_API_BASE_URL` overrides API/media/feed requests only.
