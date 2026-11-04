@@ -1,7 +1,7 @@
 "use client"
 import { useI18n } from "@/components/app-providers"
 import { BlogStyleLink } from "@/components/blog/blog-layout-context"
-import { StarMark } from "@/components/brand/star-mark"
+import { SiteLogo } from "@/components/brand/site-logo"
 import { LanguageToggle } from "@/components/layout/language-toggle"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { routes } from "@/lib/routes"
@@ -11,13 +11,13 @@ import Link from "next/link"
 import { useBlogSiteLinks } from "../blog-site-links"
 import { IndexMobileNav } from "./index-mobile-nav"
 export function IndexHeaderWordmark() {
-  return <Link href={routes.home} className={"inline-flex items-center gap-2.5 whitespace-nowrap text-[1.75rem] [line-height:1] font-bold [letter-spacing:-.05em] max-[39.9375rem]:text-[1.375rem] max-[39.9375rem]:gap-2"} aria-label={site.name}>
-    <StarMark className={"w-5.5 h-5.5 shrink-0 max-[39.9375rem]:w-[17px] max-[39.9375rem]:h-[17px]"} /><span>{site.name}</span>
+  return <Link href={routes.home} className="inline-flex shrink-0 items-center" aria-label={site.name}>
+    <SiteLogo />
   </Link>
 }
 export function IndexFooterWordmark() {
-  return <Link href={routes.home} className={"inline-flex items-center gap-2.5 whitespace-nowrap text-[1.75rem] [line-height:1] font-bold [letter-spacing:-.05em] [&&]:text-xl max-[39.9375rem]:text-[1.375rem] max-[39.9375rem]:gap-2 max-[39.9375rem]:[&&]:text-lg"} aria-label={site.name}>
-    <StarMark className={"w-5.5 h-5.5 shrink-0 [&&]:w-4 [&&]:h-4 max-[39.9375rem]:w-[17px] max-[39.9375rem]:h-[17px]"} /><span>{site.name}</span>
+  return <Link href={routes.home} className="inline-flex shrink-0 items-center" aria-label={site.name}>
+    <SiteLogo reversed />
   </Link>
 }
 export function IndexSiteNav() {

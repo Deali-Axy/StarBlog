@@ -5,7 +5,7 @@ import { Menu, Search } from "lucide-react"
 import Link from "next/link"
 
 import { useI18n } from "@/components/app-providers"
-import { StarMark } from "@/components/brand/star-mark"
+import { SiteLogo } from "@/components/brand/site-logo"
 import { LanguageToggle } from "@/components/layout/language-toggle"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { routes } from "@/lib/routes"
@@ -25,10 +25,9 @@ export function PhotographyHeader() {
 
   return (
     <header className={"sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-md"}>
-      <div className={cn(photoInsetClassName, "flex h-16 items-center gap-2 sm:h-[72px] lg:gap-8")}>
-        <Link href={routes.home} className="flex shrink-0 items-center gap-2.5 text-xl font-semibold tracking-tight">
-          <StarMark className="size-5" />
-          {site.name}
+      <div className={cn(photoInsetClassName, "flex h-16 items-center gap-2 sm:h-[72px] lg:gap-8 max-[23rem]:h-auto max-[23rem]:flex-wrap max-[23rem]:py-3")}>
+        <Link href={routes.home} className="flex shrink-0 items-center" aria-label={`${site.name} · ${t.home}`}>
+          <SiteLogo />
         </Link>
         <nav aria-label={t.siteNavigation} className="hidden items-center gap-1 lg:flex">
           {links.map(({ href, label }) => (
@@ -71,8 +70,8 @@ export function PhotographyFooter() {
     <footer className={cn(photoInsetClassName, "border-t border-border bg-background py-6 text-xs text-muted-foreground")}>
       <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-          <Link href={routes.home} className="flex items-center gap-2 font-semibold text-foreground">
-            <StarMark className="size-3.5" />{site.name}
+          <Link href={routes.home} className="flex items-center" aria-label={`${site.name} · ${t.home}`}>
+            <SiteLogo />
           </Link>
           <span>© {new Date().getFullYear()} {site.authorName}</span>
         </div>

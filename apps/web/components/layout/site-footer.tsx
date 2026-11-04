@@ -5,11 +5,10 @@ import { useI18n } from "@/components/app-providers"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
-import { StarMark } from "@/components/brand/star-mark"
+import { SiteLogo } from "@/components/brand/site-logo"
 import type { LinkResponse } from "@/lib/api/types"
 import { isPhotographyPath } from "@/lib/photography/path"
 import { routes } from "@/lib/routes"
-import { site } from "@/lib/site"
 import { eyebrowClassName, pageContainerClassName } from "@/lib/styles"
 import { cn } from "@/lib/utils"
 
@@ -21,9 +20,8 @@ export function SiteFooter({ links = [] }: { links?: LinkResponse[] }) {
     <footer className={cn("border-t", darkroom ? "border-white/10 bg-black text-white" : "border-border/70")}>
       <div className={cn(pageContainerClassName, "flex flex-col gap-8 py-12 sm:flex-row sm:items-start sm:justify-between")}>
         <div>
-          <p className="flex items-center gap-2 font-heading">
-            <StarMark className="size-3.5 text-primary" />
-            {site.name}
+          <p>
+            <SiteLogo reversed={darkroom} />
           </p>
           <p className={cn("mt-2 max-w-sm text-sm", darkroom ? "text-white/55" : "text-muted-foreground")}>{t.tagline}</p>
         </div>

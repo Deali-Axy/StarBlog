@@ -5,7 +5,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation"
 import { FormEvent, Suspense } from "react"
 import { Rss, Search } from "lucide-react"
 
-import { StarMark } from "@/components/brand/star-mark"
+import { SiteLogo } from "@/components/brand/site-logo"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -79,9 +79,8 @@ export function SiteHeader() {
       )}
     >
       <div className={cn(pageContainerClassName, "flex flex-wrap items-center gap-x-4 gap-y-3 py-3 lg:flex-nowrap")}>
-        <Link href={routes.home} className="flex items-center gap-2 font-heading text-base tracking-tight">
-          <StarMark className="size-3.5 text-primary" />
-          {site.name}
+        <Link href={routes.home} className="flex shrink-0 items-center" aria-label={`${site.name} · ${t.home}`}>
+          <SiteLogo reversed={darkroom} />
         </Link>
         <nav className="order-last flex w-full items-center gap-5 overflow-x-auto whitespace-nowrap text-sm lg:order-none lg:w-auto">
           {navItems.map((item) => {

@@ -1,7 +1,7 @@
 "use client"
 import { useI18n } from "@/components/app-providers"
 import { BlogStyleLink } from "@/components/blog/blog-layout-context"
-import { StarMark } from "@/components/brand/star-mark"
+import { SiteLogo } from "@/components/brand/site-logo"
 import { LanguageToggle } from "@/components/layout/language-toggle"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { routes } from "@/lib/routes"
@@ -10,13 +10,13 @@ import { ArrowUp, Search } from "lucide-react"
 import Link from "next/link"
 import { useBlogSiteLinks } from "../blog-site-links"
 export function FolioHeaderWordmark() {
-  return <Link href={routes.home} className={"inline-flex items-center whitespace-nowrap text-[1.75rem] [line-height:1] font-bold max-[39.9375rem]:gap-2 [font:600_38px/1_var(--font-heading)] [letter-spacing:-.055em] gap-2.5 max-[39.9375rem]:text-[31px]"} aria-label={site.name}>
-    <StarMark className={"w-5.5 h-5.5 shrink-0 [&&]:w-4.5 [&&]:h-4.5 max-[39.9375rem]:w-[17px] max-[39.9375rem]:h-[17px] max-[39.9375rem]:[&&]:w-4 max-[39.9375rem]:[&&]:h-4"} /><span>{site.name}</span>
+  return <Link href={routes.home} className="inline-flex shrink-0 items-center" aria-label={site.name}>
+    <SiteLogo />
   </Link>
 }
 export function FolioFooterWordmark() {
-  return <Link href={routes.home} className={"inline-flex items-center gap-2.5 whitespace-nowrap text-[1.75rem] [line-height:1] font-bold [letter-spacing:-.05em] [&&]:[font:600_19px/1_var(--font-heading)] [&&]:text-foreground max-[39.9375rem]:text-[1.375rem] max-[39.9375rem]:gap-2 max-[39.9375rem]:[&&]:w-full max-[39.9375rem]:[&&]:justify-center"} aria-label={site.name}>
-    <StarMark className={"w-5.5 h-5.5 shrink-0 [&&]:w-3.5 [&&]:h-3.5 max-[39.9375rem]:w-[17px] max-[39.9375rem]:h-[17px]"} /><span>{site.name}</span>
+  return <Link href={routes.home} className="inline-flex shrink-0 items-center max-[39.9375rem]:w-full max-[39.9375rem]:justify-center" aria-label={site.name}>
+    <SiteLogo />
   </Link>
 }
 export function FolioSiteNav() {

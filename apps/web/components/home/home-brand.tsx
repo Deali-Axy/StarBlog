@@ -1,6 +1,6 @@
 "use client"
 import { useI18n } from "@/components/app-providers"
-import { StarMark } from "@/components/brand/star-mark"
+import { SiteLogo } from "@/components/brand/site-logo"
 import { routes } from "@/lib/routes"
 import { site } from "@/lib/site"
 import Link from "next/link"
@@ -16,8 +16,8 @@ export function useEntries() {
 }
 export function Brand() {
   const { t } = useI18n()
-  return <Link href={routes.home} className="inline-flex min-w-0 items-start gap-2.5 font-heading text-xl leading-none font-semibold tracking-[-.04em] wrap-anywhere" aria-label={`${site.name} · ${t.home}`}>
-    <StarMark className="size-7 shrink-0 text-primary" />
-    <span>{site.name}<span className="mt-3 block font-sans text-[9px] font-normal tracking-[.2em] text-muted-foreground">{t.homeCoverLabel}</span></span>
+  return <Link href={routes.home} className="inline-flex min-w-0 flex-col items-start gap-3" aria-label={`${site.name} · ${t.home}`}>
+    <SiteLogo />
+    <span className="font-sans text-[9px] font-normal tracking-[.2em] text-muted-foreground">{t.homeCoverLabel}</span>
   </Link>
 }

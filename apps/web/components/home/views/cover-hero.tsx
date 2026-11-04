@@ -1,6 +1,6 @@
 "use client"
 import { EnhancedPostCard } from "@/components/blog/enhanced-post-card"
-import { StarMark } from "@/components/brand/star-mark"
+import { MoteMark } from "@/components/brand/site-logo"
 import { messages } from "@/lib/i18n"
 import { routes } from "@/lib/routes"
 import { headingClassName } from "@/lib/styles"
@@ -30,7 +30,7 @@ export function CoverHero({ locale, site, overview, photo, topPost }: HomeHeroPr
           <h1 style={{ zoom: "var(--home-scale)" }} id="home-hero-name" className={cn(headingClassName, "-ml-[0.055em] text-[clamp(6rem,22vw,10rem)] leading-tight tracking-tighter wrap-anywhere md:text-[clamp(7rem,15vw,11.5rem)] data-[long-name=true]:text-[clamp(3.5rem,10vw,6rem)] min-[70rem]:[&:not([data-long-name=true])]:text-[clamp(5.5rem,13cqw,11.5rem)]")} data-long-name={Array.from(name).length > 3}>
             {name}
           </h1>
-          <StarMark className="mt-3 ml-3 size-7 shrink-0 rotate-12 text-(--hero-ink)" />
+          <MoteMark className="mt-3 ml-3" />
         </div>
         {alias ? <p style={{ zoom: "var(--home-scale)" }} className="mt-1 font-heading text-[clamp(2rem,5vw,3rem)] leading-tight tracking-tighter italic wrap-anywhere">{alias}<span aria-hidden="true" className="text-(--hero-ink)"> /</span></p> : null}
 

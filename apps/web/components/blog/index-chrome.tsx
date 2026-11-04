@@ -6,7 +6,7 @@ import { IndexBackToTop, IndexCopyright, IndexFooterNav, IndexFooterWordmark, In
 export function IndexHeader() {
   const { t } = useI18n()
   return <header data-blog-header="library" className={"sticky top-0 [z-index:40] bg-background text-foreground"}>
-    <div className={"flex items-center gap-8 min-h-20 [width:min(100%_-_64px,_1280px)] mx-auto [border-bottom:2px_solid_var(--foreground)] max-[74.9375rem]:gap-5 max-[63.9375rem]:[width:calc(100%_-_48px)] max-[39.9375rem]:[width:calc(100%_-_32px)] max-[39.9375rem]:min-h-18 max-[39.9375rem]:gap-2"}>
+    <div className={"flex items-center gap-8 min-h-20 [width:min(100%_-_64px,_1280px)] mx-auto [border-bottom:2px_solid_var(--foreground)] max-[74.9375rem]:gap-5 max-[63.9375rem]:[width:calc(100%_-_48px)] max-[39.9375rem]:[width:calc(100%_-_32px)] max-[39.9375rem]:min-h-18 max-[39.9375rem]:gap-2 max-[23rem]:flex-wrap max-[23rem]:py-3"}>
       <div className={"flex flex-col items-start gap-[7px] shrink-0 [&_>_span]:ml-8 [&_>_span]:text-[.5rem] [&_>_span]:[letter-spacing:.18em] max-[39.9375rem]:gap-1.5 max-[39.9375rem]:[&_>_span]:ml-[25px] max-[39.9375rem]:[&_>_span]:text-[7px] max-[39.9375rem]:[&_>_span]:[letter-spacing:.1em]"}><IndexHeaderWordmark /><span>{t.indexChromeLabel}</span></div>
       <IndexSiteNav />
       <IndexHeaderTools />
