@@ -7,7 +7,9 @@ import { ApiError } from "@/lib/api/types"
 import { getPhoto } from "@/lib/api/queries"
 import { photoThumbnail } from "@/lib/media"
 import { routes } from "@/lib/routes"
-import { getSite } from "@/lib/site"
+import { JsonLd } from "@/components/seo/json-ld"
+import { pageMetadata } from "@/lib/seo"
+import { absoluteUrl, getSite } from "@/lib/site"
 
 export const revalidate = 300
 
@@ -20,26 +22,15 @@ export async function generateMetadata({ params }: PhotoPageProps): Promise<Meta
   const site = getSite(locale)
   const { id } = await params
   try {
-    const photo = await getPhoto(decodeURIComponent(id))
-    return {
-      title: photo.title,
+    const photo = await getPhoto(id)
+    return pageMetadata({
+      locale, title: photo.title || t.photography,
       description: photo.location || site.description,
-      alternates: { canonical: routes.photo(photo.id) },
-      openGraph: {
-        title: photo.title,
-        description: photo.location || undefined,
-        type: "article",
-        url: routes.photo(photo.id),
-        images: [{ url: photoThumbnail(photo.id, 1200), alt: photo.title }],
-      },
-      twitter: {
-        card: "summary_large_image",
-        title: photo.title,
-        images: [photoThumbnail(photo.id, 1200)],
-      },
-    }
-  } catch {
-    return { title: t.photoNotFound }
+      path: routes.photo(photo.id), image: photoThumbnail(photo.id, 1200),
+    })
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) notFound()
+    throw error
   }
 }
 
@@ -47,10 +38,23 @@ export default async function PhotoPage({ params }: PhotoPageProps) {
   const { id } = await params
   let photo
   try {
-    photo = await getPhoto(decodeURIComponent(id))
+    photo = await getPhoto(id)
   } catch (error) {
     if (error instanceof ApiError && error.status === 404) notFound()
     throw error
   }
-  return <PhotoDetail photo={photo} />
+  const { locale } = await getI18n()
+  const site = getSite(locale)
+  return <>
+    <JsonLd data={{
+      "@context": "https://schema.org", "@type": "ImageObject",
+      name: photo.title, description: photo.location || undefined,
+      url: absoluteUrl(routes.photo(photo.id)),
+      contentUrl: absoluteUrl(photoThumbnail(photo.id, 1600)),
+      datePublished: photo.createTime,
+      creator: { "@type": "Person", name: site.authorName, url: absoluteUrl(routes.about) },
+      ...(photo.width > 0 && photo.height > 0 ? { width: photo.width, height: photo.height } : {}),
+    }} />
+    <PhotoDetail photo={photo} />
+  </>
 }

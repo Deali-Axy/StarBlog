@@ -5,7 +5,7 @@ import "./globals.css"
 import { AppProviders } from "@/components/app-providers"
 import { SiteShell } from "@/components/layout/site-shell"
 import { Toaster } from "@/components/ui/sonner"
-import { absoluteUrl, getSite } from "@/lib/site"
+import { absoluteUrl, getSite, socialImage } from "@/lib/site"
 import { htmlLang } from "@/lib/i18n"
 import { getI18n } from "@/lib/i18n-server"
 import { cn } from "@/lib/utils"
@@ -41,8 +41,8 @@ export async function generateMetadata(): Promise<Metadata> {
       template: `%s · ${site.name}`,
     },
     description: site.description,
+    authors: [{ name: site.authorName }],
     alternates: {
-      canonical: "/",
       types: {
         "application/atom+xml": "/feed",
       },
@@ -53,10 +53,11 @@ export async function generateMetadata(): Promise<Metadata> {
       siteName: site.name,
       title: site.name,
       description: site.description,
-      url: absoluteUrl("/"),
+      images: [{ url: absoluteUrl(socialImage), alt: site.name }],
     },
     twitter: {
       card: "summary_large_image",
+      images: [absoluteUrl(socialImage)],
       title: site.name,
       description: site.description,
     },

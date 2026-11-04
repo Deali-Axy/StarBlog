@@ -1,3 +1,5 @@
+import type { Metadata } from "next"
+
 import { getI18n } from "@/lib/i18n-server"
 import Link from "next/link"
 
@@ -5,6 +7,11 @@ import { Button } from "@/components/ui/button"
 import { routes } from "@/lib/routes"
 import { eyebrowClassName, headingClassName } from "@/lib/styles"
 import { cn } from "@/lib/utils"
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getI18n()
+  return { title: t.notFound, robots: { index: false, follow: true } }
+}
 
 export default async function NotFound() {
   const { t } = await getI18n()

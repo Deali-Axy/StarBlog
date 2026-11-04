@@ -16,18 +16,15 @@ import { JsonLd } from "@/components/seo/json-ld"
 import { getCategoryWordCloud, getHome, getOverview, listPosts } from "@/lib/api/queries"
 import { homePreferencesCookie } from "@/lib/home-variant"
 import { postHref } from "@/lib/routes"
-import { absoluteUrl, getSite } from "@/lib/site"
+import { pageMetadata, seoText } from "@/lib/seo"
+import { getSite } from "@/lib/site"
 
 export const revalidate = 300
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { locale, t } = await getI18n()
+  const { locale } = await getI18n()
   const site = getSite(locale)
-  return {
-    title: t.home,
-    alternates: { canonical: "/" },
-    openGraph: { title: site.name, description: site.description, url: absoluteUrl("/"), type: "website" },
-  }
+  return pageMetadata({ locale, title: seoText[locale].home, description: site.description, path: "/" })
 }
 
 export default async function HomePage() {
@@ -52,11 +49,9 @@ export default async function HomePage() {
             "@type": "WebSite",
             name: site.name,
             url: site.url,
-            potentialAction: {
-              "@type": "SearchAction",
-              target: `${site.url}/search?keyword={search_term_string}`,
-              "query-input": "required name=search_term_string",
-            },
+            description: site.description,
+            inLanguage: locale === "en" ? "en" : "zh-CN",
+            author: { "@type": "Person", name: site.authorName },
           }}
         />
         <HomeHero locale={locale} site={site} overview={overview} photo={photo} topPost={home.topPost} />

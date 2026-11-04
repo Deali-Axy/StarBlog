@@ -1,9 +1,15 @@
+import type { Metadata } from "next"
 import { getI18n } from "@/lib/i18n-server"
 import Link from "next/link"
 
 import { routes } from "@/lib/routes"
 import { headingClassName, photoInsetClassName } from "@/lib/styles"
 import { cn } from "@/lib/utils"
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getI18n()
+  return { title: t.photoNotFound, robots: { index: false, follow: true } }
+}
 
 export default async function PhotographyNotFound() {
   const { t } = await getI18n()

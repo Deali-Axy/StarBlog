@@ -3,12 +3,13 @@ import { Suspense } from "react"
 
 import { RssDesign } from "@/components/rss/rss-design"
 import { getI18n } from "@/lib/i18n-server"
+import { pageMetadata } from "@/lib/seo"
 import { routes } from "@/lib/routes"
 import { absoluteUrl, site } from "@/lib/site"
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { t } = await getI18n()
-  return { title: "RSS Feed", description: t.feedDescription(site.name), alternates: { canonical: routes.rss } }
+  const { locale, t } = await getI18n()
+  return pageMetadata({ locale, title: locale === "en" ? "Subscribe via RSS" : "RSS 订阅", description: t.feedDescription(site.name), path: routes.rss })
 }
 
 export default function RssPage() {

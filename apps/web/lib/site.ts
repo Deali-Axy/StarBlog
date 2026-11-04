@@ -1,8 +1,10 @@
 import type { Locale } from "@/lib/i18n"
 
+export const socialImage = process.env.NEXT_PUBLIC_OG_IMAGE?.trim() || "/og-default.png"
+
 export const site = {
   name: process.env.NEXT_PUBLIC_SITE_NAME ?? "StarBlog",
-  description: process.env.NEXT_PUBLIC_SITE_DESCRIPTION ?? "基于 .NET 的开源博客",
+  description: process.env.NEXT_PUBLIC_SITE_DESCRIPTION ?? "曦远的个人博客，分享软件开发实践、技术探索、摄影作品与生活手记。",
   url: (process.env.NEXT_PUBLIC_SITE_URL ?? "https://blog.deali.cn").replace(/\/$/, ""),
   authorName: process.env.NEXT_PUBLIC_AUTHOR_NAME ?? "曦远 (DealiAxy)",
   authorTitle: process.env.NEXT_PUBLIC_AUTHOR_TITLE ?? "独立开发者",
@@ -33,7 +35,7 @@ export function getSite(locale: Locale) {
   return {
     ...site,
     description:
-      process.env.NEXT_PUBLIC_SITE_DESCRIPTION_EN ?? process.env.NEXT_PUBLIC_SITE_DESCRIPTION ?? "An open source blog built with .NET",
+      process.env.NEXT_PUBLIC_SITE_DESCRIPTION_EN ?? process.env.NEXT_PUBLIC_SITE_DESCRIPTION ?? "A personal blog by DealiAxy, sharing software development, technical discoveries, photography and notes on everyday life.",
     authorTitle:
       process.env.NEXT_PUBLIC_AUTHOR_TITLE_EN ?? process.env.NEXT_PUBLIC_AUTHOR_TITLE ?? "Independent developer",
     authorBio:

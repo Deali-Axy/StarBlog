@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation"
+import { permanentRedirect } from "next/navigation"
 
 import { blogStyleHref, resolveBlogVariant } from "@/lib/blog-variant"
 import { routes } from "@/lib/routes"
@@ -11,6 +11,6 @@ interface LegacyPostRedirectProps {
 export default async function LegacyPostRedirect({ params, searchParams }: LegacyPostRedirectProps) {
   const { slug } = await params
   const { lang, bv } = await searchParams
-  const href = `${routes.post(decodeURIComponent(slug))}${lang ? `?lang=${encodeURIComponent(lang)}` : ""}`
-  redirect(bv ? blogStyleHref(href, resolveBlogVariant(bv)) : href)
+  const href = `${routes.post(slug)}${lang ? `?lang=${encodeURIComponent(lang)}` : ""}`
+  permanentRedirect(bv ? blogStyleHref(href, resolveBlogVariant(bv)) : href)
 }

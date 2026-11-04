@@ -6,8 +6,9 @@ import { renderArticleMarkdown } from "@/components/blog/markdown"
 import { JsonLd } from "@/components/seo/json-ld"
 import { ApiError, type PostResponse } from "@/lib/api/types"
 import { getPostTranslations, getPublishedPost, getRelatedPosts } from "@/lib/api/queries"
-import { postHref, routes } from "@/lib/routes"
-import { absoluteUrl, getSite } from "@/lib/site"
+import { articleLanguages, articlePath, pageMetadata, plainDescription } from "@/lib/seo"
+import { routes } from "@/lib/routes"
+import { absoluteUrl, getSite, socialImage } from "@/lib/site"
 import { articleLanguage } from "@/lib/i18n"
 import { getI18n } from "@/lib/i18n-server"
 import { readingMinutes } from "@/lib/format"
@@ -27,37 +28,24 @@ function postMetadata(post: PostResponse): Omit<PostResponse, "content" | "toc">
 }
 
 export async function generateMetadata({ params, searchParams }: PostPageProps): Promise<Metadata> {
-  const { locale, t } = await getI18n()
+  const { locale } = await getI18n()
   const site = getSite(locale)
   const { id } = await params
   const { lang } = await searchParams
-  try {
-    const post = await getPublishedPost(decodeURIComponent(id), articleLanguage(locale, lang))
-    if (!post) return { title: t.postNotFound }
-    const url = absoluteUrl(postHref(post))
-    const description = post.summary ?? site.description
-    return {
-      title: post.title,
-      description,
-      alternates: { canonical: url },
-      openGraph: {
-        type: "article",
-        title: post.title,
-        description,
-        url,
-        siteName: site.name,
-        locale: locale === "en" ? "en_US" : "zh_CN",
-        publishedTime: post.creationTime,
-        modifiedTime: post.lastUpdateTime,
-      },
-      twitter: {
-        card: "summary",
-        title: post.title,
-        description,
-      },
-    }
-  } catch {
-    return { title: t.postNotFound }
+  const post = await getPublishedPost(id, articleLanguage(locale, lang))
+  if (!post) notFound()
+  const translations = await getPostTranslations(post.id).catch(() => [])
+  const description = plainDescription(post.summary?.trim() || post.content, site.description)
+  const metadata = pageMetadata({ locale, title: post.title, description, path: articlePath(post), type: "article" })
+  return {
+    ...metadata,
+    alternates: { ...metadata.alternates, languages: articleLanguages(post, translations) },
+    openGraph: {
+      ...metadata.openGraph, type: "article",
+      locale: post.language === "en" ? "en_US" : post.language?.replaceAll("-", "_") || "zh_CN",
+      publishedTime: post.creationTime, modifiedTime: post.lastUpdateTime,
+      authors: [site.authorName],
+    },
   }
 }
 
@@ -67,7 +55,7 @@ export default async function PostPage({ params, searchParams }: PostPageProps) 
   const { id } = await params
   const { lang } = await searchParams
   const requestedLanguage = articleLanguage(locale, lang)
-  const idOrSlug = decodeURIComponent(id)
+  const idOrSlug = id
   let post
   try {
     post = await getPublishedPost(idOrSlug, requestedLanguage)
@@ -82,7 +70,7 @@ export default async function PostPage({ params, searchParams }: PostPageProps) 
     getPostTranslations(post.id).catch(() => []),
   ])
   const activeLanguage = post.language ?? undefined
-  const permalink = absoluteUrl(postHref(post))
+  const permalink = absoluteUrl(articlePath(post))
   const markdown = renderArticleMarkdown(post.content ?? "", post.id)
   // Only metadata and rendered nodes cross the client boundary, not Markdown or
   // unused backend TOC/translation bodies and their parsing dependencies.
@@ -98,10 +86,11 @@ export default async function PostPage({ params, searchParams }: PostPageProps) 
               "@type": "BlogPosting",
               inLanguage: activeLanguage ?? "zh-CN",
               headline: post.title,
-              description: post.summary ?? undefined,
+              description: plainDescription(post.summary?.trim() || post.content, site.description),
+              image: absoluteUrl(socialImage),
               datePublished: post.creationTime,
               dateModified: post.lastUpdateTime,
-              author: { "@type": "Person", name: site.authorName },
+              author: { "@type": "Person", name: site.authorName, url: absoluteUrl(routes.about) },
               publisher: { "@type": "Organization", name: site.name },
               mainEntityOfPage: permalink,
               url: permalink,
