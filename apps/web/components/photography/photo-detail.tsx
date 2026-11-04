@@ -8,6 +8,7 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { toast } from "sonner"
 
 import { useI18n } from "@/components/app-providers"
+import { useHydrated } from "@/components/ui/use-hydrated"
 import { PhotoImage } from "@/components/photography/photo-image"
 import { PhotoLightboxImage } from "@/components/photography/photo-lightbox-image"
 import { AuthorMark, usePhotoStudio } from "@/components/photography/photo-studio"
@@ -24,6 +25,7 @@ const roundIcon = "grid size-11 shrink-0 place-items-center rounded-full bg-blac
 
 export function PhotoDetail({ photo }: { photo: PhotoResponse }) {
   const { t, locale } = useI18n()
+  const hydrated = useHydrated()
   const router = useRouter()
   const { photos, featured, featuredIds, filter, hasMore, loadMore, closePhoto, restoreWallFocus, authorName, lightbox, setLightbox, lightboxImages } = usePhotoStudio()
   const closeRef = useRef<HTMLButtonElement>(null)
@@ -99,6 +101,16 @@ export function PhotoDetail({ photo }: { photo: PhotoResponse }) {
       if(!(error instanceof DOMException && error.name === "AbortError")) toast.error(t.shareFailed)
     }
   }
+
+  // Portals mount only in the browser. Keep the photo readable in the initial HTML.
+  if (!hydrated) return (
+    <article className="mx-auto max-w-5xl px-6 py-10">
+      <Link href={routes.photography} className="text-sm text-primary underline underline-offset-4">{t.photography}</Link>
+      <h1 className="mt-6 text-2xl font-medium">{photo.title || t.photography}</h1>
+      {location ? <p className="mt-3 text-muted-foreground">{location}</p> : null}
+      <PhotoImage src={photoThumbnail(photo.id, 1600)} alt={photo.title || t.photography} width={photo.width || 1500} height={photo.height || 1000} priority className="mt-6" />
+    </article>
+  )
 
   return (
     <Dialog open onOpenChange={(open) => { if(!open) closePhoto() }}>

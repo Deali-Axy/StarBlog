@@ -1,7 +1,8 @@
 "use client"
 
 import { Check, Grid2X2, LayoutGrid, LoaderCircle, Shuffle } from "lucide-react"
-import { useRouter } from "next/navigation"
+import Link from "next/link"
+import { usePathname, useRouter } from "next/navigation"
 import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from "react"
 import { toast } from "sonner"
 
@@ -90,7 +91,8 @@ export function PhotoStudio({ initialPage, featured: featuredPhotos, children }:
   featured: PhotoResponse[]
   children: ReactNode
 }) {
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
+  const catalog = usePathname() === "/photography/catalog"
   const router = useRouter()
   const [photos, setPhotos] = useState(initialPage.items)
   const [totalCount, setTotalCount] = useState(initialPage.totalCount)
@@ -206,7 +208,7 @@ export function PhotoStudio({ initialPage, featured: featuredPhotos, children }:
   return (
     <PhotoStudioContext.Provider value={value}>
       {children}
-      <div className="min-h-[calc(100dvh-12rem)] bg-background text-foreground">
+      {!catalog ? <div className="min-h-[calc(100dvh-12rem)] bg-background text-foreground">
         <div data-photo-toolbar className={cn(photoInsetClassName, "sticky top-16 z-30 grid grid-cols-2 items-center gap-y-3 bg-background/95 py-4 backdrop-blur-md sm:top-[72px] lg:grid-cols-[1fr_auto_1fr] lg:py-5")}>
           <span className="text-xs tabular-nums text-muted-foreground" aria-live="polite">{t.photoCount(filter === "featured" ? featured.length : totalCount)}</span>
           <div className="flex items-center justify-end gap-1 lg:justify-center">
@@ -250,7 +252,8 @@ export function PhotoStudio({ initialPage, featured: featuredPhotos, children }:
             </button> : <p className="flex items-center gap-2 text-xs text-muted-foreground"><Check className="size-3.5" />{t.allPhotosLoaded}</p>}
           </div>
         ) : null}
-      </div>
+        <div className="pb-8 text-center"><Link href="/photography/catalog" className="inline-block min-h-11 py-3 text-sm text-muted-foreground underline underline-offset-4">{locale === "en" ? "Browse the photo catalog" : "浏览全部照片目录"}</Link></div>
+      </div> : null}
     </PhotoStudioContext.Provider>
   )
 }
