@@ -47,4 +47,4 @@ python3 scripts/brand-assets.py --check --scheme mote
 
 完成修改后运行一次不带 `--scheme` 的生成命令，以更新六套对照图。`exports/` 为生成产物，应与源文件一同提交。
 
-此方案已整理备用，尚未选定为应用默认标识。[返回六套方案目录](../README.md)。
+`apps/web` 已采用此方案：共享组件 `components/brand/site-logo.tsx` 使用 `public/brand/mote/` 中的原样 SVG 副本，自动适配深浅色和首页主题预览；`app/favicon.ico`、`app/icon.svg` 与 `app/apple-icon.png` 使用配套站点图标。更新导出后需同步这些应用副本。后台尚未切换。[返回六套方案目录](../README.md)。

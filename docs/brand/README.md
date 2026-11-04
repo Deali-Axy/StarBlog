@@ -1,6 +1,6 @@
 # StarBlog · 六套 Logo 方案
 
-六个方向均已整理为独立、可修改的素材包。当前未选定默认方案，应用中的第一版试装已撤回。下一步可按稳定 ID 接入前台、后台和站点图标。
+六个方向均已整理为独立、可修改的素材包。`apps/web` 已采用 F · 墨团 / MOTE，同步接入导航、页脚和站点图标；后台尚未切换。应用中的第一版试装已撤回。
 
 ![六套方案对照](./overview.png)
 
@@ -67,7 +67,7 @@ python3 scripts/brand-assets.py --check
 
 ## 下一步的切换约定
 
-[manifest.json](./manifest.json) 记录六个稳定 ID，`selected` 目前为 `null`，只表示尚未选择，不是运行时配置。后续接入时使用一处配置选择 ID，让导航、页脚、后台和 favicon 统一读取所选方案；六套源素材持续保存在本目录。
+[manifest.json](./manifest.json) 记录六个稳定 ID，`selected` 目前为 `null`，表示未设置跨应用的统一选择，不是运行时配置。`apps/web` 在共享品牌组件中使用 `mote`，配套图标通过 Next.js 文件约定接入；六套源素材持续保存在本目录。
 
 六套导出名称和尺寸已经统一。切换时需要同步处理图形与站点图标；深色底使用 `logo-reversed.svg` 或 `mark-reversed.svg`。`mark-current.svg` 供内联 SVG 使用，作为外部 `<img>` 时不能继承宿主元素颜色。
 
