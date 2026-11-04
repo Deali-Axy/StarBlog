@@ -4,4 +4,5 @@
   <Project Path="tests/StarBlog.E2ETests/StarBlog.E2ETests.csproj" />
   <Project Path="tools/BlogImageOptimizer/BlogImageOptimizer.csproj" />
   <Project Path="tools/StarBlogBackup/StarBlog.BackupTool.csproj" />
+  <Project Path="tools/StarBlog.AdminReset/StarBlog.AdminReset.csproj" />
 </Solution>
