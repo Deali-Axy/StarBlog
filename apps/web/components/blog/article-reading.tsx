@@ -55,6 +55,12 @@ function useReading(items: ArticleHeading[], layoutKey: string, rootRef: RefObje
     // Close the mobile contents before measuring the destination's position.
     const details = event.currentTarget.closest("details")
     if(details) details.open = false
+    navigateTo(id)
+  }
+
+  function navigateTo(id: string) {
+    const heading = document.getElementById(id)
+    if(!heading) return
     const url = new URL(window.location.href)
     url.hash = encodeURIComponent(id)
     if(window.location.hash !== url.hash) window.history.pushState(null, "", url)
@@ -63,7 +69,7 @@ function useReading(items: ArticleHeading[], layoutKey: string, rootRef: RefObje
     setActiveId(id)
   }
 
-  return { items, baseline, activeId, progress, navigate }
+  return { items, baseline, activeId, progress, navigate, navigateTo }
 }
 const ReadingContext = createContext<ReturnType<typeof useReading> | null>(null)
 export function ArticleReadingProvider({ items, layoutKey, children }: { items: ArticleHeading[]; layoutKey: string; children: ReactNode }) {

@@ -7,8 +7,8 @@ import { formatDate } from "@/lib/format"
 import { languageName } from "@/lib/i18n"
 import { postHref, routes } from "@/lib/routes"
 import { getSite } from "@/lib/site"
-import { ArrowLeft, ArrowUpRight, Clock3, Share2 } from "lucide-react"
-import { useArticleActions } from "../article-actions"
+import { ArrowLeft, ArrowUpRight, Clock3 } from "lucide-react"
+import { ArticleInteractions } from "../article-interactions"
 import type { ArticleLayoutProps } from "../article-props"
 import { IndexDesktopTOC } from "./library-desktop-toc"
 import { IndexMobileTOC } from "./library-mobile-toc"
@@ -16,7 +16,6 @@ const articleStickyClassName = "sticky top-[calc(var(--blog-header-height)+1.5re
 export function IndexArticle({ post, headings, children, minutes, related = [], permalink, translations = [], lang, translationMissing = false }: ArticleLayoutProps) {
   const { locale, t } = useI18n()
   const site = getSite(locale)
-  const { share } = useArticleActions()
   return <div className={"px-4 sm:px-6 lg:px-8"}>
     <div data-blog-article-detail data-article-layout="library" className={"mx-auto w-full pb-12 sm:pb-20 max-w-7xl"}>
       <article lang={lang ?? "zh-CN"} className={"grid grid-cols-1 lg:grid-cols-12 lg:gap-x-12 xl:gap-x-16"}>
@@ -34,7 +33,6 @@ export function IndexArticle({ post, headings, children, minutes, related = [], 
             <span className="text-foreground">{site.authorName}</span><span className={"hidden sm:inline"} aria-hidden="true">/</span>
             <time dateTime={post.creationTime}>{formatDate(post.creationTime, "YYYY.MM.DD")}</time>
             <span className="inline-flex items-center gap-2"><Clock3 className="size-3.5 shrink-0" aria-hidden="true" />{t.readingTime(minutes)}</span>
-            <button type="button" className={"ml-auto inline-flex cursor-pointer items-center gap-2 py-2 text-foreground hover:text-primary"} onClick={() => void share(post.title)}><Share2 className="size-3.5 shrink-0" aria-hidden="true" />{t.share}</button>
           </div>
           {translations.length > 0 ? <nav aria-label={t.articleLanguage} className={"mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs"}>
             <span className="text-muted-foreground">{t.articleLanguage}</span>
@@ -43,15 +41,16 @@ export function IndexArticle({ post, headings, children, minutes, related = [], 
           </nav> : null}
           {translationMissing ? <p className="mt-4 text-sm text-muted-foreground">{t.translationMissing}</p> : null}
         </header>
-        {headings.length > 0 ? <aside className={"hidden min-w-0 lg:block pt-12 lg:col-span-3 lg:col-start-1 lg:row-start-3"}><div className={articleStickyClassName}><IndexDesktopTOC /></div></aside> : null}
+        <aside className={"hidden min-w-0 lg:block pt-12 lg:col-span-3 lg:col-start-1 lg:row-start-3"}><div className={articleStickyClassName}>{headings.length > 0 ? <IndexDesktopTOC /> : null}<ArticleInteractions title={post.title} className="mt-4" /></div></aside>
         {headings.length > 0 ? <IndexMobileTOC /> : null}
         <div className={"col-span-full row-start-4 min-w-0 pt-8 wrap-anywhere lg:row-start-3 lg:col-span-8 lg:col-start-5 lg:pt-12"}>
           <div data-article-body className={"min-w-0 text-sm sm:text-base [&_h2]:border-b [&_h2]:border-border [&_h2]:pb-2"}>{children}</div>
           <div className={"mt-12 text-lg text-primary"} aria-hidden="true">■</div>
-          <div className="min-w-0 [&>section:first-child]:mt-8">
+          <div className="min-w-0">
+            <ArticleInteractions title={post.title} end />
             <PostCopyright title={post.title} permalink={permalink} />
-            <RelatedPosts posts={related} />
             <CommentSection />
+            <RelatedPosts posts={related} />
           </div>
         </div>
 

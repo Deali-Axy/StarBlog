@@ -8,8 +8,8 @@ import { languageName } from "@/lib/i18n"
 import { postHref, routes } from "@/lib/routes"
 import { getSite } from "@/lib/site"
 import { cn } from "@/lib/utils"
-import { ArrowLeft, ArrowUpRight, Clock3, Share2 } from "lucide-react"
-import { useArticleActions } from "../article-actions"
+import { ArrowLeft, ArrowUpRight, Clock3 } from "lucide-react"
+import { ArticleInteractions } from "../article-interactions"
 import type { ArticleLayoutProps } from "../article-props"
 import { FolioDesktopTOC } from "./editorial-desktop-toc"
 import { FolioMobileTOC } from "./editorial-mobile-toc"
@@ -17,7 +17,6 @@ const articleStickyClassName = "sticky top-[calc(var(--blog-header-height)+1.5re
 export function FolioArticle({ post, headings, children, minutes, related = [], permalink, translations = [], lang, translationMissing = false }: ArticleLayoutProps) {
   const { locale, t } = useI18n()
   const site = getSite(locale)
-  const { share } = useArticleActions()
   return <div className={"px-4 sm:px-6 lg:px-12"}>
     <div data-blog-article-detail data-article-layout="editorial" className={"mx-auto w-full pb-12 sm:pb-20 max-w-blog-folio"}>
       <article lang={lang ?? "zh-CN"} className={"grid grid-cols-1 lg:grid-cols-12 lg:gap-x-12"}>
@@ -35,7 +34,6 @@ export function FolioArticle({ post, headings, children, minutes, related = [], 
             <span className="text-foreground">{site.authorName}</span><span className={"hidden sm:hidden"} aria-hidden="true">/</span>
             <time dateTime={post.creationTime}>{formatDate(post.creationTime, "YYYY.MM.DD")}</time>
             <span className="inline-flex items-center gap-2"><Clock3 className="size-3.5 shrink-0" aria-hidden="true" />{t.readingTime(minutes)}</span>
-            <button type="button" className={"ml-auto inline-flex cursor-pointer items-center gap-2 hover:text-primary py-1 text-muted-foreground"} onClick={() => void share(post.title)}><Share2 className="size-3.5 shrink-0" aria-hidden="true" />{t.share}</button>
           </div>
           {translations.length > 0 ? <nav aria-label={t.articleLanguage} className={"flex flex-wrap items-center gap-x-4 gap-y-2 text-xs mt-3"}>
             <span className="text-muted-foreground">{t.articleLanguage}</span>
@@ -44,15 +42,16 @@ export function FolioArticle({ post, headings, children, minutes, related = [], 
           </nav> : null}
           {translationMissing ? <p className="mt-4 text-sm text-muted-foreground">{t.translationMissing}</p> : null}
         </header>
-        {headings.length > 0 ? <aside className={"hidden min-w-0 lg:block border-l border-border pt-8 pl-6 lg:col-span-3 lg:col-start-10 lg:row-start-2 lg:row-span-2"}><div className={articleStickyClassName}><FolioDesktopTOC /></div></aside> : null}
+        <aside className={"hidden min-w-0 lg:block border-l border-border pt-8 pl-6 lg:col-span-3 lg:col-start-10 lg:row-start-2 lg:row-span-2"}><div className={articleStickyClassName}>{headings.length > 0 ? <FolioDesktopTOC /> : null}<ArticleInteractions title={post.title} className="mt-4" /></div></aside>
         {headings.length > 0 ? <FolioMobileTOC /> : null}
         <div className={cn("col-span-full row-start-4 min-w-0 pt-8 wrap-anywhere lg:row-start-3", "border-t border-border lg:col-span-9 lg:col-start-1", headings.length > 0 && "border-t-0 lg:border-t")}>
           <div data-article-body className={"min-w-0 sm:text-base text-base [&_:is(h1,h2,h3)]:font-heading [&_h2]:text-2xl [&_blockquote]:border-l [&_blockquote]:ps-5"}>{children}</div>
           <div className={"mt-12 text-primary text-2xl"} aria-hidden="true">✳</div>
-          <div className="min-w-0 [&>section:first-child]:mt-8">
+          <div className="min-w-0">
+            <ArticleInteractions title={post.title} end />
             <PostCopyright title={post.title} permalink={permalink} />
-            <RelatedPosts posts={related} />
             <CommentSection />
+            <RelatedPosts posts={related} />
           </div>
         </div>
 

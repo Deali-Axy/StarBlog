@@ -6,8 +6,11 @@ export function useArticleActions() {
   return {
     share: async (title: string) => {
       try {
-        if(navigator.share) await navigator.share({ title, url: window.location.href })
-        else { await navigator.clipboard.writeText(window.location.href); toast.success(t.linkCopied) }
+        const url = new URL(window.location.href)
+        url.hash = ""
+        url.searchParams.delete("bv")
+        if(navigator.share) await navigator.share({ title, url: url.href })
+        else { await navigator.clipboard.writeText(url.href); toast.success(t.linkCopied) }
       } catch(error) { if(!(error instanceof DOMException && error.name === "AbortError")) toast.error(t.shareFailed) }
     }
   }

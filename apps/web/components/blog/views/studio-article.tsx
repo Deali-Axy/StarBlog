@@ -7,8 +7,8 @@ import { formatDate } from "@/lib/format"
 import { languageName } from "@/lib/i18n"
 import { postHref, routes } from "@/lib/routes"
 import { getSite } from "@/lib/site"
-import { ArrowLeft, ArrowUpRight, Clock3, FileText, Share2 } from "lucide-react"
-import { useArticleActions } from "../article-actions"
+import { ArrowLeft, ArrowUpRight, Clock3, FileText } from "lucide-react"
+import { ArticleInteractions } from "../article-interactions"
 import type { ArticleLayoutProps } from "../article-props"
 import { ArchiveDesktopTOC } from "./studio-desktop-toc"
 import { ArchiveMobileTOC } from "./studio-mobile-toc"
@@ -16,7 +16,6 @@ const articleStickyClassName = "sticky top-[calc(var(--blog-header-height)+1.5re
 export function ArchiveArticle({ post, headings, children, minutes, related = [], permalink, translations = [], lang, translationMissing = false }: ArticleLayoutProps) {
   const { locale, t } = useI18n()
   const site = getSite(locale)
-  const { share } = useArticleActions()
   return <div className={"px-4 sm:px-6"}>
     <div data-blog-article-detail data-article-layout="studio" className={"mx-auto w-full pb-12 max-w-blog-studio sm:pb-12"}>
       <article lang={lang ?? "zh-CN"} className={"grid grid-cols-1 lg:grid-cols-12 lg:gap-x-6"}>
@@ -34,7 +33,6 @@ export function ArchiveArticle({ post, headings, children, minutes, related = []
             <span className="text-foreground">{site.authorName}</span><span className={"hidden sm:inline"} aria-hidden="true">/</span>
             <time dateTime={post.creationTime}>{formatDate(post.creationTime, "YYYY.MM.DD")}</time>
             <span className="inline-flex items-center gap-2"><Clock3 className="size-3.5 shrink-0" aria-hidden="true" />{t.readingTime(minutes)}</span>
-            <button type="button" className={"ml-auto inline-flex cursor-pointer items-center gap-2 py-2 text-foreground hover:text-primary"} onClick={() => void share(post.title)}><Share2 className="size-3.5 shrink-0" aria-hidden="true" />{t.share}</button>
           </div>
           {translations.length > 0 ? <nav aria-label={t.articleLanguage} className={"mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs"}>
             <span className="text-muted-foreground">{t.articleLanguage}</span>
@@ -43,20 +41,22 @@ export function ArchiveArticle({ post, headings, children, minutes, related = []
           </nav> : null}
           {translationMissing ? <p className="mt-4 text-sm text-muted-foreground">{t.translationMissing}</p> : null}
         </header>
-        {headings.length > 0 ? <aside className={"hidden min-w-0 lg:block lg:col-span-3 lg:col-start-1 lg:row-start-2 lg:row-span-2 xl:col-span-2"}><div className={articleStickyClassName}><ArchiveDesktopTOC /></div></aside> : null}
+        <aside className={"hidden min-w-0 lg:block lg:col-span-3 lg:col-start-1 lg:row-start-2 lg:row-span-2 xl:col-span-2"}><div className={articleStickyClassName}>{headings.length > 0 ? <ArchiveDesktopTOC /> : null}<ArticleInteractions title={post.title} className="mt-4 xl:hidden" /></div></aside>
         {headings.length > 0 ? <ArchiveMobileTOC /> : null}
         <div className={"col-span-full row-start-4 min-w-0 wrap-anywhere lg:row-start-3 border border-t-0 border-border bg-card px-5 pt-7 pb-7 sm:px-8 sm:pb-8 xl:col-span-8 xl:col-start-3 xl:px-10 xl:pt-3 xl:pb-10 lg:col-span-9 lg:col-start-4"}>
           <div data-article-body className={"min-w-0 text-sm sm:text-sm lg:border-t lg:border-border lg:pt-8 [&_:is(h1,h2,h3)]:font-sans"}>{children}</div>
           <div className={"mt-12 text-center font-mono text-xs tracking-widest text-muted-foreground"} aria-hidden="true">— END OF DOCUMENT —</div>
-          <div className="min-w-0 [&>section:first-child]:mt-8">
+          <div className="min-w-0">
+            <ArticleInteractions title={post.title} end />
             <PostCopyright title={post.title} permalink={permalink} />
-            <RelatedPosts posts={related} />
             <CommentSection />
+            <RelatedPosts posts={related} />
           </div>
         </div>
         <aside className={"hidden min-w-0 text-xs text-muted-foreground xl:col-span-2 xl:col-start-11 xl:row-start-2 xl:row-span-2 xl:block"} aria-label={t.articleDetails}>
           <div className={articleStickyClassName}>
             <div className="flex items-center gap-2 border-b border-border py-4 text-xs text-foreground"><FileText className="size-3.5 shrink-0" aria-hidden="true" />{t.articleDetails}</div>
+            <ArticleInteractions title={post.title} className="mt-4" />
             <dl className="flex flex-col gap-6 pt-6">
               <div><dt className="mb-2">{t.author.replace(/[:：]\s*$/, "")}</dt><dd className="wrap-anywhere leading-relaxed text-foreground">{site.authorName}</dd></div>
               <div><dt className="mb-2">{t.created}</dt><dd className="wrap-anywhere leading-relaxed text-foreground"><time dateTime={post.creationTime}>{formatDate(post.creationTime)}</time></dd></div>

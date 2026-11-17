@@ -3,6 +3,7 @@ import type { BlogVariant } from "@/lib/blog-variant"
 import type { ComponentType } from "react"
 import type { ArticleLayoutProps } from "./article-props"
 import { ArticleImageViewer } from "./article-image-viewer"
+import { ArticleMobileActions } from "./article-interactions"
 import { ArticleReadingProvider } from "./article-reading"
 import { useBlogLayout } from "./blog-layout-context"
 import { CommentSessionProvider } from "./comment-section"
@@ -13,5 +14,5 @@ const articles = { library: IndexArticle, editorial: FolioArticle, studio: Archi
 export function BlogPostRenderer(props: ArticleLayoutProps) {
   const { variant } = useBlogLayout()
   const Article = articles[variant]
-  return <CommentSessionProvider key={props.post.id} postId={props.post.id}><ArticleReadingProvider items={props.headings} layoutKey={variant}><Article {...props}><ArticleImageViewer key={`${props.post.id}:${props.lang ?? "original"}`}>{props.children}</ArticleImageViewer></Article></ArticleReadingProvider></CommentSessionProvider>
+  return <CommentSessionProvider key={props.post.id} postId={props.post.id}><ArticleReadingProvider items={props.headings} layoutKey={variant}><Article {...props}><ArticleImageViewer key={`${props.post.id}:${props.lang ?? "original"}`}>{props.children}</ArticleImageViewer></Article><ArticleMobileActions title={props.post.title} /></ArticleReadingProvider></CommentSessionProvider>
 }
