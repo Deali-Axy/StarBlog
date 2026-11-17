@@ -48,8 +48,9 @@ export function FolioArticle({ post, headings, children, minutes, related = [], 
           <div data-article-body className={"min-w-0 sm:text-base text-base [&_:is(h1,h2,h3)]:font-heading [&_h2]:text-2xl [&_blockquote]:border-l [&_blockquote]:ps-5"}>{children}</div>
           <div className={"mt-12 text-primary text-2xl"} aria-hidden="true">✳</div>
           <div className="min-w-0">
-            <ArticleInteractions title={post.title} end />
-            <PostCopyright title={post.title} permalink={permalink} />
+            <PostCopyright title={post.title} permalink={permalink} appearance="editorial">
+              <ArticleInteractions title={post.title} end />
+            </PostCopyright>
             <CommentSection />
             <RelatedPosts posts={related} />
           </div>

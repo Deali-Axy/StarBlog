@@ -47,8 +47,9 @@ export function IndexArticle({ post, headings, children, minutes, related = [], 
           <div data-article-body className={"min-w-0 text-sm sm:text-base [&_h2]:border-b [&_h2]:border-border [&_h2]:pb-2"}>{children}</div>
           <div className={"mt-12 text-lg text-primary"} aria-hidden="true">■</div>
           <div className="min-w-0">
-            <ArticleInteractions title={post.title} end />
-            <PostCopyright title={post.title} permalink={permalink} />
+            <PostCopyright title={post.title} permalink={permalink} appearance="library">
+              <ArticleInteractions title={post.title} end />
+            </PostCopyright>
             <CommentSection />
             <RelatedPosts posts={related} />
           </div>

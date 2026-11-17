@@ -47,8 +47,9 @@ export function ArchiveArticle({ post, headings, children, minutes, related = []
           <div data-article-body className={"min-w-0 text-sm sm:text-sm lg:border-t lg:border-border lg:pt-8 [&_:is(h1,h2,h3)]:font-sans"}>{children}</div>
           <div className={"mt-12 text-center font-mono text-xs tracking-widest text-muted-foreground"} aria-hidden="true">— END OF DOCUMENT —</div>
           <div className="min-w-0">
-            <ArticleInteractions title={post.title} end />
-            <PostCopyright title={post.title} permalink={permalink} />
+            <PostCopyright title={post.title} permalink={permalink} appearance="studio">
+              <ArticleInteractions title={post.title} end />
+            </PostCopyright>
             <CommentSection />
             <RelatedPosts posts={related} />
           </div>
