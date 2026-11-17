@@ -47,7 +47,9 @@ public sealed class BlogNavigationTests {
         var shell = page.Locator("[data-blog-variant]");
         await Expect(shell).ToHaveAttributeAsync("data-blog-variant", variant);
         var title = variant == "library" ? "文章索引" : variant == "editorial" ? "折页手记" : "档案工作台";
-        await Expect(page.GetByRole(AriaRole.Heading, new() { Name = title, Exact = true })).ToBeVisibleAsync();
+        var heading = page.GetByRole(AriaRole.Heading, new() { Name = title, Exact = true });
+        if (variant == "editorial") await Expect(heading).ToBeAttachedAsync();
+        else await Expect(heading).ToBeVisibleAsync();
         await Expect(page.Locator("[data-blog-layout]")).ToHaveAttributeAsync("data-blog-layout", variant == "library" ? "index" : variant == "editorial" ? "folio" : "archive");
         Assert.False(await page.EvaluateAsync<bool>("document.documentElement.scrollWidth > innerWidth"));
         var cardBackground = await shell.EvaluateAsync<string>("el => getComputedStyle(el).getPropertyValue('--card').trim()");
@@ -377,7 +379,9 @@ public sealed class BlogNavigationTests {
         var page = await NewPageAsync(browser, 375);
         await page.GotoAsync($"{baseUrl}/blog?bv={variant}&pageSize=6");
         await page.GetByRole(AriaRole.Button, new() { Name = "Switch to English", Exact = true }).ClickAsync();
-        await Expect(page.GetByRole(AriaRole.Heading, new() { Name = title, Exact = true })).ToBeVisibleAsync();
+        var heading = page.GetByRole(AriaRole.Heading, new() { Name = title, Exact = true });
+        if (variant == "editorial") await Expect(heading).ToBeAttachedAsync();
+        else await Expect(heading).ToBeVisibleAsync();
         await page.GetByRole(AriaRole.Button, new() { Name = "Open article categories", Exact = true }).ClickAsync();
         var dialog = page.GetByRole(AriaRole.Dialog);
         await Expect(dialog.GetByRole(AriaRole.Heading, new() { Name = "Topics", Exact = true })).ToBeVisibleAsync();

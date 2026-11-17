@@ -20,6 +20,8 @@ const { resolveBlogVariant, BLOG_VARIANT, isBlogPath, blogStyleHref } = await im
 const { categoryPath, filterCategories } = await import(await moduleUrl("blog-categories"))
 
 test("preview can be fixed to the configured style, regardless of URL override", () => {
+  assert.equal(BLOG_VARIANT, "editorial")
+  assert.equal(resolveBlogVariant(), "editorial")
   assert.equal(resolveBlogVariant("studio"), "studio")
   assert.equal(resolveBlogVariant("invalid"), BLOG_VARIANT)
   assert.equal(resolveBlogVariant("editorial", false), BLOG_VARIANT)

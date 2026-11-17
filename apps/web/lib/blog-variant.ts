@@ -1,7 +1,7 @@
 /** Blog layout preview. Choose a default and disable PREVIEW after evaluation. */
 export type BlogVariant = "library" | "editorial" | "studio"
 
-export const BLOG_VARIANT: BlogVariant = "library"
+export const BLOG_VARIANT: BlogVariant = "editorial"
 export const BLOG_PREVIEW = true
 
 export const BLOG_VARIANT_OPTIONS: { id: BlogVariant; labelZh: string; labelEn: string }[] = [
