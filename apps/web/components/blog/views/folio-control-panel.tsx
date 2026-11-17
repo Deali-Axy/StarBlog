@@ -12,8 +12,8 @@ export function FolioControlPanel() {
   const { searchDraft, setSearchDraft } = useBlogInteractions()
   const { t } = useI18n()
   const { query, href, navigate } = useBlogNavigation()
-  return <div className={"flex items-center gap-5 py-4 [&&]:[border-bottom:1px_solid_var(--foreground)] max-[39.9375rem]:flex-wrap max-[39.9375rem]:gap-1 max-[39.9375rem]:py-2.5"}>
-    <form action={routes.blog} method="get" className={"flex items-center gap-2 min-w-0 [flex:1] max-[39.9375rem]:[flex-basis:100%] max-[39.9375rem]:[border-bottom:1px_solid_var(--border)]"} onSubmit={(event) => {
+  return <div className={"flex items-center gap-5 pb-3 max-sm:flex-wrap max-sm:gap-3"}>
+    <form action={routes.blog} method="get" className={"flex min-w-0 flex-1 items-center gap-2 rounded-xl bg-card px-4 py-1 transition-shadow focus-within:ring-1 focus-within:ring-ring max-sm:basis-full"} onSubmit={(event) => {
       event.preventDefault()
       navigate({ search: String(new FormData(event.currentTarget).get("search") ?? "").trim() || undefined })
     }}>
@@ -36,7 +36,7 @@ export function FolioControlPanel() {
       <BlogLink href={href({ sortType: query.sortType === "desc" ? "asc" : "desc" })} aria-label={query.sortType === "desc" ? t.ascending : t.descending} title={query.sortType === "desc" ? t.ascending : t.descending} className={"flex w-9 h-9 items-center justify-center"}>
         {query.sortType === "desc" ? <ArrowDown className="size-4" /> : <ArrowUp className="size-4" />}
       </BlogLink>
-      <div role="group" aria-label={t.articleView} className={"flex gap-0.5 [border-left:1px_solid_var(--border)] pl-2 [&_a]:flex [&_a]:w-8.5 [&_a]:h-8.5 [&_a]:items-center [&_a]:justify-center [&_a]:text-muted-foreground [&_a[aria-current=true]]:bg-accent [&_a[aria-current=true]]:text-foreground"}>
+      <div role="group" aria-label={t.articleView} className={"flex gap-0.5 rounded-lg bg-muted/60 p-1 [&_a]:flex [&_a]:w-8.5 [&_a]:h-8.5 [&_a]:rounded-md [&_a]:items-center [&_a]:justify-center [&_a]:text-muted-foreground [&_a[aria-current=true]]:bg-accent [&_a[aria-current=true]]:text-foreground"}>
         {[{ value: "grid", label: t.expandedView, Icon: AlignLeft }, { value: "list", label: t.compactView, Icon: List }].map(({ value, label, Icon }) => <BlogLink key={value} href={href({ view: value as BlogQuery["view"] })} aria-label={label} aria-current={query.view === value ? "true" : undefined} title={value === "grid" ? t.expandedView : t.compactView}><Icon className="size-4" /></BlogLink>)}
       </div>
     </div>

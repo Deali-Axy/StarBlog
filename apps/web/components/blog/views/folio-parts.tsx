@@ -37,7 +37,7 @@ export function BlogDirectory({ categories, treeState, title, }: Pick<BlogDesign
   const [open, setOpen] = useState(false)
   return <Dialog open={open} onOpenChange={setOpen}>
     <DialogTrigger asChild>
-      <button type="button" aria-label={t.openCategories} className={"inline-flex items-center justify-between gap-4 min-h-11 max-w-full [padding:10px_16px] [border:1px_solid_var(--foreground)] text-xs cursor-pointer [&_span]:overflow-hidden [&_span]:text-ellipsis [&_span]:whitespace-nowrap [&&]:[border-color:var(--highlight)] [&&]:text-highlight [&&]:min-w-[180px] max-[39.9375rem]:[&&]:min-w-0 max-[39.9375rem]:[&&]:[padding:8px_12px]"}>
+      <button type="button" aria-label={t.openCategories} className="inline-flex min-h-10 max-w-full items-center justify-between gap-3 rounded-lg px-3 py-2 text-xs text-highlight transition-colors hover:bg-muted cursor-pointer [&_span]:truncate max-sm:text-[11px]">
         <span>{t.topicDirectory} / {title}</span><ArrowDownRight className="size-4 shrink-0" />
       </button>
     </DialogTrigger>
@@ -61,7 +61,7 @@ export function BlogFilters({ title }: {
   const { query, href } = useBlogNavigation()
   if(!query.categoryId && !query.search)
     return null
-  return <div className={"flex flex-wrap gap-2 py-2.5 text-[.6875rem] [&_a]:inline-flex [&_a]:items-center [&_a]:gap-2 [&_a]:max-w-full [&_a]:[padding:4px_8px] [&_a]:border [&_a]:border-border [&_a_span]:overflow-hidden [&_a_span]:text-ellipsis [&_a_span]:whitespace-nowrap"}>
+  return <div className={"flex flex-wrap gap-2 py-2.5 text-[.6875rem] [&_a]:inline-flex [&_a]:items-center [&_a]:gap-2 [&_a]:max-w-full [&_a]:[padding:4px_8px] [&_a]:rounded-md [&_a]:bg-muted [&_a_span]:overflow-hidden [&_a_span]:text-ellipsis [&_a_span]:whitespace-nowrap"}>
     {query.categoryId ? <BlogLink href={href({ categoryId: undefined })} aria-label={`${t.removeCategory}: ${title}`}><span>{title}</span><X className="size-3 shrink-0" /></BlogLink> : null}
     {query.search ? <BlogLink href={href({ search: undefined })} aria-label={`${t.removeSearch}: ${query.search}`}><span>“{query.search}”</span><X className="size-3 shrink-0" /></BlogLink> : null}
     <BlogLink href={href({ search: undefined, categoryId: undefined, page: 1 })}>{t.clearFilters}</BlogLink>
@@ -79,7 +79,7 @@ export function BlogResults({ posts, children }: {
     <div role="status" aria-live="polite" className={"min-h-5 text-[.6875rem] text-primary"}>{pending ? t.loadingPosts : <span className="sr-only">{t.postCount(posts.totalCount)}</span>}</div>
     <section aria-label={t.posts} aria-busy={pending} className={"[transition:opacity_.15s] [&[aria-busy=true]]:[opacity:.5]"}>
       <div className={""}>
-        {posts.items.length ? children : <div className={"flex min-h-[320px] flex-col items-center justify-center gap-4 text-center p-8 [border-block:1px_solid_var(--border)] [&_h2]:text-xl [&_p]:text-[.8125rem] [&_p]:text-muted-foreground [&_a]:[border-bottom:1px_solid_currentColor] [&_a]:pb-1"}>
+        {posts.items.length ? children : <div className={"flex min-h-[320px] flex-col items-center justify-center gap-4 text-center p-8 rounded-2xl bg-card [&_h2]:text-xl [&_p]:text-[.8125rem] [&_p]:text-muted-foreground [&_a]:[border-bottom:1px_solid_currentColor] [&_a]:pb-1"}>
           <span aria-hidden="true" className="font-mono text-4xl text-muted-foreground">∅</span>
           <h2>{unavailable ? t.pageUnavailable : filtered ? t.noMatchingPosts : t.noPosts}</h2>
           {!filtered && !unavailable ? <p>{t.noPublishedPosts}</p> : null}

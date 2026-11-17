@@ -22,7 +22,7 @@ export function FolioFooterWordmark() {
 export function FolioSiteNav() {
   const { t } = useI18n()
   const links = useBlogSiteLinks()
-  return <nav aria-label={t.siteNavigation} className={"flex items-center justify-center gap-12 min-h-11 [border-top:1px_solid_var(--border)] [border-bottom:1px_solid_var(--foreground)] [&_a]:relative [&_a]:py-3 [&_a]:text-xs [&_a[aria-current=page]::after]:[content:''] [&_a[aria-current=page]::after]:absolute [&_a[aria-current=page]::after]:bottom-1 [&_a[aria-current=page]::after]:left-[50%] [&_a[aria-current=page]::after]:w-[3px] [&_a[aria-current=page]::after]:h-[3px] [&_a[aria-current=page]::after]:rounded-[50%] [&_a[aria-current=page]::after]:bg-primary [&_a:hover]:text-primary max-[39.9375rem]:gap-6 max-[39.9375rem]:min-h-11 max-[39.9375rem]:justify-between max-[39.9375rem]:[&_a]:text-[.6875rem]"}>
+  return <nav aria-label={t.siteNavigation} className={"flex items-center justify-center gap-12 min-h-11 [&_a]:relative [&_a]:py-3 [&_a]:text-xs [&_a[aria-current=page]::after]:[content:''] [&_a[aria-current=page]::after]:absolute [&_a[aria-current=page]::after]:bottom-1 [&_a[aria-current=page]::after]:left-[50%] [&_a[aria-current=page]::after]:w-[3px] [&_a[aria-current=page]::after]:h-[3px] [&_a[aria-current=page]::after]:rounded-[50%] [&_a[aria-current=page]::after]:bg-primary [&_a:hover]:text-primary max-[39.9375rem]:gap-6 max-[39.9375rem]:min-h-11 max-[39.9375rem]:justify-between max-[39.9375rem]:[&_a]:text-[.6875rem]"}>
     {links.map(({ href, label }) => <BlogStyleLink key={href} href={href} aria-current={href === routes.blog ? "page" : undefined}>
       <span>{label}</span>
     </BlogStyleLink>)}
