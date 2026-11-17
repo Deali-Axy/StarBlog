@@ -2,14 +2,19 @@
 
 首次迁移记录保留在 [2026-11-03 上线记录](deployment-2026-11-03.md)。首次迁移安装器、发布包构建与本地数据上传脚本已移除，后续更新不会重新导入旧站或本地数据库。
 
-最新成功发布：2026-11-04 的 `v2026.11.04.2`，整站 SEO 已上线，镜像摘要、备份与公网验收结果见 [发布记录](deployment-2026-11-04-seo.md)。上一版本记录保留在 [首次镜像更新](deployment-2026-11-04.md)。
+最近归档的成功发布：2026-11-04 的 `v2026.11.04.3`，默认跟随系统主题已上线，镜像摘要、备份与公网验收结果见 [发布记录](deployment-2026-11-04-theme.md)。此前记录保留在 [SEO 发布](deployment-2026-11-04-seo.md) 和 [首次镜像更新](deployment-2026-11-04.md)。
+
+上面的版本来自历史发布记录；生产当前版本以服务器 `active-release.json` 为准，补译等数据变更也不会自动产生新的镜像版本。
 
 ## 发布
 
+先按实际发布日期及序号设置新的版本号；下例仅展示格式，不表示该版本已发布，也不要直接复用示例编号。
+
 ```sh
-python3 deploy/ship-local.py plan -v v2026.11.04.2
-python3 deploy/ship-local.py doctor -v v2026.11.04.2
-python3 deploy/ship-local.py run -v v2026.11.04.2 -y
+release_version=v2026.11.17.1
+python3 deploy/ship-local.py plan -v "$release_version"
+python3 deploy/ship-local.py doctor -v "$release_version"
+python3 deploy/ship-local.py run -v "$release_version" -y
 ```
 
 在提交代码且工作区干净后发布，每次选择新的版本。当前 `version.source=env` 使用该提交的工作目录，ship manifest 记录源码 commit；不要用旧版本名覆盖镜像。构建依赖本地已安装的 .NET、Node、前后台依赖以及 Docker。`deploy/build.env` 只含公开构建参数。
