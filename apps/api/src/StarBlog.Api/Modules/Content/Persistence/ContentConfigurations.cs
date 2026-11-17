@@ -27,6 +27,8 @@ public sealed class PostConfiguration : IEntityTypeConfiguration<Post> {
         builder.Property(post => post.Slug).HasMaxLength(150);
         builder.Property(post => post.Status).HasMaxLength(64);
         builder.Property(post => post.Content);
+        builder.Property(post => post.CoverUrl).HasMaxLength(2048);
+        builder.Property(post => post.CoverFit).HasMaxLength(16).HasDefaultValue("contain");
         builder.Property(post => post.Path).HasMaxLength(512);
         builder.Property(post => post.Categories).HasMaxLength(256);
         builder.HasIndex(post => post.Slug).IsUnique().HasFilter("slug IS NOT NULL");

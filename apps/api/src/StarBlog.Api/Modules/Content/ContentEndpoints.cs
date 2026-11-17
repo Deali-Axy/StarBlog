@@ -18,6 +18,7 @@ public static class ContentEndpoints {
         posts.MapGet("/{id}", GetPost).AllowAnonymous();
         posts.MapPost("/", CreatePost).RequireAuthorization();
         posts.MapPut("/{id}", UpdatePost).RequireAuthorization();
+        posts.MapPut("/{id}/cover", SetCover).RequireAuthorization();
         posts.MapDelete("/{id}", DeletePost).RequireAuthorization();
         posts.MapPost("/imports", ImportMarkdown).RequireAuthorization().DisableAntiforgery();
         posts.MapPost("/{id}/images", UploadImage).RequireAuthorization().DisableAntiforgery();
@@ -157,6 +158,12 @@ public static class ContentEndpoints {
     private static async Task<IResult> DeletePost(string id, ContentOperations operations, CancellationToken cancellationToken) {
         var deleted = await operations.DeletePostAsync(id, cancellationToken);
         return deleted ? Results.NoContent() : HttpErrors.NotFound($"文章 {id} 不存在");
+    }
+
+    private static async Task<IResult> SetCover(string id, [FromBody] PostCoverRequest request, ContentOperations operations, CancellationToken cancellationToken) {
+        var (post, error) = await operations.SetCoverAsync(id, request, cancellationToken);
+        if (error != null) return HttpErrors.BadRequest(error);
+        return post == null ? HttpErrors.NotFound($"文章 {id} 不存在") : Results.Ok(post);
     }
 
     private static async Task<IResult> UploadImage(string id, HttpRequest request, ContentOperations operations, CancellationToken cancellationToken) {

@@ -339,6 +339,23 @@ namespace StarBlog.Api.Infrastructure.Persistence.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("content");
 
+                    b.Property<string>("CoverFit")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(16)
+                        .HasColumnType("TEXT")
+                        .HasDefaultValue("contain")
+                        .HasColumnName("cover_fit");
+
+                    b.Property<bool>("CoverHidden")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("cover_hidden");
+
+                    b.Property<string>("CoverUrl")
+                        .HasMaxLength(2048)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("cover_url");
+
                     b.Property<DateTime>("CreationTime")
                         .HasColumnType("TEXT")
                         .HasColumnName("creation_time");

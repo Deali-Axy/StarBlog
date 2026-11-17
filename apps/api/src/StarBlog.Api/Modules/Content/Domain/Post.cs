@@ -11,6 +11,9 @@ public sealed class Post {
     public bool IsPublish { get; set; }
     public string? Summary { get; set; }
     public string? Content { get; set; }
+    public string? CoverUrl { get; set; }
+    public bool CoverHidden { get; set; }
+    public string CoverFit { get; set; } = "contain";
     public string? Path { get; set; }
     public DateTime CreationTime { get; set; }
     public DateTime LastUpdateTime { get; set; }

@@ -59,6 +59,11 @@ public sealed class PostResponse {
     public bool IsPublish { get; init; }
     public string? Summary { get; init; }
     public string? Content { get; init; }
+    public string? CoverUrl { get; init; }
+    public bool CoverHidden { get; init; }
+    public string CoverFit { get; init; } = "contain";
+    public IReadOnlyList<ArticleImage> CoverImages { get; init; } = [];
+    public IReadOnlyList<ArticleImage>? ImageCandidates { get; init; }
     public string? Path { get; init; }
     public DateTime CreationTime { get; init; }
     public DateTime LastUpdateTime { get; init; }
@@ -84,6 +89,11 @@ public sealed class PostResponse {
             IsPublish = post.IsPublish,
             Summary = translation == null ? post.Summary : translation.Summary,
             Content = includeContent ? body : null,
+            CoverUrl = post.CoverUrl,
+            CoverHidden = post.CoverHidden,
+            CoverFit = post.CoverFit,
+            CoverImages = ArticleImages.Candidates(post, body),
+            ImageCandidates = includeContent ? ArticleImages.BodyCandidates(post, body) : null,
             Path = post.Path,
             CreationTime = post.CreationTime,
             LastUpdateTime = post.LastUpdateTime,
@@ -216,4 +226,12 @@ public sealed class MarkdownImportResult {
     public int PostsImported { get; init; }
     public int CategoriesCreated { get; init; }
     public IReadOnlyList<string> PostIds { get; init; } = [];
+}
+
+/// <summary>Change only illustration settings; never overwrite the article body.</summary>
+public sealed class PostCoverRequest {
+    [StringLength(2048)]
+    public string? Url { get; init; }
+    public bool Hidden { get; init; }
+    public string Fit { get; init; } = "contain";
 }

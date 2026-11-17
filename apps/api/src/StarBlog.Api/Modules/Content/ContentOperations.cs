@@ -4,6 +4,7 @@ using StarBlog.Api.Infrastructure.Storage;
 using StarBlog.Api.Infrastructure.Time;
 using StarBlog.Api.Modules.Configuration;
 using StarBlog.Api.Modules.Content.Domain;
+using StarBlog.Api.Modules.Content.Markdown;
 using StarBlog.Api.Shared;
 
 namespace StarBlog.Api.Modules.Content;
@@ -138,6 +139,21 @@ public sealed class ContentOperations : IPublishedContentQueries {
         _db.Posts.Remove(post);
         await _db.SaveChangesAsync(cancellationToken);
         return true;
+    }
+
+    /// <summary>更新配图设置，不修改正文及文章排序时间。</summary>
+    public async Task<(PostResponse? Post, string? Error)> SetCoverAsync(string id, PostCoverRequest request, CancellationToken cancellationToken) {
+        if (request.Fit is not ("cover" or "contain")) return (null, "图片显示方式必须为 cover 或 contain");
+        if (request.Url?.Length > 2048) return (null, "图片地址不能超过 2048 个字符");
+        var url = string.IsNullOrWhiteSpace(request.Url) ? null : ArticleImages.ResolveUrl(request.Url, id);
+        if (!string.IsNullOrWhiteSpace(request.Url) && url == null) return (null, "图片地址必须是有效的 HTTP(S) 地址或站内图片路径");
+        var post = await _db.Posts.Include(item => item.Category).FirstOrDefaultAsync(item => item.Id == id, cancellationToken);
+        if (post == null) return (null, null);
+        post.CoverUrl = url;
+        post.CoverHidden = request.Hidden;
+        post.CoverFit = request.Fit;
+        await _db.SaveChangesAsync(cancellationToken);
+        return (PostResponse.From(post, includeContent: false), null);
     }
 
     /// <summary>将文章图片保存到 media/blog/{postId}/ 并返回绝对 URL。</summary>
