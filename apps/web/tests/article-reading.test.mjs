@@ -38,6 +38,25 @@ test("legacy article and translation images resolve within the original post med
   assert.match(renderToStaticMarkup(result.content), /src="\/media\/blog\/abc\/image.jpg"/)
 })
 
+test("article images have keyboard-accessible preview links and retain original media URLs", () => {
+  const result = renderArticleMarkdown('![图片说明](./文章.assets/image.png "图片标题")\n\n![](/media/second.png)', "post-id")
+  const html = renderToStaticMarkup(result.content)
+  assert.match(html, /<a[^>]*href="\/media\/blog\/post-id\/%E6%96%87%E7%AB%A0.assets\/image.png"[^>]*data-article-image=""/)
+  assert.match(html, /<a[^>]*href="\/media\/second.png"[^>]*data-article-image=""/)
+  assert.match(html, /alt="图片说明" title="图片标题"/)
+  assert.match(html, /aria-label="图片说明"/)
+  assert.equal((html.match(/data-article-image=""/g) ?? []).length, 2)
+  assert.match(html, /loading="lazy"/)
+})
+
+test("linked images keep their existing destinations and unsafe preview URLs remain inert", () => {
+  const { html } = render('[![Linked image](/media/image.jpg)](https://example.com/destination)\n\n![Unsafe](javascript:alert%281%29)')
+  assert.match(html, /href="https:\/\/example.com\/destination"/)
+  assert.doesNotMatch(html, /<a[^>]*>\s*<a/)
+  assert.equal((html.match(/data-article-image=""/g) ?? []).length, 1)
+  assert.doesNotMatch(html, /(?:href|src)="javascript:/)
+})
+
 test("TOC targets equal rendered IDs for Chinese, punctuation, duplicates, inline code and all heading levels", () => {
   const { headings, html } = render([
     "# 开始阅读", "## C# 与 .NET：实战！", "### 使用 `await` 与 **异步** [链接](https://example.com)",

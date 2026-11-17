@@ -22,6 +22,23 @@ interface MarkdownNode {
   children?: MarkdownNode[]
 }
 
+/** Give unlinked images a native original-image fallback, without nesting links. */
+export function rehypeArticleImages({ postId }: { postId?: string }) {
+  return (tree: MarkdownNode) => {
+    function visit(node: MarkdownNode, linked = false) {
+      node.children = node.children?.map(child => {
+        if (child.tagName === "img" && !linked && node.tagName !== "a") {
+          const src = articleImageUrl(String(child.properties?.src ?? ""), postId)
+          return { type: "element", tagName: "a", properties: { href: src, ariaLabel: String(child.properties?.alt || child.properties?.title || src), dataArticleImage: "" }, children: [child] }
+        }
+        visit(child, linked || node.tagName === "a")
+        return child
+      })
+    }
+    visit(tree)
+  }
+}
+
 function headingText(node: MarkdownNode): string {
   if (node.type === "text") return node.value ?? ""
   if (node.tagName === "img") return String(node.properties?.alt ?? "")
