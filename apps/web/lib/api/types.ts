@@ -22,6 +22,10 @@ export interface PostResponse {
   isPublish: boolean
   summary?: string | null
   content?: string | null
+  coverUrl?: string | null
+  coverHidden?: boolean
+  coverFit?: "contain" | "cover"
+  coverImages?: { url: string; alt: string }[]
   path?: string | null
   creationTime: string
   lastUpdateTime: string

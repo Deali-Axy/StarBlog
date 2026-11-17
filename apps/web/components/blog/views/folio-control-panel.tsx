@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils"
 import { AlignLeft, ArrowDown, ArrowRight, ArrowUp, List, Search } from "lucide-react"
 import { useBlogInteractions } from "../blog-interactions"
 export function FolioControlPanel() {
-  const { searchDraft, setSearchDraft } = useBlogInteractions()
+  const { searchDraft, setSearchDraft, coverMode, setCoverMode } = useBlogInteractions()
   const { t } = useI18n()
   const { query, href, navigate } = useBlogNavigation()
   return <div className={"flex items-center gap-5 pb-3 max-sm:flex-wrap max-sm:gap-3"}>
@@ -24,7 +24,7 @@ export function FolioControlPanel() {
       </div>
       <button type="submit" aria-label={t.search} title={t.search} className={"flex items-center justify-center w-10 h-10 shrink-0 cursor-pointer"}><ArrowRight className="size-5" /></button>
     </form>
-    <div className={"flex items-center gap-2 max-[39.9375rem]:w-full max-[39.9375rem]:justify-end max-[39.9375rem]:[&_>_:first-child]:mr-auto"}>
+    <div className={"flex flex-wrap items-center gap-2 max-[39.9375rem]:w-full max-[39.9375rem]:justify-end max-[39.9375rem]:[&_>_:first-child]:mr-auto"}>
       <Select value={query.sortBy} onValueChange={(sortBy) => navigate({ sortBy: sortBy as BlogQuery["sortBy"] })}>
         <SelectTrigger aria-label={t.sort} className={"min-w-29 h-9 border-0 rounded-none [background:transparent] [box-shadow:none] text-[.6875rem]"}><SelectValue /></SelectTrigger>
         <SelectContent position="popper" className={cn(blogThemeClassName("editorial"), "bg-card")}>
@@ -36,6 +36,9 @@ export function FolioControlPanel() {
       <BlogLink href={href({ sortType: query.sortType === "desc" ? "asc" : "desc" })} aria-label={query.sortType === "desc" ? t.ascending : t.descending} title={query.sortType === "desc" ? t.ascending : t.descending} className={"flex w-9 h-9 items-center justify-center"}>
         {query.sortType === "desc" ? <ArrowDown className="size-4" /> : <ArrowUp className="size-4" />}
       </BlogLink>
+      {query.view === "grid" ? <div role="group" aria-label={t.coverDisplay} className="flex shrink-0 gap-0.5 rounded-lg bg-muted/60 p-1">
+        {([{ value: "single", label: t.coverSingle }, { value: "collage", label: t.coverCollage }] as const).map(({ value, label }) => <button key={value} type="button" aria-pressed={coverMode === value} title={value === "collage" ? t.coverCollageHint : label} onClick={() => setCoverMode(value)} className="min-h-8.5 cursor-pointer rounded-md px-2 text-[11px] text-muted-foreground transition-colors hover:text-foreground aria-pressed:bg-accent aria-pressed:text-foreground">{label}</button>)}
+      </div> : null}
       <div role="group" aria-label={t.articleView} className={"flex gap-0.5 rounded-lg bg-muted/60 p-1 [&_a]:flex [&_a]:w-8.5 [&_a]:h-8.5 [&_a]:rounded-md [&_a]:items-center [&_a]:justify-center [&_a]:text-muted-foreground [&_a[aria-current=true]]:bg-accent [&_a[aria-current=true]]:text-foreground"}>
         {[{ value: "grid", label: t.expandedView, Icon: AlignLeft }, { value: "list", label: t.compactView, Icon: List }].map(({ value, label, Icon }) => <BlogLink key={value} href={href({ view: value as BlogQuery["view"] })} aria-label={label} aria-current={query.view === value ? "true" : undefined} title={value === "grid" ? t.expandedView : t.compactView}><Icon className="size-4" /></BlogLink>)}
       </div>
