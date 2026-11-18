@@ -23,7 +23,7 @@ export function IndexFooterWordmark() {
 export function IndexSiteNav() {
   const { t } = useI18n()
   const links = useBlogSiteLinks()
-  return <nav aria-label={t.siteNavigation} className={"flex items-center justify-center [flex:1] gap-6.5 [&_a]:flex [&_a]:items-baseline [&_a]:gap-1.5 [&_a]:py-3 [&_a]:[border-bottom:2px_solid_transparent] [&_a]:text-xs [&_a]:whitespace-nowrap [&_small]:[font:8px_ui-monospace,_monospace] [&_small]:text-muted-foreground [&_a[aria-current=page]]:[border-color:var(--foreground)] [&_a[aria-current=page]_span]:bg-highlight [&_a[aria-current=page]_span]:[color:#202719] [&_a[aria-current=page]_span]:[padding:3px_6px] [&_a:hover]:[border-color:var(--border)] max-[74.9375rem]:gap-4.5 max-[63.9375rem]:hidden"}>
+  return <nav aria-label={t.siteNavigation} className={"flex items-center justify-center flex-1 gap-6.5 [&_a]:flex [&_a]:items-baseline [&_a]:gap-1.5 [&_a]:py-3 [&_a]:[border-bottom:2px_solid_transparent] [&_a]:text-xs [&_a]:whitespace-nowrap [&_small]:[font:8px_ui-monospace,_monospace] [&_small]:text-muted-foreground [&_a[aria-current=page]]:border-foreground [&_a[aria-current=page]_span]:bg-highlight [&_a[aria-current=page]_span]:text-[#202719] [&_a[aria-current=page]_span]:py-[3px] [&_a[aria-current=page]_span]:px-[6px] [&_a:hover]:border-border max-[74.9375rem]:gap-4.5 max-[63.9375rem]:hidden"}>
     {links.map(({ href, label }, index) => <BlogStyleLink key={href} href={href} aria-current={href === routes.blog ? "page" : undefined}>
       {<small aria-hidden="true">0{index + 1}</small>}<span>{label}</span>
     </BlogStyleLink>)}
@@ -32,24 +32,24 @@ export function IndexSiteNav() {
 export function IndexHeaderTools() {
   const { t } = useI18n()
   return <div className={"flex items-center gap-1 ml-auto shrink-0 max-[39.9375rem]:gap-px"}>
-    <Link href={routes.search} className={"inline-flex items-center justify-center shrink-0 min-w-9.5 w-9.5 h-9.5 border-0 rounded-none p-0 [color:inherit] [background:transparent] [box-shadow:none] cursor-pointer [letter-spacing:0] [&:hover]:bg-muted [&:hover]:text-foreground max-[39.9375rem]:min-w-8.5 max-[39.9375rem]:w-8.5 max-[39.9375rem]:h-9.5"} aria-label={t.searchPosts} title={t.searchPosts}><Search className="size-4" /></Link>
-    {<a href={routes.feed} className={"inline-flex items-center justify-center shrink-0 min-w-9.5 w-9.5 h-9.5 border-0 rounded-none p-0 [color:inherit] [background:transparent] [box-shadow:none] cursor-pointer [letter-spacing:0] [&:hover]:bg-muted [&:hover]:text-foreground max-[39.9375rem]:min-w-8.5 max-[39.9375rem]:w-8.5 max-[39.9375rem]:h-9.5 max-[39.9375rem]:hidden"} aria-label="RSS" title="RSS"><Rss className="size-4" /></a>}
-    <ThemeToggle iconOnly className={"inline-flex items-center justify-center shrink-0 min-w-9.5 w-9.5 h-9.5 border-0 rounded-none p-0 [color:inherit] [background:transparent] [box-shadow:none] cursor-pointer [letter-spacing:0] [&:hover]:bg-muted [&:hover]:text-foreground max-[39.9375rem]:min-w-8.5 max-[39.9375rem]:w-8.5 max-[39.9375rem]:h-9.5"} />
-    <LanguageToggle className={"inline-flex items-center justify-center shrink-0 min-w-13 w-auto h-9.5 border-0 rounded-none p-0 [color:inherit] [background:transparent] [box-shadow:none] cursor-pointer [letter-spacing:0] px-1 text-[.6875rem] [&:hover]:bg-muted [&:hover]:text-foreground max-[39.9375rem]:min-w-12"} />
+    <Link href={routes.search} className={"inline-flex items-center justify-center shrink-0 min-w-9.5 w-9.5 h-9.5 border-0 rounded-none p-0 text-inherit [background:transparent] [box-shadow:none] cursor-pointer tracking-[0] [&:hover]:bg-muted [&:hover]:text-foreground max-[39.9375rem]:min-w-8.5 max-[39.9375rem]:w-8.5 max-[39.9375rem]:h-9.5"} aria-label={t.searchPosts} title={t.searchPosts}><Search className="size-4" /></Link>
+    {<a href={routes.feed} className={"inline-flex items-center justify-center shrink-0 min-w-9.5 w-9.5 h-9.5 border-0 rounded-none p-0 text-inherit [background:transparent] [box-shadow:none] cursor-pointer tracking-[0] [&:hover]:bg-muted [&:hover]:text-foreground max-[39.9375rem]:min-w-8.5 max-[39.9375rem]:w-8.5 max-[39.9375rem]:h-9.5 max-[39.9375rem]:hidden"} aria-label="RSS" title="RSS"><Rss className="size-4" /></a>}
+    <ThemeToggle iconOnly className={"inline-flex items-center justify-center shrink-0 min-w-9.5 w-9.5 h-9.5 border-0 rounded-none p-0 text-inherit [background:transparent] [box-shadow:none] cursor-pointer tracking-[0] [&:hover]:bg-muted [&:hover]:text-foreground max-[39.9375rem]:min-w-8.5 max-[39.9375rem]:w-8.5 max-[39.9375rem]:h-9.5"} />
+    <LanguageToggle className={"inline-flex items-center justify-center shrink-0 min-w-13 w-auto h-9.5 border-0 rounded-none p-0 text-inherit [background:transparent] [box-shadow:none] cursor-pointer tracking-[0] px-1 text-[.6875rem] [&:hover]:bg-muted [&:hover]:text-foreground max-[39.9375rem]:min-w-12"} />
     {<IndexMobileNav />}
   </div>
 }
 export function IndexFooterNav() {
   const { t } = useI18n()
   const links = useBlogSiteLinks().filter(({ href }) => href !== routes.home)
-  return <nav aria-label={t.footerNavigation} className={"flex flex-col items-stretch gap-0 [&_a]:py-3 [&_a]:[border-bottom:1px_solid_color-mix(in_srgb,_var(--footer-foreground)_25%,_transparent)] [&_a]:text-[.8125rem] [&_a:hover]:text-highlight max-[39.9375rem]:grid max-[39.9375rem]:[grid-template-columns:1fr_1fr] max-[39.9375rem]:gap-x-6 max-[39.9375rem]:[&_a]:text-xs"}>
+  return <nav aria-label={t.footerNavigation} className={"flex flex-col items-stretch gap-0 [&_a]:py-3 [&_a]:[border-bottom:1px_solid_color-mix(in_srgb,_var(--footer-foreground)_25%,_transparent)] [&_a]:text-[.8125rem] [&_a:hover]:text-highlight max-[39.9375rem]:grid max-[39.9375rem]:grid-cols-[1fr_1fr] max-[39.9375rem]:gap-x-6 max-[39.9375rem]:[&_a]:text-xs"}>
     {links.map(({ href, label }) => <BlogStyleLink key={href} href={href}>{label}</BlogStyleLink>)}
     <Link href={routes.rss}>RSS</Link>
   </nav>
 }
 export function IndexBackToTop() {
   const { t } = useI18n()
-  return <button type="button" className={"[&&]:ml-auto inline-flex items-center justify-center gap-3 min-h-9.5 cursor-pointer text-[.6875rem] [&:hover]:[text-decoration:underline] [&:hover]:[text-underline-offset:4px] max-[39.9375rem]:[&&]:w-full max-[39.9375rem]:[&&]:ml-0 max-[39.9375rem]:[&&]:justify-start"} onClick={() => window.scrollTo({ top: 0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" })}>
+  return <button type="button" className={"[&&]:ml-auto inline-flex items-center justify-center gap-3 min-h-9.5 cursor-pointer text-[.6875rem] [&:hover]:[text-decoration:underline] [&:hover]:underline-offset-4 max-[39.9375rem]:[&&]:w-full max-[39.9375rem]:[&&]:ml-0 max-[39.9375rem]:[&&]:justify-start"} onClick={() => window.scrollTo({ top: 0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" })}>
     {t.backToTop}<ArrowUp className="size-4" aria-hidden="true" />
   </button>
 }

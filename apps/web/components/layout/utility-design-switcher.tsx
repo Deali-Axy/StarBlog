@@ -28,7 +28,7 @@ export function UtilityDesignSwitcher({ value, onChange }: {
   return (
     <DropdownMenu modal={false} open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
-        <button ref={triggerRef} type="button" aria-label={t.designPreview} title={t.designPreview} className="fixed z-45 grid size-12 cursor-pointer place-items-center border border-border bg-card text-foreground [right:max(20px,env(safe-area-inset-right))] [bottom:calc(80px_+_env(safe-area-inset-bottom))] hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring">
+        <button ref={triggerRef} type="button" aria-label={t.designPreview} title={t.designPreview} className="fixed z-45 grid size-12 cursor-pointer place-items-center border border-border bg-card text-foreground right-[max(20px,env(safe-area-inset-right))] bottom-[calc(80px_+_env(safe-area-inset-bottom))] hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring">
           <Palette size={20} aria-hidden="true" />
         </button>
       </DropdownMenuTrigger>

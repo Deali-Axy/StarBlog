@@ -18,7 +18,7 @@ export function ArchiveControlPanel() {
       navigate({ search: String(new FormData(event.currentTarget).get("search") ?? "").trim() || undefined })
     }}>
       {Object.entries(query).filter(([key, value]) => key !== "search" && key !== "page" && value !== undefined).map(([key, value]) => <input key={key} type="hidden" name={key} value={value} />)}
-      <div className={"flex items-center gap-2 [flex:1] min-w-0 [&_input]:min-w-0 [&_input]:w-full [&_input]:h-9 [&_input]:border-0 [&_input]:rounded-none [&_input]:[background:transparent] [&_input]:text-xs [&_input]:[outline-offset:2px] [&_input::placeholder]:text-muted-foreground"}>
+      <div className={"flex items-center gap-2 flex-1 min-w-0 [&_input]:min-w-0 [&_input]:w-full [&_input]:h-9 [&_input]:border-0 [&_input]:rounded-none [&_input]:[background:transparent] [&_input]:text-xs [&_input]:outline-offset-2 [&_input::placeholder]:text-muted-foreground"}>
         <Search className="size-3.5 shrink-0 text-muted-foreground" aria-hidden="true" />
         <input type="search" name="search" value={searchDraft} onChange={event => setSearchDraft(event.target.value)} aria-label={t.searchPosts} placeholder={t.searchTitle} />
       </div>

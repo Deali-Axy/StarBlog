@@ -27,7 +27,7 @@ export function BlogBreadcrumb({ path }: {
 }
 export function BlogDirectoryFooter() {
   const { t } = useI18n()
-  return <div className={"flex justify-between gap-4 [padding:16px_12px_0] [border-top:1px_solid_var(--border)] text-[.6875rem] text-muted-foreground [&_a]:inline-flex [&_a]:items-center [&_a]:gap-2"}>
+  return <div className={"flex justify-between gap-4 pt-[16px] px-[12px] pb-0 [border-top:1px_solid_var(--border)] text-[.6875rem] text-muted-foreground [&_a]:inline-flex [&_a]:items-center [&_a]:gap-2"}>
     <Link href={routes.blogRandom}><Shuffle className="size-3" />{t.randomPost}</Link>
     <a href={routes.feed}><Rss className="size-3" />{t.subscribe}</a>
   </div>
@@ -44,14 +44,14 @@ export function BlogDirectory({ categories, treeState, title, }: Pick<BlogDesign
   const [open, setOpen] = useState(false)
   return <Sheet open={open} onOpenChange={setOpen}>
     <SheetTrigger asChild>
-      <button type="button" aria-label={t.openCategories} className={"items-center justify-between gap-4 min-h-11 max-w-full [padding:10px_16px] [border:1px_solid_var(--foreground)] text-xs cursor-pointer [&_span]:overflow-hidden [&_span]:text-ellipsis [&_span]:whitespace-nowrap max-[39.9375rem]:[&&]:w-full max-[39.9375rem]:[&&]:[padding:8px_12px] max-[39.9375rem]:[&&]:[border-color:var(--border)] hidden max-[63.9375rem]:inline-flex"}>
+      <button type="button" aria-label={t.openCategories} className={"items-center justify-between gap-4 min-h-11 max-w-full py-[10px] px-[16px] [border:1px_solid_var(--foreground)] text-xs cursor-pointer [&_span]:overflow-hidden [&_span]:text-ellipsis [&_span]:whitespace-nowrap max-[39.9375rem]:[&&]:w-full max-[39.9375rem]:[&&]:py-[8px] max-[39.9375rem]:[&&]:px-[12px] max-[39.9375rem]:[&&]:border-border hidden max-[63.9375rem]:inline-flex"}>
         <span>{t.topicDirectory} / {title}</span><ArrowDownRight className="size-4 shrink-0" />
       </button>
     </SheetTrigger>
     <SheetPortal>
-      <SheetOverlay className={"fixed [inset:0] [z-index:50] [background:rgb(0_0_0_/_.45)] [backdrop-filter:blur(5px)]"} />
-      <SheetContent side="left" data-directory-layout="drawer" className={cn(blogThemeClassName("studio"), "fixed [z-index:50] top-[10dvh] left-[50%] flex flex-col [width:min(340px,_calc(100vw_-_32px))] max-h-[none] [transform:none] border border-border p-3 [box-shadow:0_20px_80px_rgb(0_0_0_/_.2)] bg-card [inset:0_auto_0_0] max-[39.9375rem]:[inset:16px] max-[39.9375rem]:w-auto max-[39.9375rem]:max-h-[none] max-[39.9375rem]:p-3 max-[39.9375rem]:[transform:none] motion-reduce:[&_*]:[transition:none]! motion-reduce:[&_*]:[animation:none]! motion-reduce:[&_*]:[scroll-behavior:auto]!")}>
-        <div className={"flex items-center justify-between gap-4 [padding:4px_12px_16px] [border-bottom:1px_solid_var(--border)] [&_h2]:text-[1.375rem] [&_h2]:font-medium"}>
+      <SheetOverlay className={"fixed inset-0 z-50 [background:rgb(0_0_0_/_.45)] [backdrop-filter:blur(5px)]"} />
+      <SheetContent side="left" data-directory-layout="drawer" className={cn(blogThemeClassName("studio"), "fixed z-50 top-[10dvh] left-[50%] flex flex-col w-[min(340px,_calc(100vw_-_32px))] max-h-[none] transform-none border border-border p-3 [box-shadow:0_20px_80px_rgb(0_0_0_/_.2)] bg-card [inset:0_auto_0_0] max-[39.9375rem]:inset-[16px] max-[39.9375rem]:w-auto max-[39.9375rem]:max-h-[none] max-[39.9375rem]:p-3 max-[39.9375rem]:transform-none motion-reduce:[&_*]:[transition:none]! motion-reduce:[&_*]:animate-none! motion-reduce:[&_*]:scroll-auto!")}>
+        <div className={"flex items-center justify-between gap-4 pt-[4px] px-[12px] pb-[16px] [border-bottom:1px_solid_var(--border)] [&_h2]:text-[1.375rem] [&_h2]:font-medium"}>
           <SheetTitle>{t.topicDirectory}</SheetTitle>
           <SheetClose asChild><button type="button" aria-label={t.close} className={"inline-flex w-9 h-9 items-center justify-center cursor-pointer"}><X className="size-5" /></button></SheetClose>
         </div>
@@ -68,7 +68,7 @@ export function BlogFilters({ title }: {
   const { query, href } = useBlogNavigation()
   if(!query.categoryId && !query.search)
     return null
-  return <div className={"flex flex-wrap gap-2 py-2.5 text-[.6875rem] [&_a]:inline-flex [&_a]:items-center [&_a]:gap-2 [&_a]:max-w-full [&_a]:[padding:4px_8px] [&_a]:border [&_a]:border-border [&_a_span]:overflow-hidden [&_a_span]:text-ellipsis [&_a_span]:whitespace-nowrap [&&]:px-4.5"}>
+  return <div className={"flex flex-wrap gap-2 py-2.5 text-[.6875rem] [&_a]:inline-flex [&_a]:items-center [&_a]:gap-2 [&_a]:max-w-full [&_a]:py-[4px] [&_a]:px-[8px] [&_a]:border [&_a]:border-border [&_a_span]:overflow-hidden [&_a_span]:text-ellipsis [&_a_span]:whitespace-nowrap [&&]:px-4.5"}>
     {query.categoryId ? <BlogLink href={href({ categoryId: undefined })} aria-label={`${t.removeCategory}: ${title}`}><span>{title}</span><X className="size-3 shrink-0" /></BlogLink> : null}
     {query.search ? <BlogLink href={href({ search: undefined })} aria-label={`${t.removeSearch}: ${query.search}`}><span>“{query.search}”</span><X className="size-3 shrink-0" /></BlogLink> : null}
     <BlogLink href={href({ search: undefined, categoryId: undefined, page: 1 })}>{t.clearFilters}</BlogLink>
@@ -84,8 +84,8 @@ export function BlogResults({ posts, children }: {
   const unavailable = posts.totalCount > 0 && !posts.items.length && query.page > posts.totalPages
   return <>
     <div role="status" aria-live="polite" className={pending ? "px-4.5 py-1 font-mono text-[10px] text-primary" : "sr-only"}>{pending ? t.loadingPosts : <span className="sr-only">{t.postCount(posts.totalCount)}</span>}</div>
-    <section aria-label={t.posts} aria-busy={pending} className={"[transition:opacity_.15s] [&[aria-busy=true]]:[opacity:.5] [&&]:flex [&&]:flex-col [&&]:[flex:1] [&&]:min-h-0 [&&_>_nav]:[margin:0] [&&_>_nav]:[padding:12px_14px] [&&_>_nav]:gap-2.5 [&&_>_nav]:bg-background [&&_>_nav_>_div:first-child]:flex [&&_>_nav_>_div:first-child]:flex-wrap [&&_>_nav_>_div:first-child]:items-center [&&_>_nav_>_div:first-child]:gap-2 [&&_>_nav_p]:text-[.5625rem] [&&_>_nav_>_div:last-child]:gap-0 max-[63.9375rem]:[&&_>_nav]:p-5 max-[39.9375rem]:[&&_>_nav]:[padding:16px_10px]"}>
-      <div className={"[&&]:[flex:1] [&&]:min-h-0 [&&]:overflow-y-auto [&&]:overscroll-contain [&&]:[scrollbar-width:thin] max-[63.9375rem]:[&&]:overflow-visible"}>
+    <section aria-label={t.posts} aria-busy={pending} className={"[transition:opacity_.15s] [&[aria-busy=true]]:opacity-50 [&&]:flex [&&]:flex-col [&&]:flex-1 [&&]:min-h-0 [&&_>_nav]:m-0 [&&_>_nav]:py-[12px] [&&_>_nav]:px-[14px] [&&_>_nav]:gap-2.5 [&&_>_nav]:bg-background [&&_>_nav_>_div:first-child]:flex [&&_>_nav_>_div:first-child]:flex-wrap [&&_>_nav_>_div:first-child]:items-center [&&_>_nav_>_div:first-child]:gap-2 [&&_>_nav_p]:text-[.5625rem] [&&_>_nav_>_div:last-child]:gap-0 max-[63.9375rem]:[&&_>_nav]:p-5 max-[39.9375rem]:[&&_>_nav]:py-[16px] max-[39.9375rem]:[&&_>_nav]:px-[10px]"}>
+      <div className={"[&&]:flex-1 [&&]:min-h-0 [&&]:overflow-y-auto [&&]:overscroll-contain [&&]:[scrollbar-width:thin] max-[63.9375rem]:[&&]:overflow-visible"}>
         {posts.items.length ? children : <div className={"flex min-h-[320px] flex-col items-center justify-center gap-4 text-center p-8 [border-block:1px_solid_var(--border)] [&_h2]:text-xl [&_p]:text-[.8125rem] [&_p]:text-muted-foreground [&_a]:[border-bottom:1px_solid_currentColor] [&_a]:pb-1"}>
           <span aria-hidden="true" className="font-mono text-4xl text-muted-foreground">∅</span>
           <h2>{unavailable ? t.pageUnavailable : filtered ? t.noMatchingPosts : t.noPosts}</h2>

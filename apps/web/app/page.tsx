@@ -56,7 +56,7 @@ export default async function HomePage() {
         />
         <HomeHero locale={locale} site={site} overview={overview} photo={photo} topPost={home.topPost} />
 
-        <div className={"w-full max-w-[var(--home-width)] mx-auto px-[1rem]"}>
+        <div className={"w-full max-w-[var(--home-width)] mx-auto px-4"}>
           <FeaturedPosts posts={home.featuredPosts} />
           <LatestPosts posts={latest.items} />
 

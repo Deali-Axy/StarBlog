@@ -27,7 +27,7 @@ export function BlogBreadcrumb({ path }: {
 }
 export function BlogDirectoryFooter() {
   const { t } = useI18n()
-  return <div className={"flex justify-between gap-4 [padding:16px_12px_0] [border-top:1px_solid_var(--border)] text-[.6875rem] text-muted-foreground [&_a]:inline-flex [&_a]:items-center [&_a]:gap-2"}>
+  return <div className={"flex justify-between gap-4 pt-[16px] px-[12px] pb-0 [border-top:1px_solid_var(--border)] text-[.6875rem] text-muted-foreground [&_a]:inline-flex [&_a]:items-center [&_a]:gap-2"}>
     <Link href={routes.blogRandom}><Shuffle className="size-3" />{t.randomPost}</Link>
     <a href={routes.feed}><Rss className="size-3" />{t.subscribe}</a>
   </div>
@@ -42,9 +42,9 @@ export function BlogDirectory({ categories, treeState, title, }: Pick<BlogDesign
       </button>
     </DialogTrigger>
     <DialogPortal>
-      <DialogOverlay className={"fixed [inset:0] [z-index:50] [background:rgb(0_0_0_/_.45)] [backdrop-filter:blur(5px)]"} />
-      <DialogContent data-directory-layout="sheet" className={cn(blogThemeClassName("editorial"), "fixed [z-index:50] top-[10dvh] left-[50%] flex flex-col [width:min(1050px,_calc(100vw_-_64px))] max-h-[80dvh] [transform:translateX(-50%)] border border-border p-8 [box-shadow:0_20px_80px_rgb(0_0_0_/_.2)] bg-card max-w-[840px] max-[39.9375rem]:[inset:16px] max-[39.9375rem]:w-auto max-[39.9375rem]:max-h-[none] max-[39.9375rem]:p-3 max-[39.9375rem]:[transform:none] motion-reduce:[&_*]:[transition:none]! motion-reduce:[&_*]:[animation:none]! motion-reduce:[&_*]:[scroll-behavior:auto]!")}>
-        <div className={"flex items-center justify-between gap-4 [padding:4px_12px_16px] [border-bottom:1px_solid_var(--border)] [&_h2]:text-[1.375rem] [&_h2]:font-medium"}>
+      <DialogOverlay className={"fixed inset-0 z-50 [background:rgb(0_0_0_/_.45)] [backdrop-filter:blur(5px)]"} />
+      <DialogContent data-directory-layout="sheet" className={cn(blogThemeClassName("editorial"), "fixed z-50 top-[10dvh] left-[50%] flex flex-col w-[min(1050px,_calc(100vw_-_64px))] max-h-[80dvh] [transform:translateX(-50%)] border border-border p-8 [box-shadow:0_20px_80px_rgb(0_0_0_/_.2)] bg-card max-w-[840px] max-[39.9375rem]:inset-[16px] max-[39.9375rem]:w-auto max-[39.9375rem]:max-h-[none] max-[39.9375rem]:p-3 max-[39.9375rem]:transform-none motion-reduce:[&_*]:[transition:none]! motion-reduce:[&_*]:animate-none! motion-reduce:[&_*]:scroll-auto!")}>
+        <div className={"flex items-center justify-between gap-4 pt-[4px] px-[12px] pb-[16px] [border-bottom:1px_solid_var(--border)] [&_h2]:text-[1.375rem] [&_h2]:font-medium"}>
           <DialogTitle>{t.topicDirectory}</DialogTitle>
           <DialogClose asChild><button type="button" aria-label={t.close} className={"inline-flex w-9 h-9 items-center justify-center cursor-pointer"}><X className="size-5" /></button></DialogClose>
         </div>
@@ -61,7 +61,7 @@ export function BlogFilters({ title }: {
   const { query, href } = useBlogNavigation()
   if(!query.categoryId && !query.search)
     return null
-  return <div className={"flex flex-wrap gap-2 py-2.5 text-[.6875rem] [&_a]:inline-flex [&_a]:items-center [&_a]:gap-2 [&_a]:max-w-full [&_a]:[padding:4px_8px] [&_a]:rounded-md [&_a]:bg-muted [&_a_span]:overflow-hidden [&_a_span]:text-ellipsis [&_a_span]:whitespace-nowrap"}>
+  return <div className={"flex flex-wrap gap-2 py-2.5 text-[.6875rem] [&_a]:inline-flex [&_a]:items-center [&_a]:gap-2 [&_a]:max-w-full [&_a]:py-[4px] [&_a]:px-[8px] [&_a]:rounded-md [&_a]:bg-muted [&_a_span]:overflow-hidden [&_a_span]:text-ellipsis [&_a_span]:whitespace-nowrap"}>
     {query.categoryId ? <BlogLink href={href({ categoryId: undefined })} aria-label={`${t.removeCategory}: ${title}`}><span>{title}</span><X className="size-3 shrink-0" /></BlogLink> : null}
     {query.search ? <BlogLink href={href({ search: undefined })} aria-label={`${t.removeSearch}: ${query.search}`}><span>“{query.search}”</span><X className="size-3 shrink-0" /></BlogLink> : null}
     <BlogLink href={href({ search: undefined, categoryId: undefined, page: 1 })}>{t.clearFilters}</BlogLink>
@@ -77,7 +77,7 @@ export function BlogResults({ posts, children }: {
   const unavailable = posts.totalCount > 0 && !posts.items.length && query.page > posts.totalPages
   return <>
     <div role="status" aria-live="polite" className={"min-h-5 text-[.6875rem] text-primary"}>{pending ? t.loadingPosts : <span className="sr-only">{t.postCount(posts.totalCount)}</span>}</div>
-    <section aria-label={t.posts} aria-busy={pending} className={"[transition:opacity_.15s] [&[aria-busy=true]]:[opacity:.5]"}>
+    <section aria-label={t.posts} aria-busy={pending} className={"[transition:opacity_.15s] [&[aria-busy=true]]:opacity-50"}>
       <div className={""}>
         {posts.items.length ? children : <div className={"flex min-h-[320px] flex-col items-center justify-center gap-4 text-center p-8 rounded-2xl bg-card [&_h2]:text-xl [&_p]:text-[.8125rem] [&_p]:text-muted-foreground [&_a]:[border-bottom:1px_solid_currentColor] [&_a]:pb-1"}>
           <span aria-hidden="true" className="font-mono text-4xl text-muted-foreground">∅</span>

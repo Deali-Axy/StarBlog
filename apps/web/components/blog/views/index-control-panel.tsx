@@ -13,12 +13,12 @@ export function IndexControlPanel() {
   const { t } = useI18n()
   const { query, href, navigate } = useBlogNavigation()
   return <div className={"flex items-center gap-5 py-4 max-[39.9375rem]:flex-wrap max-[39.9375rem]:gap-1 max-[39.9375rem]:py-2.5"}>
-    <form action={routes.blog} method="get" className={"flex items-center gap-2 min-w-0 [flex:1] max-[39.9375rem]:[flex-basis:100%] max-[39.9375rem]:[border-bottom:1px_solid_var(--border)]"} onSubmit={(event) => {
+    <form action={routes.blog} method="get" className={"flex items-center gap-2 min-w-0 flex-1 max-[39.9375rem]:basis-full max-[39.9375rem]:[border-bottom:1px_solid_var(--border)]"} onSubmit={(event) => {
       event.preventDefault()
       navigate({ search: String(new FormData(event.currentTarget).get("search") ?? "").trim() || undefined })
     }}>
       {Object.entries(query).filter(([key, value]) => key !== "search" && key !== "page" && value !== undefined).map(([key, value]) => <input key={key} type="hidden" name={key} value={value} />)}
-      <div className={"flex items-center gap-2.5 [flex:1] min-w-0 [&_input]:min-w-0 [&_input]:w-full [&_input]:h-10 [&_input]:border-0 [&_input]:rounded-none [&_input]:[background:transparent] [&_input]:text-[.8125rem] [&_input]:[outline-offset:2px] [&_input::placeholder]:text-muted-foreground"}>
+      <div className={"flex items-center gap-2.5 flex-1 min-w-0 [&_input]:min-w-0 [&_input]:w-full [&_input]:h-10 [&_input]:border-0 [&_input]:rounded-none [&_input]:[background:transparent] [&_input]:text-[.8125rem] [&_input]:outline-offset-2 [&_input::placeholder]:text-muted-foreground"}>
         <Search className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
         <input type="search" name="search" value={searchDraft} onChange={event => setSearchDraft(event.target.value)} aria-label={t.searchPosts} placeholder={t.searchTitle} />
       </div>

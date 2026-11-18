@@ -31,24 +31,24 @@ export function FolioSiteNav() {
 export function FolioHeaderTools() {
   const { t } = useI18n()
   return <div className={"flex items-center gap-1 ml-auto shrink-0 max-[39.9375rem]:gap-px"}>
-    <Link href={routes.search} className={"inline-flex items-center justify-center shrink-0 min-w-9.5 w-9.5 h-9.5 border-0 rounded-none p-0 [color:inherit] [background:transparent] [box-shadow:none] cursor-pointer [letter-spacing:0] [&:hover]:bg-muted [&:hover]:text-foreground max-[39.9375rem]:min-w-8.5 max-[39.9375rem]:w-8.5 max-[39.9375rem]:h-9.5"} aria-label={t.searchPosts} title={t.searchPosts}><Search className="size-4" /></Link>
+    <Link href={routes.search} className={"inline-flex items-center justify-center shrink-0 min-w-9.5 w-9.5 h-9.5 border-0 rounded-none p-0 text-inherit [background:transparent] [box-shadow:none] cursor-pointer tracking-[0] [&:hover]:bg-muted [&:hover]:text-foreground max-[39.9375rem]:min-w-8.5 max-[39.9375rem]:w-8.5 max-[39.9375rem]:h-9.5"} aria-label={t.searchPosts} title={t.searchPosts}><Search className="size-4" /></Link>
 
-    <ThemeToggle iconOnly className={"inline-flex items-center justify-center shrink-0 min-w-9.5 w-9.5 h-9.5 border-0 rounded-none p-0 [color:inherit] [background:transparent] [box-shadow:none] cursor-pointer [letter-spacing:0] [&:hover]:bg-muted [&:hover]:text-foreground max-[39.9375rem]:min-w-8.5 max-[39.9375rem]:w-8.5 max-[39.9375rem]:h-9.5"} />
-    <LanguageToggle className={"inline-flex items-center justify-center shrink-0 min-w-13 w-auto h-9.5 border-0 rounded-none p-0 [color:inherit] [background:transparent] [box-shadow:none] cursor-pointer [letter-spacing:0] px-1 text-[.6875rem] [&:hover]:bg-muted [&:hover]:text-foreground max-[39.9375rem]:min-w-12"} />
+    <ThemeToggle iconOnly className={"inline-flex items-center justify-center shrink-0 min-w-9.5 w-9.5 h-9.5 border-0 rounded-none p-0 text-inherit [background:transparent] [box-shadow:none] cursor-pointer tracking-[0] [&:hover]:bg-muted [&:hover]:text-foreground max-[39.9375rem]:min-w-8.5 max-[39.9375rem]:w-8.5 max-[39.9375rem]:h-9.5"} />
+    <LanguageToggle className={"inline-flex items-center justify-center shrink-0 min-w-13 w-auto h-9.5 border-0 rounded-none p-0 text-inherit [background:transparent] [box-shadow:none] cursor-pointer tracking-[0] px-1 text-[.6875rem] [&:hover]:bg-muted [&:hover]:text-foreground max-[39.9375rem]:min-w-12"} />
 
   </div>
 }
 export function FolioFooterNav() {
   const { t } = useI18n()
   const links = useBlogSiteLinks().filter(({ href }) => href !== routes.home)
-  return <nav aria-label={t.footerNavigation} className={"flex justify-center flex-wrap gap-8 [margin-block:32px_40px] text-xs [&_a:hover]:text-primary [&_a:hover]:[text-decoration:underline] [&_a:hover]:[text-underline-offset:5px] max-[39.9375rem]:gap-6 max-[39.9375rem]:[margin-block:28px] max-[39.9375rem]:text-[.6875rem]"}>
+  return <nav aria-label={t.footerNavigation} className={"flex justify-center flex-wrap gap-8 mbs-[32px] mbe-[40px] text-xs [&_a:hover]:text-primary [&_a:hover]:[text-decoration:underline] [&_a:hover]:underline-offset-5 max-[39.9375rem]:gap-6 max-[39.9375rem]:my-[28px] max-[39.9375rem]:text-[.6875rem]"}>
     {links.map(({ href, label }) => <BlogStyleLink key={href} href={href}>{label}</BlogStyleLink>)}
     <Link href={routes.rss}>RSS</Link>
   </nav>
 }
 export function FolioBackToTop() {
   const { t } = useI18n()
-  return <button type="button" className={"inline-flex items-center justify-center gap-3 min-h-9.5 cursor-pointer text-[.6875rem] [&:hover]:[text-decoration:underline] [&:hover]:[text-underline-offset:4px]"} onClick={() => window.scrollTo({ top: 0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" })}>
+  return <button type="button" className={"inline-flex items-center justify-center gap-3 min-h-9.5 cursor-pointer text-[.6875rem] [&:hover]:[text-decoration:underline] [&:hover]:underline-offset-4"} onClick={() => window.scrollTo({ top: 0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" })}>
     {t.backToTop}<ArrowUp className="size-4" aria-hidden="true" />
   </button>
 }

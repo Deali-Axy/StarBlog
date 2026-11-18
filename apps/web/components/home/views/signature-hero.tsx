@@ -8,7 +8,7 @@ import type { HomeHeroProps } from "../home-hero-props"
 export function SignatureHero({ locale, site, overview, topPost }: HomeHeroProps) {
   const t = messages[locale]
   const name = site.authorName.replace(/\s*[(（].*?[)）]\s*$/u, "")
-  return <section data-home-hero="signature" aria-labelledby="home-hero-name" className={cn("w-full max-w-[var(--home-width)] mx-auto px-[1rem]", "pt-8 pb-10")}>
+  return <section data-home-hero="signature" aria-labelledby="home-hero-name" className={cn("w-full max-w-[var(--home-width)] mx-auto px-4", "pt-8 pb-10")}>
 
     <div className={"border-b border-foreground py-10 sm:py-14"}>
       <p style={{ zoom: "var(--home-scale)" }} className="mb-5 text-xs tracking-[.2em] text-primary">{t.personalJournal} / {t.hero}</p>

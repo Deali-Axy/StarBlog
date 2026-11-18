@@ -8,7 +8,7 @@ import Link from "next/link"
 export function ContactFooter() {
   const { t, locale } = useI18n()
   const author = getSite(locale)
-  return <footer data-home-footer={"contact"} className={cn("w-full max-w-[var(--home-width)] mx-auto px-[1rem]", "pt-12 pb-24 sm:pb-12")}>
+  return <footer data-home-footer={"contact"} className={cn("w-full max-w-[var(--home-width)] mx-auto px-4", "pt-12 pb-24 sm:pb-12")}>
     <div data-home-surface={""} data-home-padding={""} className={"flex flex-wrap items-end justify-between gap-8 border border-border bg-card [box-shadow:var(--home-shadow)] p-[calc(1.5rem*var(--home-density))]"}>
       <div className="min-w-0">
         <p className="font-heading text-[clamp(1.5rem,3vw,2rem)] tracking-[-.04em]">{author.authorName}<span className="ml-3 text-primary" aria-hidden="true">＊</span></p>

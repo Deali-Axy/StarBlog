@@ -15,7 +15,7 @@ export function CoverHero({ locale, site, overview, photo, topPost }: HomeHeroPr
   const name = identity?.[1]?.trim() || site.authorName
   const alias = identity?.[2]?.trim()
   const hasVisual = Boolean(photo || topPost)
-  return (<section data-home-hero="cover" className={cn("w-full max-w-[var(--home-width)] mx-auto px-[1rem]", "pt-8 pb-10", "[&_:is(a,button)]:[-webkit-tap-highlight-color:transparent] [&_:is(a,button):focus-visible]:outline-2 [&_:is(a,button):focus-visible]:outline-solid [&_:is(a,button):focus-visible]:outline-offset-4 [&_:is(a,button):focus-visible]:outline-(--hero-ink)", "motion-reduce:[&_*]:transition-none! motion-reduce:[&_*]:animate-none! motion-reduce:[&_*::before]:transition-none! motion-reduce:[&_*::before]:animate-none! motion-reduce:[&_*::after]:transition-none! motion-reduce:[&_*::after]:animate-none!")} aria-labelledby="home-hero-name">
+  return (<section data-home-hero="cover" className={cn("w-full max-w-[var(--home-width)] mx-auto px-4", "pt-8 pb-10", "[&_:is(a,button)]:[-webkit-tap-highlight-color:transparent] [&_:is(a,button):focus-visible]:outline-2 [&_:is(a,button):focus-visible]:outline-solid [&_:is(a,button):focus-visible]:outline-offset-4 [&_:is(a,button):focus-visible]:outline-(--hero-ink)", "motion-reduce:[&_*]:transition-none! motion-reduce:[&_*]:animate-none! motion-reduce:[&_*::before]:transition-none! motion-reduce:[&_*::before]:animate-none! motion-reduce:[&_*::after]:transition-none! motion-reduce:[&_*::after]:animate-none!")} aria-labelledby="home-hero-name">
     <div className="flex flex-wrap items-center justify-between gap-3 pt-6 text-xs tracking-widest">
       <span className="flex items-center gap-2.5">
         <span className="size-1.5 rounded-full bg-(--hero-ink)" />

@@ -14,7 +14,7 @@ export function PhotographHero({ locale, site, overview, topPost, photo }: HomeH
   const name = site.authorName.replace(/\s*[(（].*?[)）]\s*$/u, "")
   if(!photo || failedPhoto === photo.id)
     return <><SignatureHero locale={locale} site={site} overview={overview} topPost={topPost} /><p style={{ zoom: "var(--home-scale)" }} role="status" className="mx-auto w-full max-w-(--home-width) px-4 pb-4 text-xs text-muted-foreground">{t.homePhotoFallback}</p></>
-  return <section data-home-hero="photograph" aria-labelledby="home-hero-name" className={cn("w-full max-w-[var(--home-width)] mx-auto px-[1rem]", "pt-8 pb-10")}>
+  return <section data-home-hero="photograph" aria-labelledby="home-hero-name" className={cn("w-full max-w-[var(--home-width)] mx-auto px-4", "pt-8 pb-10")}>
     {photo ? <FullWidthHeroPhoto photo={photo} onFailure={() => setFailedPhoto(photo.id)} /> : null}
     <div className={"border-b border-foreground py-10 sm:py-14 bg-background"}>
       <p style={{ zoom: "var(--home-scale)" }} className="mb-5 text-xs tracking-[.2em] text-primary">{t.personalJournal} / {t.hero}</p>
