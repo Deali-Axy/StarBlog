@@ -30,9 +30,9 @@ export function ArchiveCategoryTree({ categoryNodes, state, onSelect, className 
     </Collapsible>)
   }
   return (<nav className={cn("flex min-h-0 flex-col", className)} aria-label={t.categoryTree}>
-    <div className="shrink-0 px-3 pt-4 pb-3">
-      <p className={"mb-3 px-1 text-xs font-medium tracking-wider text-muted-foreground font-mono uppercase"}>
-        {t.browseCategories}
+    <div className="shrink-0 px-3 py-3">
+      <p className={"mb-2 px-1 text-xs font-medium tracking-wider text-muted-foreground font-mono uppercase"}>
+        {t.topicDirectory}
       </p>
       <div className="relative">
         <Search className="pointer-events-none absolute top-3 left-3 size-3.5 text-muted-foreground" />
@@ -41,7 +41,7 @@ export function ArchiveCategoryTree({ categoryNodes, state, onSelect, className 
       </div>
     </div>
     <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 pb-3 [scrollbar-width:thin]">
-      <BlogLink data-category-all href={href({ categoryId: undefined })} onClick={onSelect} aria-current={!query.categoryId ? "page" : undefined} className={cn("mb-3 flex min-h-11 items-center gap-2.5 rounded-lg px-3 text-sm font-medium", !query.categoryId ? "bg-accent text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground")}>
+      <BlogLink data-category-all href={href({ categoryId: undefined })} onClick={onSelect} aria-current={!query.categoryId ? "page" : undefined} className={cn("mb-2 flex min-h-11 items-center gap-2.5 rounded-lg px-3 text-sm font-medium", !query.categoryId ? "bg-accent text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground")}>
         <Library className="size-4" />{t.allPosts}
       </BlogLink>
       <div data-category-roots className="">{filtered.length ? filtered.map((node) => nodeView(node)) : <p className="px-3 py-8 text-sm text-muted-foreground">{searching ? t.noMatchingCategories : t.noCategories}</p>}</div>

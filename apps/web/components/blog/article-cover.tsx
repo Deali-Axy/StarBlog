@@ -10,7 +10,7 @@ type Candidate = NonNullable<PostResponse["coverImages"]>[number]
 const singleSizes = "(max-width: 639px) calc(100vw - 32px), (max-width: 1023px) 55vw, 700px"
 
 /** One shared frame keeps both presentations stable while bad candidates fall through. */
-export function ArticleCover({ post, eager = false, mode = "collage" }: { post: PostResponse; eager?: boolean; mode?: CoverMode }) {
+export function ArticleCover({ post, eager = false, mode = "collage", className }: { post: PostResponse; eager?: boolean; mode?: CoverMode; className?: string }) {
   const [rejected, setRejected] = useState<string[]>([])
   const candidates = post.coverImages?.filter((image, index, items) => !rejected.includes(image.url) && items.findIndex(item => item.url === image.url) === index) ?? []
   const images = candidates.slice(0, mode === "collage" ? 3 : 1)
@@ -18,7 +18,7 @@ export function ArticleCover({ post, eager = false, mode = "collage" }: { post: 
   const collage = images.length > 1
   const reject = (url: string) => setRejected(current => current.includes(url) ? current : [...current, url])
   return <span data-article-cover data-cover-mode={collage ? "collage" : "single"} data-cover-count={images.length}
-    className="relative mt-6 block aspect-[3/2] w-full overflow-hidden bg-muted/50 group-[&:nth-child(4n+2)]:order-[-1] group-[&:nth-child(4n+2)]:mb-6 group-[&:nth-child(4n+2)]:mt-0 group-[&:nth-child(4n+2)]:aspect-[4/3]">
+    className={cn("relative mt-6 block aspect-[3/2] w-full overflow-hidden bg-muted/50 group-[&:nth-child(4n+2)]:order-[-1] group-[&:nth-child(4n+2)]:mb-6 group-[&:nth-child(4n+2)]:mt-0 group-[&:nth-child(4n+2)]:aspect-[4/3]", className)}>
     {collage ? <span className={cn("absolute inset-0 grid gap-1", images.length === 2 ? "grid-cols-2" : "grid-cols-[minmax(0,1.65fr)_minmax(0,1fr)] grid-rows-2")}>
       {images.map((image, index) => <span key={image.url} className={cn("relative min-h-0 min-w-0 overflow-hidden", images.length === 3 && index === 0 && "row-span-2")}>
         <CoverImage image={image} post={post} cropped eager={eager && index === 0} onReject={reject} compact
