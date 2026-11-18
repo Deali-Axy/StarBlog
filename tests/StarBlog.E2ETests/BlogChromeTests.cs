@@ -36,9 +36,14 @@ public sealed class BlogChromeTests {
         var footer = page.GetByRole(AriaRole.Contentinfo);
         await Expect(chrome).ToHaveAttributeAsync("data-blog-chrome", variant);
         await Expect(header).ToHaveAttributeAsync("data-blog-header", variant);
-        await Expect(footer).ToHaveAttributeAsync("data-blog-footer", variant);
         await Expect(header).ToHaveCountAsync(1);
-        await Expect(footer).ToHaveCountAsync(1);
+        if (variant == "studio") {
+            // The archive collection fills the viewport; its footer is article-only.
+            await Expect(footer).ToHaveCountAsync(0);
+        } else {
+            await Expect(footer).ToHaveAttributeAsync("data-blog-footer", variant);
+            await Expect(footer).ToHaveCountAsync(1);
+        }
         var preview = page.GetByRole(AriaRole.Button, new() { Name = "风格预览", Exact = true });
         await Expect(preview).ToHaveCountAsync(1);
         await Expect(preview).ToHaveCSSAsync("position", "fixed");
@@ -76,18 +81,21 @@ public sealed class BlogChromeTests {
             await Expect(active).ToHaveAttributeAsync("aria-current", "page");
             await Expect(active).ToBeVisibleAsync();
         }
-        await page.Locator("main h1").ClickAsync();
+        // The editorial heading is screen-reader-only; only its focus outline needs clearing.
+        await page.EvaluateAsync("() => { if (document.activeElement instanceof HTMLElement) document.activeElement.blur(); }");
         await SaveAsync(page, $"chrome-{variant}-{width}-{theme}-header");
         var article = page.Locator("[data-blog-article]").First;
         var articleTitle = await article.GetByRole(AriaRole.Heading).InnerTextAsync();
         var articleHref = (await article.GetByRole(AriaRole.Link).GetAttributeAsync("href"))!;
         Assert.Contains($"bv={variant}", articleHref);
-        await footer.ScrollIntoViewIfNeededAsync();
-        Assert.False(await page.EvaluateAsync<bool>("document.documentElement.scrollWidth > innerWidth"));
-        await Expect(footer.GetByRole(AriaRole.Link, new() { Name = "文章", Exact = true })).ToHaveAttributeAsync("href", $"/blog?bv={variant}");
-        await SaveAsync(page, $"chrome-{variant}-{width}-{theme}-footer");
-        await footer.GetByRole(AriaRole.Button, new() { Name = "回到顶部", Exact = true }).ClickAsync();
-        Assert.Equal(0, await page.EvaluateAsync<int>("Math.round(scrollY)"));
+        if (variant != "studio") {
+            await footer.ScrollIntoViewIfNeededAsync();
+            Assert.False(await page.EvaluateAsync<bool>("document.documentElement.scrollWidth > innerWidth"));
+            await Expect(footer.GetByRole(AriaRole.Link, new() { Name = "文章", Exact = true })).ToHaveAttributeAsync("href", $"/blog?bv={variant}");
+            await SaveAsync(page, $"chrome-{variant}-{width}-{theme}-footer");
+            await footer.GetByRole(AriaRole.Button, new() { Name = "回到顶部", Exact = true }).ClickAsync();
+            Assert.Equal(0, await page.EvaluateAsync<int>("Math.round(scrollY)"));
+        }
         await article.GetByRole(AriaRole.Link).ClickAsync();
         await Expect(page.Locator("[data-blog-article-detail]")).ToBeVisibleAsync();
         await Expect(page.Locator("main h1").First).ToHaveTextAsync(articleTitle);
@@ -119,6 +127,7 @@ public sealed class BlogChromeTests {
         var originalUrl = new Uri(page.Url);
         var articles = await page.Locator("[data-blog-article] h2").AllTextContentsAsync();
         var trigger = page.Locator("[data-blog-preview-trigger]");
+        await Expect(trigger).ToBeEnabledAsync();
         await trigger.FocusAsync();
         await page.Keyboard.PressAsync("Enter");
         await page.Keyboard.PressAsync("Home");

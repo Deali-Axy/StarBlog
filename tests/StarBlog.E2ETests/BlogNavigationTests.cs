@@ -80,7 +80,8 @@ public sealed class BlogNavigationTests {
             var tree = page.GetByRole(AriaRole.Navigation, new() { Name = "分类目录", Exact = true });
             Assert.True(await tree.EvaluateAsync<bool>("el => el.getBoundingClientRect().bottom <= innerHeight"));
         }
-        await page.Locator("main h1").ClickAsync();
+        // The editorial heading is screen-reader-only; clear focus without clicking it.
+        await page.EvaluateAsync("() => { if (document.activeElement instanceof HTMLElement) document.activeElement.blur(); }");
         var screenshotDirectory = Environment.GetEnvironmentVariable("E2E_SCREENSHOT_DIR");
         if (!string.IsNullOrWhiteSpace(screenshotDirectory)) {
             Directory.CreateDirectory(screenshotDirectory);
@@ -285,7 +286,7 @@ public sealed class BlogNavigationTests {
         await using var browser = await LaunchAsync(playwright);
         var page = await NewPageAsync(browser, 375);
         await page.GotoAsync($"{baseUrl}/blog?bv=invalid&view=list&pageSize=6");
-        await Expect(page.Locator("[data-blog-variant]")).ToHaveAttributeAsync("data-blog-variant", "library");
+        await Expect(page.Locator("[data-blog-variant]")).ToHaveAttributeAsync("data-blog-variant", "editorial");
         await BlogPreview.SelectAsync(page, "档案工作台");
         var open = page.GetByRole(AriaRole.Button, new() { Name = "打开分类目录", Exact = true });
         await open.ClickAsync();
