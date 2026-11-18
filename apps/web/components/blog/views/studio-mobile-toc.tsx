@@ -21,7 +21,7 @@ export function ArchiveMobileTOC() {
     </ol>
 
   </nav>
-  return <details className={cn("group/toc col-span-full row-start-3 mt-6 border-y border-border lg:hidden", nativeStyles.mobileContents, "mt-0 border border-t-0 border-border bg-muted px-5 sm:px-8")}>
+  return <details className={cn("group/toc col-span-full row-start-2 mt-6 border-y border-border lg:hidden", nativeStyles.mobileContents, "mt-0 border border-t-0 border-border bg-muted px-5 sm:px-8")}>
     <summary className="flex min-h-12 cursor-pointer list-none items-center gap-2 text-xs">
       <List size={16} aria-hidden="true" /><span>{t.toc}</span>
       <small className="ml-auto font-mono text-xs text-muted-foreground">{t.sectionCount(items.length)}</small>
